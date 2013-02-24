@@ -1,0 +1,2 @@
+int mpiSetup( int , char *[] );
+
