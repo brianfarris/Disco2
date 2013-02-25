@@ -33,13 +33,14 @@ enum{C_FIXED,C_WCELL,C_WRIEMANN,C_RIGID};
 #define CS_FLOOR 0.0001
 #define CS_CAP 1.0
 #define VEL_CAP 10.0
-//struct Grid *theGrid;
 
+/*
 int MyProc,NumProcs;
 int dim_MyProc[2];
 int dim_NumProcs[2];
 int left_Proc[2];
 int right_Proc[2];
+*/
 
 MPI_Comm grid_comm;
 

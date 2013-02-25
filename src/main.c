@@ -5,16 +5,21 @@
 #include "Headers/Grid.h"
 #include "Headers/Face.h"
 #include "Headers/GravMass.h"
-#include "Headers/onestep.h"
 #include "Headers/IO.h"
+#include "Headers/TimeStep.h"
 #include "Headers/header.h"
+//int mpiSetup( int, char ** );
 
 int main(int argc, char **argv) {
 
   // start MPI 
-  int error = mpiSetup(argc,argv);
-  if (error==1) return(0);
-  
+  // int error = mpiSetup(argc,argv);
+  // if (error==1) return(0);
+  struct MPIsetup * theMPIsetup = mpisetup_create(argc,argv);
+  mpisetup_setprocs(theMPIsetup);
+  mpisetup_cart_create(theMPIsetup);
+  mpisetup_left_right(theMPIsetup);
+
   //grid
   struct Grid * theGrid = grid_create();
   grid_set_N_p(theGrid);
@@ -25,13 +30,13 @@ int main(int argc, char **argv) {
   struct GravMass *theGravMasses = gravMass_create(NP);
   gravMass_initialize(theGravMasses);
   gravMass_clean_pi(theGravMasses);
-  
+
   // allocate memory for data 
   struct Cell ***theCells = cell_create(theGrid);
   cell_clean_pi(theCells,theGrid);
   // set initial data 
   cell_init(theCells,theGrid);
- 
+
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid);
   cell_syncproc_z(theCells,theGrid);
@@ -41,22 +46,23 @@ int main(int argc, char **argv) {
 
   double dtcheck = T_MAX/NUM_CHECKPOINTS;
   double tcheck = dtcheck;
-  
+
   int nfile=0;
   char filename[256];
 
-  double t  = 0.0;
-  while( t < T_MAX ){
-    double dt = cell_mindt( theCells ,theGrid);
-    printf("t: %e, dt: %e\n",t,dt);
-    if( t+dt > T_MAX ) dt = T_MAX-t;
+  struct TimeStep * theTimeStep = timestep_create();
+  while( timestep_get_t(theTimeStep) < T_MAX ){
+    timestep_set_dt(theTimeStep,theCells,theGrid);
+    printf("t: %e\n",timestep_get_t(theTimeStep));
     cell_copy(theCells,theGrid);
     gravMass_copy(theGravMasses);
-    onestep(theCells,theGrid,theGravMasses,dt,0.0);
-    onestep(theCells,theGrid,theGravMasses,.5*dt,0.5);
-    onestep_Psi(theCells,theGrid,dt);
-    t += dt; 
-    if( t>tcheck){
+    timestep_set_RK(theTimeStep,0.0);
+    timestep_substep(theTimeStep,theCells,theGrid,theGravMasses,1.0);
+    timestep_set_RK(theTimeStep,0.5);
+    timestep_substep(theTimeStep,theCells,theGrid,theGravMasses,0.5);
+    timestep_update_Psi(theTimeStep,theCells,theGrid);
+    timestep_update_t(theTimeStep); 
+    if( timestep_get_t(theTimeStep)>tcheck){
       sprintf(filename,"checkpoint_%04d.h5",nfile);
       struct io *outPrims = io_create(theGrid);
       io_flattened_prim(outPrims,theCells,theGrid);
@@ -66,19 +72,19 @@ int main(int argc, char **argv) {
       ++nfile;
     }
   }
-/*
-  cell_printscreen(theCells,theGrid);
-  struct io *outPrims = io_new(theGrid);
-  io_flattened_prim(outPrims,theCells,theGrid);
+  /*
+     cell_printscreen(theCells,theGrid);
+     struct io *outPrims = io_new(theGrid);
+     io_flattened_prim(outPrims,theCells,theGrid);
 
-  io_hdf5_out(outPrims,theGrid);
-  io_delete(outPrims,theGrid);
+     io_hdf5_out(outPrims,theGrid);
+     io_delete(outPrims,theGrid);
 
-  struct io *input_prims = io_new(theGrid);
-  io_hdf5_in(input_prims,theGrid);
-  io_unflattened_prim(outPrims,theCells,theGrid);
-  io_delete(input_prims,theGrid);
-*/
+     struct io *input_prims = io_new(theGrid);
+     io_hdf5_in(input_prims,theGrid);
+     io_unflattened_prim(outPrims,theCells,theGrid);
+     io_delete(input_prims,theGrid);
+     */
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid);
   cell_syncproc_z(theCells,theGrid);
@@ -89,8 +95,8 @@ int main(int argc, char **argv) {
   gravMass_destroy(theGravMasses);
 
   // exit MPI 
-  MPI_Barrier(grid_comm);
-  MPI_Finalize();
-
+  //MPI_Barrier(grid_comm);
+  //MPI_Finalize();
+  mpisetup_destroy(theMPIsetup);
   return(0);
 }

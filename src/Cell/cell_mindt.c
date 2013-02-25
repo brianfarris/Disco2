@@ -8,9 +8,6 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-
-
-
 double maxvel(double * prim , double w , double r ){
 
   double Pp  = prim[PPP];

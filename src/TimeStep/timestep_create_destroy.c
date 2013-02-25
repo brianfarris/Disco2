@@ -6,6 +6,7 @@
 
 struct TimeStep *timestep_create() {
   struct TimeStep *theTimeStep = (struct TimeStep *) malloc(sizeof(struct TimeStep));
+  theTimeStep->t = 0.0;
   return theTimeStep;
 }
 

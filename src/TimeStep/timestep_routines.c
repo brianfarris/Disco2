@@ -1,14 +1,34 @@
-#include <stdio.h>
+#define TIMESTEP_PRIVATE_DEFS
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
-#include "../Headers/cell.h"
-#include "../Headers/grid.h"
-#include "../Headers/face.h"
+#include "../Headers/Cell.h"
+#include "../Headers/TimeStep.h"
+#include "../Headers/Grid.h"
+#include "../Headers/Cell.h"
 #include "../Headers/GravMass.h"
-#include "../Headers/onestep.h"
+#include "../Headers/Face.h"
+#include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
-void onestep(struct Cell *** theCells,struct Grid * theGrid,struct GravMass * theGravMasses,double dt,double RK){
+void timestep_set_dt(struct TimeStep * theTimeStep, struct Cell *** theCells, struct Grid * theGrid){
+  theTimeStep->dt = cell_mindt(theCells,theGrid);
+  if( theTimeStep->t+theTimeStep->dt > T_MAX ) {
+    theTimeStep->dt = T_MAX-theTimeStep->t;
+  }
+}
+void timestep_update_t(struct TimeStep * theTimeStep){
+  theTimeStep->t += theTimeStep->dt;
+}
+void timestep_set_RK(struct TimeStep * theTimeStep,double RK){
+  theTimeStep->RK = RK;
+}
+double timestep_get_t(struct TimeStep * theTimeStep){
+  return(theTimeStep->t);
+}
+
+void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,struct Grid * theGrid,struct GravMass * theGravMasses,double timestep_fac){
+  double dt = timestep_fac*theTimeStep->dt;
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int *nri = malloc(N_r_withghost*sizeof(int));
@@ -21,7 +41,7 @@ void onestep(struct Cell *** theCells,struct Grid * theGrid,struct GravMass * th
   cell_clear_w(theCells,theGrid);
   if( MOVE_CELLS == C_WCELL ) cell_set_wcell( theCells ,theGrid);
   if( MOVE_CELLS == C_RIGID ) cell_set_wrigid( theCells ,theGrid);
-  cell_adjust_RK_cons( theCells, theGrid, RK);
+  cell_adjust_RK_cons( theCells, theGrid, theTimeStep->RK);
 
   cell_clear_divB(theCells,theGrid);
   cell_clear_GradPsi(theCells,theGrid);
@@ -47,7 +67,7 @@ void onestep(struct Cell *** theCells,struct Grid * theGrid,struct GravMass * th
   //forceGravMasss( theCells , theGravMasses );
 
   //Bookkeeping
-  cell_update_phi( theCells ,theGrid, RK , dt );
+  cell_update_phi( theCells ,theGrid, theTimeStep->RK , dt );
   cell_update_dphi( theCells ,theGrid);
   // update_RK_gravMasses( theGravMasses , RK , dt );
   cell_calc_prim( theCells ,theGrid);
@@ -71,7 +91,7 @@ void onestep(struct Cell *** theCells,struct Grid * theGrid,struct GravMass * th
 
 }
 
-void onestep_Psi( struct Cell *** theCells , struct Grid * theGrid, double dt ){
+void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCells , struct Grid * theGrid){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
@@ -79,7 +99,7 @@ void onestep_Psi( struct Cell *** theCells , struct Grid * theGrid, double dt ){
   for( k=0 ; k<N_z_withghost ; ++k ){
     for( i=0 ; i<N_r_withghost ; ++i ){
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-        cell_mult_psi(cell_pointer(theCells,i,j,k),exp(-dt*DIVB_CH/DIVB_L));
+        cell_mult_psi(cell_pointer(theCells,i,j,k),exp(-theTimeStep->dt*DIVB_CH/DIVB_L));
       }
     }
   }
