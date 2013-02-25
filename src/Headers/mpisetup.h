@@ -25,4 +25,10 @@ int mpisetup_check_rin_bndry(struct MPIsetup * );
 int mpisetup_check_rout_bndry(struct MPIsetup * );
 int mpisetup_check_zbot_bndry(struct MPIsetup * );
 int mpisetup_check_ztop_bndry(struct MPIsetup * );
+int mpisetup_MyProc(struct MPIsetup * );
+int * mpisetup_dim_MyProc(struct MPIsetup * );
+int * mpisetup_dim_NumProcs(struct MPIsetup * );
+int * mpisetup_left_Proc(struct MPIsetup * );
+int * mpisetup_right_Proc(struct MPIsetup * );
+
 #endif

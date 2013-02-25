@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../Headers/grid.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
 void grid_set_N_p(struct Grid * theGrid){
@@ -11,9 +12,9 @@ void grid_set_N_p(struct Grid * theGrid){
   }
 }
 
-void grid_set_rz(struct Grid * theGrid){
-  int N_r_0 = theGrid->N_r*dim_MyProc[0];
-  int N_z_0 = theGrid->N_z*dim_MyProc[1];
+void grid_set_rz(struct Grid * theGrid,struct MPIsetup * theMPIsetup){
+  int N_r_0 = theGrid->N_r*mpisetup_dim_MyProc(theMPIsetup)[0];
+  int N_z_0 = theGrid->N_z*mpisetup_dim_MyProc(theMPIsetup)[1];
 
   int i;
   for(i = 0; i < theGrid->N_r+theGrid->Nghost_rmin+theGrid->Nghost_rmax+1; i++){
@@ -28,7 +29,7 @@ void grid_set_rz(struct Grid * theGrid){
   } 
 }
 
-void grid_set_Ncells_and_offset(struct Grid *theGrid) {
+void grid_set_Ncells_and_offset(struct Grid *theGrid,struct MPIsetup * theMPIsetup) {
   int i,j,k,q;
 
   int Ncells=0;
@@ -38,11 +39,11 @@ void grid_set_Ncells_and_offset(struct Grid *theGrid) {
     Ncells += theGrid->N_p[i]*theGrid->N_z;
   }
 
-  int *Ncells_arr = malloc(sizeof(int) * NumProcs);
+  int *Ncells_arr = malloc(sizeof(int) * mpisetup_NumProcs(theMPIsetup));
   MPI_Allgather(&Ncells, 1, MPI_INT, Ncells_arr, 1, MPI_INT, MPI_COMM_WORLD);
 
   int offset=0;
-  for (i=0;i<MyProc;i++){
+  for (i=0;i<mpisetup_MyProc(theMPIsetup);i++){
     offset += Ncells_arr[i];
   }
   free(Ncells_arr);

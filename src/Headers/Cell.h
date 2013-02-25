@@ -5,6 +5,7 @@ struct Cell;
 struct Grid;
 struct Face;
 struct GravMass;
+struct MPIsetup;
 
 #ifdef CELL_PRIVATE_DEFS
 struct Cell{
@@ -22,9 +23,9 @@ struct Cell{
 };
 #endif
 
-struct Cell ***cell_create(struct Grid *);
+struct Cell ***cell_create(struct Grid *,struct MPIsetup *);
 void cell_destroy(struct Cell ***,struct Grid *);
-void cell_init(struct Cell ***,struct Grid *);
+void cell_init(struct Cell ***,struct Grid *,struct MPIsetup *);
 void cell_single_init(struct Cell ***, struct Grid *,int ,int ,int );
 double *cell_get_prims(struct Cell ***,int ,int ,int );
 double *cell_get_cons(struct Cell ***,int ,int ,int );
@@ -43,8 +44,8 @@ void cell_add_GradPsi(struct Cell *, int, double);
 void cell_add_wiph(struct Cell *, double);
 void cell_mult_psi(struct Cell *, double);
 void cell_clean_pi(struct Cell *** ,struct Grid *);
-void cell_syncproc_r( struct Cell *** , struct Grid *);
-void cell_syncproc_z( struct Cell *** , struct Grid *);
+void cell_syncproc_r( struct Cell *** , struct Grid *,struct MPIsetup *);
+void cell_syncproc_z( struct Cell *** , struct Grid *,struct MPIsetup *);
 void cell_prim2cons(struct Cell ***,struct Grid *); 
 double cell_mindt( struct Cell *** , struct Grid * );
 void cell_riemann_p( struct Cell * , struct Cell * , double , double , double );
@@ -62,9 +63,9 @@ void cell_adjust_RK_cons( struct Cell *** , struct Grid * , double );
 void cell_update_phi( struct Cell *** , struct Grid * , double , double );
 void cell_update_dphi( struct Cell *** ,struct Grid * );
 void cell_calc_prim( struct Cell ***,struct Grid *);
-void cell_boundary_outflow_r( struct Cell *** , struct Face * ,struct Grid * , int * );
-void cell_boundary_outflow_z( struct Cell *** , struct Face * , struct Grid * ,int * );
-void cell_boundary_fixed_r( struct Cell ***, struct Grid *);
+void cell_boundary_outflow_r( struct Cell *** , struct Face * ,struct Grid * ,struct MPIsetup *, int * );
+void cell_boundary_outflow_z( struct Cell *** , struct Face * , struct Grid * ,struct MPIsetup *,int * );
+void cell_boundary_fixed_r( struct Cell ***, struct Grid *,struct MPIsetup *);
 void cell_set_prim(struct Cell ***,int,int,int,int,double);
 void cell_set_tiph(struct Cell ***,int,int,int,double);
 void cell_printscreen(struct Cell ***,struct Grid * );

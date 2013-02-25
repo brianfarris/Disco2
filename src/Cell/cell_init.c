@@ -6,6 +6,7 @@
 #include "../Headers/Grid.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
 void cell_single_init(struct Cell ***theCells, struct Grid *theGrid,int i,int j,int k){
@@ -34,14 +35,14 @@ void cell_single_init(struct Cell ***theCells, struct Grid *theGrid,int i,int j,
   theCells[k][i][j].GradPsi[2] = 0.0;
 }
 
-void cell_init(struct Cell ***theCells,struct Grid *theGrid) {
+void cell_init(struct Cell ***theCells,struct Grid *theGrid,struct MPIsetup * theMPIsetup) {
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
   int i, j,k;
 
   double DISK_MACH = 10.;
-  srand(666+MyProc);
+  srand(666+mpisetup_MyProc(theMPIsetup));
   double rho0 = 1.0;
   for (k = 0; k < N_z_withghost; k++) {
     for (i = 0; i < N_r_withghost; i++) {
