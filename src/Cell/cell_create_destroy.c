@@ -13,19 +13,29 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
-//  struct Cell *placeHolder = (struct Cell *) malloc(sizeof(struct cell)*num_elements_withghost);
-  struct Cell ***theCells = (struct Cell ***) malloc(sizeof(struct Cell **)*N_z_withghost);
-
+  //count up the total number of cells
+  int Ncells_withghost=0;
   int i,j,k;
-  int position=0;
   for (k=0; k<N_z_withghost; k++) {
-    theCells[k] = (struct Cell **) malloc(sizeof(struct Cell *)*N_r_withghost);
     for (i=0; i<N_r_withghost;i++){
-      //theCells[k][i] = placeHolder + position;
-      //position += grid_N_p(theGrid,i);
-      theCells[k][i] = (struct Cell *) malloc(sizeof(struct Cell)*grid_N_p(theGrid,i));
+      for(j = 0; j < grid_N_p(theGrid,i); j++){
+        ++Ncells_withghost;
+      }
     }
   }
+
+  //allocate memory contiguously
+  struct Cell ***theCells = (struct Cell ***)malloc(sizeof(struct Cell **)*N_z_withghost);
+  theCells[0] = (struct Cell **)malloc(sizeof(struct Cell *)*N_r_withghost*N_z_withghost);
+  theCells[0][0] = (struct Cell *)malloc(sizeof(struct Cell)*Ncells_withghost);
+  
+  for (k=0; k<N_z_withghost; k++) {
+    theCells[k] = theCells[0]+k*N_r_withghost;
+    for (i=0; i<N_r_withghost;i++){
+      theCells[k][i] = theCells[0][0]+grid_N_p(theGrid,i)*(k*N_r_withghost+i);
+    }
+  }
+
   //  initialize
   srand(666+mpisetup_MyProc(theMPIsetup));
   for(k = 0; k < N_z_withghost; k++){
@@ -64,12 +74,8 @@ void cell_destroy(struct Cell ***theCells,struct Grid *theGrid){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int i,k;
-  for (k=0; k<N_z_withghost; k++) {
-    for (i=0; i<N_r_withghost;i++){
-      free(theCells[k][i]);
-    }
-    free(theCells[k]);    
-  }
+  free(theCells[0][0]);
+  free(theCells[0]);
   free(theCells);
 }
 

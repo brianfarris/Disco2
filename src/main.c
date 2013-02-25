@@ -53,7 +53,6 @@ int main(int argc, char **argv) {
   struct TimeStep * theTimeStep = timestep_create();
   while( timestep_get_t(theTimeStep) < T_MAX ){
     timestep_set_dt(theTimeStep,theCells,theGrid);
-    printf("t: %e\n",timestep_get_t(theTimeStep));
     cell_copy(theCells,theGrid);
     gravMass_copy(theGravMasses);
     timestep_set_RK(theTimeStep,0.0);

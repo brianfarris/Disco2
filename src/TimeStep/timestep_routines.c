@@ -17,6 +17,7 @@ void timestep_set_dt(struct TimeStep * theTimeStep, struct Cell *** theCells, st
   if( theTimeStep->t+theTimeStep->dt > T_MAX ) {
     theTimeStep->dt = T_MAX-theTimeStep->t;
   }
+  printf("t: %e, dt: %e\n",theTimeStep->t,theTimeStep->dt);
 }
 void timestep_update_t(struct TimeStep * theTimeStep){
   theTimeStep->t += theTimeStep->dt;

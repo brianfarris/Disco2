@@ -3,8 +3,8 @@ enum{DDD,TAU,SRR,LLL,SZZ};
 enum{C_FIXED,C_WCELL,C_WRIEMANN,C_RIGID};
 
 #include "mpi.h"
-#define N_z_global  128 
-#define N_r_global  128
+#define N_z_global  32 
+#define N_r_global  32
 #define ng          2
 #define NUM_Q   9
 
