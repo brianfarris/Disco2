@@ -61,3 +61,19 @@ int mpisetup_check_zbot_bndry(struct MPIsetup * theMPIsetup){
 int mpisetup_check_ztop_bndry(struct MPIsetup * theMPIsetup){
   return(theMPIsetup->dim_MyProc[1]== (dim_NumProcs[1]-1));
 }
+int mpisetup_MyProc(struct MPIsetup * theMPIsetup){
+  return(theMPIsetup->MyProc);
+}
+int * mpisetup_dim_MyProc(struct MPIsetup * theMPIsetup){
+  return(theMPIsetup->dim_MyProc);
+}
+int * mpisetup_dim_NumProcs(struct MPIsetup * theMPIsetup){
+  return(theMPIsetup->dim_NumProcs);
+}
+int * mpisetup_left_Proc(struct MPIsetup * theMPIsetup){
+  return(theMPIsetup->left_Proc);
+}
+int * mpisetup_right_Proc(struct MPIsetup * theMPIsetup){
+  return(theMPIsetup->right_Proc);
+}
+

@@ -6,9 +6,10 @@
 #include "../Headers/Grid.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
-void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid){
+void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPIsetup * theMPIsetup){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
@@ -102,11 +103,12 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid){
   }
   MPI_Status status;
 
-  MPI_Sendrecv(buffer_r_in_send,buffersize_r_in_send,MPI_DOUBLE,left_Proc[0],12,buffer_r_out_recv,buffersize_r_out_recv,MPI_DOUBLE,right_Proc[0],12,grid_comm,&status);
-  MPI_Sendrecv(buffer_r_out_send,buffersize_r_out_send,MPI_DOUBLE,right_Proc[0],13,buffer_r_in_recv,buffersize_r_in_recv,MPI_DOUBLE,left_Proc[0],13,grid_comm,&status);
+  MPI_Sendrecv(buffer_r_in_send,buffersize_r_in_send,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[0],12,buffer_r_out_recv,buffersize_r_out_recv,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[0],12,grid_comm,&status);
+  MPI_Sendrecv(buffer_r_out_send,buffersize_r_out_send,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[0],13,buffer_r_in_recv,buffersize_r_in_recv,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[0],13,grid_comm,&status);
 
 
-  if (dim_MyProc[0]!=(dim_NumProcs[0]-1)){
+  //if (dim_MyProc[0]!=(dim_NumProcs[0]-1)){
+  if (!mpisetup_check_rout_bndry(theMPIsetup)){
     count=0;
     for (k=0;k<N_z_withghost;++k){
       for (i= N_r_withghost-grid_Nghost_rmax(theGrid);i< N_r_withghost;++i){
@@ -126,7 +128,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid){
     }
   }
 
-  if (dim_MyProc[0]!=0){
+  if (!mpisetup_check_rin_bndry(theMPIsetup)){
     count=0;
     for (k=0;k<N_z_withghost;++k){
       for (i=0;i<grid_Nghost_rmin(theGrid);++i){
@@ -152,7 +154,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid){
 }
 
 
-void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid){
+void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid,struct MPIsetup * theMPIsetup){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
@@ -245,8 +247,8 @@ void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid){
   }
   MPI_Status status;
 
-  MPI_Sendrecv(buffer_z_bot_send,buffersize_z_bot_send,MPI_DOUBLE,left_Proc[1],14,buffer_z_top_recv,buffersize_z_top_recv,MPI_DOUBLE,right_Proc[1],14,grid_comm,&status);
-  MPI_Sendrecv(buffer_z_top_send,buffersize_z_top_send,MPI_DOUBLE,right_Proc[1],15,buffer_z_bot_recv,buffersize_z_bot_recv,MPI_DOUBLE,left_Proc[1],15,grid_comm,&status);
+  MPI_Sendrecv(buffer_z_bot_send,buffersize_z_bot_send,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[1],14,buffer_z_top_recv,buffersize_z_top_recv,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[1],14,grid_comm,&status);
+  MPI_Sendrecv(buffer_z_top_send,buffersize_z_top_send,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[1],15,buffer_z_bot_recv,buffersize_z_bot_recv,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[1],15,grid_comm,&status);
 
   count=0;
   for (k= N_z_withghost-grid_Nghost_zmax(theGrid);k< N_z_withghost;++k){

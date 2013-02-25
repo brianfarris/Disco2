@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
   mpisetup_left_right(theMPIsetup);
 
   //grid
-  struct Grid * theGrid = grid_create();
+  struct Grid * theGrid = grid_create(theMPIsetup);
   grid_set_N_p(theGrid);
   grid_set_rz(theGrid);
   grid_set_Ncells_and_offset(theGrid);
@@ -32,10 +32,10 @@ int main(int argc, char **argv) {
   gravMass_clean_pi(theGravMasses);
 
   // allocate memory for data 
-  struct Cell ***theCells = cell_create(theGrid);
+  struct Cell ***theCells = cell_create(theGrid,theMPIsetup);
   cell_clean_pi(theCells,theGrid);
   // set initial data 
-  cell_init(theCells,theGrid);
+  cell_init(theCells,theGrid,theMPIsetup);
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid);

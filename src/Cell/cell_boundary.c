@@ -6,10 +6,11 @@
 #include "../Headers/Grid.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
 
-void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces ,struct Grid * theGrid, int * nri ){
+void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces ,struct Grid * theGrid,struct MPIsetup * theMPIsetup, int * nri ){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int Nf = nri[N_r_withghost-1];
@@ -20,7 +21,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
   int i,j,k;
   double r;
 
-  if( dim_MyProc[0] == 0 ){
+  if( mpisetup_check_rin_bndry(theMPIsetup) ){
 
     for( i=0 ; i>=0 ; --i ){
       r=grid_r_faces(theGrid,i);
@@ -53,7 +54,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
     }
   }
 
-  if( dim_MyProc[0] == dim_NumProcs[0]-1 ){
+  if( mpisetup_check_rout_bndry(theMPIsetup) ){
     for( n=n1 ; n<Nf ; ++n ){
       for( q=0 ; q<NUM_Q ; ++q ){
         face_R_pointer(theFaces,n)->prim[q] = 0.0;
@@ -86,7 +87,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
 
 }
 
-void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces, struct Grid * theGrid,int * nzk ){
+void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces, struct Grid * theGrid,struct MPIsetup * theMPIsetup,int * nzk ){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
@@ -97,7 +98,7 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
 
   int n,q;
 
-  if( dim_MyProc[1] == 0 ){
+  if(mpisetup_check_zbot_bndry(theMPIsetup)){
     for( n=0 ; n<n0 ; ++n ){
       for( q=0 ; q<NUM_Q ; ++q ){
         face_L_pointer(theFaces,n)->prim[q] = 0.0;
@@ -125,7 +126,7 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
     }
   }
 
-  if( dim_MyProc[1] == dim_NumProcs[1]-1 ){
+  if(mpisetup_check_ztop_bndry(theMPIsetup)){
     for( n=n1 ; n<Nf ; ++n ){
       for( q=0 ; q<NUM_Q ; ++q ){
         face_R_pointer(theFaces,n)->prim[q] = 0.0;
@@ -156,13 +157,13 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
 
 }
 
-void cell_boundary_fixed_r( struct Cell *** theCells, struct Grid *theGrid ){
+void cell_boundary_fixed_r( struct Cell *** theCells, struct Grid *theGrid,struct MPIsetup * theMPIsetup ){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
   int i,j,k;
 
-  if( dim_MyProc[0] == 0 ){
+  if(mpisetup_check_rin_bndry(theMPIsetup)){
     for( i=0 ; i<grid_Nghost_rmin(theGrid) ; ++i ){
       for( k=0 ; k<N_z_withghost ; ++k ){
         for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
@@ -172,7 +173,7 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Grid *theGrid ){
     }
   }
 
-  if( dim_MyProc[0] == dim_NumProcs[0]-1 ){
+  if( mpisetup_check_rout_bndry(theMPIsetup) ){
     for( i=N_r_withghost-1 ; i>N_r_withghost-grid_Nghost_rmax(theGrid)-1 ; --i ){
       for( k=0 ; k<N_z_withghost ; ++k ){
         for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){

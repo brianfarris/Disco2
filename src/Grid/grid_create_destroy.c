@@ -2,15 +2,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../Headers/Grid.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
 
-struct Grid *grid_create() {
-  int N_r = N_r_global/dim_NumProcs[0];
-  int N_z = N_z_global/dim_NumProcs[1];
+struct Grid *grid_create(struct MPIsetup * theMPIsetup) {
+  int N_r = N_r_global/mpisetup_dim_NumProcs(theMPIsetup)[0];
+  int N_z = N_z_global/mpisetup_dim_NumProcs(theMPIsetup)[1];
 
   int Nghost_rmin;
-  if (dim_MyProc[0]==0){
+  if (mpisetup_dim_MyProc(theMPIsetup)[0]==0){
     Nghost_rmin  = 1;
   }else{
     Nghost_rmin  = ng;

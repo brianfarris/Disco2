@@ -1,6 +1,7 @@
 #ifndef GRID_H
 #define GRID_H
 struct Grid;
+struct MPIsetup;
 
 #ifdef GRID_PRIVATE_DEFS
 struct Grid {
@@ -19,7 +20,7 @@ struct Grid {
 };
 #endif
 
-struct Grid *grid_create();
+struct Grid *grid_create(struct MPIsetup * );
 void grid_destroy(struct Grid *); 
 int grid_N_p(struct Grid *,int);
 double grid_r_faces(struct Grid *,int);
@@ -34,6 +35,6 @@ int grid_Nghost_rmax(struct Grid *);
 int grid_Nghost_zmin(struct Grid *);
 int grid_Nghost_zmax(struct Grid *);
 void grid_set_N_p(struct Grid *);
-void grid_set_rz(struct Grid *);
-void grid_set_Ncells_and_offset(struct Grid *);
+void grid_set_rz(struct Grid *,struct MPIsetup *);
+void grid_set_Ncells_and_offset(struct Grid *,struct MPIsetup *);
 #endif

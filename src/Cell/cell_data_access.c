@@ -69,6 +69,7 @@ void cell_set_tiph(struct Cell ***theCells,int i,int j,int k,double value) {
   theCells[k][i][j].tiph = value;
 }
 
+/*
 void cell_printscreen(struct Cell ***theCells,struct Grid * theGrid){
   int i;
 
@@ -78,3 +79,4 @@ void cell_printscreen(struct Cell ***theCells,struct Grid * theGrid){
   }
 
 }
+*/

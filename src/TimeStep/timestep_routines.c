@@ -9,6 +9,7 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/Face.h"
 #include "../Headers/TimeStep.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
 void timestep_set_dt(struct TimeStep * theTimeStep, struct Cell *** theCells, struct Grid * theGrid){
@@ -75,7 +76,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   //Boundary Data
   //cell_boundary_outflow_r( theCells , theFaces_r ,theGrid, nri );
   //if( N_z_global > 1 ) cell_boundary_z( theCells , theFaces_z ,theGrid, nzk );
-  cell_boundary_fixed_r( theCells, theGrid );
+  cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
 
   free(nri);
   free(nzk);
