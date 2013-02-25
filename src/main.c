@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Headers/mpisetup.h"
+#include "Headers/MPIsetup.h"
 #include "Headers/Cell.h"
 #include "Headers/Grid.h"
 #include "Headers/Face.h"

@@ -1,7 +1,7 @@
 #define GRID_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
-#include "../Headers/grid.h"
+#include "../Headers/Grid.h"
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 

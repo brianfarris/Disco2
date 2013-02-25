@@ -5,10 +5,10 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "../Headers/grid.h"
-#include "../Headers/cell.h"
+#include "../Headers/Grid.h"
+#include "../Headers/Cell.h"
 #include "hdf5.h"
-#include "../Headers/io.h"
+#include "../Headers/IO.h"
 #include "../Headers/header.h"
 
 struct io *io_create(struct Grid *theGrid) {
