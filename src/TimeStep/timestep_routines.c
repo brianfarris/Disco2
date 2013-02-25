@@ -28,7 +28,7 @@ double timestep_get_t(struct TimeStep * theTimeStep){
   return(theTimeStep->t);
 }
 
-void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,struct Grid * theGrid,struct GravMass * theGravMasses,double timestep_fac){
+void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,struct Grid * theGrid,struct GravMass * theGravMasses,struct MPIsetup * theMPIsetup,double timestep_fac){
   double dt = timestep_fac*theTimeStep->dt;
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
@@ -84,15 +84,15 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   face_destroy(theFaces_z);
 
   //inter-processor syncs
-  cell_syncproc_r(theCells,theGrid);
-  cell_syncproc_z(theCells,theGrid);
+  cell_syncproc_r(theCells,theGrid,theMPIsetup);
+  cell_syncproc_z(theCells,theGrid,theMPIsetup);
   
   cell_prim2cons( theCells,theGrid );
 
 
 }
 
-void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCells , struct Grid * theGrid){
+void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCells , struct Grid * theGrid,struct MPIsetup * theMPIsetup){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
@@ -111,8 +111,8 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
   cell_prim2cons( theCells,theGrid );
 
   //inter-processor syncs
-  cell_syncproc_r(theCells,theGrid);
-  cell_syncproc_z(theCells,theGrid);
+  cell_syncproc_r(theCells,theGrid,theMPIsetup);
+  cell_syncproc_z(theCells,theGrid,theMPIsetup);
 
 }
 

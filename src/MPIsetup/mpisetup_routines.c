@@ -53,16 +53,19 @@ int mpisetup_check_rin_bndry(struct MPIsetup * theMPIsetup){
   return(theMPIsetup->dim_MyProc[0]==0);
 }
 int mpisetup_check_rout_bndry(struct MPIsetup * theMPIsetup){
-  return(theMPIsetup->dim_MyProc[0]== (dim_NumProcs[0]-1));
+  return(theMPIsetup->dim_MyProc[0]== (theMPIsetup->dim_NumProcs[0]-1));
 }
 int mpisetup_check_zbot_bndry(struct MPIsetup * theMPIsetup){
   return(theMPIsetup->dim_MyProc[1]==1);
 }
 int mpisetup_check_ztop_bndry(struct MPIsetup * theMPIsetup){
-  return(theMPIsetup->dim_MyProc[1]== (dim_NumProcs[1]-1));
+  return(theMPIsetup->dim_MyProc[1]== (theMPIsetup->dim_NumProcs[1]-1));
 }
 int mpisetup_MyProc(struct MPIsetup * theMPIsetup){
   return(theMPIsetup->MyProc);
+}
+int mpisetup_NumProcs(struct MPIsetup * theMPIsetup){
+  return(theMPIsetup->NumProcs);
 }
 int * mpisetup_dim_MyProc(struct MPIsetup * theMPIsetup){
   return(theMPIsetup->dim_MyProc);

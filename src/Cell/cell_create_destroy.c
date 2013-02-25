@@ -6,6 +6,7 @@
 #include "../Headers/Grid.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
 struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
@@ -26,7 +27,7 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
     }
   }
   //  initialize
-  srand(666+MPIsetup_MyProc(theMPIsetup));
+  srand(666+mpisetup_MyProc(theMPIsetup));
   for(k = 0; k < N_z_withghost; k++){
     for(i = 0; i < N_r_withghost; i++){
       double tiph_0 = 2.*M_PI*(double)rand()/(double)RAND_MAX;

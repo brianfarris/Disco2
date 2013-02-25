@@ -23,8 +23,8 @@ int main(int argc, char **argv) {
   //grid
   struct Grid * theGrid = grid_create(theMPIsetup);
   grid_set_N_p(theGrid);
-  grid_set_rz(theGrid);
-  grid_set_Ncells_and_offset(theGrid);
+  grid_set_rz(theGrid,theMPIsetup);
+  grid_set_Ncells_and_offset(theGrid,theMPIsetup);
 
   // gravMass
   struct GravMass *theGravMasses = gravMass_create(NP);
@@ -38,8 +38,8 @@ int main(int argc, char **argv) {
   cell_init(theCells,theGrid,theMPIsetup);
 
   //inter-processor syncs
-  cell_syncproc_r(theCells,theGrid);
-  cell_syncproc_z(theCells,theGrid);
+  cell_syncproc_r(theCells,theGrid,theMPIsetup);
+  cell_syncproc_z(theCells,theGrid,theMPIsetup);
 
   //set conserved quantities
   cell_prim2cons(theCells,theGrid);
@@ -57,10 +57,10 @@ int main(int argc, char **argv) {
     cell_copy(theCells,theGrid);
     gravMass_copy(theGravMasses);
     timestep_set_RK(theTimeStep,0.0);
-    timestep_substep(theTimeStep,theCells,theGrid,theGravMasses,1.0);
+    timestep_substep(theTimeStep,theCells,theGrid,theGravMasses,theMPIsetup,1.0);
     timestep_set_RK(theTimeStep,0.5);
-    timestep_substep(theTimeStep,theCells,theGrid,theGravMasses,0.5);
-    timestep_update_Psi(theTimeStep,theCells,theGrid);
+    timestep_substep(theTimeStep,theCells,theGrid,theGravMasses,theMPIsetup,0.5);
+    timestep_update_Psi(theTimeStep,theCells,theGrid,theMPIsetup);
     timestep_update_t(theTimeStep); 
     if( timestep_get_t(theTimeStep)>tcheck){
       sprintf(filename,"checkpoint_%04d.h5",nfile);
@@ -86,8 +86,8 @@ int main(int argc, char **argv) {
      io_delete(input_prims,theGrid);
      */
   //inter-processor syncs
-  cell_syncproc_r(theCells,theGrid);
-  cell_syncproc_z(theCells,theGrid);
+  cell_syncproc_r(theCells,theGrid,theMPIsetup);
+  cell_syncproc_z(theCells,theGrid,theMPIsetup);
 
   // clean up
   cell_destroy(theCells,theGrid);

@@ -4,6 +4,7 @@ struct TimeStep;
 struct Cell;
 struct Grid;
 struct GravMass;
+struct MPIsetup;
 
 #ifdef TIMESTEP_PRIVATE_DEFS
 struct TimeStep {
@@ -18,7 +19,7 @@ void timestep_destroy(struct TimeStep *);
 void timestep_set_dt(struct TimeStep * , struct Cell *** , struct Grid * );
 void timestep_update_t(struct TimeStep *);
 void timestep_set_RK(struct TimeStep * ,double);
-void timestep_substep(struct TimeStep * , struct Cell *** ,struct Grid * ,struct GravMass * ,double);
-void timestep_update_Psi( struct TimeStep * , struct Cell *** , struct Grid * );
+void timestep_substep(struct TimeStep * , struct Cell *** ,struct Grid * ,struct GravMass * ,struct MPIsetup *,double);
+void timestep_update_Psi( struct TimeStep * , struct Cell *** , struct Grid *,struct MPIsetup * );
 double timestep_get_t(struct TimeStep *);
 #endif
