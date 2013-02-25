@@ -1,6 +1,6 @@
 #define FACE_PRIVATE_DEFS
 #include <stdlib.h>
-#include <stdIO.h>
+#include <stdio.h>
 #include <math.h>
 #include "../Headers/Grid.h"
 #include "../Headers/Face.h"

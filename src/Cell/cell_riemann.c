@@ -1,6 +1,6 @@
 #define CELL_PRIVATE_DEFS
 #include <stdlib.h>
-#include <stdIO.h>
+#include <stdio.h>
 #include <math.h>
 #include "../Headers/Cell.h"
 #include "../Headers/Grid.h"
