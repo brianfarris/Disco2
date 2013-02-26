@@ -48,14 +48,15 @@ void cell_add_wiph(struct Cell *, double);
 void cell_add_src( struct Cell *** ,struct Grid * , struct GravMass * , double );
 void cell_mult_psi(struct Cell *, double);
 void cell_clean_pi(struct Cell *** ,struct Grid *);
-void cell_set_tiph(struct Cell ***,int,int,int,double);
-void cell_set_wcell(struct Cell ***,struct Grid *);
-void cell_set_wrigid(struct Cell ***,struct Grid *);
+void cell_update_phi( struct Cell *** , struct Grid * , double , double );
+void cell_update_dphi( struct Cell *** ,struct Grid * );
+//clear
 void cell_clear_w(struct Cell ***,struct Grid * );
 void cell_clear_divB( struct Cell ***,struct Grid * );
 void cell_clear_GradPsi( struct Cell ***,struct Grid * );
-void cell_update_phi( struct Cell *** , struct Grid * , double , double );
-void cell_update_dphi( struct Cell *** ,struct Grid * );
+//set w
+void cell_set_wcell(struct Cell ***,struct Grid *);
+void cell_set_wrigid(struct Cell ***,struct Grid *);
 //processor syncs
 void cell_syncproc_r( struct Cell *** , struct Grid *,struct MPIsetup *);
 void cell_syncproc_z( struct Cell *** , struct Grid *,struct MPIsetup *);
@@ -76,6 +77,7 @@ double cell_mindt( struct Cell *** , struct Grid * );
 void cell_copy(struct Cell ***,struct Grid * );
 void cell_adjust_RK_cons( struct Cell *** , struct Grid * , double );
 void cell_set_prim(struct Cell ***,int,int,int,int,double);//this will morph into a checkpoint restart routine
+void cell_set_tiph(struct Cell ***,int,int,int,double);//this will morph into a checkpoint restart routine
 
 //void cell_printscreen(struct Cell ***,struct Grid * );
 #endif

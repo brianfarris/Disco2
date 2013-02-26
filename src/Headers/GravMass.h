@@ -21,12 +21,16 @@ struct GravMass{
 };
 #endif
 
+//create and destroy
 struct GravMass *gravMass_create(int);
 void gravMass_destroy(struct GravMass *);
+//initialization
 void gravMass_initialize(struct GravMass *);
-void gravMass_clean_pi(struct GravMass *);
-void gravMass_copy(struct GravMass * );
+//access data
 double gravMass_r(struct GravMass * ,int);
 double gravMass_phi(struct GravMass * ,int);
 double gravMass_M(struct GravMass * ,int);
+//miscellaneous
+void gravMass_clean_pi(struct GravMass *);
+void gravMass_copy(struct GravMass * );
 #endif 

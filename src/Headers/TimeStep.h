@@ -14,12 +14,16 @@ struct TimeStep {
 };
 #endif
 
+//create and destroy
 struct TimeStep *timestep_create();
 void timestep_destroy(struct TimeStep *); 
+//adjust t, dt, and RK
 void timestep_set_dt(struct TimeStep * , struct Cell *** , struct Grid * );
 void timestep_update_t(struct TimeStep *);
 void timestep_set_RK(struct TimeStep * ,double);
+//take a substep
 void timestep_substep(struct TimeStep * , struct Cell *** ,struct Grid * ,struct GravMass * ,struct MPIsetup *,double);
 void timestep_update_Psi( struct TimeStep * , struct Cell *** , struct Grid *,struct MPIsetup * );
+// get the current time
 double timestep_get_t(struct TimeStep *);
 #endif
