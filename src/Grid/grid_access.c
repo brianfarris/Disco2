@@ -47,5 +47,8 @@ int grid_ng(struct Grid *theGrid){
 int grid_N_z_global(struct Grid *theGrid){
   return(theGrid->N_z_global);
 }
+int grid_NUM_Q(struct Grid *theGrid){
+  return(theGrid->NUM_Q);
+}
 
 

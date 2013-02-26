@@ -14,6 +14,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int Nf = nri[N_r_withghost-1];
+  int NUM_Q = grid_NUM_Q(theGrid);
   //   int n0 = nri[1];
   int n1 = nri[N_r_withghost-2];
 
@@ -90,6 +91,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
 void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces, struct Grid * theGrid,struct MPIsetup * theMPIsetup,int * nzk ){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
+  int NUM_Q = grid_NUM_Q(theGrid);
 
   int j,i;
   int Nf = nzk[N_z_withghost-1];

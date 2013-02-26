@@ -13,6 +13,7 @@
 
 struct io *io_create(struct Grid *theGrid) {
   struct io *theIO = (struct io *) malloc(sizeof(struct io));
+  int NUM_Q = grid_NUM_Q(theGrid);
 
   int Ncells = grid_Ncells(theGrid)*(NUM_Q+3);
   int N_r = grid_N_r(theGrid);

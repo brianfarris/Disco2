@@ -6,7 +6,7 @@ enum{C_FIXED,C_WCELL,C_WRIEMANN,C_RIGID};
 //#define N_z_global  32 
 //#define N_r_global  32
 //#define ng          2
-#define NUM_Q   9
+//#define NUM_Q   9
 
 
 //#define RMIN    1.0

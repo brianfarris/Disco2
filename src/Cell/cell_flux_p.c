@@ -23,9 +23,9 @@ void cell_flux_p( struct Cell *** theCells ,struct Grid *theGrid, double dt ){
       double dr = rp-rm;
       double r = .5*(rp+rm);
       for( j=0 ; j<grid_N_p(theGrid,i)-1 ; ++j ){
-        cell_riemann_p( &(theCells[k][i][j]) , &(theCells[k][i][j+1]) , dr*dz , dt , r );
+        cell_riemann_p( &(theCells[k][i][j]) , &(theCells[k][i][j+1]) ,theGrid, dr*dz , dt , r );
       }
-      cell_riemann_p( &(theCells[k][i][grid_N_p(theGrid,i)-1]) , &(theCells[k][i][0]) , dr*dz , dt , r );
+      cell_riemann_p( &(theCells[k][i][grid_N_p(theGrid,i)-1]) , &(theCells[k][i][0]) ,theGrid, dr*dz , dt , r );
     }
   }
 }

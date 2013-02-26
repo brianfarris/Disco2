@@ -12,6 +12,7 @@
 #include "../Headers/header.h"
 
 void io_flattened_prim(struct io *io_pointer,struct Cell ***theCells,struct Grid *theGrid){
+  int NUM_Q = grid_NUM_Q(theGrid);
   int N_r = grid_N_r(theGrid);
   int N_z = grid_N_z(theGrid);
   int i,j,k,q;
@@ -32,6 +33,7 @@ void io_flattened_prim(struct io *io_pointer,struct Cell ***theCells,struct Grid
 }
 
 void io_unflattened_prim(struct io *io_pointer,struct Cell ***theCells,struct Grid *theGrid){
+  int NUM_Q = grid_NUM_Q(theGrid);
   int N_r = grid_N_r(theGrid);
   int N_z = grid_N_z(theGrid);
   int i,j,k,q;

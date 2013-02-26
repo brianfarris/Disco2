@@ -12,6 +12,7 @@
 void cell_clean_pi(struct Cell *** theCells,struct Grid *theGrid){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
+  int NUM_Q = grid_NUM_Q(theGrid);
 
   int i,j,k;
   for( k=0 ; k<N_z_withghost ; ++k ){
@@ -29,6 +30,7 @@ void cell_clean_pi(struct Cell *** theCells,struct Grid *theGrid){
 void cell_copy(struct Cell ***theCells,struct Grid * theGrid){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
+  int NUM_Q = grid_NUM_Q(theGrid);
   int i,j,k,q;
   for( k=0 ; k<N_z_withghost ; ++k ){
     for( i=0 ; i<N_r_withghost ; ++i ){
@@ -45,6 +47,7 @@ void cell_copy(struct Cell ***theCells,struct Grid * theGrid){
 void cell_adjust_RK_cons( struct Cell *** theCells , struct Grid * theGrid, double RK ){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
+  int NUM_Q = grid_NUM_Q(theGrid);
 
   int i,j,k,q;
   for( k=0 ; k<N_z_withghost ; ++k ){

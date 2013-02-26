@@ -12,13 +12,9 @@
 #include "../Headers/header.h"
 
 void io_hdf5_out(struct io *io_pointer,struct Grid * theGrid, char * output_filename){
-  printf("1a hello inside io_hdf5_out\n");
+  int NUM_Q = grid_NUM_Q(theGrid);
   int Ncells = grid_Ncells(theGrid);
-  printf("1b hello inside io_hdf5_out\n");
-  printf("NUM_Q: %d\n",NUM_Q);
-  printf("Ncells: %d\n",Ncells);
   double prim_data[Ncells][NUM_Q+3];
-  printf("1c hello inside io_hdf5_out\n");
   int i,q;
   for (i=0;i<Ncells;++i){
       prim_data[i][0] = io_pointer->primitives[i][0];
@@ -28,7 +24,6 @@ void io_hdf5_out(struct io *io_pointer,struct Grid * theGrid, char * output_file
       prim_data[i][q+3] = io_pointer->primitives[i][q+3];
     }
   }
-  printf("1c hello inside io_hdf5_out\n");
 
   // HDF5 APIs definitions
   hid_t       file_id, dset_id;         /* file and dataset identifiers */
@@ -48,12 +43,10 @@ void io_hdf5_out(struct io *io_pointer,struct Grid * theGrid, char * output_file
   // Set up file access property list with parallel I/O access
   plist_id = H5Pcreate(H5P_FILE_ACCESS);
   H5Pset_fapl_mpio(plist_id, grid_comm, info);
-  printf("2 hello inside io_hdf5_out\n");
 
   // Create a new file collectively and release property list identifier.
   file_id = H5Fcreate(output_filename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
   H5Pclose(plist_id);
-  printf("3 hello inside io_hdf5_out\n");
 
   // Create the dataspace for the dataset.
   dimsf[0] = grid_Ncells_global(theGrid);
@@ -101,6 +94,7 @@ void io_hdf5_out(struct io *io_pointer,struct Grid * theGrid, char * output_file
 }    
 
 void io_hdf5_in(struct io *io_pointer,struct Grid * theGrid){
+  int NUM_Q = grid_NUM_Q(theGrid);
   int Ncells = grid_Ncells(theGrid);
   double prim_data[Ncells][NUM_Q+3];
    // double **chunk_out = io_pointer->primitives;

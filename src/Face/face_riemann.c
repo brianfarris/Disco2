@@ -280,7 +280,8 @@ void getUstar( double * prim , double * Ustar , double r , double Sk , double Ss
 */
 }
 
-void face_riemann_r( struct Face * F , double dt ){
+void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
+  int NUM_Q = grid_NUM_Q(theGrid);
 
   struct Cell * cL = F->L;
   struct Cell * cR = F->R;
@@ -397,7 +398,8 @@ void face_riemann_r( struct Face * F , double dt ){
   free(Flux);
 }
 
-void face_riemann_z( struct Face * F , double dt ){
+void face_riemann_z( struct Face * F , struct Grid *theGrid, double dt ){
+  int NUM_Q = grid_NUM_Q(theGrid);
 
   struct Cell * cL = F->L;
   struct Cell * cR = F->R;

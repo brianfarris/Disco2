@@ -62,14 +62,14 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_plm_rz( theCells ,theGrid, theFaces_r , Nfr , 0 );
   int n;
   for( n=0 ; n<Nfr ; ++n ){
-    face_riemann_r( face_pointer(theFaces_r,n) , dt );
+    face_riemann_r( face_pointer(theFaces_r,n) , theGrid, dt );
   }
 
   //Z Flux
   if( grid_N_z_global(theGrid) != 1 ){
     cell_plm_rz( theCells ,theGrid, theFaces_z , Nfz , 1 );
     for( n=0 ; n<Nfz ; ++n ){
-      face_riemann_z( face_pointer(theFaces_z,n) , dt );
+      face_riemann_z( face_pointer(theFaces_z,n) ,theGrid, dt );
     }
   }
   //Source Terms

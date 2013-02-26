@@ -24,7 +24,7 @@ struct Grid {
   double RMAX;
   double ZMIN;
   double ZMAX;
-
+  int NUM_Q;
 };
 #endif
 

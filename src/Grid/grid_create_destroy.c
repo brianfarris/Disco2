@@ -14,6 +14,8 @@ struct Grid *grid_create(struct MPIsetup * theMPIsetup) {
 
   theGrid->ng = 2;
 
+  theGrid->NUM_Q = 9;
+
   int N_r = theGrid->N_r_global/mpisetup_dim_NumProcs(theMPIsetup)[0];
   int N_z = theGrid->N_z_global/mpisetup_dim_NumProcs(theMPIsetup)[1];
 

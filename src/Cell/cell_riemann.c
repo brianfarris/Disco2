@@ -17,7 +17,8 @@ void prim2cons_local( double * , double * , double , double );
 void getUstar( double * , double * , double , double , double , double * , double * );
 void flux( double * , double * , double , double * );
 
-void cell_riemann_p( struct Cell * cL , struct Cell * cR, double dA , double dt , double r ){
+void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid, double dA , double dt , double r ){
+  int NUM_Q = grid_NUM_Q(theGrid);
 
   double * primL = malloc(NUM_Q*sizeof(double));
   double * primR = malloc(NUM_Q*sizeof(double));

@@ -1,6 +1,5 @@
 #ifndef CELL_H
 #define CELL_H
-#define NUM_Q   9
 struct Cell;
 struct Grid;
 struct Face;
@@ -9,11 +8,11 @@ struct MPIsetup;
 
 #ifdef CELL_PRIVATE_DEFS
 struct Cell{
-  double prim[NUM_Q];
-  double cons[NUM_Q];
-  double RKcons[NUM_Q];
-  double grad[NUM_Q];
-  double gradp[NUM_Q];
+  double * prim;
+  double * cons;
+  double * RKcons;
+  double * grad;
+  double * gradp;
   double tiph;
   double RKtiph;
   double dphi;
@@ -61,7 +60,7 @@ void cell_set_wrigid(struct Cell ***,struct Grid *);
 void cell_syncproc_r( struct Cell *** , struct Grid *,struct MPIsetup *);
 void cell_syncproc_z( struct Cell *** , struct Grid *,struct MPIsetup *);
 //riemann
-void cell_riemann_p( struct Cell * , struct Cell * , double , double , double );
+void cell_riemann_p( struct Cell * , struct Cell * ,struct Grid *, double , double , double );
 void cell_plm_rz( struct Cell *** ,struct Grid *, struct Face * , int , int );
 void cell_plm_p( struct Cell *** ,struct Grid * );
 void cell_flux_p( struct Cell *** ,struct Grid *, double );
