@@ -19,8 +19,8 @@ void flux( double * , double * , double , double * );
 
 void cell_riemann_p( struct Cell * cL , struct Cell * cR, double dA , double dt , double r ){
 
-  double primL[NUM_Q];
-  double primR[NUM_Q];
+  double * primL = malloc(NUM_Q*sizeof(double));
+  double * primR = malloc(NUM_Q*sizeof(double));
 
   int q;
   for( q=0 ; q<NUM_Q ; ++q ){
@@ -38,10 +38,11 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, double dA , double dt 
   double Bpack[6];
   vel( primL , primR , &Sl , &Sr , &Ss , n , r , Bpack );
 
-  double Fk[NUM_Q];
-  double Uk[NUM_Q];
+  double * Fk = malloc(NUM_Q*sizeof(double));
+  double * Uk = malloc(NUM_Q*sizeof(double));
+  
+  double * Flux = malloc(NUM_Q*sizeof(double));
 
-  double Flux[NUM_Q];
 
   double Bp_face = 0.5*(primL[BPP]+primR[BPP]);
   double Psi_face = 0.5*(primL[PSI]+primR[PSI]);
@@ -62,7 +63,7 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, double dA , double dt 
       Flux[q] = Fk[q] - w*Uk[q];
     }
   }else{
-    double Ustar[NUM_Q];
+    double * Ustar = malloc(NUM_Q*sizeof(double));
     if( w < Ss ){
       prim2cons_local( primL , Uk , r , 1.0 );
       getUstar( primL , Ustar , r , Sl , Ss , n , Bpack );
@@ -80,6 +81,7 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, double dA , double dt 
         Flux[q] = Fk[q] + Sr*( Ustar[q] - Uk[q] ) - w*Ustar[q];
       }
     }
+    free(Ustar);
   }
 
   /*
@@ -108,6 +110,11 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, double dA , double dt 
   cell_add_GradPsi(cL,1,Psi_face/r);
   cell_add_GradPsi(cR,1,-Psi_face/r);
 
+  free(primL);
+  free(primR);
+  free(Fk);
+  free(Uk);
+  free(Flux);
 }
 
 

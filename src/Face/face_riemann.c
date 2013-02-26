@@ -289,8 +289,11 @@ void face_riemann_r( struct Face * F , double dt ){
   double deltaR       = F->deltaR;
   double r         = F->r;
 
-  double primL[NUM_Q];
-  double primR[NUM_Q];
+//  double primL[NUM_Q];
+//  double primR[NUM_Q];
+  double * primL = malloc(NUM_Q*sizeof(double));
+  double * primR = malloc(NUM_Q*sizeof(double));
+
 
   double pL = cell_single_tiph(cL) - .5*cell_single_dphi(cL);
   double pR = cell_single_tiph(cR) - .5*cell_single_dphi(cR);   
@@ -319,10 +322,16 @@ void face_riemann_r( struct Face * F , double dt ){
   double Bpack[6];
   vel( primL , primR , &Sl , &Sr , &Ss , n , r , Bpack );
 
-  double Fk[NUM_Q];
-  double Uk[NUM_Q];
+//  double Fk[NUM_Q];
+//  double Uk[NUM_Q];
 
-  double Flux[NUM_Q];
+//  double Flux[NUM_Q];
+
+  double * Fk = malloc(NUM_Q*sizeof(double));
+  double * Uk = malloc(NUM_Q*sizeof(double));
+  
+  double * Flux = malloc(NUM_Q*sizeof(double));
+
 
   double Br_face = 0.5*(primL[BRR]+primR[BRR]);
   double Psi_face = 0.5*(primL[PSI]+primR[PSI]);
@@ -332,7 +341,8 @@ void face_riemann_r( struct Face * F , double dt ){
   }else if( 0. > Sr ){
     flux( primR , Flux , r , n );
   }else{
-    double Ustar[NUM_Q];
+    //double Ustar[NUM_Q];
+    double * Ustar = malloc(NUM_Q*sizeof(double));
     if( 0. < Ss ){
       prim2cons_local( primL , Uk , r , 1.0 );
       getUstar( primL , Ustar , r , Sl , Ss , n , Bpack );
@@ -350,6 +360,7 @@ void face_riemann_r( struct Face * F , double dt ){
         Flux[q] = Fk[q] + Sr*( Ustar[q] - Uk[q] );
       }
     }
+    free(Ustar);
   }
 
   /*
@@ -378,6 +389,12 @@ void face_riemann_r( struct Face * F , double dt ){
   cell_add_divB(cR,-dA*Br_face);
   cell_add_GradPsi(cL,0,Psi_face);
   cell_add_GradPsi(cR,0,-Psi_face);
+
+  free(primL);
+  free(primR);
+  free(Fk);
+  free(Uk);
+  free(Flux);
 }
 
 void face_riemann_z( struct Face * F , double dt ){
@@ -389,8 +406,11 @@ void face_riemann_z( struct Face * F , double dt ){
   double deltaR       = F->deltaR;
   double r         = F->r;
 
-  double primL[NUM_Q];
-  double primR[NUM_Q];
+  //double primL[NUM_Q];
+  //double primR[NUM_Q];
+  double * primL = malloc(NUM_Q*sizeof(double));
+  double * primR = malloc(NUM_Q*sizeof(double));
+
 
   double pL = cell_single_tiph(cL) - .5*cell_single_dphi(cL);
   double pR = cell_single_tiph(cR) - .5*cell_single_dphi(cR);
@@ -419,10 +439,15 @@ void face_riemann_z( struct Face * F , double dt ){
   double Bpack[6];
   vel( primL , primR , &Sl , &Sr , &Ss , n , r , Bpack );
 
-  double Fk[NUM_Q];
-  double Uk[NUM_Q];
+  //double Fk[NUM_Q];
+  //double Uk[NUM_Q];
 
-  double Flux[NUM_Q];
+  //double Flux[NUM_Q];
+  double * Fk = malloc(NUM_Q*sizeof(double));
+  double * Uk = malloc(NUM_Q*sizeof(double));
+  
+  double * Flux = malloc(NUM_Q*sizeof(double));
+
 
   double Bz_face = 0.5*(primL[BZZ]+primR[BZZ]);
   double Psi_face = 0.5*(primL[PSI]+primR[PSI]);
@@ -432,7 +457,8 @@ void face_riemann_z( struct Face * F , double dt ){
   }else if( 0. > Sr ){
     flux( primR , Flux , r , n );
   }else{
-    double Ustar[NUM_Q];
+    //double Ustar[NUM_Q];
+    double * Ustar = malloc(NUM_Q*sizeof(double));
     if( 0. < Ss ){
       prim2cons_local( primL , Uk , r , 1.0 );
       getUstar( primL , Ustar , r , Sl , Ss , n , Bpack );
@@ -450,6 +476,7 @@ void face_riemann_z( struct Face * F , double dt ){
         Flux[q] = Fk[q] + Sr*( Ustar[q] - Uk[q] );
       }
     }
+    free(Ustar);
   }
 
   /*
@@ -476,6 +503,13 @@ void face_riemann_z( struct Face * F , double dt ){
   cell_add_divB(cR,-dA*Bz_face);
   cell_add_GradPsi(cL,2,Psi_face);
   cell_add_GradPsi(cR,2,-Psi_face);
+
+  free(primL);
+  free(primR);
+  free(Fk);
+  free(Uk);
+  free(Flux);
+
 }
 
 
