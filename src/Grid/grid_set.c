@@ -13,19 +13,24 @@ void grid_set_N_p(struct Grid * theGrid){
 }
 
 void grid_set_rz(struct Grid * theGrid,struct MPIsetup * theMPIsetup){
+  theGrid->RMIN = 1.0;
+  theGrid->RMAX = 4.0;
+  theGrid->ZMIN = -1.0;
+  theGrid->ZMAX = 1.0;
+
   int N_r_0 = theGrid->N_r*mpisetup_dim_MyProc(theMPIsetup)[0];
   int N_z_0 = theGrid->N_z*mpisetup_dim_MyProc(theMPIsetup)[1];
 
   int i;
   for(i = 0; i < theGrid->N_r+theGrid->Nghost_rmin+theGrid->Nghost_rmax+1; i++){
     int ig = i-theGrid->Nghost_rmin+N_r_0;
-    double delta = (RMAX-RMIN)/(double)N_r_global;
-    theGrid->r_faces[i] = RMIN+(double)ig*delta;
+    double delta = (theGrid->RMAX-theGrid->RMIN)/(double)theGrid->N_r_global;
+    theGrid->r_faces[i] = theGrid->RMIN+(double)ig*delta;
   }
   for(i = 0; i < theGrid->N_z+theGrid->Nghost_zmin+theGrid->Nghost_zmax+1; i++){
     int ig = i-theGrid->Nghost_zmin+N_z_0;
-    double delta = (ZMAX-ZMIN)/(double)N_z_global;
-    theGrid->z_faces[i] = ZMIN+(double)ig*delta;
+    double delta = (theGrid->ZMAX-theGrid->ZMIN)/(double)theGrid->N_z_global;
+    theGrid->z_faces[i] = theGrid->ZMIN+(double)ig*delta;
   } 
 }
 

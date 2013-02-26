@@ -22,7 +22,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
 
   int count=0;
   for (k=0;k<N_z_withghost;++k){
-    for (i= N_r_withghost-2*ng;i< N_r_withghost-ng;++i){
+    for (i= N_r_withghost-2*grid_ng(theGrid);i< N_r_withghost-grid_ng(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         buffersize_r_out_send++;
       }
@@ -31,7 +31,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   buffersize_r_out_send *= (2*NUM_Q+1);
 
   for (k=0;k<N_z_withghost;++k){
-    for (i= N_r_withghost-ng;i< N_r_withghost;++i){
+    for (i= N_r_withghost-grid_ng(theGrid);i< N_r_withghost;++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         buffersize_r_out_recv++;
       }
@@ -44,7 +44,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   
   count=0;
   for (k=0;k<N_z_withghost;++k){
-    for (i= N_r_withghost-2*ng;i< N_r_withghost-ng;++i){
+    for (i= N_r_withghost-2*grid_ng(theGrid);i< N_r_withghost-grid_ng(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         for (q=0;q<NUM_Q;++q){
           buffer_r_out_send[count] = theCells[k][i][j].prim[q];
@@ -66,7 +66,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   double *buffer_r_in_recv;
 
   for (k=0;k<N_z_withghost;++k){
-    for (i= ng;i< 2*ng;++i){
+    for (i= grid_ng(theGrid);i< 2*grid_ng(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         buffersize_r_in_send++;
       }
@@ -74,7 +74,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   }
   buffersize_r_in_send *= (2*NUM_Q+1);
   for (k=0;k<N_z_withghost;++k){
-    for (i=0;i<ng;++i){
+    for (i=0;i<grid_ng(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         buffersize_r_in_recv++;
       }
@@ -86,7 +86,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   buffer_r_in_recv = malloc(sizeof(double)*buffersize_r_in_recv);
   count=0;
   for (k=0;k<N_z_withghost;++k){
-    for (i= ng;i< 2*ng;++i){
+    for (i= grid_ng(theGrid);i< 2*grid_ng(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         for (q=0;q<NUM_Q;++q){
           buffer_r_in_send[count] = theCells[k][i][j].prim[q];

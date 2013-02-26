@@ -41,5 +41,11 @@ int grid_Nghost_zmin(struct Grid *theGrid){
 int grid_Nghost_zmax(struct Grid *theGrid){
   return(theGrid->Nghost_zmax);
 }
+int grid_ng(struct Grid *theGrid){
+  return(theGrid->ng);
+}
+int grid_N_z_global(struct Grid *theGrid){
+  return(theGrid->N_z_global);
+}
 
 

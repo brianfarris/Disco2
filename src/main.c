@@ -50,13 +50,10 @@
 #include "Headers/IO.h"
 #include "Headers/TimeStep.h"
 #include "Headers/header.h"
-//int mpiSetup( int, char ** );
 
 int main(int argc, char **argv) {
 
   // start MPI 
-  // int error = mpiSetup(argc,argv);
-  // if (error==1) return(0);
   struct MPIsetup * theMPIsetup = mpisetup_create(argc,argv);
   mpisetup_setprocs(theMPIsetup);
   mpisetup_cart_create(theMPIsetup);
@@ -86,14 +83,15 @@ int main(int argc, char **argv) {
   //set conserved quantities
   cell_prim2cons(theCells,theGrid);
 
-  double dtcheck = T_MAX/NUM_CHECKPOINTS;
+  struct TimeStep * theTimeStep = timestep_create();
+
+  double dtcheck = timestep_get_T_MAX(theTimeStep)/timestep_NUM_CHECKPOINTS(theTimeStep);
   double tcheck = dtcheck;
 
   int nfile=0;
   char filename[256];
 
-  struct TimeStep * theTimeStep = timestep_create();
-  while( timestep_get_t(theTimeStep) < T_MAX ){
+  while( timestep_get_t(theTimeStep) < timestep_get_T_MAX(theTimeStep) ){
     timestep_set_dt(theTimeStep,theCells,theGrid);
     cell_copy(theCells,theGrid);
     gravMass_copy(theGravMasses);
@@ -105,25 +103,25 @@ int main(int argc, char **argv) {
     timestep_update_t(theTimeStep); 
     if( timestep_get_t(theTimeStep)>tcheck){
       sprintf(filename,"checkpoint_%04d.h5",nfile);
-      struct io *outPrims = io_create(theGrid);
-      io_flattened_prim(outPrims,theCells,theGrid);
-      io_hdf5_out(outPrims,theGrid,filename);
-      io_destroy(outPrims,theGrid);
+      struct io *theIO = io_create(theGrid);
+      io_flattened_prim(theIO,theCells,theGrid);
+      io_hdf5_out(theIO,theGrid,filename);
+      io_destroy(theIO,theGrid);
       tcheck += dtcheck;
       ++nfile;
     }
   }
   /*
      cell_printscreen(theCells,theGrid);
-     struct io *outPrims = io_new(theGrid);
-     io_flattened_prim(outPrims,theCells,theGrid);
+     struct io *theIO = io_new(theGrid);
+     io_flattened_prim(theIO,theCells,theGrid);
 
-     io_hdf5_out(outPrims,theGrid);
-     io_delete(outPrims,theGrid);
+     io_hdf5_out(theIO,theGrid);
+     io_delete(theIO,theGrid);
 
      struct io *input_prims = io_new(theGrid);
      io_hdf5_in(input_prims,theGrid);
-     io_unflattened_prim(outPrims,theCells,theGrid);
+     io_unflattened_prim(theIO,theCells,theGrid);
      io_delete(input_prims,theGrid);
      */
   //inter-processor syncs
@@ -136,8 +134,6 @@ int main(int argc, char **argv) {
   gravMass_destroy(theGravMasses);
 
   // exit MPI 
-  //MPI_Barrier(grid_comm);
-  //MPI_Finalize();
   mpisetup_destroy(theMPIsetup);
   return(0);
 }

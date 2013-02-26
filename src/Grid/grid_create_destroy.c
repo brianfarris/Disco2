@@ -7,23 +7,29 @@
 
 
 struct Grid *grid_create(struct MPIsetup * theMPIsetup) {
-  int N_r = N_r_global/mpisetup_dim_NumProcs(theMPIsetup)[0];
-  int N_z = N_z_global/mpisetup_dim_NumProcs(theMPIsetup)[1];
+  struct Grid *theGrid = (struct Grid *) malloc(sizeof(struct Grid));
+
+  theGrid->N_r_global = 32;
+  theGrid->N_z_global = 32;
+
+  theGrid->ng = 2;
+
+  int N_r = theGrid->N_r_global/mpisetup_dim_NumProcs(theMPIsetup)[0];
+  int N_z = theGrid->N_z_global/mpisetup_dim_NumProcs(theMPIsetup)[1];
 
   int Nghost_rmin;
   if (mpisetup_dim_MyProc(theMPIsetup)[0]==0){
     Nghost_rmin  = 1;
   }else{
-    Nghost_rmin  = ng;
+    Nghost_rmin  = theGrid->ng;
   }
-  int Nghost_rmax = ng;
-  int Nghost_zmin = ng;
-  int Nghost_zmax = ng;
+  int Nghost_rmax = theGrid->ng;
+  int Nghost_zmin = theGrid->ng;
+  int Nghost_zmax = theGrid->ng;
 
   int N_r_withghost = N_r+Nghost_rmin+Nghost_rmax;
   int N_z_withghost = N_z+Nghost_zmin+Nghost_zmax;
 
-  struct Grid *theGrid = (struct Grid *) malloc(sizeof(struct Grid));
 
   theGrid->N_z = N_z;
   theGrid->N_r = N_r;

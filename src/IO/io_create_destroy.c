@@ -12,24 +12,25 @@
 #include "../Headers/header.h"
 
 struct io *io_create(struct Grid *theGrid) {
+  struct io *theIO = (struct io *) malloc(sizeof(struct io));
+
   int Ncells = grid_Ncells(theGrid)*(NUM_Q+3);
   int N_r = grid_N_r(theGrid);
   int N_z = grid_N_z(theGrid);
 
-  struct io *io_pointer = (struct io *) malloc(sizeof(struct io));
 
-  io_pointer->primitives = malloc(sizeof(double *)*grid_Ncells(theGrid));
-  io_pointer->primitives[0] = malloc(sizeof(double )*grid_Ncells(theGrid)*(NUM_Q+3));
+  theIO->primitives = malloc(sizeof(double *)*grid_Ncells(theGrid));
+  theIO->primitives[0] = malloc(sizeof(double )*grid_Ncells(theGrid)*(NUM_Q+3));
   int i;
   for (i=0;i<grid_Ncells(theGrid);++i){
-    io_pointer->primitives[i]= io_pointer->primitives[0]+i*(NUM_Q+3);
+    theIO->primitives[i]= theIO->primitives[0]+i*(NUM_Q+3);
   }
-  return(io_pointer);
+  return(theIO);
 }
 
-void io_destroy(struct io *io_pointer,struct Grid *theGrid){
+void io_destroy(struct io *theIO,struct Grid *theGrid){
   int i;
-  free(io_pointer->primitives[0]);
-  free(io_pointer->primitives);
-  free(io_pointer);
+  free(theIO->primitives[0]);
+  free(theIO->primitives);
+  free(theIO);
 }

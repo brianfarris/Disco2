@@ -3,18 +3,18 @@ enum{DDD,TAU,SRR,LLL,SZZ};
 enum{C_FIXED,C_WCELL,C_WRIEMANN,C_RIGID};
 
 #include "mpi.h"
-#define N_z_global  32 
-#define N_r_global  32
-#define ng          2
+//#define N_z_global  32 
+//#define N_r_global  32
+//#define ng          2
 #define NUM_Q   9
 
 
-#define RMIN    1.0
-#define RMAX    4.0
-#define ZMIN   -1.0
-#define ZMAX    1.0
-#define T_MAX   50.0
-#define NUM_CHECKPOINTS 10
+//#define RMIN    1.0
+//#define RMAX    4.0
+//#define ZMIN   -1.0
+//#define ZMAX    1.0
+//#define T_MAX   50.0
+//#define NUM_CHECKPOINTS 10
 #define NP      1
 #define Z_PERIODIC 1
 #define GAMMALAW 1.66666666

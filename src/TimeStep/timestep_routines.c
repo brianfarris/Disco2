@@ -14,8 +14,8 @@
 
 void timestep_set_dt(struct TimeStep * theTimeStep, struct Cell *** theCells, struct Grid * theGrid){
   theTimeStep->dt = cell_mindt(theCells,theGrid);
-  if( theTimeStep->t+theTimeStep->dt > T_MAX ) {
-    theTimeStep->dt = T_MAX-theTimeStep->t;
+  if( theTimeStep->t+theTimeStep->dt > theTimeStep->T_MAX ) {
+    theTimeStep->dt = theTimeStep->T_MAX-theTimeStep->t;
   }
   printf("t: %e, dt: %e\n",theTimeStep->t,theTimeStep->dt);
 }
@@ -28,6 +28,14 @@ void timestep_set_RK(struct TimeStep * theTimeStep,double RK){
 double timestep_get_t(struct TimeStep * theTimeStep){
   return(theTimeStep->t);
 }
+double timestep_get_T_MAX(struct TimeStep * theTimeStep){
+  return(theTimeStep->T_MAX);
+}
+double timestep_NUM_CHECKPOINTS(struct TimeStep * theTimeStep){
+  return(theTimeStep->NUM_CHECKPOINTS);
+}
+
+
 
 void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,struct Grid * theGrid,struct GravMass * theGravMasses,struct MPIsetup * theMPIsetup,double timestep_fac){
   double dt = timestep_fac*theTimeStep->dt;
@@ -58,7 +66,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   }
 
   //Z Flux
-  if( N_z_global != 1 ){
+  if( grid_N_z_global(theGrid) != 1 ){
     cell_plm_rz( theCells ,theGrid, theFaces_z , Nfz , 1 );
     for( n=0 ; n<Nfz ; ++n ){
       face_riemann_z( face_pointer(theFaces_z,n) , dt );

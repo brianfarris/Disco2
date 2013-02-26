@@ -17,6 +17,14 @@ struct Grid {
   int Ncells;
   int Ncells_global;
   int offset;
+  int N_r_global;
+  int N_z_global;
+  int ng;
+  double RMIN;
+  double RMAX;
+  double ZMIN;
+  double ZMAX;
+
 };
 #endif
 

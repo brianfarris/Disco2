@@ -6,6 +6,7 @@ struct grid;
 #ifdef IO_PRIVATE_DEFS
 struct io{
   double **primitives;
+  int NUM_CHECKPOINTS;
 };
 #endif
 //create and destroy

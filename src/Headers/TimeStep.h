@@ -11,6 +11,8 @@ struct TimeStep {
   double t;
   double dt;
   double RK;
+  double T_MAX;
+  int NUM_CHECKPOINTS;
 };
 #endif
 
@@ -24,6 +26,7 @@ void timestep_set_RK(struct TimeStep * ,double);
 //take a substep
 void timestep_substep(struct TimeStep * , struct Cell *** ,struct Grid * ,struct GravMass * ,struct MPIsetup *,double);
 void timestep_update_Psi( struct TimeStep * , struct Cell *** , struct Grid *,struct MPIsetup * );
-// get the current time
+//access data 
 double timestep_get_t(struct TimeStep *);
+double timestep_NUM_CHECKPOINTS(struct TimeStep *);
 #endif
