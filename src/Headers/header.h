@@ -15,8 +15,10 @@ enum{C_FIXED,C_WCELL,C_WRIEMANN,C_RIGID};
 //#define ZMAX    1.0
 //#define T_MAX   50.0
 //#define NUM_CHECKPOINTS 10
+//#define Z_PERIODIC 1
+//#define MOVE_CELLS  C_RIGID
+/*
 #define NP      1
-#define Z_PERIODIC 1
 #define GAMMALAW 1.66666666
 #define INCLUDE_VISCOSITY 0
 #define EXPLICIT_VISCOSITY 0.1
@@ -24,7 +26,6 @@ enum{C_FIXED,C_WCELL,C_WRIEMANN,C_RIGID};
 #define DIVB_L 0.1
 #define CFL     0.5
 #define PLM     1.0
-#define MOVE_CELLS  C_RIGID
 #define POWELL 1
 #define GRAV2D 1
 #define G_EPS 0.0
@@ -33,7 +34,7 @@ enum{C_FIXED,C_WCELL,C_WRIEMANN,C_RIGID};
 #define CS_FLOOR 0.0001
 #define CS_CAP 1.0
 #define VEL_CAP 10.0
-
+*/
 /*
 int MyProc,NumProcs;
 int dim_MyProc[2];

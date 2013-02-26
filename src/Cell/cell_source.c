@@ -44,6 +44,7 @@ void gravMassaryForce( struct GravMass * theGravMasses , int p , double r , doub
   *fp = sinap*f1;
 }
 
+/*
 void source( double * prim , double * cons ,double divB, double * GradPsi, struct GravMass * theGravMasses , double rp , double rm , double phi , double dphi , double zp , double zm , double dt ){
 
   double rho = prim[RHO];
@@ -114,6 +115,7 @@ void source( double * prim , double * cons ,double divB, double * GradPsi, struc
   }
 
 }
+*/
 
 void cell_add_src( struct Cell *** theCells ,struct Grid * theGrid, struct GravMass * theGravMasses , double dt ){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
@@ -128,7 +130,80 @@ void cell_add_src( struct Cell *** theCells ,struct Grid * theGrid, struct GravM
       double rp = grid_r_faces(theGrid,i);
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
-        source( c->prim , c->cons , c->divB, c->GradPsi, theGravMasses , rp , rm , c->tiph-.5*c->dphi, c->dphi , zp , zm , dt );
+        //source( c->prim , c->cons , c->divB, c->GradPsi, theGravMasses , rp , rm , c->tiph-.5*c->dphi, c->dphi , zp , zm , dt );
+        double phi = c->tiph-.5*c->dphi;
+        double dphi = c->dphi;
+
+        double rho = c->prim[RHO];
+        double Pp  = c->prim[PPP];
+        double r   = .5*(rp+rm);
+        double vr  = c->prim[URR];
+        double vz  = c->prim[UZZ];
+        double vp  = c->prim[UPP]*r;
+        double dz = zp-zm;
+        double dV = dphi*.5*(rp*rp-rm*rm)*dz;
+
+        double Br = c->prim[BRR];
+        double Bp = c->prim[BPP];
+        double Bz = c->prim[BZZ];
+
+        double B2 = Br*Br+Bp*Bp+Bz*Bz;
+
+        double divB = c->divB;
+        double *GradPsi = c->GradPsi;
+
+        double z  = .5*(zp+zm);
+        double R  = sqrt(r*r+z*z);
+        double sint;
+        double cost;
+        double gravdist;
+        if (GRAV2D==1){
+          sint = 1.0;
+          cost = 0.0;
+          gravdist = r;
+        }else{
+          sint = r/R;
+          cost = z/R;
+          gravdist = R;
+        }
+        double fr,fp;
+        double Fr = 0.0;
+        double Fp = 0.0;
+        int p;
+
+        double vdotB = vr*Br+vp*Bp+vz*Bz;
+        double BdotGradPsi = dV*(Br*GradPsi[0]+Bp*GradPsi[1]+Bz*GradPsi[2]);
+        double vdotGradPsi = dV*(vr*GradPsi[0]+vp*GradPsi[1]+vz*GradPsi[2]);
+
+        for( p=0 ; p<grid_NumGravMass(theGrid); ++p ){
+          gravMassaryForce( theGravMasses , p , gravdist , phi , &fr , &fp );
+          Fr += fr;
+          Fp += fp;
+        }
+        cons[SRR] += dt*dV*( rho*vp*vp + Pp + .5*B2 - Bp*Bp )/r;
+        cons[SRR] -= POWELL*dt*divB*Br;
+
+        cons[SRR] += dt*dV*rho*Fr*sint;
+        cons[SZZ] += dt*dV*rho*Fr*cost;
+        cons[SZZ] -= POWELL*dt*divB*Bz;
+        cons[LLL] += dt*dV*rho*Fp*r;
+        cons[LLL] -= POWELL*dt*divB*Bp*r;
+        cons[TAU] += dt*dV*rho*( Fr*(vr*sint+vz*cost) + Fp*vp );
+        cons[TAU] -= POWELL*dt*(divB*vdotB+BdotGradPsi);
+
+        double psi = prim[PSI];
+        //cons[BRR] += dt*dV*( psi )/r;
+        //cons[PSI] -= dt*dV*psi*DIVB_CH/DIVB_L;//DIVB_CH2/DIVB_CP2;
+        cons[BRR] -= POWELL*dt*divB*vr/r;
+        cons[BPP] -= POWELL*dt*divB*vp/r;
+        cons[BZZ] -= POWELL*dt*divB*vz;
+        cons[PSI] -= POWELL*dt*vdotGradPsi;
+
+        if( INCLUDE_VISCOSITY ){
+          double nu = EXPLICIT_VISCOSITY;
+          cons[SRR] += -dt*dV*nu*rho*vr/r/r;
+        }
+
       }
     }
   }

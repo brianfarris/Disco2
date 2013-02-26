@@ -10,7 +10,7 @@
 
 
 
-void cell_prim2cons(struct Cell ***theCells,struct Grid *theGrid) {
+void cell_calc_cons(struct Cell ***theCells,struct Grid *theGrid) {
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
@@ -18,14 +18,10 @@ void cell_prim2cons(struct Cell ***theCells,struct Grid *theGrid) {
   for(k = 0; k < N_z_withghost; k++){
     for(i = 0; i < N_r_withghost; i++){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
-        //printf("before r_plus: \n");
         double r_plus = grid_r_faces(theGrid,i);
-        //printf("before r_minus:\n");
         double r_minus = grid_r_faces(theGrid,i-1);
         double r = 0.5*(r_minus+r_plus);
-        //printf("before z_plus: \n");
         double z_plus = grid_z_faces(theGrid,k);
-        //printf("before z_minus:\n");
         double z_minus = grid_z_faces(theGrid,k-1);
         double dz = z_plus-z_minus;
         double dphi = theCells[k][i][j].dphi;
@@ -60,7 +56,6 @@ void cell_prim2cons(struct Cell ***theCells,struct Grid *theGrid) {
     }
   }
 }
-
 
 void cons2prim( double * cons , double * prim , double r , double dV ){
 

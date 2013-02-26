@@ -8,10 +8,6 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-
-
-
-
 void vel( double * , double * , double * , double * , double * , double * , double , double * );
 void prim2cons_local( double * , double * , double , double );
 void getUstar( double * , double * , double , double , double , double * , double * );
@@ -48,7 +44,7 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid,
   double Bp_face = 0.5*(primL[BPP]+primR[BPP]);
   double Psi_face = 0.5*(primL[PSI]+primR[PSI]);
 
-  if( MOVE_CELLS == C_WRIEMANN ) cell_add_wiph(cL,Ss);
+  if( grid_MOVE_CELLS(theGrid) == C_WRIEMANN ) cell_add_wiph(cL,Ss);
   double w = cell_single_wiph(cL);
 
   if( w < Sl ){

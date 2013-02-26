@@ -11,7 +11,7 @@
 #include "../Headers/IO.h"
 #include "../Headers/header.h"
 
-void io_hdf5_out(struct io *io_pointer,struct Grid * theGrid, char * output_filename){
+void io_hdf5_out(struct IO *io_pointer,struct Grid * theGrid, char * output_filename){
   int NUM_Q = grid_NUM_Q(theGrid);
   int Ncells = grid_Ncells(theGrid);
   double prim_data[Ncells][NUM_Q+3];
@@ -93,7 +93,7 @@ void io_hdf5_out(struct io *io_pointer,struct Grid * theGrid, char * output_file
   H5Fclose(file_id);
 }    
 
-void io_hdf5_in(struct io *io_pointer,struct Grid * theGrid){
+void io_hdf5_in(struct IO *io_pointer,struct Grid * theGrid){
   int NUM_Q = grid_NUM_Q(theGrid);
   int Ncells = grid_Ncells(theGrid);
   double prim_data[Ncells][NUM_Q+3];

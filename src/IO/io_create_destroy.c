@@ -11,8 +11,8 @@
 #include "../Headers/IO.h"
 #include "../Headers/header.h"
 
-struct io *io_create(struct Grid *theGrid) {
-  struct io *theIO = (struct io *) malloc(sizeof(struct io));
+struct IO *io_create(struct Grid *theGrid) {
+  struct IO *theIO = (struct IO *) malloc(sizeof(struct IO));
   int NUM_Q = grid_NUM_Q(theGrid);
 
   int Ncells = grid_Ncells(theGrid)*(NUM_Q+3);
@@ -29,7 +29,7 @@ struct io *io_create(struct Grid *theGrid) {
   return(theIO);
 }
 
-void io_destroy(struct io *theIO,struct Grid *theGrid){
+void io_destroy(struct IO *theIO,struct Grid *theGrid){
   int i;
   free(theIO->primitives[0]);
   free(theIO->primitives);

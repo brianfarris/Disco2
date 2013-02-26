@@ -4,9 +4,9 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void gravMass_clean_pi(struct GravMass * theGravMasses){
+void gravMass_clean_pi(struct GravMass * theGravMasses,struct Grid * theGrid){
    int p;
-   for( p=0 ; p<NP ; ++p ){
+   for( p=0 ; p<grid_NumGravMass(theGrid) ; ++p ){
       double phi = theGravMasses[p].phi;
       while( phi > 2.*M_PI ) phi -= 2.*M_PI;
       while( phi < 0.0 ) phi += 2.*M_PI;
@@ -14,9 +14,9 @@ void gravMass_clean_pi(struct GravMass * theGravMasses){
    }
 }
 
-void gravMass_copy(struct GravMass * theGravMasses){
+void gravMass_copy(struct GravMass * theGravMasses,struct Grid * theGrid){
   int p;
-  for( p=0 ; p<NP ; ++p ){
+  for( p=0 ; p<grid_NumGravMass(theGrid) ; ++p ){
     theGravMasses[p].RK_r   = theGravMasses[p].r;
     theGravMasses[p].RK_phi = theGravMasses[p].phi;
     theGravMasses[p].RK_M   = theGravMasses[p].M;

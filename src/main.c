@@ -66,9 +66,9 @@ int main(int argc, char **argv) {
   grid_set_Ncells_and_offset(theGrid,theMPIsetup);
 
   // gravMass
-  struct GravMass *theGravMasses = gravMass_create(NP);
+  struct GravMass *theGravMasses = gravMass_create(grid_NumGravMass(theGrid));
   gravMass_initialize(theGravMasses);
-  gravMass_clean_pi(theGravMasses);
+  gravMass_clean_pi(theGravMasses,theGrid);
 
   // allocate memory for data 
   struct Cell ***theCells = cell_create(theGrid,theMPIsetup);
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
   cell_syncproc_z(theCells,theGrid,theMPIsetup);
 
   //set conserved quantities
-  cell_prim2cons(theCells,theGrid);
+  cell_calc_cons(theCells,theGrid);
 
   struct TimeStep * theTimeStep = timestep_create();
 
@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
   while( timestep_get_t(theTimeStep) < timestep_get_T_MAX(theTimeStep) ){
     timestep_set_dt(theTimeStep,theCells,theGrid);
     cell_copy(theCells,theGrid);
-    gravMass_copy(theGravMasses);
+    gravMass_copy(theGravMasses,theGrid);
     timestep_set_RK(theTimeStep,0.0);
     timestep_substep(theTimeStep,theCells,theGrid,theGravMasses,theMPIsetup,1.0);
     timestep_set_RK(theTimeStep,0.5);

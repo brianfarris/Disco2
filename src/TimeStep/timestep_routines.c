@@ -49,8 +49,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   struct Face *theFaces_z = face_create_z(theCells,theGrid,&Nfz,nzk);
   cell_clean_pi(theCells,theGrid);
   cell_clear_w(theCells,theGrid);
-  if( MOVE_CELLS == C_WCELL ) cell_set_wcell( theCells ,theGrid);
-  if( MOVE_CELLS == C_RIGID ) cell_set_wrigid( theCells ,theGrid);
+  if( grid_MOVE_CELLS(theGrid) == C_WCELL ) cell_set_wcell( theCells ,theGrid);
+  if( grid_MOVE_CELLS(theGrid) == C_RIGID ) cell_set_wrigid( theCells ,theGrid);
   cell_adjust_RK_cons( theCells, theGrid, theTimeStep->RK);
 
   cell_clear_divB(theCells,theGrid);
@@ -96,7 +96,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_syncproc_r(theCells,theGrid,theMPIsetup);
   cell_syncproc_z(theCells,theGrid,theMPIsetup);
   
-  cell_prim2cons( theCells,theGrid );
+  cell_calc_cons( theCells,theGrid );
 
 
 }
@@ -117,7 +117,7 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
 
   //Bookkeeping
   cell_calc_prim( theCells,theGrid );
-  cell_prim2cons( theCells,theGrid );
+  cell_calc_cons( theCells,theGrid );
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid,theMPIsetup);

@@ -16,6 +16,26 @@ struct Grid *grid_create(struct MPIsetup * theMPIsetup) {
 
   theGrid->NUM_Q = 9;
 
+  theGrid->Z_PERIODIC = 1;
+  theGrid->MOVE_CELLS=C_RIGID;
+  theGrid->NumGravMass = 1;
+
+  theGrid->GAMMALAW=1.66666666;
+  theGrid->INCLUDE_VISCOSITY=0;
+  theGrid->EXPLICIT_VISCOSITY=0.1;
+  theGrid->DIVB_CH=0.06;
+  theGrid->DIVB_L=0.1;
+  theGrid->CFL=0.5;
+  theGrid->PLM=1.0;
+  theGrid->POWELL=1;
+  theGrid->GRAV2D=1;
+  theGrid->G_EPS=0.0;
+  theGrid->PHI_ORDER=2.0;
+  theGrid->RHO_FLOOR=0.00001;
+  theGrid->CS_FLOOR=0.0001;
+  theGrid->CS_CAP=1.0;
+  theGrid->VEL_CAP=10.0;
+ 
   int N_r = theGrid->N_r_global/mpisetup_dim_NumProcs(theMPIsetup)[0];
   int N_z = theGrid->N_z_global/mpisetup_dim_NumProcs(theMPIsetup)[1];
 

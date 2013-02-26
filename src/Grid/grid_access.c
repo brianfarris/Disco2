@@ -50,5 +50,11 @@ int grid_N_z_global(struct Grid *theGrid){
 int grid_NUM_Q(struct Grid *theGrid){
   return(theGrid->NUM_Q);
 }
+int grid_MOVE_CELLS(struct Grid *theGrid){
+  return(theGrid->MOVE_CELLS);
+}
+int grid_NumGravMass(struct Grid *theGrid){
+  return(theGrid->NumGravMass);
+}
 
 

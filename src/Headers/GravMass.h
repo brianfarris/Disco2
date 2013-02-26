@@ -31,6 +31,6 @@ double gravMass_r(struct GravMass * ,int);
 double gravMass_phi(struct GravMass * ,int);
 double gravMass_M(struct GravMass * ,int);
 //miscellaneous
-void gravMass_clean_pi(struct GravMass *);
-void gravMass_copy(struct GravMass * );
+void gravMass_clean_pi(struct GravMass *,struct Grid *);
+void gravMass_copy(struct GravMass *,struct Grid *);
 #endif 

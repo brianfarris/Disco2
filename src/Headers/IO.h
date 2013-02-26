@@ -1,21 +1,20 @@
 #ifndef IO_H
 #define IO_H
-struct io;
+struct IO;
 struct cell;
 struct grid;
 #ifdef IO_PRIVATE_DEFS
-struct io{
+struct IO{
   double **primitives;
-  int NUM_CHECKPOINTS;
 };
 #endif
 //create and destroy
-struct io *io_create(struct Grid *);
-void io_destroy(struct io *,struct Grid *);
+struct IO *io_create(struct Grid *);
+void io_destroy(struct IO *,struct Grid *);
 //move data between theCells and IO buffer
-void io_flattened_prim(struct io *,struct Cell ***,struct Grid *);
-void io_unflattened_prim(struct io *,struct Cell ***,struct Grid *);
+void io_flattened_prim(struct IO *,struct Cell ***,struct Grid *);
+void io_unflattened_prim(struct IO *,struct Cell ***,struct Grid *);
 //calls to hdf5 routines
-void io_hdf5_out(struct io *,struct Grid *,char *);
-void io_hdf5_in(struct io *,struct Grid * );
+void io_hdf5_out(struct IO *,struct Grid *,char *);
+void io_hdf5_in(struct IO *,struct Grid * );
 #endif

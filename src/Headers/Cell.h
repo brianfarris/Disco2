@@ -70,7 +70,7 @@ void cell_boundary_outflow_z( struct Cell *** , struct Face * , struct Grid * ,s
 void cell_boundary_fixed_r( struct Cell ***, struct Grid *,struct MPIsetup *);
 //primitive-conservative conversion routines
 void cell_calc_prim( struct Cell ***,struct Grid *);
-void cell_prim2cons(struct Cell ***,struct Grid *); 
+void cell_calc_cons(struct Cell ***,struct Grid *); 
 //miscellaneous
 double cell_mindt( struct Cell *** , struct Grid * );
 void cell_copy(struct Cell ***,struct Grid * );
