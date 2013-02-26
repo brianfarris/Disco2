@@ -1,6 +1,7 @@
 1) sort all header files by category
 2) get rest of stuff out of header.h
 3) remove redundant member functions
+<<<<<<< HEAD
 4) add restart from checkpoint capability
 5) have a pure hydro version option
 6) generalize planets
@@ -9,3 +10,12 @@
 9) restore NUM_C stuff
 10) unify face_riemann_r and face_riemann_z
 11)restore bc_damp
+=======
+4) have a pure hydro version option
+5) generalize planets
+6) restore viscosity
+7) see if it is possible to not use buffers in syncing and IO
+8) restore NUM_C stuff
+9) unify face_riemann_r and face_riemann_z
+10)restore bc_damp
+>>>>>>> 6c9716299e7dd0f6ead8db74edd49a3ff0ba4a67
