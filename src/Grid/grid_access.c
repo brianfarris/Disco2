@@ -56,5 +56,50 @@ int grid_MOVE_CELLS(struct Grid *theGrid){
 int grid_NumGravMass(struct Grid *theGrid){
   return(theGrid->NumGravMass);
 }
+double grid_GAMMALAW(struct Grid *theGrid){
+  return(theGrid->GAMMALAW);
+}
+int grid_INCLUDE_VISCOSITY(struct Grid *theGrid) {
+  return(theGrid->INCLUDE_VISCOSITY);
+}
+double grid_EXPLICIT_VISCOSITY(struct Grid *theGrid){
+  return(theGrid->EXPLICIT_VISCOSITY);
+}
+double grid_DIVB_CH(struct Grid *theGrid){
+  return(theGrid->DIVB_CH);
+}
+double grid_DIVB_L(struct Grid *theGrid) {
+  return(theGrid->DIVB_L);
+}
+double grid_CFL(struct Grid *theGrid){
+  return(theGrid->CFL);
+}
+double grid_PLM(struct Grid *theGrid){
+  return(theGrid->PLM);
+}
+int grid_POWELL(struct Grid *theGrid){
+  return(theGrid->POWELL);
+}
+int grid_GRAV2D(struct Grid *theGrid){
+  return(theGrid->GRAV2D);
+}
+double grid_G_EPS(struct Grid *theGrid){
+  return(theGrid->G_EPS);
+}
+double grid_PHI_ORDER(struct Grid *theGrid){
+  return(theGrid->PHI_ORDER);
+}
+double grid_RHO_FLOOR(struct Grid *theGrid) {
+  return(theGrid->RHO_FLOOR);
+}
+double grid_CS_FLOOR(struct Grid *theGrid){
+  return(theGrid->CS_FLOOR);
+}
+double grid_CS_CAP(struct Grid *theGrid){
+  return(theGrid->CS_CAP);
+}
+double grid_VEL_CAP(struct Grid *theGrid) {
+  return(theGrid->VEL_CAP);
+}
 
 

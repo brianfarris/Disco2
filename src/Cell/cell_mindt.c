@@ -8,14 +8,14 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-double maxvel(double * prim , double w , double r ){
+double maxvel(double * prim , double w , double r ,struct Grid * theGrid){
 
   double Pp  = prim[PPP];
   double rho = prim[RHO];
   double vp  = prim[UPP]*r-w;
   double vr  = prim[URR];
   double vz  = prim[UZZ];
-  double cs  = sqrt(GAMMALAW*Pp/rho);
+  double cs  = sqrt(grid_GAMMALAW(theGrid)*Pp/rho);
 
   double Br  = prim[BRR];
   double Bp  = prim[BPP];
@@ -25,7 +25,7 @@ double maxvel(double * prim , double w , double r ){
   double cf2 = cs*cs + b2;
 
   double maxv = sqrt(cf2) + sqrt( vr*vr + vp*vp + vz*vz );
-  double ch = DIVB_CH;
+  double ch = grid_DIVB_CH(theGrid); 
   if( maxv < ch ) maxv = ch;
 
   return(maxv);
@@ -55,10 +55,10 @@ double cell_mindt( struct Cell *** theCells, struct Grid * theGrid ){
         double rdphi = .5*(rp+rm)*theCells[k][i][j].dphi;
         if( rdphi<dr ) dx = rdphi;
         if( dx>dz ) dx = dz;
-        double a  = maxvel( theCells[k][i][j].prim , w , r );
-        double dt = CFL*dx/a;
-        if( INCLUDE_VISCOSITY==1 ){
-          double dt_visc = .9*dx*dx/(EXPLICIT_VISCOSITY);
+        double a  = maxvel( theCells[k][i][j].prim , w , r ,theGrid);
+        double dt = grid_CFL(theGrid)*dx/a;
+        if( grid_INCLUDE_VISCOSITY(theGrid)==1 ){
+          double dt_visc = .9*dx*dx/(grid_EXPLICIT_VISCOSITY(theGrid));
           dt = dt/( 1. + dt/dt_visc );
         }
         if( dt_m > dt ) dt_m = dt;

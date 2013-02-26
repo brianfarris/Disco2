@@ -38,7 +38,7 @@ void cell_calc_cons(struct Cell ***theCells,struct Grid *theGrid) {
         double Bz  = theCells[k][i][j].prim[BZZ];
 
         double v2  = vr*vr + vp*vp + vz*vz;
-        double rhoe = Pp/(GAMMALAW - 1.);
+        double rhoe = Pp/(grid_GAMMALAW(theGrid) - 1.);
         double B2 = Br*Br + Bp*Bp + Bz*Bz;
 
         theCells[k][i][j].cons[DDD] = rho*dV;
@@ -57,7 +57,12 @@ void cell_calc_cons(struct Cell ***theCells,struct Grid *theGrid) {
   }
 }
 
-void cons2prim( double * cons , double * prim , double r , double dV ){
+void cons2prim( double * cons , double * prim , double r , double dV ,struct Grid * theGrid){
+  double CS_FLOOR = grid_CS_FLOOR(theGrid);
+  double CS_CAP = grid_CS_CAP(theGrid);
+  double RHO_FLOOR = grid_RHO_FLOOR(theGrid);
+  double VEL_CAP = grid_VEL_CAP(theGrid);
+  double GAMMALAW = grid_GAMMALAW(theGrid);
 
   double rho = cons[DDD]/dV;
   if( rho < RHO_FLOOR ) rho = RHO_FLOOR;
@@ -123,7 +128,7 @@ void cell_calc_prim( struct Cell *** theCells ,struct Grid * theGrid){
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         double dV = .5*(rp*rp-rm*rm)*c->dphi*dz;
-        cons2prim( c->cons , c->prim , r , dV );
+        cons2prim( c->cons , c->prim , r , dV ,theGrid);
       }
     }
   }

@@ -11,6 +11,7 @@
 
 void cell_single_init(struct Cell ***theCells, struct Grid *theGrid,int i,int j,int k){
   double DISK_MACH = 10.;
+  double GAMMALAW = grid_GAMMALAW(theGrid);
   double rm =  grid_r_faces(theGrid,i-1);
   double rp =  grid_r_faces(theGrid,i);
   double r = .5*(rm+rp);
@@ -42,6 +43,8 @@ void cell_init(struct Cell ***theCells,struct Grid *theGrid,struct MPIsetup * th
   int i, j,k;
 
   double DISK_MACH = 10.;
+  double GAMMALAW = grid_GAMMALAW(theGrid);
+  
   srand(666+mpisetup_MyProc(theMPIsetup));
   double rho0 = 1.0;
   for (k = 0; k < N_z_withghost; k++) {

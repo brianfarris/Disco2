@@ -1,5 +1,5 @@
 1) get rest of stuff out of header.h
-2) remove redundant member functions
+2) fix prim2cons_local
 3) make prim_data[][] declared properly with malloc
 4) make sure that all functions are declared in headers
 5) add restart from checkpoint capability

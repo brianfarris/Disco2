@@ -9,12 +9,13 @@
 #include "../Headers/header.h"
 
 
-double fgrav( double M , double r , double eps ){
-  double n = PHI_ORDER;
+double fgrav( double M , double r , double eps, double n ){
   return( M*pow(r,n-1.)/pow( pow(r,n) + pow(eps,n) ,1.+1./n) );
 }
 
-void gravMassaryForce( struct GravMass * theGravMasses , int p , double r , double phi , double * fr , double * fp ){
+void gravMassForce( struct GravMass * theGravMasses ,struct Grid * theGrid, int p , double r , double phi , double * fr , double * fp ){
+  double G_EPS=grid_G_EPS(theGrid);
+  double PHI_ORDER=grid_PHI_ORDER(theGrid);
 
   double rp = gravMass_r(theGravMasses,p);
   double pp = gravMass_phi(theGravMasses,p);
@@ -30,9 +31,7 @@ void gravMassaryForce( struct GravMass * theGravMasses , int p , double r , doub
   double cosap = cosa*cosp+sina*sinp;
   double sinap = sina*cosp-cosa*sinp;
 
-  double eps = G_EPS;
-
-  double f1 = -fgrav( gravMass_M(theGravMasses,p) , script_r , eps );
+  double f1 = -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );
 
   //double rH = theGravMasses[p].r*pow(theGravMasses[p].M/theGravMasses[0].M/3.,1./3.);
   //double pd = 0.8;
@@ -86,7 +85,7 @@ void source( double * prim , double * cons ,double divB, double * GradPsi, struc
   double vdotGradPsi = dV*(vr*GradPsi[0]+vp*GradPsi[1]+vz*GradPsi[2]);
 
   for( p=0 ; p<NP; ++p ){
-    gravMassaryForce( theGravMasses , p , gravdist , phi , &fr , &fp );
+    gravMassForce( theGravMasses , p , gravdist , phi , &fr , &fp );
     Fr += fr;
     Fp += fp;
   }
@@ -120,7 +119,10 @@ void source( double * prim , double * cons ,double divB, double * GradPsi, struc
 void cell_add_src( struct Cell *** theCells ,struct Grid * theGrid, struct GravMass * theGravMasses , double dt ){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
-
+  int GRAV2D=grid_GRAV2D(theGrid);
+  int POWELL=grid_POWELL(theGrid);
+  int INCLUDE_VISCOSITY=grid_INCLUDE_VISCOSITY(theGrid);
+  double EXPLICIT_VISCOSITY=grid_EXPLICIT_VISCOSITY(theGrid);
   int i,j,k;
   for( k=0 ; k<N_z_withghost ; ++k ){
     double zm = grid_z_faces(theGrid,k-1);
@@ -176,32 +178,32 @@ void cell_add_src( struct Cell *** theCells ,struct Grid * theGrid, struct GravM
         double vdotGradPsi = dV*(vr*GradPsi[0]+vp*GradPsi[1]+vz*GradPsi[2]);
 
         for( p=0 ; p<grid_NumGravMass(theGrid); ++p ){
-          gravMassaryForce( theGravMasses , p , gravdist , phi , &fr , &fp );
+          gravMassForce( theGravMasses , theGrid , p , gravdist , phi , &fr , &fp );
           Fr += fr;
           Fp += fp;
         }
-        cons[SRR] += dt*dV*( rho*vp*vp + Pp + .5*B2 - Bp*Bp )/r;
-        cons[SRR] -= POWELL*dt*divB*Br;
+        c->cons[SRR] += dt*dV*( rho*vp*vp + Pp + .5*B2 - Bp*Bp )/r;
+        c->cons[SRR] -= POWELL*dt*divB*Br;
 
-        cons[SRR] += dt*dV*rho*Fr*sint;
-        cons[SZZ] += dt*dV*rho*Fr*cost;
-        cons[SZZ] -= POWELL*dt*divB*Bz;
-        cons[LLL] += dt*dV*rho*Fp*r;
-        cons[LLL] -= POWELL*dt*divB*Bp*r;
-        cons[TAU] += dt*dV*rho*( Fr*(vr*sint+vz*cost) + Fp*vp );
-        cons[TAU] -= POWELL*dt*(divB*vdotB+BdotGradPsi);
+        c->cons[SRR] += dt*dV*rho*Fr*sint;
+        c->cons[SZZ] += dt*dV*rho*Fr*cost;
+        c->cons[SZZ] -= POWELL*dt*divB*Bz;
+        c->cons[LLL] += dt*dV*rho*Fp*r;
+        c->cons[LLL] -= POWELL*dt*divB*Bp*r;
+        c->cons[TAU] += dt*dV*rho*( Fr*(vr*sint+vz*cost) + Fp*vp );
+        c->cons[TAU] -= POWELL*dt*(divB*vdotB+BdotGradPsi);
 
-        double psi = prim[PSI];
+        double psi = c->prim[PSI];
         //cons[BRR] += dt*dV*( psi )/r;
         //cons[PSI] -= dt*dV*psi*DIVB_CH/DIVB_L;//DIVB_CH2/DIVB_CP2;
-        cons[BRR] -= POWELL*dt*divB*vr/r;
-        cons[BPP] -= POWELL*dt*divB*vp/r;
-        cons[BZZ] -= POWELL*dt*divB*vz;
-        cons[PSI] -= POWELL*dt*vdotGradPsi;
+        c->cons[BRR] -= POWELL*dt*divB*vr/r;
+        c->cons[BPP] -= POWELL*dt*divB*vp/r;
+        c->cons[BZZ] -= POWELL*dt*divB*vz;
+        c->cons[PSI] -= POWELL*dt*vdotGradPsi;
 
         if( INCLUDE_VISCOSITY ){
           double nu = EXPLICIT_VISCOSITY;
-          cons[SRR] += -dt*dV*nu*rho*vr/r/r;
+          c->cons[SRR] += -dt*dV*nu*rho*vr/r/r;
         }
 
       }

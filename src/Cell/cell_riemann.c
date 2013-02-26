@@ -9,12 +9,13 @@
 #include "../Headers/header.h"
 
 void vel( double * , double * , double * , double * , double * , double * , double , double * );
-void prim2cons_local( double * , double * , double , double );
-void getUstar( double * , double * , double , double , double , double * , double * );
+void prim2cons_local( double * , double * , double , double ,double);
+void getUstar( double * , double * , double , double , double , double * , double * ,double);
 void flux( double * , double * , double , double * );
 
 void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid, double dA , double dt , double r ){
   int NUM_Q = grid_NUM_Q(theGrid);
+  double GAMMALAW = grid_GAMMALAW(theGrid);
 
   double * primL = malloc(NUM_Q*sizeof(double));
   double * primR = malloc(NUM_Q*sizeof(double));
@@ -49,29 +50,29 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid,
 
   if( w < Sl ){
     flux( primL , Fk , r , n );
-    prim2cons_local( primL , Uk , r , 1.0 );
+    prim2cons_local( primL , Uk , r , 1.0,GAMMALAW );
     for( q=0 ; q<NUM_Q ; ++q ){
       Flux[q] = Fk[q] - w*Uk[q];
     }
   }else if( w > Sr ){
     flux( primR , Fk , r , n );
-    prim2cons_local( primR , Uk , r , 1.0 );
+    prim2cons_local( primR , Uk , r , 1.0 ,GAMMALAW);
     for( q=0 ; q<NUM_Q ; ++q ){
       Flux[q] = Fk[q] - w*Uk[q];
     }
   }else{
     double * Ustar = malloc(NUM_Q*sizeof(double));
     if( w < Ss ){
-      prim2cons_local( primL , Uk , r , 1.0 );
-      getUstar( primL , Ustar , r , Sl , Ss , n , Bpack );
+      prim2cons_local( primL , Uk , r , 1.0 ,GAMMALAW);
+      getUstar( primL , Ustar , r , Sl , Ss , n , Bpack,GAMMALAW );
       flux( primL , Fk , r , n );
 
       for( q=0 ; q<NUM_Q ; ++q ){
         Flux[q] = Fk[q] + Sl*( Ustar[q] - Uk[q] ) - w*Ustar[q];
       }
     }else{
-      prim2cons_local( primR , Uk , r , 1.0 );
-      getUstar( primR , Ustar , r , Sr , Ss , n , Bpack );
+      prim2cons_local( primR , Uk , r , 1.0 ,GAMMALAW);
+      getUstar( primR , Ustar , r , Sr , Ss , n , Bpack ,GAMMALAW);
       flux( primR , Fk , r , n );
 
       for( q=0 ; q<NUM_Q ; ++q ){

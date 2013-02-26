@@ -12,6 +12,7 @@ void cell_plm_rz( struct Cell *** theCells ,struct Grid *theGrid, struct Face * 
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
+  double PLM = grid_PLM(theGrid);
 
   int i,j,k,q;
 
@@ -107,6 +108,7 @@ void cell_plm_p( struct Cell *** theCells ,struct Grid * theGrid){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
+  double PLM = grid_PLM(theGrid);
 
   int Qmin = 0;
   int Qmax = NUM_Q;

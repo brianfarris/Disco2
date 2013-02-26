@@ -104,6 +104,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
 void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCells , struct Grid * theGrid,struct MPIsetup * theMPIsetup){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
+  double DIVB_CH = grid_DIVB_CH(theGrid);
+  double DIVB_L = grid_DIVB_L(theGrid);
 
   int i,j,k;
   for( k=0 ; k<N_z_withghost ; ++k ){

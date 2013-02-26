@@ -7,7 +7,7 @@
 #include "../Headers/Cell.h"
 #include "../Headers/header.h"
 
-void flux( double * prim , double * flux , double r , double * n ){
+void flux( double * prim , double * flux , double r , double * n ,double GAMMALAW,double DIVB_CH){
 
   double rho = prim[RHO];
   double Pp  = prim[PPP];
@@ -50,7 +50,7 @@ void flux( double * prim , double * flux , double r , double * n ){
 
 }
 
-void vel( double * prim1 , double * prim2 , double * Sl , double * Sr , double * Ss , double * n , double r , double * Bpack ){
+void vel( double * prim1 , double * prim2 , double * Sl , double * Sr , double * Ss , double * n , double r , double * Bpack,double GAMMALAW,double DIVB_CH ){
 
   double wp = 0.0*n[1];
   double ch = DIVB_CH;
@@ -172,7 +172,7 @@ void vel( double * prim1 , double * prim2 , double * Sl , double * Sr , double *
 
 }
 
-void prim2cons_local( double * prim , double * cons , double r , double dV ){
+void prim2cons_local( double * prim , double * cons , double r , double dV ,double GAMMALAW){
 
   double rho = prim[RHO];
   double Pp  = prim[PPP];
@@ -210,7 +210,7 @@ void prim2cons_local( double * prim , double * cons , double r , double dV ){
      */
 }
 
-void getUstar( double * prim , double * Ustar , double r , double Sk , double Ss , double * n , double * Bpack ){
+void getUstar( double * prim , double * Ustar , double r , double Sk , double Ss , double * n , double * Bpack,double GAMMALAW ){
 
    double Bsn = Bpack[0];
    double Bsr = Bpack[1];
@@ -282,6 +282,8 @@ void getUstar( double * prim , double * Ustar , double r , double Sk , double Ss
 
 void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
   int NUM_Q = grid_NUM_Q(theGrid);
+  double GAMMALAW = grid_GAMMALAW(theGrid);
+  double DIVB_CH = grid_DIVB_CH(theGrid);
 
   struct Cell * cL = F->L;
   struct Cell * cR = F->R;
@@ -321,7 +323,7 @@ void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
   n[0] = 1.0;   n[1] = 0.0;   n[2] = 0.0;
 
   double Bpack[6];
-  vel( primL , primR , &Sl , &Sr , &Ss , n , r , Bpack );
+  vel( primL , primR , &Sl , &Sr , &Ss , n , r , Bpack ,GAMMALAW,DIVB_CH);
 
 //  double Fk[NUM_Q];
 //  double Uk[NUM_Q];
@@ -338,24 +340,24 @@ void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
   double Psi_face = 0.5*(primL[PSI]+primR[PSI]);
 
   if( 0. < Sl ){
-    flux( primL , Flux , r , n );
+    flux( primL , Flux , r , n ,GAMMALAW,DIVB_CH);
   }else if( 0. > Sr ){
-    flux( primR , Flux , r , n );
+    flux( primR , Flux , r , n ,GAMMALAW,DIVB_CH);
   }else{
     //double Ustar[NUM_Q];
     double * Ustar = malloc(NUM_Q*sizeof(double));
     if( 0. < Ss ){
-      prim2cons_local( primL , Uk , r , 1.0 );
-      getUstar( primL , Ustar , r , Sl , Ss , n , Bpack );
-      flux( primL , Fk , r , n );
+      prim2cons_local( primL , Uk , r , 1.0 ,GAMMALAW);
+      getUstar( primL , Ustar , r , Sl , Ss , n , Bpack,GAMMALAW );
+      flux( primL , Fk , r , n ,GAMMALAW,DIVB_CH);
 
       for( q=0 ; q<NUM_Q ; ++q ){
         Flux[q] = Fk[q] + Sl*( Ustar[q] - Uk[q] );
       }
     }else{
-      prim2cons_local( primR , Uk , r , 1.0 );
-      getUstar( primR , Ustar , r , Sr , Ss , n , Bpack );
-      flux( primR , Fk , r , n );
+      prim2cons_local( primR , Uk , r , 1.0 ,GAMMALAW);
+      getUstar( primR , Ustar , r , Sr , Ss , n , Bpack ,GAMMALAW);
+      flux( primR , Fk , r , n ,GAMMALAW,DIVB_CH);
 
       for( q=0 ; q<NUM_Q ; ++q ){
         Flux[q] = Fk[q] + Sr*( Ustar[q] - Uk[q] );
@@ -400,6 +402,9 @@ void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
 
 void face_riemann_z( struct Face * F , struct Grid *theGrid, double dt ){
   int NUM_Q = grid_NUM_Q(theGrid);
+  double GAMMALAW = grid_GAMMALAW(theGrid);
+  double DIVB_CH = grid_DIVB_CH(theGrid);
+
 
   struct Cell * cL = F->L;
   struct Cell * cR = F->R;
@@ -439,7 +444,7 @@ void face_riemann_z( struct Face * F , struct Grid *theGrid, double dt ){
   n[0] = 0.0;   n[1] = 0.0;   n[2] = 1.0;
 
   double Bpack[6];
-  vel( primL , primR , &Sl , &Sr , &Ss , n , r , Bpack );
+  vel( primL , primR , &Sl , &Sr , &Ss , n , r , Bpack,GAMMALAW,DIVB_CH );
 
   //double Fk[NUM_Q];
   //double Uk[NUM_Q];
@@ -455,24 +460,24 @@ void face_riemann_z( struct Face * F , struct Grid *theGrid, double dt ){
   double Psi_face = 0.5*(primL[PSI]+primR[PSI]);
 
   if( 0. < Sl ){
-    flux( primL , Flux , r , n );
+    flux( primL , Flux , r , n ,GAMMALAW,DIVB_CH);
   }else if( 0. > Sr ){
-    flux( primR , Flux , r , n );
+    flux( primR , Flux , r , n ,GAMMALAW,DIVB_CH);
   }else{
     //double Ustar[NUM_Q];
     double * Ustar = malloc(NUM_Q*sizeof(double));
     if( 0. < Ss ){
-      prim2cons_local( primL , Uk , r , 1.0 );
-      getUstar( primL , Ustar , r , Sl , Ss , n , Bpack );
-      flux( primL , Fk , r , n );
+      prim2cons_local( primL , Uk , r , 1.0,GAMMALAW );
+      getUstar( primL , Ustar , r , Sl , Ss , n , Bpack,GAMMALAW );
+      flux( primL , Fk , r , n ,GAMMALAW,DIVB_CH);
 
       for( q=0 ; q<NUM_Q ; ++q ){
         Flux[q] = Fk[q] + Sl*( Ustar[q] - Uk[q] );
       }
     }else{
-      prim2cons_local( primR , Uk , r , 1.0 );
-      getUstar( primR , Ustar , r , Sr , Ss , n , Bpack );
-      flux( primR , Fk , r , n );
+      prim2cons_local( primR , Uk , r , 1.0,GAMMALAW );
+      getUstar( primR , Ustar , r , Sr , Ss , n , Bpack,GAMMALAW );
+      flux( primR , Fk , r , n ,GAMMALAW,DIVB_CH);
 
       for( q=0 ; q<NUM_Q ; ++q ){
         Flux[q] = Fk[q] + Sr*( Ustar[q] - Uk[q] );

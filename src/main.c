@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
   double dtcheck = timestep_get_T_MAX(theTimeStep)/timestep_NUM_CHECKPOINTS(theTimeStep);
   double tcheck = dtcheck;
-
+  printf("dtcheck: %f\n",dtcheck);
   int nfile=0;
   char filename[256];
 
@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
     timestep_update_t(theTimeStep); 
     if( timestep_get_t(theTimeStep)>tcheck){
       sprintf(filename,"checkpoint_%04d.h5",nfile);
-      struct io *theIO = io_create(theGrid);
+      struct IO *theIO = io_create(theGrid);
       io_flattened_prim(theIO,theCells,theGrid);
       io_hdf5_out(theIO,theGrid,filename);
       io_destroy(theIO,theGrid);

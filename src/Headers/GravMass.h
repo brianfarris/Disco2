@@ -1,6 +1,7 @@
 #ifndef PLANET_H
 #define PLANET_H
 struct GravMass;
+struct Grid;
 
 #ifdef PLANET_PRIVATE_DEFS
 struct GravMass{

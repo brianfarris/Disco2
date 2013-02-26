@@ -25,7 +25,7 @@ struct Grid {
   double ZMIN;
   double ZMAX;
   int NUM_Q;
-  int Z_PERIODIC
+  int Z_PERIODIC;
   int MOVE_CELLS;   
   int NumGravMass;
   double GAMMALAW;
@@ -43,7 +43,6 @@ struct Grid {
   double CS_FLOOR;
   double CS_CAP;
   double VEL_CAP;
-}
 };
 #endif
 
@@ -65,6 +64,21 @@ int grid_Nghost_zmin(struct Grid *);
 int grid_Nghost_zmax(struct Grid *);
 int grid_MOVE_CELLS(struct Grid *);
 int grid_NumGravMass(struct Grid *);
+double grid_GAMMALAW(struct Grid *);
+int grid_INCLUDE_VISCOSITY(struct Grid *);
+double grid_EXPLICIT_VISCOSITY(struct Grid *);
+double grid_DIVB_CH(struct Grid *);
+double grid_DIVB_L(struct Grid *);
+double grid_CFL(struct Grid *);
+double grid_PLM(struct Grid *);
+int grid_POWELL(struct Grid *);
+int grid_GRAV2D(struct Grid *);
+double grid_G_EPS(struct Grid *);
+double grid_PHI_ORDER(struct Grid *);
+double grid_RHO_FLOOR(struct Grid *);
+double grid_CS_FLOOR(struct Grid *);
+double grid_CS_CAP(struct Grid *);
+double grid_VEL_CAP(struct Grid *);
 //set grid data
 void grid_set_N_p(struct Grid *);
 void grid_set_rz(struct Grid *,struct MPIsetup *);
