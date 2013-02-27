@@ -1,9 +1,8 @@
-1) remove unnecessary includes from .c files 
-2) fix prim2cons_local
-3) make prim_data[][] declared properly with malloc
-4) add restart from checkpoint capability
-5) have a pure hydro version option
-6) generalize planets
+2) make prim_data[][] declared properly with malloc
+3) add restart from checkpoint capability
+4) have a pure hydro version option
+5) generalize planets
+6) remove unnecessary includes from .c files 
 7) restore viscosity
 8) see if it is possible to not use buffers in syncing and IO
 9) restore NUM_C stuff

@@ -172,44 +172,6 @@ void vel( double * prim1 , double * prim2 , double * Sl , double * Sr , double *
 
 }
 
-void prim2cons_local( double * prim , double * cons , double r , double dV ,double GAMMALAW){
-
-  double rho = prim[RHO];
-  double Pp  = prim[PPP];
-  double vr  = prim[URR];
-  double vp  = prim[UPP]*r;
-  double vz  = prim[UZZ];
-
-  double Br  = prim[BRR];
-  double Bp  = prim[BPP];
-  double Bz  = prim[BZZ];
-
-  double v2  = vr*vr + vp*vp + vz*vz;
-
-  double rhoe = Pp/(GAMMALAW - 1.);
-
-  double B2 = Br*Br + Bp*Bp + Bz*Bz;
-
-  cons[DDD] = rho*dV;
-  cons[SRR] = rho*vr*dV;
-  cons[LLL] = r*rho*vp*dV;
-  cons[SZZ] = rho*vz*dV;
-  cons[TAU] = ( .5*rho*v2 + rhoe + .5*B2 )*dV;
-
-  cons[BRR] = Br*dV/r;
-  cons[BPP] = Bp*dV/r;
-  cons[BZZ] = Bz*dV;
-
-  cons[PSI] = prim[PSI]*dV;
-
-  /*
-     int q;
-     for( q=NUM_C ; q<NUM_Q ; ++q ){
-     cons[q] = prim[q]*cons[DDD];
-     }
-     */
-}
-
 void getUstar( double * prim , double * Ustar , double r , double Sk , double Ss , double * n , double * Bpack,double GAMMALAW ){
 
    double Bsn = Bpack[0];
@@ -292,8 +254,6 @@ void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
   double deltaR       = F->deltaR;
   double r         = F->r;
 
-//  double primL[NUM_Q];
-//  double primR[NUM_Q];
   double * primL = malloc(NUM_Q*sizeof(double));
   double * primR = malloc(NUM_Q*sizeof(double));
 
@@ -325,11 +285,6 @@ void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
   double Bpack[6];
   vel( primL , primR , &Sl , &Sr , &Ss , n , r , Bpack ,GAMMALAW,DIVB_CH);
 
-//  double Fk[NUM_Q];
-//  double Uk[NUM_Q];
-
-//  double Flux[NUM_Q];
-
   double * Fk = malloc(NUM_Q*sizeof(double));
   double * Uk = malloc(NUM_Q*sizeof(double));
   
@@ -344,10 +299,9 @@ void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
   }else if( 0. > Sr ){
     flux( primR , Flux , r , n ,GAMMALAW,DIVB_CH);
   }else{
-    //double Ustar[NUM_Q];
     double * Ustar = malloc(NUM_Q*sizeof(double));
     if( 0. < Ss ){
-      prim2cons_local( primL , Uk , r , 1.0 ,GAMMALAW);
+      cell_prim2cons( primL , Uk , r , 1.0 ,GAMMALAW);
       getUstar( primL , Ustar , r , Sl , Ss , n , Bpack,GAMMALAW );
       flux( primL , Fk , r , n ,GAMMALAW,DIVB_CH);
 
@@ -355,7 +309,7 @@ void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
         Flux[q] = Fk[q] + Sl*( Ustar[q] - Uk[q] );
       }
     }else{
-      prim2cons_local( primR , Uk , r , 1.0 ,GAMMALAW);
+      cell_prim2cons( primR , Uk , r , 1.0 ,GAMMALAW);
       getUstar( primR , Ustar , r , Sr , Ss , n , Bpack ,GAMMALAW);
       flux( primR , Fk , r , n ,GAMMALAW,DIVB_CH);
 
@@ -413,8 +367,6 @@ void face_riemann_z( struct Face * F , struct Grid *theGrid, double dt ){
   double deltaR       = F->deltaR;
   double r         = F->r;
 
-  //double primL[NUM_Q];
-  //double primR[NUM_Q];
   double * primL = malloc(NUM_Q*sizeof(double));
   double * primR = malloc(NUM_Q*sizeof(double));
 
@@ -446,10 +398,6 @@ void face_riemann_z( struct Face * F , struct Grid *theGrid, double dt ){
   double Bpack[6];
   vel( primL , primR , &Sl , &Sr , &Ss , n , r , Bpack,GAMMALAW,DIVB_CH );
 
-  //double Fk[NUM_Q];
-  //double Uk[NUM_Q];
-
-  //double Flux[NUM_Q];
   double * Fk = malloc(NUM_Q*sizeof(double));
   double * Uk = malloc(NUM_Q*sizeof(double));
   
@@ -464,10 +412,9 @@ void face_riemann_z( struct Face * F , struct Grid *theGrid, double dt ){
   }else if( 0. > Sr ){
     flux( primR , Flux , r , n ,GAMMALAW,DIVB_CH);
   }else{
-    //double Ustar[NUM_Q];
     double * Ustar = malloc(NUM_Q*sizeof(double));
     if( 0. < Ss ){
-      prim2cons_local( primL , Uk , r , 1.0,GAMMALAW );
+      cell_prim2cons( primL , Uk , r , 1.0,GAMMALAW );
       getUstar( primL , Ustar , r , Sl , Ss , n , Bpack,GAMMALAW );
       flux( primL , Fk , r , n ,GAMMALAW,DIVB_CH);
 
@@ -475,7 +422,7 @@ void face_riemann_z( struct Face * F , struct Grid *theGrid, double dt ){
         Flux[q] = Fk[q] + Sl*( Ustar[q] - Uk[q] );
       }
     }else{
-      prim2cons_local( primR , Uk , r , 1.0,GAMMALAW );
+      cell_prim2cons( primR , Uk , r , 1.0,GAMMALAW );
       getUstar( primR , Ustar , r , Sr , Ss , n , Bpack,GAMMALAW );
       flux( primR , Fk , r , n ,GAMMALAW,DIVB_CH);
 

@@ -84,6 +84,7 @@ void io_hdf5_out(struct IO *io_pointer,struct Grid * theGrid, char * output_file
   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
   status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, prim_data);
+//  status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, &(io_pointer->primitives[0]));
 
   // Close/release resources.
   H5Dclose(dset_id);
@@ -141,7 +142,7 @@ void io_hdf5_in(struct IO *io_pointer,struct Grid * theGrid){
 
   // Read chunk 
   status = H5Dread(dataset, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT, prim_data);
-
+  //status = H5Dread(dataset, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT,&(io_pointer->primitives[0]));
   int i,q;
   for (i=0;i<grid_Ncells(theGrid);++i){
     io_pointer->primitives[i][0] = prim_data[i][0] ;

@@ -9,8 +9,69 @@
 #include "../Headers/header.h"
 
 
+void cell_prim2cons( double * prim , double * cons , double r , double dV ,double GAMMALAW){
 
-void cell_calc_cons(struct Cell ***theCells,struct Grid *theGrid) {
+  double rho = prim[RHO];
+  double Pp  = prim[PPP];
+  double vr  = prim[URR];
+  double vp  = prim[UPP]*r;
+  double vz  = prim[UZZ];
+
+  double Br  = prim[BRR];
+  double Bp  = prim[BPP];
+  double Bz  = prim[BZZ];
+
+  double v2  = vr*vr + vp*vp + vz*vz;
+
+  double rhoe = Pp/(GAMMALAW - 1.);
+
+  double B2 = Br*Br + Bp*Bp + Bz*Bz;
+
+  cons[DDD] = rho*dV;
+  cons[SRR] = rho*vr*dV;
+  cons[LLL] = r*rho*vp*dV;
+  cons[SZZ] = rho*vz*dV;
+  cons[TAU] = ( .5*rho*v2 + rhoe + .5*B2 )*dV;
+
+  cons[BRR] = Br*dV/r;
+  cons[BPP] = Bp*dV/r;
+  cons[BZZ] = Bz*dV;
+
+  cons[PSI] = prim[PSI]*dV;
+
+  /*
+     int q;
+     for( q=NUM_C ; q<NUM_Q ; ++q ){
+     cons[q] = prim[q]*cons[DDD];
+     }
+     */
+}
+
+void cell_calc_cons( struct Cell *** theCells,struct Grid *theGrid ){
+  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
+  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
+  double GAMMALAW = grid_GAMMALAW(theGrid);
+
+  int i,j,k;
+  for( k=0 ; k<N_z_withghost ; ++k ){
+    double zp = grid_z_faces(theGrid,k);
+    double zm = grid_z_faces(theGrid,k-1);
+    double dz = zp-zm;
+    for( i=0 ; i<N_r_withghost ; ++i ){
+      double rp = grid_r_faces(theGrid,i);
+      double rm = grid_r_faces(theGrid,i-1);
+      double r = .5*(rp+rm);
+      for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+        struct Cell * c = &(theCells[k][i][j]);
+        double dV = .5*(rp*rp - rm*rm)*c->dphi*dz;
+        cell_prim2cons( c->prim , c->cons , r , dV,GAMMALAW );
+      }    
+    }    
+  }
+}
+
+/*
+ void cell_calc_cons(struct Cell ***theCells,struct Grid *theGrid) {
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
@@ -56,8 +117,9 @@ void cell_calc_cons(struct Cell ***theCells,struct Grid *theGrid) {
     }
   }
 }
+*/
 
-void cons2prim( double * cons , double * prim , double r , double dV ,struct Grid * theGrid){
+void cell_cons2prim( double * cons , double * prim , double r , double dV ,struct Grid * theGrid){
   double CS_FLOOR = grid_CS_FLOOR(theGrid);
   double CS_CAP = grid_CS_CAP(theGrid);
   double RHO_FLOOR = grid_RHO_FLOOR(theGrid);
@@ -128,7 +190,7 @@ void cell_calc_prim( struct Cell *** theCells ,struct Grid * theGrid){
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         double dV = .5*(rp*rp-rm*rm)*c->dphi*dz;
-        cons2prim( c->cons , c->prim , r , dV ,theGrid);
+        cell_cons2prim( c->cons , c->prim , r , dV ,theGrid);
       }
     }
   }
