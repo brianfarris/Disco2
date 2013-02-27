@@ -10,7 +10,7 @@
 void grid_set_N_p(struct Grid * theGrid){
   int i;
   for(i = 0; i < theGrid->N_r+theGrid->Nghost_rmin+theGrid->Nghost_rmax; i++){
-    theGrid->N_p[i] = 16;
+    theGrid->N_p[i] = 64;
   }
 }
 
