@@ -111,19 +111,7 @@ int main(int argc, char **argv) {
       ++nfile;
     }
   }
-  /*
-     cell_printscreen(theCells,theGrid);
-     struct io *theIO = io_new(theGrid);
-     io_flattened_prim(theIO,theCells,theGrid);
 
-     io_hdf5_out(theIO,theGrid);
-     io_delete(theIO,theGrid);
-
-     struct io *input_prims = io_new(theGrid);
-     io_hdf5_in(input_prims,theGrid);
-     io_unflattened_prim(theIO,theCells,theGrid);
-     io_delete(input_prims,theGrid);
-     */
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid,theMPIsetup);
   cell_syncproc_z(theCells,theGrid,theMPIsetup);
