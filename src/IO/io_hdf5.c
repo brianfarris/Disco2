@@ -14,17 +14,7 @@
 void io_hdf5_out(struct IO *io_pointer,struct Grid * theGrid, char * output_filename){
   int NUM_Q = grid_NUM_Q(theGrid);
   int Ncells = grid_Ncells(theGrid);
-  double prim_data[Ncells][NUM_Q+3];
   int i,q;
-  for (i=0;i<Ncells;++i){
-      prim_data[i][0] = io_pointer->primitives[i][0];
-      prim_data[i][1] = io_pointer->primitives[i][1];
-      prim_data[i][2] = io_pointer->primitives[i][2];
-    for (q=0;q<NUM_Q;++q){
-      prim_data[i][q+3] = io_pointer->primitives[i][q+3];
-    }
-  }
-
   // HDF5 APIs definitions
   hid_t       file_id, dset_id;         /* file and dataset identifiers */
   hid_t       filespace, memspace;      /* file and memory dataspace identifiers */
@@ -83,8 +73,8 @@ void io_hdf5_out(struct IO *io_pointer,struct Grid * theGrid, char * output_file
   plist_id = H5Pcreate(H5P_DATASET_XFER);
   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
-  status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, prim_data);
-//  status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, &(io_pointer->primitives[0]));
+  //status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, prim_data);
+  status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, &(io_pointer->primitives[0][0]));
 
   // Close/release resources.
   H5Dclose(dset_id);
@@ -97,7 +87,6 @@ void io_hdf5_out(struct IO *io_pointer,struct Grid * theGrid, char * output_file
 void io_hdf5_in(struct IO *io_pointer,struct Grid * theGrid){
   int NUM_Q = grid_NUM_Q(theGrid);
   int Ncells = grid_Ncells(theGrid);
-  double prim_data[Ncells][NUM_Q+3];
    // double **chunk_out = io_pointer->primitives;
   hid_t       file;                        /* handles */
   hid_t       dataset;  
@@ -141,18 +130,8 @@ void io_hdf5_in(struct IO *io_pointer,struct Grid * theGrid){
   status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, stride, count, block);
 
   // Read chunk 
-  status = H5Dread(dataset, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT, prim_data);
-  //status = H5Dread(dataset, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT,&(io_pointer->primitives[0]));
-  int i,q;
-  for (i=0;i<grid_Ncells(theGrid);++i){
-    io_pointer->primitives[i][0] = prim_data[i][0] ;
-    io_pointer->primitives[i][1] = prim_data[i][1] ;
-    io_pointer->primitives[i][2] = prim_data[i][2] ;
-    for (q=0;q<NUM_Q;++q){
-      io_pointer->primitives[i][q+3] = prim_data[i][q+3] ;
-    }
-  }
-
+  // status = H5Dread(dataset, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT, prim_data);
+  status = H5Dread(dataset, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT,&(io_pointer->primitives[0][0]));
 
   // Close/release resources.
   H5Dclose(dataset);

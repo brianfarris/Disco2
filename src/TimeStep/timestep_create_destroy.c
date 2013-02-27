@@ -8,7 +8,7 @@ struct TimeStep *timestep_create() {
   struct TimeStep *theTimeStep = (struct TimeStep *) malloc(sizeof(struct TimeStep));
   theTimeStep->t = 0.0;
   theTimeStep->T_MAX = 50.0;
-  theTimeStep->NUM_CHECKPOINTS = 10;
+  theTimeStep->NUM_CHECKPOINTS = 100;
   return theTimeStep;
 }
 

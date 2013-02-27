@@ -41,7 +41,7 @@ void io_unflattened_prim(struct IO *io_pointer,struct Cell ***theCells,struct Gr
   for (k=grid_Nghost_zmin(theGrid); k<(grid_Nghost_zmin(theGrid)+N_z); k++) {
     for (i=grid_Nghost_rmin(theGrid); i<(grid_Nghost_rmin(theGrid)+N_r);i++){
       for (j=0; j<grid_N_p(theGrid,i);j++){
-        cell_set_tiph(theCells,i,j,k,io_pointer->primitives[index][q]);
+        cell_set_tiph(theCells,i,j,k,io_pointer->primitives[index][0]);
         for (q=0;q<NUM_Q;q++){
           cell_set_prim(theCells,i,j,k,q,io_pointer->primitives[index][q+3]);
         }
