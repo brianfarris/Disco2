@@ -1,5 +1,6 @@
 #ifndef MPISETUP_H
 #define MPISETUP_H
+
 struct MPIsetup;
 
 #ifdef MPISETUP_PRIVATE_DEFS

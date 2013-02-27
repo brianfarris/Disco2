@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "../Headers/GravMass.h"
+#include "../Headers/Grid.h"
 #include "../Headers/header.h"
 
 void gravMass_clean_pi(struct GravMass * theGravMasses,struct Grid * theGrid){
