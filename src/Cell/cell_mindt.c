@@ -4,8 +4,6 @@
 #include <math.h>
 #include "../Headers/Cell.h"
 #include "../Headers/Grid.h"
-#include "../Headers/Face.h"
-#include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
 double maxvel(double * prim , double w , double r ,struct Grid * theGrid){

@@ -1,5 +1,4 @@
 #define TIMESTEP_PRIVATE_DEFS
-#define CELL_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>

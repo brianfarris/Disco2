@@ -1,4 +1,4 @@
-1) figure out what is wrong on ria
+1) remove unnecessary includes from .c files 
 2) fix prim2cons_local
 3) make prim_data[][] declared properly with malloc
 4) add restart from checkpoint capability
