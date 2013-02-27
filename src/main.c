@@ -74,8 +74,19 @@ int main(int argc, char **argv) {
   struct Cell ***theCells = cell_create(theGrid,theMPIsetup);
   cell_clean_pi(theCells,theGrid);
   // set initial data 
-  cell_init(theCells,theGrid,theMPIsetup);
-
+  int restart=1;
+  if (grid_Restart(theGrid)==1){
+    char input_filename[256];
+    sprintf(input_filename,"input.h5");
+    struct IO *theIO = io_create(theGrid);
+    io_hdf5_in(theIO,theGrid,input_filename);
+    io_unflattened_prim(theIO,theCells,theGrid);
+  }else{
+    cell_init(theCells,theGrid,theMPIsetup);
+  }
+  
+  cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
+  
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid,theMPIsetup);
   cell_syncproc_z(theCells,theGrid,theMPIsetup);
@@ -83,15 +94,16 @@ int main(int argc, char **argv) {
   //set conserved quantities
   cell_calc_cons(theCells,theGrid);
 
+  cell_set_wrigid(theCells,theGrid);
+  
   struct TimeStep * theTimeStep = timestep_create();
 
-  double dtcheck = timestep_get_T_MAX(theTimeStep)/timestep_NUM_CHECKPOINTS(theTimeStep);
+  double dtcheck = grid_get_T_MAX(theGrid)/grid_NUM_CHECKPOINTS(theGrid);
   double tcheck = dtcheck;
-  printf("dtcheck: %f\n",dtcheck);
   int nfile=0;
   char filename[256];
 
-  while( timestep_get_t(theTimeStep) < timestep_get_T_MAX(theTimeStep) ){
+  while( timestep_get_t(theTimeStep) < grid_get_T_MAX(theGrid) ){
     timestep_set_dt(theTimeStep,theCells,theGrid);
     cell_copy(theCells,theGrid);
     gravMass_copy(theGravMasses,theGrid);

@@ -16,5 +16,5 @@ void io_flattened_prim(struct IO *,struct Cell ***,struct Grid *);
 void io_unflattened_prim(struct IO *,struct Cell ***,struct Grid *);
 //calls to hdf5 routines
 void io_hdf5_out(struct IO *,struct Grid *,char *);
-void io_hdf5_in(struct IO *,struct Grid * );
+void io_hdf5_in(struct IO *,struct Grid *,char * );
 #endif

@@ -1,0 +1,46 @@
+
+//Disco Parameter File//
+
+Restart			0		//If this=1 restart using input.h5
+
+//Computational Grid
+NumR			32			//Radial Zones
+NumZ			32			//Vertical Zones
+Np_Const		16	
+ng                      2
+R_Min			1.0
+R_Max			4.0
+Z_Min			-1.0
+Z_Max			1.0
+
+NUM_Q                   9
+Time_Max                50.0
+Num_Checkpoints		100
+
+Z_Periodic		1
+
+Move_Cells              3
+NumGravMass             1
+Adiabatic_Index		1.6666666666
+Include_Viscosity	0		//If this=1, include viscosity
+Explicit_Viscosity      0.01
+
+DivB_Ch			0.06		//Dedner divergence cleaning
+DivB_l			0.1
+//Numerical Parameters
+CFL			0.5
+PLM			1.0
+
+POWELL                  1
+Grav_2D			1
+G_EPS			0.0
+
+PHI_ORDER               2
+
+//Atmosphere Parameters
+Rho_Floor		0.00001
+Cs_Floor		0.0001		
+Cs_Cap			1.0
+Vel_Cap			10.0
+
+

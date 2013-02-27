@@ -84,7 +84,7 @@ void io_hdf5_out(struct IO *io_pointer,struct Grid * theGrid, char * output_file
   H5Fclose(file_id);
 }    
 
-void io_hdf5_in(struct IO *io_pointer,struct Grid * theGrid){
+void io_hdf5_in(struct IO *io_pointer,struct Grid * theGrid, char * input_filename){
   int NUM_Q = grid_NUM_Q(theGrid);
   int Ncells = grid_Ncells(theGrid);
    // double **chunk_out = io_pointer->primitives;
@@ -103,7 +103,7 @@ void io_hdf5_in(struct IO *io_pointer,struct Grid * theGrid){
   //int         i, j,k;
 
   // Open the file and the dataset.
-  file = H5Fopen(H5FILE_NAME, H5F_ACC_RDONLY, H5P_DEFAULT);
+  file = H5Fopen(input_filename, H5F_ACC_RDONLY, H5P_DEFAULT);
   dataset = H5Dopen1(file, "DoubleArray");
 
   // Get dataset rank and dimension.

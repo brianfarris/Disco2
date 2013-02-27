@@ -1,9 +1,10 @@
-2) make prim_data[][] declared properly with malloc
-3) add restart from checkpoint capability
-4) have a pure hydro version option
-5) generalize planets
-6) remove unnecessary includes from .c files 
-7) restore viscosity
+1) figure out where the nans come from
+2) have a pure hydro version option
+3) generalize planets
+4) remove unnecessary includes from .c files 
+5) check that checkpoint restart agrees to machine precision
+6) restore viscosity
+7) add error checking wherever possible
 8) see if it is possible to not use buffers in syncing and IO
 9) restore NUM_C stuff
 10) unify face_riemann_r and face_riemann_z

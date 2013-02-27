@@ -9,6 +9,8 @@
 struct Grid *grid_create(struct MPIsetup * theMPIsetup) {
   struct Grid *theGrid = (struct Grid *) malloc(sizeof(struct Grid));
 
+  /*
+  theGrid->Restart = 0;
   theGrid->N_r_global = 32;
   theGrid->N_z_global = 32;
 
@@ -35,7 +37,11 @@ struct Grid *grid_create(struct MPIsetup * theMPIsetup) {
   theGrid->CS_FLOOR=0.0001;
   theGrid->CS_CAP=1.0;
   theGrid->VEL_CAP=10.0;
- 
+  theGrid->T_MAX = 50.0;
+  theGrid->NUM_CHECKPOINTS = 100;
+  */
+  grid_read_par_file(theGrid,theMPIsetup,"mri_flock.par");
+
   int N_r = theGrid->N_r_global/mpisetup_dim_NumProcs(theMPIsetup)[0];
   int N_z = theGrid->N_z_global/mpisetup_dim_NumProcs(theMPIsetup)[1];
 

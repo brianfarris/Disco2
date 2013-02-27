@@ -65,6 +65,10 @@ void cell_calc_cons( struct Cell *** theCells,struct Grid *theGrid ){
         struct Cell * c = &(theCells[k][i][j]);
         double dV = .5*(rp*rp - rm*rm)*c->dphi*dz;
         cell_prim2cons( c->prim , c->cons , r , dV,GAMMALAW );
+        //int q;
+        //for (q=0;q<9;++q){
+        //  printf("k: %d, i: %d, j: %d,prim[%d]: %e\n",k,i,j,q,c->prim[q]);
+        //}
       }    
     }    
   }

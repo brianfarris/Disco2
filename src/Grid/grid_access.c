@@ -23,6 +23,9 @@ int grid_N_z(struct Grid *theGrid){
 int grid_Ncells(struct Grid *theGrid){
   return(theGrid->Ncells);
 }
+int grid_Restart(struct Grid *theGrid){
+  return(theGrid->Restart);
+}
 int grid_Ncells_global(struct Grid *theGrid){
   return(theGrid->Ncells_global);
 }
@@ -100,6 +103,12 @@ double grid_CS_CAP(struct Grid *theGrid){
 }
 double grid_VEL_CAP(struct Grid *theGrid) {
   return(theGrid->VEL_CAP);
+}
+double grid_get_T_MAX(struct Grid * theGrid){
+  return(theGrid->T_MAX);
+}
+double grid_NUM_CHECKPOINTS(struct Grid * theGrid){
+  return(theGrid->NUM_CHECKPOINTS);
 }
 
 

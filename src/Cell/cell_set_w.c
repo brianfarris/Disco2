@@ -47,7 +47,8 @@ void cell_set_wrigid(struct Cell ***theCells,struct Grid *theGrid){
         w += vp*m;
       }
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-        theCells[k][i][j].wiph = w/Mring;        
+        theCells[k][i][j].wiph = w/Mring;       
+        //printf("theCells[%d][%d][%d].wiph: %e\n",k,i,j,theCells[k][i][j].wiph);
       }
     }
   }

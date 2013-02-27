@@ -11,8 +11,6 @@ struct TimeStep {
   double t;
   double dt;
   double RK;
-  double T_MAX;
-  int NUM_CHECKPOINTS;
 };
 #endif
 

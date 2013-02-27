@@ -14,8 +14,8 @@
 
 void timestep_set_dt(struct TimeStep * theTimeStep, struct Cell *** theCells, struct Grid * theGrid){
   theTimeStep->dt = cell_mindt(theCells,theGrid);
-  if( theTimeStep->t+theTimeStep->dt > theTimeStep->T_MAX ) {
-    theTimeStep->dt = theTimeStep->T_MAX-theTimeStep->t;
+  if( theTimeStep->t+theTimeStep->dt > grid_get_T_MAX(theGrid) ) {
+    theTimeStep->dt = grid_get_T_MAX(theGrid)-theTimeStep->t;
   }
   printf("t: %e, dt: %e\n",theTimeStep->t,theTimeStep->dt);
 }
@@ -28,13 +28,6 @@ void timestep_set_RK(struct TimeStep * theTimeStep,double RK){
 double timestep_get_t(struct TimeStep * theTimeStep){
   return(theTimeStep->t);
 }
-double timestep_get_T_MAX(struct TimeStep * theTimeStep){
-  return(theTimeStep->T_MAX);
-}
-double timestep_NUM_CHECKPOINTS(struct TimeStep * theTimeStep){
-  return(theTimeStep->NUM_CHECKPOINTS);
-}
-
 
 
 void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,struct Grid * theGrid,struct GravMass * theGravMasses,struct MPIsetup * theMPIsetup,double timestep_fac){

@@ -17,9 +17,12 @@ struct Grid {
   int Ncells;
   int Ncells_global;
   int offset;
+  int Restart;
   int N_r_global;
   int N_z_global;
   int ng;
+  double T_MAX;
+  int NUM_CHECKPOINTS;
   double RMIN;
   double RMAX;
   double ZMIN;
@@ -55,6 +58,7 @@ double grid_r_faces(struct Grid *,int);
 double grid_z_faces(struct Grid *,int);
 int grid_N_r(struct Grid *);
 int grid_N_z(struct Grid *);
+int grid_Restart(struct Grid *);
 int grid_N_z_global(struct Grid *);
 int grid_Ncells(struct Grid *);
 int grid_Ncells_global(struct Grid *);
@@ -82,7 +86,12 @@ double grid_CS_FLOOR(struct Grid *);
 double grid_CS_CAP(struct Grid *);
 double grid_VEL_CAP(struct Grid *);
 int grid_NUM_Q(struct Grid *);
+double grid_get_T_MAX(struct Grid * );
+double grid_NUM_CHECKPOINTS(struct Grid * );
+
+
 //set grid data
+int grid_read_par_file(struct Grid * ,struct MPIsetup *, char * );
 void grid_set_N_p(struct Grid *);
 void grid_set_rz(struct Grid *,struct MPIsetup *);
 void grid_set_Ncells_and_offset(struct Grid *,struct MPIsetup *);
