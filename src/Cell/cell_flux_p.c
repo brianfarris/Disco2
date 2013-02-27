@@ -11,7 +11,6 @@
 void cell_flux_p( struct Cell *** theCells ,struct Grid *theGrid, double dt ){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
-
   int i,j,k;
   for( k=0 ; k<N_z_withghost ; ++k ){
     double zm = grid_z_faces(theGrid,k-1);

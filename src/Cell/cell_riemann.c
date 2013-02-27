@@ -8,7 +8,7 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void vel( double * , double * , double * , double * , double * , double * , double , double * );
+void vel( double * , double * , double * , double * , double * , double * , double , double *,double ,double );
 void prim2cons_local( double * , double * , double , double ,double);
 void getUstar( double * , double * , double , double , double , double * , double * ,double);
 void flux( double * , double * , double , double * );
@@ -16,6 +16,7 @@ void flux( double * , double * , double , double * );
 void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid, double dA , double dt , double r ){
   int NUM_Q = grid_NUM_Q(theGrid);
   double GAMMALAW = grid_GAMMALAW(theGrid);
+  double DIVB_CH = grid_DIVB_CH(theGrid);
 
   double * primL = malloc(NUM_Q*sizeof(double));
   double * primR = malloc(NUM_Q*sizeof(double));
@@ -27,18 +28,16 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid,
     primR[q] = cell_single_get_prims(cR)[q] 
       + cell_single_get_gradp(cR)[q]*cell_single_dphi(cR);
   }
-
-
   double Sl,Sr,Ss;
   double n[3];
   n[0] = 0.0;   n[1] = 1.0;   n[2] = 0.0;
 
   double Bpack[6];
-  vel( primL , primR , &Sl , &Sr , &Ss , n , r , Bpack );
+  vel( primL , primR , &Sl , &Sr , &Ss , n , r , Bpack ,GAMMALAW,DIVB_CH);
 
   double * Fk = malloc(NUM_Q*sizeof(double));
   double * Uk = malloc(NUM_Q*sizeof(double));
-  
+
   double * Flux = malloc(NUM_Q*sizeof(double));
 
 
@@ -47,7 +46,6 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid,
 
   if( grid_MOVE_CELLS(theGrid) == C_WRIEMANN ) cell_add_wiph(cL,Ss);
   double w = cell_single_wiph(cL);
-
   if( w < Sl ){
     flux( primL , Fk , r , n );
     prim2cons_local( primL , Uk , r , 1.0,GAMMALAW );
@@ -98,11 +96,11 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid,
      }
      }
      */
-
   for( q=0 ; q<NUM_Q ; ++q ){
     cell_add_cons(cL,q,-dt*dA*Flux[q]);
     cell_add_cons(cR,q,dt*dA*Flux[q]);
   }
+
   cell_add_divB(cL,dA*Bp_face);
   cell_add_divB(cR,-dA*Bp_face);
   cell_add_GradPsi(cL,1,Psi_face/r);

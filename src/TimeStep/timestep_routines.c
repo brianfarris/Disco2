@@ -1,4 +1,5 @@
 #define TIMESTEP_PRIVATE_DEFS
+#define CELL_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -38,12 +39,13 @@ double timestep_NUM_CHECKPOINTS(struct TimeStep * theTimeStep){
 
 
 void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,struct Grid * theGrid,struct GravMass * theGravMasses,struct MPIsetup * theMPIsetup,double timestep_fac){
+
   double dt = timestep_fac*theTimeStep->dt;
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int *nri = malloc(N_r_withghost*sizeof(int));
   int *nzk = malloc(N_z_withghost*sizeof(int));
-   //onestep
+  //onestep
   int Nfr,Nfz;
   struct Face *theFaces_r = face_create_r(theCells,theGrid,&Nfr,nri);
   struct Face *theFaces_z = face_create_z(theCells,theGrid,&Nfz,nzk);
@@ -52,7 +54,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   if( grid_MOVE_CELLS(theGrid) == C_WCELL ) cell_set_wcell( theCells ,theGrid);
   if( grid_MOVE_CELLS(theGrid) == C_RIGID ) cell_set_wrigid( theCells ,theGrid);
   cell_adjust_RK_cons( theCells, theGrid, theTimeStep->RK);
-
   cell_clear_divB(theCells,theGrid);
   cell_clear_GradPsi(theCells,theGrid);
   //Phi Flux
@@ -61,10 +62,10 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   //R Flux
   cell_plm_rz( theCells ,theGrid, theFaces_r , Nfr , 0 );
   int n;
+
   for( n=0 ; n<Nfr ; ++n ){
     face_riemann_r( face_pointer(theFaces_r,n) , theGrid, dt );
   }
-
   //Z Flux
   if( grid_N_z_global(theGrid) != 1 ){
     cell_plm_rz( theCells ,theGrid, theFaces_z , Nfz , 1 );
@@ -95,7 +96,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid,theMPIsetup);
   cell_syncproc_z(theCells,theGrid,theMPIsetup);
-  
+
   cell_calc_cons( theCells,theGrid );
 
 
