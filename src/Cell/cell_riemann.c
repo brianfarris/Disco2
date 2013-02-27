@@ -10,7 +10,7 @@
 
 void vel( double * , double * , double * , double * , double * , double * , double , double *,double ,double );
 void getUstar( double * , double * , double , double , double , double * , double * ,double);
-void flux( double * , double * , double , double * );
+void flux( double * , double * , double , double * ,double ,double );
 
 void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid, double dA , double dt , double r ){
   int NUM_Q = grid_NUM_Q(theGrid);
@@ -46,13 +46,13 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid,
   if( grid_MOVE_CELLS(theGrid) == C_WRIEMANN ) cell_add_wiph(cL,Ss);
   double w = cell_single_wiph(cL);
   if( w < Sl ){
-    flux( primL , Fk , r , n );
+    flux( primL , Fk , r , n ,GAMMALAW,DIVB_CH);
     cell_prim2cons( primL , Uk , r , 1.0,GAMMALAW );
     for( q=0 ; q<NUM_Q ; ++q ){
       Flux[q] = Fk[q] - w*Uk[q];
     }
   }else if( w > Sr ){
-    flux( primR , Fk , r , n );
+    flux( primR , Fk , r , n,GAMMALAW,DIVB_CH );
     cell_prim2cons( primR , Uk , r , 1.0 ,GAMMALAW);
     for( q=0 ; q<NUM_Q ; ++q ){
       Flux[q] = Fk[q] - w*Uk[q];
@@ -62,7 +62,7 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid,
     if( w < Ss ){
       cell_prim2cons( primL , Uk , r , 1.0 ,GAMMALAW);
       getUstar( primL , Ustar , r , Sl , Ss , n , Bpack,GAMMALAW );
-      flux( primL , Fk , r , n );
+      flux( primL , Fk , r , n,GAMMALAW,DIVB_CH );
 
       for( q=0 ; q<NUM_Q ; ++q ){
         Flux[q] = Fk[q] + Sl*( Ustar[q] - Uk[q] ) - w*Ustar[q];
@@ -70,7 +70,7 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid,
     }else{
       cell_prim2cons( primR , Uk , r , 1.0 ,GAMMALAW);
       getUstar( primR , Ustar , r , Sr , Ss , n , Bpack ,GAMMALAW);
-      flux( primR , Fk , r , n );
+      flux( primR , Fk , r , n,GAMMALAW,DIVB_CH );
 
       for( q=0 ; q<NUM_Q ; ++q ){
         Flux[q] = Fk[q] + Sr*( Ustar[q] - Uk[q] ) - w*Ustar[q];
