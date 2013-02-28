@@ -36,11 +36,11 @@ void face_build_r( struct Cell *** theCells , struct Face * theFaces , int * nri
       double dz = zp-zm;
 
       int jp;
-      double p0 = cell_tiph(theCells,i,grid_N_p(theGrid,i)-1,k);
+      double p0 = cell_single_tiph(cell_pointer(theCells,i,grid_N_p(theGrid,i)-1,k));
       int jpmin=0;
       double dpmin=2.*M_PI;
       for( jp=0 ; jp<grid_N_p(theGrid,i+1) ; ++jp ){
-        double dp = cell_tiph(theCells,i+1,jp,k) - p0;
+        double dp = cell_single_tiph(cell_pointer(theCells,i+1,jp,k)) - p0;
         while( dp > 2.*M_PI ) dp -= 2.*M_PI;
         while( dp < 0.0 ) dp += 2.*M_PI;
         if( dpmin > dp ){
@@ -52,15 +52,15 @@ void face_build_r( struct Cell *** theCells , struct Face * theFaces , int * nri
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         int jm = j-1;
         if(jm<0) jm = grid_N_p(theGrid,i)-1;
-        double dp  = cell_tiph(theCells,i+1,jp,k)-cell_tiph(theCells,i,jm,k);
+        double dp  = cell_single_tiph(cell_pointer(theCells,i+1,jp,k))-cell_single_tiph(cell_pointer(theCells,i,jm,k));
         while( dp > 2.*M_PI ) dp -= 2.*M_PI;
         while( dp < 0.0 ) dp += 2.*M_PI;
         //First figure out if cell+ covers all of cell-, 
         //if so create one face out of cell-.
-        if( cell_dphi(theCells,i,j,k) < dp ){
+        if( cell_single_dphi(cell_pointer(theCells,i,j,k)) < dp ){
           if( mode==1 ){
             addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i+1,jp,k),
-                grid_r_faces(theGrid,i),deltaL,deltaR,cell_dphi(theCells,i,j,k),cell_tiph(theCells,i,j,k),dz);
+                grid_r_faces(theGrid,i),deltaL,deltaR,cell_single_dphi(cell_pointer(theCells,i,j,k)),cell_single_tiph(cell_pointer(theCells,i,j,k)),dz);
           }
           ++n;
         }else{
@@ -68,32 +68,32 @@ void face_build_r( struct Cell *** theCells , struct Face * theFaces , int * nri
           //Step A: face formed out of beginning of cell- and end of cell+. ++jp;
           if( mode==1 ){
             addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i+1,jp,k),
-                grid_r_faces(theGrid,i),deltaL,deltaR,dp,cell_tiph(theCells,i+1,jp,k),dz);
+                grid_r_faces(theGrid,i),deltaL,deltaR,dp,cell_single_tiph(cell_pointer(theCells,i+1,jp,k)),dz);
           }
           ++n;
           ++jp;
           if( jp == grid_N_p(theGrid,i+1) ) jp = 0;
-          dp  = cell_tiph(theCells,i,j,k) - cell_tiph(theCells,i+1,jp,k);
+          dp  = cell_single_tiph(cell_pointer(theCells,i,j,k)) - cell_single_tiph(cell_pointer(theCells,i+1,jp,k));
           while( dp > M_PI ) dp -= 2.*M_PI;
           while( dp < -M_PI ) dp += 2.*M_PI;
           while( dp > 0.0 ){
             //Step B: (optional) all faces formed out of part of cell- and all of cell+. ++jp;
             if( mode==1 ){
               addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i+1,jp,k),
-                  grid_r_faces(theGrid,i),deltaL,deltaR,cell_dphi(theCells,i+1,jp,k),cell_tiph(theCells,i+1,jp,k) ,dz);
+                  grid_r_faces(theGrid,i),deltaL,deltaR,cell_single_dphi(cell_pointer(theCells,i+1,jp,k)),cell_single_tiph(cell_pointer(theCells,i+1,jp,k)) ,dz);
             }
             ++n;
             ++jp;
             if( jp == grid_N_p(theGrid,i+1) ) jp = 0;
-            dp = cell_tiph(theCells,i,j,k)-cell_tiph(theCells,i+1,jp,k);
+            dp = cell_single_tiph(cell_pointer(theCells,i,j,k))-cell_single_tiph(cell_pointer(theCells,i+1,jp,k));
             while( dp > M_PI ) dp -= 2.*M_PI;
             while( dp < -M_PI ) dp += 2.*M_PI;
           }
-          dp = cell_dphi(theCells,i+1,jp,k)+dp;
+          dp = cell_single_dphi(cell_pointer(theCells,i+1,jp,k))+dp;
           //Step C: face formed out of end of cell- and beginning of cell+.
           if( mode==1 ){
             addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i+1,jp,k),
-                grid_r_faces(theGrid,i),deltaL,deltaR,dp,cell_tiph(theCells,i,j,k),dz);
+                grid_r_faces(theGrid,i),deltaL,deltaR,dp,cell_single_tiph(cell_pointer(theCells,i,j,k)),dz);
           }
           ++n;
         }
@@ -124,11 +124,11 @@ void face_build_z( struct Cell *** theCells , struct Face * theFaces, int * nzk 
       dzR = .5*(grid_z_faces(theGrid,k+1)-grid_z_faces(theGrid,k));
 
       int jp;
-      double p0 = cell_tiph(theCells,i,grid_N_p(theGrid,i)-1,k);
+      double p0 = cell_single_tiph(cell_pointer(theCells,i,grid_N_p(theGrid,i)-1,k));
       int jpmin=0;
       double dpmin=2.*M_PI;
       for( jp=0 ; jp<grid_N_p(theGrid,i) ; ++jp ){
-        double dp = cell_tiph(theCells,i,jp,k+1)-p0;
+        double dp = cell_single_tiph(cell_pointer(theCells,i,jp,k+1))-p0;
         while( dp > 2.*M_PI ) dp -= 2.*M_PI;
         while( dp < 0.0 ) dp += 2.*M_PI;
         if( dpmin > dp ){
@@ -140,15 +140,15 @@ void face_build_z( struct Cell *** theCells , struct Face * theFaces, int * nzk 
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         int jm = j-1;
         if(jm<0) jm = grid_N_p(theGrid,i)-1;
-        double dp  = cell_tiph(theCells,i,jp,k+1)-cell_tiph(theCells,i,jm,k);
+        double dp  = cell_single_tiph(cell_pointer(theCells,i,jp,k+1))-cell_single_tiph(cell_pointer(theCells,i,jm,k));
         while( dp > 2.*M_PI ) dp -= 2.*M_PI;
         while( dp < 0.0 ) dp += 2.*M_PI;
         //First figure out if cell+ covers all of cell-, 
         //if so create one face out of cell-.
-        if( cell_dphi(theCells,i,j,k) < dp ){
+        if( cell_single_dphi(cell_pointer(theCells,i,j,k)) < dp ){
           if(mode==1){
             addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i,jp,k+1),
-                r,dzL,dzR,cell_dphi(theCells,i,j,k),cell_tiph(theCells,i,j,k),dr);
+                r,dzL,dzR,cell_single_dphi(cell_pointer(theCells,i,j,k)),cell_single_tiph(cell_pointer(theCells,i,j,k)),dr);
           }
           ++n;
         }else{
@@ -156,32 +156,32 @@ void face_build_z( struct Cell *** theCells , struct Face * theFaces, int * nzk 
           //Step A: face formed out of beginning of cell- and end of cell+. ++jp;
           if (mode==1 ){
             addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i,jp,k+1),
-                r,dzL,dzR,dp,cell_tiph(theCells,i,jp,k+1),dr);
+                r,dzL,dzR,dp,cell_single_tiph(cell_pointer(theCells,i,jp,k+1)),dr);
           }
           ++n;
           ++jp;
           if( jp == grid_N_p(theGrid,i) ) jp = 0;
-          dp  = cell_tiph(theCells,i,j,k) - cell_tiph(theCells,i,jp,k+1);
+          dp  = cell_single_tiph(cell_pointer(theCells,i,j,k)) - cell_single_tiph(cell_pointer(theCells,i,jp,k+1));
           while( dp > M_PI ) dp -= 2.*M_PI;
           while( dp < -M_PI ) dp += 2.*M_PI;
           while( dp > 0.0 ){
             //Step B: (optional) all faces formed out of part of cell- and all of cell+. ++jp;
             if(mode==1){
               addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i,jp,k+1),
-                  r,dzL,dzR,cell_dphi(theCells,i,jp,k+1),cell_tiph(theCells,i,jp,k+1),dr);
+                  r,dzL,dzR,cell_single_dphi(cell_pointer(theCells,i,jp,k+1)),cell_single_tiph(cell_pointer(theCells,i,jp,k+1)),dr);
             }
             ++n;
             ++jp;
             if( jp == grid_N_p(theGrid,i) ) jp = 0;
-            dp  = cell_tiph(theCells,i,j,k) - cell_tiph(theCells,i,jp,k+1);
+            dp  = cell_single_tiph(cell_pointer(theCells,i,j,k)) - cell_single_tiph(cell_pointer(theCells,i,jp,k+1));
             while( dp > M_PI ) dp -= 2.*M_PI;
             while( dp < -M_PI ) dp += 2.*M_PI;
           }
-          dp = cell_dphi(theCells,i,jp,k+1)+dp;
+          dp = cell_single_dphi(cell_pointer(theCells,i,jp,k+1))+dp;
           //Step C: face formed out of end of cell- and beginning of cell+.
           if( mode==1 ){
             addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i,jp,k+1),
-                r,dzL,dzR,dp,cell_tiph(theCells,i,j,k),dr);
+                r,dzL,dzR,dp,cell_single_tiph(cell_pointer(theCells,i,j,k)),dr);
           }
           ++n;
         }

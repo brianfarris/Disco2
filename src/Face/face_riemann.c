@@ -270,10 +270,10 @@ void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
 
   int q;
   for( q=0 ; q<NUM_Q ; ++q ){
-    primL[q] = cell_single_get_prims(cL)[q] 
+    primL[q] = cell_get_prims(cL)[q] 
       + cell_single_get_grad(cL)[q]*deltaL 
       + cell_single_get_gradp(cL)[q]*dpL;
-    primR[q] = cell_single_get_prims(cR)[q] 
+    primR[q] = cell_get_prims(cR)[q] 
       + cell_single_get_grad(cR)[q]*deltaR 
       + cell_single_get_gradp(cR)[q]*dpR;
   }
@@ -383,10 +383,10 @@ void face_riemann_z( struct Face * F , struct Grid *theGrid, double dt ){
 
   int q;
   for( q=0 ; q<NUM_Q ; ++q ){
-    primL[q] = cell_single_get_prims(cL)[q] 
+    primL[q] = cell_get_prims(cL)[q] 
       + cell_single_get_grad(cL)[q]*deltaL 
       + cell_single_get_gradp(cL)[q]*dpL;
-    primR[q] = cell_single_get_prims(cR)[q] 
+    primR[q] = cell_get_prims(cR)[q] 
       + cell_single_get_grad(cR)[q]*deltaR 
       + cell_single_get_gradp(cR)[q]*dpR;
   }

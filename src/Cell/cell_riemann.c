@@ -22,9 +22,9 @@ void cell_riemann_p( struct Cell * cL , struct Cell * cR, struct Grid * theGrid,
 
   int q;
   for( q=0 ; q<NUM_Q ; ++q ){
-    primL[q] = cell_single_get_prims(cL)[q] 
+    primL[q] = cell_get_prims(cL)[q] 
       + cell_single_get_gradp(cL)[q]*cell_single_dphi(cL);
-    primR[q] = cell_single_get_prims(cR)[q] 
+    primR[q] = cell_get_prims(cR)[q] 
       + cell_single_get_gradp(cR)[q]*cell_single_dphi(cR);
   }
   double Sl,Sr,Ss;
