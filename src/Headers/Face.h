@@ -3,6 +3,7 @@
 struct Face;
 struct Grid;
 struct Cell;
+struct TimeStep;
 
 #ifdef FACE_PRIVATE_DEFS
 struct Face{
@@ -18,8 +19,8 @@ struct Face{
 #endif
 
 //create and destroy
-struct Face *face_create_r(struct Cell *** ,struct Grid *,int *, int *);
-struct Face *face_create_z(struct Cell *** ,struct Grid *,int *, int *);
+struct Face *face_create_r(struct Cell *** ,struct Grid *,struct TimeStep *);
+struct Face *face_create_z(struct Cell *** ,struct Grid *,struct TimeStep *);
 void face_destroy(struct Face *);
 //access face data
 struct Face *face_pointer( struct Face *,int);

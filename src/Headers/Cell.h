@@ -28,13 +28,13 @@ void cell_destroy(struct Cell ***,struct Grid *);
 void cell_init(struct Cell ***,struct Grid *,struct MPIsetup *);
 void cell_single_init(struct Cell ***, struct Grid *,int ,int ,int );
 //retrieve data
-double *cell_get_prims(struct Cell *);
-double *cell_single_get_grad(struct Cell *);
-double *cell_single_get_gradp(struct Cell *);
-struct Cell *cell_pointer(struct Cell ***,int,int,int);
-double cell_single_tiph(struct Cell *);//redundant
-double cell_single_dphi(struct Cell *);//redundant
-double cell_single_wiph(struct Cell *);
+double *cell_prims(struct Cell *);
+double *cell_grad(struct Cell *);
+double *cell_gradp(struct Cell *);
+struct Cell *cell_single(struct Cell ***,int,int,int);
+double cell_tiph(struct Cell *);//redundant
+double cell_dphi(struct Cell *);//redundant
+double cell_wiph(struct Cell *);
 //modify cell data
 void cell_add_cons(struct Cell *, int, double);
 void cell_add_divB(struct Cell *, double);

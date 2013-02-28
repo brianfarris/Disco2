@@ -1,3 +1,4 @@
+1) create flux class
 2) have a pure hydro version option
 3) generalize planets
 4) remove unnecessary includes from .c files 
@@ -9,3 +10,4 @@
 10) unify face_riemann_r and face_riemann_z
 11)restore bc_damp
 12) openMP support
+13) doxygen

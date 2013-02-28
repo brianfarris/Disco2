@@ -20,11 +20,11 @@ void io_flattened_prim(struct IO *io_pointer,struct Cell ***theCells,struct Grid
   for (k=grid_Nghost_zmin(theGrid); k<(grid_Nghost_zmin(theGrid)+N_z); k++) {
     for (i=grid_Nghost_rmin(theGrid); i<(grid_Nghost_rmin(theGrid)+N_r);i++){
       for (j=0; j<grid_N_p(theGrid,i);j++){
-           io_pointer->primitives[index][0] = cell_single_tiph(cell_pointer(theCells,i,j,k));
+           io_pointer->primitives[index][0] = cell_tiph(cell_single(theCells,i,j,k));
           io_pointer->primitives[index][1] = 0.5*(grid_r_faces(theGrid,i-1)+grid_r_faces(theGrid,i));
           io_pointer->primitives[index][2] = 0.5*(grid_z_faces(theGrid,k-1)+grid_z_faces(theGrid,k));
         for (q=0;q<NUM_Q;q++){
-          io_pointer->primitives[index][q+3] = cell_get_prims(cell_pointer(theCells,i,j,k))[q]; 
+          io_pointer->primitives[index][q+3] = cell_prims(cell_single(theCells,i,j,k))[q]; 
         }
         index += 1;
       }

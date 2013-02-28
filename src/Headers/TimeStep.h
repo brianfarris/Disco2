@@ -11,6 +11,10 @@ struct TimeStep {
   double t;
   double dt;
   double RK;
+  int *nri;
+  int *nzk;
+  int Nfr;
+  int Nfz;
 };
 #endif
 
@@ -28,4 +32,11 @@ void timestep_update_Psi( struct TimeStep * , struct Cell *** , struct Grid *,st
 double timestep_get_t(struct TimeStep *);
 double timestep_get_T_MAX(struct TimeStep * );
 double timestep_NUM_CHECKPOINTS(struct TimeStep *);
+int * timestep_nri(struct TimeStep *);
+int * timestep_nzk(struct TimeStep *);
+void timestep_set_Nfr(struct TimeStep *,struct Grid *);
+void timestep_set_Nfz(struct TimeStep *,struct Grid *);
+int timestep_Nfr(struct TimeStep *);
+int timestep_Nfz(struct TimeStep *);
+
 #endif

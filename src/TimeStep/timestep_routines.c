@@ -35,12 +35,9 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   double dt = timestep_fac*theTimeStep->dt;
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
-  int *nri = malloc(N_r_withghost*sizeof(int));
-  int *nzk = malloc(N_z_withghost*sizeof(int));
   //onestep
-  int Nfr,Nfz;
-  struct Face *theFaces_r = face_create_r(theCells,theGrid,&Nfr,nri);
-  struct Face *theFaces_z = face_create_z(theCells,theGrid,&Nfz,nzk);
+  struct Face *theFaces_r = face_create_r(theCells,theGrid,theTimeStep);
+  struct Face *theFaces_z = face_create_z(theCells,theGrid,theTimeStep);
   cell_clean_pi(theCells,theGrid);
   cell_clear_w(theCells,theGrid);
   if( grid_MOVE_CELLS(theGrid) == C_WCELL ) cell_set_wcell( theCells ,theGrid);
@@ -52,16 +49,16 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_plm_p( theCells,theGrid );
   cell_flux_p( theCells ,theGrid, dt );
   //R Flux
-  cell_plm_rz( theCells ,theGrid, theFaces_r , Nfr , 0 );
+  cell_plm_rz( theCells ,theGrid, theFaces_r , timestep_Nfr(theTimeStep) , 0 );
   int n;
 
-  for( n=0 ; n<Nfr ; ++n ){
+  for( n=0 ; n<timestep_Nfr(theTimeStep) ; ++n ){
     face_riemann_r( face_pointer(theFaces_r,n) , theGrid, dt );
   }
   //Z Flux
   if( grid_N_z_global(theGrid) != 1 ){
-    cell_plm_rz( theCells ,theGrid, theFaces_z , Nfz , 1 );
-    for( n=0 ; n<Nfz ; ++n ){
+    cell_plm_rz( theCells ,theGrid, theFaces_z , timestep_Nfz(theTimeStep) , 1 );
+    for( n=0 ; n<timestep_Nfz(theTimeStep) ; ++n ){
       face_riemann_z( face_pointer(theFaces_z,n) ,theGrid, dt );
     }
   }
@@ -80,8 +77,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   //if( N_z_global > 1 ) cell_boundary_z( theCells , theFaces_z ,theGrid, nzk );
   cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
 
-  free(nri);
-  free(nzk);
   face_destroy(theFaces_r);
   face_destroy(theFaces_z);
 
@@ -90,8 +85,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_syncproc_z(theCells,theGrid,theMPIsetup);
 
   cell_calc_cons( theCells,theGrid );
-
-
 }
 
 void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCells , struct Grid * theGrid,struct MPIsetup * theMPIsetup){
@@ -104,7 +97,7 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
   for( k=0 ; k<N_z_withghost ; ++k ){
     for( i=0 ; i<N_r_withghost ; ++i ){
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-        cell_mult_psi(cell_pointer(theCells,i,j,k),exp(-theTimeStep->dt*DIVB_CH/DIVB_L));
+        cell_mult_psi(cell_single(theCells,i,j,k),exp(-theTimeStep->dt*DIVB_CH/DIVB_L));
       }
     }
   }
@@ -120,4 +113,23 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
 
 }
 
-
+int * timestep_nri(struct TimeStep * theTimeStep){
+  return(theTimeStep->nri);
+}
+int * timestep_nzk(struct TimeStep * theTimeStep){
+  return(theTimeStep->nzk);
+}
+void timestep_set_Nfr(struct TimeStep * theTimeStep,struct Grid * theGrid){
+  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
+  theTimeStep->Nfr = theTimeStep->nri[N_r_withghost-1];
+}
+void timestep_set_Nfz(struct TimeStep * theTimeStep,struct Grid * theGrid){
+  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
+  theTimeStep->Nfz = theTimeStep->nzk[N_z_withghost-1];
+}
+int timestep_Nfr(struct TimeStep * theTimeStep){
+  return(theTimeStep->Nfr);
+}
+int timestep_Nfz(struct TimeStep * theTimeStep){
+  return(theTimeStep->Nfz);
+}

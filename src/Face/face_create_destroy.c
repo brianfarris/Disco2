@@ -5,6 +5,7 @@
 #include "../Headers/Grid.h"
 #include "../Headers/Face.h"
 #include "../Headers/Cell.h"
+#include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
 void addFace( struct Face * theFaces , int n , struct Cell * cL , struct Cell * cR , double r , double deltaL , double deltaR , double dphi , double tp , double dz ){
@@ -36,11 +37,11 @@ void face_build_r( struct Cell *** theCells , struct Face * theFaces , int * nri
       double dz = zp-zm;
 
       int jp;
-      double p0 = cell_single_tiph(cell_pointer(theCells,i,grid_N_p(theGrid,i)-1,k));
+      double p0 = cell_tiph(cell_single(theCells,i,grid_N_p(theGrid,i)-1,k));
       int jpmin=0;
       double dpmin=2.*M_PI;
       for( jp=0 ; jp<grid_N_p(theGrid,i+1) ; ++jp ){
-        double dp = cell_single_tiph(cell_pointer(theCells,i+1,jp,k)) - p0;
+        double dp = cell_tiph(cell_single(theCells,i+1,jp,k)) - p0;
         while( dp > 2.*M_PI ) dp -= 2.*M_PI;
         while( dp < 0.0 ) dp += 2.*M_PI;
         if( dpmin > dp ){
@@ -52,48 +53,48 @@ void face_build_r( struct Cell *** theCells , struct Face * theFaces , int * nri
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         int jm = j-1;
         if(jm<0) jm = grid_N_p(theGrid,i)-1;
-        double dp  = cell_single_tiph(cell_pointer(theCells,i+1,jp,k))-cell_single_tiph(cell_pointer(theCells,i,jm,k));
+        double dp  = cell_tiph(cell_single(theCells,i+1,jp,k))-cell_tiph(cell_single(theCells,i,jm,k));
         while( dp > 2.*M_PI ) dp -= 2.*M_PI;
         while( dp < 0.0 ) dp += 2.*M_PI;
         //First figure out if cell+ covers all of cell-, 
         //if so create one face out of cell-.
-        if( cell_single_dphi(cell_pointer(theCells,i,j,k)) < dp ){
+        if( cell_dphi(cell_single(theCells,i,j,k)) < dp ){
           if( mode==1 ){
-            addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i+1,jp,k),
-                grid_r_faces(theGrid,i),deltaL,deltaR,cell_single_dphi(cell_pointer(theCells,i,j,k)),cell_single_tiph(cell_pointer(theCells,i,j,k)),dz);
+            addFace(theFaces,n,cell_single(theCells,i,j,k),cell_single(theCells,i+1,jp,k),
+                grid_r_faces(theGrid,i),deltaL,deltaR,cell_dphi(cell_single(theCells,i,j,k)),cell_tiph(cell_single(theCells,i,j,k)),dz);
           }
           ++n;
         }else{
           //Otherwise, three steps:
           //Step A: face formed out of beginning of cell- and end of cell+. ++jp;
           if( mode==1 ){
-            addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i+1,jp,k),
-                grid_r_faces(theGrid,i),deltaL,deltaR,dp,cell_single_tiph(cell_pointer(theCells,i+1,jp,k)),dz);
+            addFace(theFaces,n,cell_single(theCells,i,j,k),cell_single(theCells,i+1,jp,k),
+                grid_r_faces(theGrid,i),deltaL,deltaR,dp,cell_tiph(cell_single(theCells,i+1,jp,k)),dz);
           }
           ++n;
           ++jp;
           if( jp == grid_N_p(theGrid,i+1) ) jp = 0;
-          dp  = cell_single_tiph(cell_pointer(theCells,i,j,k)) - cell_single_tiph(cell_pointer(theCells,i+1,jp,k));
+          dp  = cell_tiph(cell_single(theCells,i,j,k)) - cell_tiph(cell_single(theCells,i+1,jp,k));
           while( dp > M_PI ) dp -= 2.*M_PI;
           while( dp < -M_PI ) dp += 2.*M_PI;
           while( dp > 0.0 ){
             //Step B: (optional) all faces formed out of part of cell- and all of cell+. ++jp;
             if( mode==1 ){
-              addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i+1,jp,k),
-                  grid_r_faces(theGrid,i),deltaL,deltaR,cell_single_dphi(cell_pointer(theCells,i+1,jp,k)),cell_single_tiph(cell_pointer(theCells,i+1,jp,k)) ,dz);
+              addFace(theFaces,n,cell_single(theCells,i,j,k),cell_single(theCells,i+1,jp,k),
+                  grid_r_faces(theGrid,i),deltaL,deltaR,cell_dphi(cell_single(theCells,i+1,jp,k)),cell_tiph(cell_single(theCells,i+1,jp,k)) ,dz);
             }
             ++n;
             ++jp;
             if( jp == grid_N_p(theGrid,i+1) ) jp = 0;
-            dp = cell_single_tiph(cell_pointer(theCells,i,j,k))-cell_single_tiph(cell_pointer(theCells,i+1,jp,k));
+            dp = cell_tiph(cell_single(theCells,i,j,k))-cell_tiph(cell_single(theCells,i+1,jp,k));
             while( dp > M_PI ) dp -= 2.*M_PI;
             while( dp < -M_PI ) dp += 2.*M_PI;
           }
-          dp = cell_single_dphi(cell_pointer(theCells,i+1,jp,k))+dp;
+          dp = cell_dphi(cell_single(theCells,i+1,jp,k))+dp;
           //Step C: face formed out of end of cell- and beginning of cell+.
           if( mode==1 ){
-            addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i+1,jp,k),
-                grid_r_faces(theGrid,i),deltaL,deltaR,dp,cell_single_tiph(cell_pointer(theCells,i,j,k)),dz);
+            addFace(theFaces,n,cell_single(theCells,i,j,k),cell_single(theCells,i+1,jp,k),
+                grid_r_faces(theGrid,i),deltaL,deltaR,dp,cell_tiph(cell_single(theCells,i,j,k)),dz);
           }
           ++n;
         }
@@ -124,11 +125,11 @@ void face_build_z( struct Cell *** theCells , struct Face * theFaces, int * nzk 
       dzR = .5*(grid_z_faces(theGrid,k+1)-grid_z_faces(theGrid,k));
 
       int jp;
-      double p0 = cell_single_tiph(cell_pointer(theCells,i,grid_N_p(theGrid,i)-1,k));
+      double p0 = cell_tiph(cell_single(theCells,i,grid_N_p(theGrid,i)-1,k));
       int jpmin=0;
       double dpmin=2.*M_PI;
       for( jp=0 ; jp<grid_N_p(theGrid,i) ; ++jp ){
-        double dp = cell_single_tiph(cell_pointer(theCells,i,jp,k+1))-p0;
+        double dp = cell_tiph(cell_single(theCells,i,jp,k+1))-p0;
         while( dp > 2.*M_PI ) dp -= 2.*M_PI;
         while( dp < 0.0 ) dp += 2.*M_PI;
         if( dpmin > dp ){
@@ -140,48 +141,48 @@ void face_build_z( struct Cell *** theCells , struct Face * theFaces, int * nzk 
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         int jm = j-1;
         if(jm<0) jm = grid_N_p(theGrid,i)-1;
-        double dp  = cell_single_tiph(cell_pointer(theCells,i,jp,k+1))-cell_single_tiph(cell_pointer(theCells,i,jm,k));
+        double dp  = cell_tiph(cell_single(theCells,i,jp,k+1))-cell_tiph(cell_single(theCells,i,jm,k));
         while( dp > 2.*M_PI ) dp -= 2.*M_PI;
         while( dp < 0.0 ) dp += 2.*M_PI;
         //First figure out if cell+ covers all of cell-, 
         //if so create one face out of cell-.
-        if( cell_single_dphi(cell_pointer(theCells,i,j,k)) < dp ){
+        if( cell_dphi(cell_single(theCells,i,j,k)) < dp ){
           if(mode==1){
-            addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i,jp,k+1),
-                r,dzL,dzR,cell_single_dphi(cell_pointer(theCells,i,j,k)),cell_single_tiph(cell_pointer(theCells,i,j,k)),dr);
+            addFace(theFaces,n,cell_single(theCells,i,j,k),cell_single(theCells,i,jp,k+1),
+                r,dzL,dzR,cell_dphi(cell_single(theCells,i,j,k)),cell_tiph(cell_single(theCells,i,j,k)),dr);
           }
           ++n;
         }else{
           //Otherwise, three steps:
           //Step A: face formed out of beginning of cell- and end of cell+. ++jp;
           if (mode==1 ){
-            addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i,jp,k+1),
-                r,dzL,dzR,dp,cell_single_tiph(cell_pointer(theCells,i,jp,k+1)),dr);
+            addFace(theFaces,n,cell_single(theCells,i,j,k),cell_single(theCells,i,jp,k+1),
+                r,dzL,dzR,dp,cell_tiph(cell_single(theCells,i,jp,k+1)),dr);
           }
           ++n;
           ++jp;
           if( jp == grid_N_p(theGrid,i) ) jp = 0;
-          dp  = cell_single_tiph(cell_pointer(theCells,i,j,k)) - cell_single_tiph(cell_pointer(theCells,i,jp,k+1));
+          dp  = cell_tiph(cell_single(theCells,i,j,k)) - cell_tiph(cell_single(theCells,i,jp,k+1));
           while( dp > M_PI ) dp -= 2.*M_PI;
           while( dp < -M_PI ) dp += 2.*M_PI;
           while( dp > 0.0 ){
             //Step B: (optional) all faces formed out of part of cell- and all of cell+. ++jp;
             if(mode==1){
-              addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i,jp,k+1),
-                  r,dzL,dzR,cell_single_dphi(cell_pointer(theCells,i,jp,k+1)),cell_single_tiph(cell_pointer(theCells,i,jp,k+1)),dr);
+              addFace(theFaces,n,cell_single(theCells,i,j,k),cell_single(theCells,i,jp,k+1),
+                  r,dzL,dzR,cell_dphi(cell_single(theCells,i,jp,k+1)),cell_tiph(cell_single(theCells,i,jp,k+1)),dr);
             }
             ++n;
             ++jp;
             if( jp == grid_N_p(theGrid,i) ) jp = 0;
-            dp  = cell_single_tiph(cell_pointer(theCells,i,j,k)) - cell_single_tiph(cell_pointer(theCells,i,jp,k+1));
+            dp  = cell_tiph(cell_single(theCells,i,j,k)) - cell_tiph(cell_single(theCells,i,jp,k+1));
             while( dp > M_PI ) dp -= 2.*M_PI;
             while( dp < -M_PI ) dp += 2.*M_PI;
           }
-          dp = cell_single_dphi(cell_pointer(theCells,i,jp,k+1))+dp;
+          dp = cell_dphi(cell_single(theCells,i,jp,k+1))+dp;
           //Step C: face formed out of end of cell- and beginning of cell+.
           if( mode==1 ){
-            addFace(theFaces,n,cell_pointer(theCells,i,j,k),cell_pointer(theCells,i,jp,k+1),
-                r,dzL,dzR,dp,cell_single_tiph(cell_pointer(theCells,i,j,k)),dr);
+            addFace(theFaces,n,cell_single(theCells,i,j,k),cell_single(theCells,i,jp,k+1),
+                r,dzL,dzR,dp,cell_tiph(cell_single(theCells,i,j,k)),dr);
           }
           ++n;
         }
@@ -191,30 +192,26 @@ void face_build_z( struct Cell *** theCells , struct Face * theFaces, int * nzk 
   if( mode==0 ) nzk[N_z_withghost-1] = n;
 }
 
-struct Face *face_create_r(struct Cell *** theCells ,struct Grid *theGrid, int *pNfr, int *nri) {
+struct Face *face_create_r(struct Cell *** theCells ,struct Grid *theGrid, struct TimeStep * theTimeStep){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   struct Face * theFaces_r;
-  //int nri[N_r_withghost];
   //Count them first.  Buildfaces with argument zero says "just count", doesn't create any faces.
-  face_build_r( theCells , NULL , nri , 0 ,theGrid);
-   *pNfr = nri[N_r_withghost-1];
-  int Nfr = *pNfr;
-  theFaces_r = (struct Face *) malloc( Nfr*sizeof(struct Face) );
-  face_build_r( theCells , theFaces_r , nri , 1 ,theGrid);
+  face_build_r( theCells , NULL , timestep_nri(theTimeStep) , 0 ,theGrid);
+  timestep_set_Nfr(theTimeStep,theGrid);
+  theFaces_r = (struct Face *) malloc( timestep_Nfr(theTimeStep)*sizeof(struct Face) );
+  face_build_r( theCells , theFaces_r , timestep_nri(theTimeStep) , 1 ,theGrid);
    return(theFaces_r);
 }
 
-struct Face *face_create_z(struct Cell *** theCells ,struct Grid *theGrid, int *pNfz, int *nzk) {
+struct Face *face_create_z(struct Cell *** theCells ,struct Grid *theGrid, struct TimeStep * theTimeStep){
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
   struct Face * theFaces_z;
-  //int nzk[N_z_withghost];
   //Count them first.  Buildfaces with argument zero says "just count", doesn't create any faces.
-  face_build_z( theCells , NULL , nzk , 0 ,theGrid);
-  *pNfz = nzk[N_z_withghost-1];
-  int Nfz = *pNfz;
-  theFaces_z = (struct Face *) malloc( Nfz*sizeof(struct Face) );
-  face_build_z( theCells , theFaces_z , nzk , 1 ,theGrid);
+  face_build_z( theCells , NULL , timestep_nzk(theTimeStep) , 0 ,theGrid);
+  timestep_set_Nfz(theTimeStep,theGrid);
+  theFaces_z = (struct Face *) malloc( timestep_Nfz(theTimeStep)*sizeof(struct Face) );
+  face_build_z( theCells , theFaces_z , timestep_nzk(theTimeStep) , 1 ,theGrid);
   return(theFaces_z);
 }
 

@@ -258,8 +258,8 @@ void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
   double * primR = malloc(NUM_Q*sizeof(double));
 
 
-  double pL = cell_single_tiph(cL) - .5*cell_single_dphi(cL);
-  double pR = cell_single_tiph(cR) - .5*cell_single_dphi(cR);   
+  double pL = cell_tiph(cL) - .5*cell_dphi(cL);
+  double pR = cell_tiph(cR) - .5*cell_dphi(cR);   
   double dpL = F->cm - pL;
   double dpR = pR - F->cm;
   while( dpL >  M_PI ) dpL -= 2.*M_PI;
@@ -270,12 +270,12 @@ void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
 
   int q;
   for( q=0 ; q<NUM_Q ; ++q ){
-    primL[q] = cell_get_prims(cL)[q] 
-      + cell_single_get_grad(cL)[q]*deltaL 
-      + cell_single_get_gradp(cL)[q]*dpL;
-    primR[q] = cell_get_prims(cR)[q] 
-      + cell_single_get_grad(cR)[q]*deltaR 
-      + cell_single_get_gradp(cR)[q]*dpR;
+    primL[q] = cell_prims(cL)[q] 
+      + cell_grad(cL)[q]*deltaL 
+      + cell_gradp(cL)[q]*dpL;
+    primR[q] = cell_prims(cR)[q] 
+      + cell_grad(cR)[q]*deltaR 
+      + cell_gradp(cR)[q]*dpR;
   }
 
   double Sl,Sr,Ss;
@@ -327,7 +327,7 @@ void face_riemann_r( struct Face * F , struct Grid *theGrid, double dt ){
      double Gprim[NUM_Q];
      for( q=0 ; q<NUM_Q ; ++q ){
      AvgPrim[q] = .5*(primL[q]+primR[q]);
-     Gprim[q] = .5*(cell_single_get_grad(cL)[q]+cell_single_get_grad(cR)[q]);
+     Gprim[q] = .5*(cell_grad(cL)[q]+cell_grad(cR)[q]);
 
      VFlux[q] = 0.0;
      }
@@ -371,8 +371,8 @@ void face_riemann_z( struct Face * F , struct Grid *theGrid, double dt ){
   double * primR = malloc(NUM_Q*sizeof(double));
 
 
-  double pL = cell_single_tiph(cL) - .5*cell_single_dphi(cL);
-  double pR = cell_single_tiph(cR) - .5*cell_single_dphi(cR);
+  double pL = cell_tiph(cL) - .5*cell_dphi(cL);
+  double pR = cell_tiph(cR) - .5*cell_dphi(cR);
   double dpL = F->cm - pL;
   double dpR = pR - F->cm;
   while( dpL >  M_PI ) dpL -= 2.*M_PI;
@@ -383,12 +383,12 @@ void face_riemann_z( struct Face * F , struct Grid *theGrid, double dt ){
 
   int q;
   for( q=0 ; q<NUM_Q ; ++q ){
-    primL[q] = cell_get_prims(cL)[q] 
-      + cell_single_get_grad(cL)[q]*deltaL 
-      + cell_single_get_gradp(cL)[q]*dpL;
-    primR[q] = cell_get_prims(cR)[q] 
-      + cell_single_get_grad(cR)[q]*deltaR 
-      + cell_single_get_gradp(cR)[q]*dpR;
+    primL[q] = cell_prims(cL)[q] 
+      + cell_grad(cL)[q]*deltaL 
+      + cell_gradp(cL)[q]*dpL;
+    primR[q] = cell_prims(cR)[q] 
+      + cell_grad(cR)[q]*deltaR 
+      + cell_gradp(cR)[q]*dpR;
   }
 
   double Sl,Sr,Ss;

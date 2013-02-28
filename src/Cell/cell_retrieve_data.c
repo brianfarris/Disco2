@@ -8,25 +8,25 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-double *cell_get_prims(struct Cell *theCell){
+double *cell_prims(struct Cell *theCell){
   return(theCell->prim);
 }
-double *cell_single_get_grad(struct Cell *theCell){
+double *cell_grad(struct Cell *theCell){
   return(theCell->grad);
 }
-double *cell_single_get_gradp(struct Cell *theCell){
+double *cell_gradp(struct Cell *theCell){
   return(theCell->gradp);
 }
-struct Cell *cell_pointer(struct Cell ***theCells,int i,int j,int k){
+struct Cell *cell_single(struct Cell ***theCells,int i,int j,int k){
   return &(theCells[k][i][j]);
 }
-double cell_single_tiph(struct Cell *oneCell){
+double cell_tiph(struct Cell *oneCell){
   return(oneCell->tiph);
 }
-double cell_single_dphi(struct Cell *oneCell){
+double cell_dphi(struct Cell *oneCell){
   return(oneCell->dphi);
 }
-double cell_single_wiph(struct Cell *oneCell){
+double cell_wiph(struct Cell *oneCell){
   return(oneCell->wiph);
 }
 
