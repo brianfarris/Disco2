@@ -319,7 +319,7 @@ double riemann_Ss(struct Riemann * theRiemann){
   return(theRiemann->Ss);
 }
 
-void riemann_blah(struct Cell * cL , struct Cell * cR, struct Grid *theGrid, double dA,double dt, double r,double deltaL,double deltaR, double dpL, double dpR , int direction ){
+void riemann_driver(struct Cell * cL , struct Cell * cR, struct Grid *theGrid, double dA,double dt, double r,double deltaL,double deltaR, double dpL, double dpR , int direction ){
   int NUM_Q = grid_NUM_Q(theGrid);
   double GAMMALAW = grid_GAMMALAW(theGrid);
   double DIVB_CH = grid_DIVB_CH(theGrid);

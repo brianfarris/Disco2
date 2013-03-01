@@ -1,0 +1,88 @@
+\hypertarget{io__flatten__unflatten_8c}{\section{src/\-I\-O/io\-\_\-flatten\-\_\-unflatten.c File Reference}
+\label{io__flatten__unflatten_8c}\index{src/\-I\-O/io\-\_\-flatten\-\_\-unflatten.\-c@{src/\-I\-O/io\-\_\-flatten\-\_\-unflatten.\-c}}
+}
+{\ttfamily \#include $<$string.\-h$>$}\\*
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Grid.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Cell.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}hdf5.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-I\-O.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/header.\-h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{io__flatten__unflatten_8c_adec9c8c242f2ed06e92770ec778a67d0}{I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}
+\item 
+\#define \hyperlink{io__flatten__unflatten_8c_ad7fc3ae742bec278239a58edad998ade}{H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E}~\char`\"{}testout.\-h5\char`\"{}
+\item 
+\#define \hyperlink{io__flatten__unflatten_8c_ab71ef18f468ca81eceb78268128c3f46}{D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E}~\char`\"{}Double\-Array\char`\"{}
+\item 
+\#define \hyperlink{io__flatten__unflatten_8c_a4e76a9ce86d91fa75775a7ae3f8d3aa5}{R\-A\-N\-K}~2
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{io__flatten__unflatten_8c_a60b319a16c190f4120aa688b0118ea9c}{io\-\_\-flattened\-\_\-prim} (struct I\-O $\ast$io\-\_\-pointer, struct Cell $\ast$$\ast$$\ast$the\-Cells, struct Grid $\ast$the\-Grid)
+\item 
+void \hyperlink{io__flatten__unflatten_8c_a8979a092ba2c97d8e8810dec49397353}{io\-\_\-unflattened\-\_\-prim} (struct I\-O $\ast$io\-\_\-pointer, struct Cell $\ast$$\ast$$\ast$the\-Cells, struct Grid $\ast$the\-Grid)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{io__flatten__unflatten_8c_ab71ef18f468ca81eceb78268128c3f46}{\index{io\-\_\-flatten\-\_\-unflatten.\-c@{io\-\_\-flatten\-\_\-unflatten.\-c}!D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E@{D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E}}
+\index{D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E@{D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E}!io_flatten_unflatten.c@{io\-\_\-flatten\-\_\-unflatten.\-c}}
+\subsubsection[{D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E~\char`\"{}Double\-Array\char`\"{}}}\label{io__flatten__unflatten_8c_ab71ef18f468ca81eceb78268128c3f46}
+
+
+Definition at line 3 of file io\-\_\-flatten\-\_\-unflatten.\-c.
+
+\hypertarget{io__flatten__unflatten_8c_ad7fc3ae742bec278239a58edad998ade}{\index{io\-\_\-flatten\-\_\-unflatten.\-c@{io\-\_\-flatten\-\_\-unflatten.\-c}!H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E@{H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E}}
+\index{H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E@{H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E}!io_flatten_unflatten.c@{io\-\_\-flatten\-\_\-unflatten.\-c}}
+\subsubsection[{H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E~\char`\"{}testout.\-h5\char`\"{}}}\label{io__flatten__unflatten_8c_ad7fc3ae742bec278239a58edad998ade}
+
+
+Definition at line 2 of file io\-\_\-flatten\-\_\-unflatten.\-c.
+
+\hypertarget{io__flatten__unflatten_8c_adec9c8c242f2ed06e92770ec778a67d0}{\index{io\-\_\-flatten\-\_\-unflatten.\-c@{io\-\_\-flatten\-\_\-unflatten.\-c}!I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S@{I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}}
+\index{I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S@{I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}!io_flatten_unflatten.c@{io\-\_\-flatten\-\_\-unflatten.\-c}}
+\subsubsection[{I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}}\label{io__flatten__unflatten_8c_adec9c8c242f2ed06e92770ec778a67d0}
+
+
+Definition at line 1 of file io\-\_\-flatten\-\_\-unflatten.\-c.
+
+\hypertarget{io__flatten__unflatten_8c_a4e76a9ce86d91fa75775a7ae3f8d3aa5}{\index{io\-\_\-flatten\-\_\-unflatten.\-c@{io\-\_\-flatten\-\_\-unflatten.\-c}!R\-A\-N\-K@{R\-A\-N\-K}}
+\index{R\-A\-N\-K@{R\-A\-N\-K}!io_flatten_unflatten.c@{io\-\_\-flatten\-\_\-unflatten.\-c}}
+\subsubsection[{R\-A\-N\-K}]{\setlength{\rightskip}{0pt plus 5cm}\#define R\-A\-N\-K~2}}\label{io__flatten__unflatten_8c_a4e76a9ce86d91fa75775a7ae3f8d3aa5}
+
+
+Definition at line 4 of file io\-\_\-flatten\-\_\-unflatten.\-c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{io__flatten__unflatten_8c_a60b319a16c190f4120aa688b0118ea9c}{\index{io\-\_\-flatten\-\_\-unflatten.\-c@{io\-\_\-flatten\-\_\-unflatten.\-c}!io\-\_\-flattened\-\_\-prim@{io\-\_\-flattened\-\_\-prim}}
+\index{io\-\_\-flattened\-\_\-prim@{io\-\_\-flattened\-\_\-prim}!io_flatten_unflatten.c@{io\-\_\-flatten\-\_\-unflatten.\-c}}
+\subsubsection[{io\-\_\-flattened\-\_\-prim}]{\setlength{\rightskip}{0pt plus 5cm}void io\-\_\-flattened\-\_\-prim (
+\begin{DoxyParamCaption}
+\item[{struct I\-O $\ast$}]{io\-\_\-pointer, }
+\item[{struct Cell $\ast$$\ast$$\ast$}]{the\-Cells, }
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{io__flatten__unflatten_8c_a60b319a16c190f4120aa688b0118ea9c}
+
+
+Definition at line 14 of file io\-\_\-flatten\-\_\-unflatten.\-c.
+
+\hypertarget{io__flatten__unflatten_8c_a8979a092ba2c97d8e8810dec49397353}{\index{io\-\_\-flatten\-\_\-unflatten.\-c@{io\-\_\-flatten\-\_\-unflatten.\-c}!io\-\_\-unflattened\-\_\-prim@{io\-\_\-unflattened\-\_\-prim}}
+\index{io\-\_\-unflattened\-\_\-prim@{io\-\_\-unflattened\-\_\-prim}!io_flatten_unflatten.c@{io\-\_\-flatten\-\_\-unflatten.\-c}}
+\subsubsection[{io\-\_\-unflattened\-\_\-prim}]{\setlength{\rightskip}{0pt plus 5cm}void io\-\_\-unflattened\-\_\-prim (
+\begin{DoxyParamCaption}
+\item[{struct I\-O $\ast$}]{io\-\_\-pointer, }
+\item[{struct Cell $\ast$$\ast$$\ast$}]{the\-Cells, }
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{io__flatten__unflatten_8c_a8979a092ba2c97d8e8810dec49397353}
+
+
+Definition at line 35 of file io\-\_\-flatten\-\_\-unflatten.\-c.
+

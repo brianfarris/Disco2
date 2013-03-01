@@ -36,5 +36,5 @@ double * riemann_prim(struct Riemann *,int );
 int riemann_state(struct Riemann * );
 double *riemann_F(struct Riemann * );
 double riemann_Ss(struct Riemann * );
-void riemann_blah( struct Cell * , struct Cell * ,struct Grid *, double , double , double ,double,double,double,double,int);
+void riemann_driver( struct Cell * , struct Cell * ,struct Grid *, double , double , double ,double,double,double,double,int);
 #endif

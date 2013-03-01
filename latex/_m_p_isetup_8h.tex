@@ -1,0 +1,205 @@
+\hypertarget{_m_p_isetup_8h}{\section{src/\-Headers/\-M\-P\-Isetup.h File Reference}
+\label{_m_p_isetup_8h}\index{src/\-Headers/\-M\-P\-Isetup.\-h@{src/\-Headers/\-M\-P\-Isetup.\-h}}
+}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct M\-P\-Isetup $\ast$ \hyperlink{_m_p_isetup_8h_aecdbb2ac98e37d389a841cda0035e892}{mpisetup\-\_\-create} (int, char $\ast$$\ast$)
+\item 
+void \hyperlink{_m_p_isetup_8h_a0d4be4bee55fc4298308e8a65323b9ad}{mpisetup\-\_\-destroy} (struct M\-P\-Isetup $\ast$)
+\item 
+void \hyperlink{_m_p_isetup_8h_aa2315410cad83a126c8070aa150e974e}{mpisetup\-\_\-setprocs} (struct M\-P\-Isetup $\ast$)
+\item 
+void \hyperlink{_m_p_isetup_8h_a1df7726a73a1f8f6fb30f795919f8200}{mpisetup\-\_\-cart\-\_\-create} (struct M\-P\-Isetup $\ast$)
+\item 
+void \hyperlink{_m_p_isetup_8h_ab8168ccc6d63240640b421cac9ce4e2f}{mpisetup\-\_\-left\-\_\-right} (struct M\-P\-Isetup $\ast$)
+\item 
+int \hyperlink{_m_p_isetup_8h_a459360ba209d0ccb12784222fa9abb59}{mpisetup\-\_\-check\-\_\-rin\-\_\-bndry} (struct M\-P\-Isetup $\ast$)
+\item 
+int \hyperlink{_m_p_isetup_8h_a0aa89dc7cb37b49d42ea78fe858ca66d}{mpisetup\-\_\-check\-\_\-rout\-\_\-bndry} (struct M\-P\-Isetup $\ast$)
+\item 
+int \hyperlink{_m_p_isetup_8h_aed8c261e315d4829891cb13c4a6ad00e}{mpisetup\-\_\-check\-\_\-zbot\-\_\-bndry} (struct M\-P\-Isetup $\ast$)
+\item 
+int \hyperlink{_m_p_isetup_8h_af727db631d5578bcc9508727963f33d5}{mpisetup\-\_\-check\-\_\-ztop\-\_\-bndry} (struct M\-P\-Isetup $\ast$)
+\item 
+int \hyperlink{_m_p_isetup_8h_a18a93a5b10dff98f78235a93df3e9e1e}{mpisetup\-\_\-\-My\-Proc} (struct M\-P\-Isetup $\ast$)
+\item 
+int \hyperlink{_m_p_isetup_8h_a34dc780318fd42805515d262a6c2724d}{mpisetup\-\_\-\-Num\-Procs} (struct M\-P\-Isetup $\ast$)
+\item 
+int $\ast$ \hyperlink{_m_p_isetup_8h_a713f61708aa6178cc849341bda55c178}{mpisetup\-\_\-dim\-\_\-\-My\-Proc} (struct M\-P\-Isetup $\ast$)
+\item 
+int $\ast$ \hyperlink{_m_p_isetup_8h_a5ab9585377fcbec1d19d95df36bb1393}{mpisetup\-\_\-dim\-\_\-\-Num\-Procs} (struct M\-P\-Isetup $\ast$)
+\item 
+int $\ast$ \hyperlink{_m_p_isetup_8h_a58e3f2c0e666888bb1bf537d7eb39570}{mpisetup\-\_\-left\-\_\-\-Proc} (struct M\-P\-Isetup $\ast$)
+\item 
+int $\ast$ \hyperlink{_m_p_isetup_8h_a1073a7abfcbdcce31deb8579bcf08df9}{mpisetup\-\_\-right\-\_\-\-Proc} (struct M\-P\-Isetup $\ast$)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{_m_p_isetup_8h_a1df7726a73a1f8f6fb30f795919f8200}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-cart\-\_\-create@{mpisetup\-\_\-cart\-\_\-create}}
+\index{mpisetup\-\_\-cart\-\_\-create@{mpisetup\-\_\-cart\-\_\-create}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-cart\-\_\-create}]{\setlength{\rightskip}{0pt plus 5cm}void mpisetup\-\_\-cart\-\_\-create (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_a1df7726a73a1f8f6fb30f795919f8200}
+
+
+Definition at line 28 of file mpisetup\-\_\-routines.\-c.
+
+\hypertarget{_m_p_isetup_8h_a459360ba209d0ccb12784222fa9abb59}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-check\-\_\-rin\-\_\-bndry@{mpisetup\-\_\-check\-\_\-rin\-\_\-bndry}}
+\index{mpisetup\-\_\-check\-\_\-rin\-\_\-bndry@{mpisetup\-\_\-check\-\_\-rin\-\_\-bndry}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-check\-\_\-rin\-\_\-bndry}]{\setlength{\rightskip}{0pt plus 5cm}int mpisetup\-\_\-check\-\_\-rin\-\_\-bndry (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_a459360ba209d0ccb12784222fa9abb59}
+
+
+Definition at line 52 of file mpisetup\-\_\-routines.\-c.
+
+\hypertarget{_m_p_isetup_8h_a0aa89dc7cb37b49d42ea78fe858ca66d}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-check\-\_\-rout\-\_\-bndry@{mpisetup\-\_\-check\-\_\-rout\-\_\-bndry}}
+\index{mpisetup\-\_\-check\-\_\-rout\-\_\-bndry@{mpisetup\-\_\-check\-\_\-rout\-\_\-bndry}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-check\-\_\-rout\-\_\-bndry}]{\setlength{\rightskip}{0pt plus 5cm}int mpisetup\-\_\-check\-\_\-rout\-\_\-bndry (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_a0aa89dc7cb37b49d42ea78fe858ca66d}
+
+
+Definition at line 55 of file mpisetup\-\_\-routines.\-c.
+
+\hypertarget{_m_p_isetup_8h_aed8c261e315d4829891cb13c4a6ad00e}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-check\-\_\-zbot\-\_\-bndry@{mpisetup\-\_\-check\-\_\-zbot\-\_\-bndry}}
+\index{mpisetup\-\_\-check\-\_\-zbot\-\_\-bndry@{mpisetup\-\_\-check\-\_\-zbot\-\_\-bndry}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-check\-\_\-zbot\-\_\-bndry}]{\setlength{\rightskip}{0pt plus 5cm}int mpisetup\-\_\-check\-\_\-zbot\-\_\-bndry (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_aed8c261e315d4829891cb13c4a6ad00e}
+
+
+Definition at line 58 of file mpisetup\-\_\-routines.\-c.
+
+\hypertarget{_m_p_isetup_8h_af727db631d5578bcc9508727963f33d5}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-check\-\_\-ztop\-\_\-bndry@{mpisetup\-\_\-check\-\_\-ztop\-\_\-bndry}}
+\index{mpisetup\-\_\-check\-\_\-ztop\-\_\-bndry@{mpisetup\-\_\-check\-\_\-ztop\-\_\-bndry}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-check\-\_\-ztop\-\_\-bndry}]{\setlength{\rightskip}{0pt plus 5cm}int mpisetup\-\_\-check\-\_\-ztop\-\_\-bndry (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_af727db631d5578bcc9508727963f33d5}
+
+
+Definition at line 61 of file mpisetup\-\_\-routines.\-c.
+
+\hypertarget{_m_p_isetup_8h_aecdbb2ac98e37d389a841cda0035e892}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-create@{mpisetup\-\_\-create}}
+\index{mpisetup\-\_\-create@{mpisetup\-\_\-create}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-create}]{\setlength{\rightskip}{0pt plus 5cm}struct M\-P\-Isetup$\ast$ mpisetup\-\_\-create (
+\begin{DoxyParamCaption}
+\item[{int}]{, }
+\item[{char $\ast$$\ast$}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [read]}}}\label{_m_p_isetup_8h_aecdbb2ac98e37d389a841cda0035e892}
+
+
+Definition at line 7 of file mpisetup\-\_\-create\-\_\-destroy.\-c.
+
+\hypertarget{_m_p_isetup_8h_a0d4be4bee55fc4298308e8a65323b9ad}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-destroy@{mpisetup\-\_\-destroy}}
+\index{mpisetup\-\_\-destroy@{mpisetup\-\_\-destroy}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-destroy}]{\setlength{\rightskip}{0pt plus 5cm}void mpisetup\-\_\-destroy (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_a0d4be4bee55fc4298308e8a65323b9ad}
+
+
+Definition at line 17 of file mpisetup\-\_\-create\-\_\-destroy.\-c.
+
+\hypertarget{_m_p_isetup_8h_a713f61708aa6178cc849341bda55c178}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-dim\-\_\-\-My\-Proc@{mpisetup\-\_\-dim\-\_\-\-My\-Proc}}
+\index{mpisetup\-\_\-dim\-\_\-\-My\-Proc@{mpisetup\-\_\-dim\-\_\-\-My\-Proc}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-dim\-\_\-\-My\-Proc}]{\setlength{\rightskip}{0pt plus 5cm}int$\ast$ mpisetup\-\_\-dim\-\_\-\-My\-Proc (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_a713f61708aa6178cc849341bda55c178}
+
+
+Definition at line 70 of file mpisetup\-\_\-routines.\-c.
+
+\hypertarget{_m_p_isetup_8h_a5ab9585377fcbec1d19d95df36bb1393}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-dim\-\_\-\-Num\-Procs@{mpisetup\-\_\-dim\-\_\-\-Num\-Procs}}
+\index{mpisetup\-\_\-dim\-\_\-\-Num\-Procs@{mpisetup\-\_\-dim\-\_\-\-Num\-Procs}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-dim\-\_\-\-Num\-Procs}]{\setlength{\rightskip}{0pt plus 5cm}int$\ast$ mpisetup\-\_\-dim\-\_\-\-Num\-Procs (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_a5ab9585377fcbec1d19d95df36bb1393}
+
+
+Definition at line 73 of file mpisetup\-\_\-routines.\-c.
+
+\hypertarget{_m_p_isetup_8h_a58e3f2c0e666888bb1bf537d7eb39570}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-left\-\_\-\-Proc@{mpisetup\-\_\-left\-\_\-\-Proc}}
+\index{mpisetup\-\_\-left\-\_\-\-Proc@{mpisetup\-\_\-left\-\_\-\-Proc}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-left\-\_\-\-Proc}]{\setlength{\rightskip}{0pt plus 5cm}int$\ast$ mpisetup\-\_\-left\-\_\-\-Proc (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_a58e3f2c0e666888bb1bf537d7eb39570}
+
+
+Definition at line 76 of file mpisetup\-\_\-routines.\-c.
+
+\hypertarget{_m_p_isetup_8h_ab8168ccc6d63240640b421cac9ce4e2f}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-left\-\_\-right@{mpisetup\-\_\-left\-\_\-right}}
+\index{mpisetup\-\_\-left\-\_\-right@{mpisetup\-\_\-left\-\_\-right}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-left\-\_\-right}]{\setlength{\rightskip}{0pt plus 5cm}void mpisetup\-\_\-left\-\_\-right (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_ab8168ccc6d63240640b421cac9ce4e2f}
+
+
+Definition at line 36 of file mpisetup\-\_\-routines.\-c.
+
+\hypertarget{_m_p_isetup_8h_a18a93a5b10dff98f78235a93df3e9e1e}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-\-My\-Proc@{mpisetup\-\_\-\-My\-Proc}}
+\index{mpisetup\-\_\-\-My\-Proc@{mpisetup\-\_\-\-My\-Proc}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-\-My\-Proc}]{\setlength{\rightskip}{0pt plus 5cm}int mpisetup\-\_\-\-My\-Proc (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_a18a93a5b10dff98f78235a93df3e9e1e}
+
+
+Definition at line 64 of file mpisetup\-\_\-routines.\-c.
+
+\hypertarget{_m_p_isetup_8h_a34dc780318fd42805515d262a6c2724d}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-\-Num\-Procs@{mpisetup\-\_\-\-Num\-Procs}}
+\index{mpisetup\-\_\-\-Num\-Procs@{mpisetup\-\_\-\-Num\-Procs}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-\-Num\-Procs}]{\setlength{\rightskip}{0pt plus 5cm}int mpisetup\-\_\-\-Num\-Procs (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_a34dc780318fd42805515d262a6c2724d}
+
+
+Definition at line 67 of file mpisetup\-\_\-routines.\-c.
+
+\hypertarget{_m_p_isetup_8h_a1073a7abfcbdcce31deb8579bcf08df9}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-right\-\_\-\-Proc@{mpisetup\-\_\-right\-\_\-\-Proc}}
+\index{mpisetup\-\_\-right\-\_\-\-Proc@{mpisetup\-\_\-right\-\_\-\-Proc}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-right\-\_\-\-Proc}]{\setlength{\rightskip}{0pt plus 5cm}int$\ast$ mpisetup\-\_\-right\-\_\-\-Proc (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_a1073a7abfcbdcce31deb8579bcf08df9}
+
+
+Definition at line 79 of file mpisetup\-\_\-routines.\-c.
+
+\hypertarget{_m_p_isetup_8h_aa2315410cad83a126c8070aa150e974e}{\index{M\-P\-Isetup.\-h@{M\-P\-Isetup.\-h}!mpisetup\-\_\-setprocs@{mpisetup\-\_\-setprocs}}
+\index{mpisetup\-\_\-setprocs@{mpisetup\-\_\-setprocs}!MPIsetup.h@{M\-P\-Isetup.\-h}}
+\subsubsection[{mpisetup\-\_\-setprocs}]{\setlength{\rightskip}{0pt plus 5cm}void mpisetup\-\_\-setprocs (
+\begin{DoxyParamCaption}
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_m_p_isetup_8h_aa2315410cad83a126c8070aa150e974e}
+
+
+Definition at line 7 of file mpisetup\-\_\-routines.\-c.
+

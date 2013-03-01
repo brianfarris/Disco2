@@ -1,0 +1,486 @@
+\hypertarget{grid__access_8c}{\section{src/\-Grid/grid\-\_\-access.c File Reference}
+\label{grid__access_8c}\index{src/\-Grid/grid\-\_\-access.\-c@{src/\-Grid/grid\-\_\-access.\-c}}
+}
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Grid.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/header.\-h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{grid__access_8c_a8ad154467de64d4a07293e613fc39dd8}{G\-R\-I\-D\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{grid__access_8c_ac3b5de7cbdbc48d04b552ba2b1cb9adc}{grid\-\_\-\-N\-\_\-p} (struct Grid $\ast$the\-Grid, int i)
+\item 
+double \hyperlink{grid__access_8c_aa4cdd33a0cab1b7337fd889940fc20f8}{grid\-\_\-r\-\_\-faces} (struct Grid $\ast$the\-Grid, int i)
+\item 
+double \hyperlink{grid__access_8c_afec7a2fd4c6d34b5d0d58b4371bd4e3f}{grid\-\_\-z\-\_\-faces} (struct Grid $\ast$the\-Grid, int k)
+\item 
+int \hyperlink{grid__access_8c_a46ee5cd39a84120961d2a1fc38cf2bfe}{grid\-\_\-\-N\-\_\-r} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_af7f219f742f4a3984b190bd533fd897f}{grid\-\_\-\-N\-\_\-z} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_a15069e68179ec3d730d67cc672111ded}{grid\-\_\-\-Ncells} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_aee6d4119b739f5b9e2e1999694ed0b24}{grid\-\_\-\-Restart} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_ad391ed289b9f1870a0800694880c1723}{grid\-\_\-\-Ncells\-\_\-global} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_a9900bf63ffac411ac8e23a494e0f7540}{grid\-\_\-offset} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_abf17e58faab4e36286e11ca0af9332a1}{grid\-\_\-\-Nghost\-\_\-rmin} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_ab24f0e03f9e159664daff8c9cb987cff}{grid\-\_\-\-Nghost\-\_\-rmax} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_a38f63d22d6851f78ed63112d34c6a166}{grid\-\_\-\-Nghost\-\_\-zmin} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_acba327cbc94f06cb299e7ae9cb850775}{grid\-\_\-\-Nghost\-\_\-zmax} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_a25b8a834605952a616aadfb77eac9bfd}{grid\-\_\-ng} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_aa0f2b1fb1c806dc61ae961bdbc10a1c7}{grid\-\_\-\-N\-\_\-z\-\_\-global} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_ac9a25354d365798f7838aaeaa7a263cc}{grid\-\_\-\-N\-U\-M\-\_\-\-Q} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_a8adad30c148c82c71675d50ee886fb22}{grid\-\_\-\-M\-O\-V\-E\-\_\-\-C\-E\-L\-L\-S} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_ae009153ccbad0b3cf63b42b2f85568c3}{grid\-\_\-\-Num\-Grav\-Mass} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_a541231c85ba34f8bf8c1e84dcafd4721}{grid\-\_\-\-G\-A\-M\-M\-A\-L\-A\-W} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_a400a9dbac7afd69ad19eb0250bc0e55c}{grid\-\_\-\-I\-N\-C\-L\-U\-D\-E\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_a2242425c26feed98a14826905cfceb16}{grid\-\_\-\-E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_aa633f237ea3f5cfdf53baf72a424dc49}{grid\-\_\-\-D\-I\-V\-B\-\_\-\-C\-H} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_aecaac4571dc4932b93c692f63e1ff9ff}{grid\-\_\-\-D\-I\-V\-B\-\_\-\-L} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_a0b47e386a3fe62de71bcccdc6c8d09b7}{grid\-\_\-\-C\-F\-L} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_a1e71efa688844baa111aac395d35d845}{grid\-\_\-\-P\-L\-M} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_aa82f77dd136a6ef209a7c556bb4e15a6}{grid\-\_\-\-P\-O\-W\-E\-L\-L} (struct Grid $\ast$the\-Grid)
+\item 
+int \hyperlink{grid__access_8c_a37ce92ed4e0690f81c4f905615a75d71}{grid\-\_\-\-G\-R\-A\-V2\-D} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_aa7a878111e4a512207cf219a9032c8ff}{grid\-\_\-\-G\-\_\-\-E\-P\-S} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_a30e7e0c6c104fc40f811eaf6c9fc0272}{grid\-\_\-\-P\-H\-I\-\_\-\-O\-R\-D\-E\-R} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_a778c9486e22f595df19060daeb368825}{grid\-\_\-\-R\-H\-O\-\_\-\-F\-L\-O\-O\-R} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_afd2888289e44665897693a2bfb623b04}{grid\-\_\-\-C\-S\-\_\-\-F\-L\-O\-O\-R} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_a43c9aac6a5bb67e2350f723f47fea12d}{grid\-\_\-\-C\-S\-\_\-\-C\-A\-P} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_ab04b2f780fd0041cf8977001c422e4e5}{grid\-\_\-\-V\-E\-L\-\_\-\-C\-A\-P} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_a68aec104bbe241337a8a4aa6fcd8739f}{grid\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X} (struct Grid $\ast$the\-Grid)
+\item 
+double \hyperlink{grid__access_8c_a757be2546826dcb22e7694963e9cbeef}{grid\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S} (struct Grid $\ast$the\-Grid)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{grid__access_8c_a8ad154467de64d4a07293e613fc39dd8}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!G\-R\-I\-D\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S@{G\-R\-I\-D\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}}
+\index{G\-R\-I\-D\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S@{G\-R\-I\-D\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{G\-R\-I\-D\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define G\-R\-I\-D\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}}\label{grid__access_8c_a8ad154467de64d4a07293e613fc39dd8}
+
+
+Definition at line 1 of file grid\-\_\-access.\-c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{grid__access_8c_a0b47e386a3fe62de71bcccdc6c8d09b7}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-C\-F\-L@{grid\-\_\-\-C\-F\-L}}
+\index{grid\-\_\-\-C\-F\-L@{grid\-\_\-\-C\-F\-L}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-C\-F\-L}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-C\-F\-L (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a0b47e386a3fe62de71bcccdc6c8d09b7}
+
+
+Definition at line 77 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a43c9aac6a5bb67e2350f723f47fea12d}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-C\-S\-\_\-\-C\-A\-P@{grid\-\_\-\-C\-S\-\_\-\-C\-A\-P}}
+\index{grid\-\_\-\-C\-S\-\_\-\-C\-A\-P@{grid\-\_\-\-C\-S\-\_\-\-C\-A\-P}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-C\-S\-\_\-\-C\-A\-P}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-C\-S\-\_\-\-C\-A\-P (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a43c9aac6a5bb67e2350f723f47fea12d}
+
+
+Definition at line 101 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_afd2888289e44665897693a2bfb623b04}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-C\-S\-\_\-\-F\-L\-O\-O\-R@{grid\-\_\-\-C\-S\-\_\-\-F\-L\-O\-O\-R}}
+\index{grid\-\_\-\-C\-S\-\_\-\-F\-L\-O\-O\-R@{grid\-\_\-\-C\-S\-\_\-\-F\-L\-O\-O\-R}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-C\-S\-\_\-\-F\-L\-O\-O\-R}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-C\-S\-\_\-\-F\-L\-O\-O\-R (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_afd2888289e44665897693a2bfb623b04}
+
+
+Definition at line 98 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_aa633f237ea3f5cfdf53baf72a424dc49}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-D\-I\-V\-B\-\_\-\-C\-H@{grid\-\_\-\-D\-I\-V\-B\-\_\-\-C\-H}}
+\index{grid\-\_\-\-D\-I\-V\-B\-\_\-\-C\-H@{grid\-\_\-\-D\-I\-V\-B\-\_\-\-C\-H}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-D\-I\-V\-B\-\_\-\-C\-H}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-D\-I\-V\-B\-\_\-\-C\-H (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_aa633f237ea3f5cfdf53baf72a424dc49}
+
+
+Definition at line 71 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_aecaac4571dc4932b93c692f63e1ff9ff}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-D\-I\-V\-B\-\_\-\-L@{grid\-\_\-\-D\-I\-V\-B\-\_\-\-L}}
+\index{grid\-\_\-\-D\-I\-V\-B\-\_\-\-L@{grid\-\_\-\-D\-I\-V\-B\-\_\-\-L}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-D\-I\-V\-B\-\_\-\-L}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-D\-I\-V\-B\-\_\-\-L (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_aecaac4571dc4932b93c692f63e1ff9ff}
+
+
+Definition at line 74 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a2242425c26feed98a14826905cfceb16}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y@{grid\-\_\-\-E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y}}
+\index{grid\-\_\-\-E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y@{grid\-\_\-\-E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a2242425c26feed98a14826905cfceb16}
+
+
+Definition at line 68 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_aa7a878111e4a512207cf219a9032c8ff}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-G\-\_\-\-E\-P\-S@{grid\-\_\-\-G\-\_\-\-E\-P\-S}}
+\index{grid\-\_\-\-G\-\_\-\-E\-P\-S@{grid\-\_\-\-G\-\_\-\-E\-P\-S}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-G\-\_\-\-E\-P\-S}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-G\-\_\-\-E\-P\-S (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_aa7a878111e4a512207cf219a9032c8ff}
+
+
+Definition at line 89 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a541231c85ba34f8bf8c1e84dcafd4721}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-G\-A\-M\-M\-A\-L\-A\-W@{grid\-\_\-\-G\-A\-M\-M\-A\-L\-A\-W}}
+\index{grid\-\_\-\-G\-A\-M\-M\-A\-L\-A\-W@{grid\-\_\-\-G\-A\-M\-M\-A\-L\-A\-W}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-G\-A\-M\-M\-A\-L\-A\-W}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-G\-A\-M\-M\-A\-L\-A\-W (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a541231c85ba34f8bf8c1e84dcafd4721}
+
+
+Definition at line 62 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a68aec104bbe241337a8a4aa6fcd8739f}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X@{grid\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X}}
+\index{grid\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X@{grid\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a68aec104bbe241337a8a4aa6fcd8739f}
+
+
+Definition at line 107 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a37ce92ed4e0690f81c4f905615a75d71}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-G\-R\-A\-V2\-D@{grid\-\_\-\-G\-R\-A\-V2\-D}}
+\index{grid\-\_\-\-G\-R\-A\-V2\-D@{grid\-\_\-\-G\-R\-A\-V2\-D}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-G\-R\-A\-V2\-D}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-G\-R\-A\-V2\-D (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a37ce92ed4e0690f81c4f905615a75d71}
+
+
+Definition at line 86 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a400a9dbac7afd69ad19eb0250bc0e55c}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-I\-N\-C\-L\-U\-D\-E\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y@{grid\-\_\-\-I\-N\-C\-L\-U\-D\-E\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y}}
+\index{grid\-\_\-\-I\-N\-C\-L\-U\-D\-E\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y@{grid\-\_\-\-I\-N\-C\-L\-U\-D\-E\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-I\-N\-C\-L\-U\-D\-E\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-I\-N\-C\-L\-U\-D\-E\-\_\-\-V\-I\-S\-C\-O\-S\-I\-T\-Y (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a400a9dbac7afd69ad19eb0250bc0e55c}
+
+
+Definition at line 65 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a8adad30c148c82c71675d50ee886fb22}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-M\-O\-V\-E\-\_\-\-C\-E\-L\-L\-S@{grid\-\_\-\-M\-O\-V\-E\-\_\-\-C\-E\-L\-L\-S}}
+\index{grid\-\_\-\-M\-O\-V\-E\-\_\-\-C\-E\-L\-L\-S@{grid\-\_\-\-M\-O\-V\-E\-\_\-\-C\-E\-L\-L\-S}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-M\-O\-V\-E\-\_\-\-C\-E\-L\-L\-S}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-M\-O\-V\-E\-\_\-\-C\-E\-L\-L\-S (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a8adad30c148c82c71675d50ee886fb22}
+
+
+Definition at line 56 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_ac3b5de7cbdbc48d04b552ba2b1cb9adc}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-N\-\_\-p@{grid\-\_\-\-N\-\_\-p}}
+\index{grid\-\_\-\-N\-\_\-p@{grid\-\_\-\-N\-\_\-p}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-N\-\_\-p}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-N\-\_\-p (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid, }
+\item[{int}]{i}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_ac3b5de7cbdbc48d04b552ba2b1cb9adc}
+
+
+Definition at line 8 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a46ee5cd39a84120961d2a1fc38cf2bfe}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-N\-\_\-r@{grid\-\_\-\-N\-\_\-r}}
+\index{grid\-\_\-\-N\-\_\-r@{grid\-\_\-\-N\-\_\-r}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-N\-\_\-r}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-N\-\_\-r (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a46ee5cd39a84120961d2a1fc38cf2bfe}
+
+
+Definition at line 17 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_af7f219f742f4a3984b190bd533fd897f}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-N\-\_\-z@{grid\-\_\-\-N\-\_\-z}}
+\index{grid\-\_\-\-N\-\_\-z@{grid\-\_\-\-N\-\_\-z}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-N\-\_\-z}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-N\-\_\-z (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_af7f219f742f4a3984b190bd533fd897f}
+
+
+Definition at line 20 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_aa0f2b1fb1c806dc61ae961bdbc10a1c7}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-N\-\_\-z\-\_\-global@{grid\-\_\-\-N\-\_\-z\-\_\-global}}
+\index{grid\-\_\-\-N\-\_\-z\-\_\-global@{grid\-\_\-\-N\-\_\-z\-\_\-global}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-N\-\_\-z\-\_\-global}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-N\-\_\-z\-\_\-global (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_aa0f2b1fb1c806dc61ae961bdbc10a1c7}
+
+
+Definition at line 50 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a15069e68179ec3d730d67cc672111ded}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-Ncells@{grid\-\_\-\-Ncells}}
+\index{grid\-\_\-\-Ncells@{grid\-\_\-\-Ncells}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-Ncells}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-Ncells (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a15069e68179ec3d730d67cc672111ded}
+
+
+Definition at line 23 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_ad391ed289b9f1870a0800694880c1723}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-Ncells\-\_\-global@{grid\-\_\-\-Ncells\-\_\-global}}
+\index{grid\-\_\-\-Ncells\-\_\-global@{grid\-\_\-\-Ncells\-\_\-global}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-Ncells\-\_\-global}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-Ncells\-\_\-global (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_ad391ed289b9f1870a0800694880c1723}
+
+
+Definition at line 29 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a25b8a834605952a616aadfb77eac9bfd}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-ng@{grid\-\_\-ng}}
+\index{grid\-\_\-ng@{grid\-\_\-ng}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-ng}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-ng (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a25b8a834605952a616aadfb77eac9bfd}
+
+
+Definition at line 47 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_ab24f0e03f9e159664daff8c9cb987cff}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-Nghost\-\_\-rmax@{grid\-\_\-\-Nghost\-\_\-rmax}}
+\index{grid\-\_\-\-Nghost\-\_\-rmax@{grid\-\_\-\-Nghost\-\_\-rmax}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-Nghost\-\_\-rmax}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-Nghost\-\_\-rmax (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_ab24f0e03f9e159664daff8c9cb987cff}
+
+
+Definition at line 38 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_abf17e58faab4e36286e11ca0af9332a1}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-Nghost\-\_\-rmin@{grid\-\_\-\-Nghost\-\_\-rmin}}
+\index{grid\-\_\-\-Nghost\-\_\-rmin@{grid\-\_\-\-Nghost\-\_\-rmin}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-Nghost\-\_\-rmin}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-Nghost\-\_\-rmin (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_abf17e58faab4e36286e11ca0af9332a1}
+
+
+Definition at line 35 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_acba327cbc94f06cb299e7ae9cb850775}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-Nghost\-\_\-zmax@{grid\-\_\-\-Nghost\-\_\-zmax}}
+\index{grid\-\_\-\-Nghost\-\_\-zmax@{grid\-\_\-\-Nghost\-\_\-zmax}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-Nghost\-\_\-zmax}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-Nghost\-\_\-zmax (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_acba327cbc94f06cb299e7ae9cb850775}
+
+
+Definition at line 44 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a38f63d22d6851f78ed63112d34c6a166}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-Nghost\-\_\-zmin@{grid\-\_\-\-Nghost\-\_\-zmin}}
+\index{grid\-\_\-\-Nghost\-\_\-zmin@{grid\-\_\-\-Nghost\-\_\-zmin}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-Nghost\-\_\-zmin}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-Nghost\-\_\-zmin (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a38f63d22d6851f78ed63112d34c6a166}
+
+
+Definition at line 41 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a757be2546826dcb22e7694963e9cbeef}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S@{grid\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S}}
+\index{grid\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S@{grid\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a757be2546826dcb22e7694963e9cbeef}
+
+
+Definition at line 110 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_ac9a25354d365798f7838aaeaa7a263cc}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-N\-U\-M\-\_\-\-Q@{grid\-\_\-\-N\-U\-M\-\_\-\-Q}}
+\index{grid\-\_\-\-N\-U\-M\-\_\-\-Q@{grid\-\_\-\-N\-U\-M\-\_\-\-Q}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-N\-U\-M\-\_\-\-Q}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-N\-U\-M\-\_\-\-Q (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_ac9a25354d365798f7838aaeaa7a263cc}
+
+
+Definition at line 53 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_ae009153ccbad0b3cf63b42b2f85568c3}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-Num\-Grav\-Mass@{grid\-\_\-\-Num\-Grav\-Mass}}
+\index{grid\-\_\-\-Num\-Grav\-Mass@{grid\-\_\-\-Num\-Grav\-Mass}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-Num\-Grav\-Mass}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-Num\-Grav\-Mass (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_ae009153ccbad0b3cf63b42b2f85568c3}
+
+
+Definition at line 59 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a9900bf63ffac411ac8e23a494e0f7540}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-offset@{grid\-\_\-offset}}
+\index{grid\-\_\-offset@{grid\-\_\-offset}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-offset}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-offset (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a9900bf63ffac411ac8e23a494e0f7540}
+
+
+Definition at line 32 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a30e7e0c6c104fc40f811eaf6c9fc0272}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-P\-H\-I\-\_\-\-O\-R\-D\-E\-R@{grid\-\_\-\-P\-H\-I\-\_\-\-O\-R\-D\-E\-R}}
+\index{grid\-\_\-\-P\-H\-I\-\_\-\-O\-R\-D\-E\-R@{grid\-\_\-\-P\-H\-I\-\_\-\-O\-R\-D\-E\-R}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-P\-H\-I\-\_\-\-O\-R\-D\-E\-R}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-P\-H\-I\-\_\-\-O\-R\-D\-E\-R (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a30e7e0c6c104fc40f811eaf6c9fc0272}
+
+
+Definition at line 92 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a1e71efa688844baa111aac395d35d845}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-P\-L\-M@{grid\-\_\-\-P\-L\-M}}
+\index{grid\-\_\-\-P\-L\-M@{grid\-\_\-\-P\-L\-M}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-P\-L\-M}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-P\-L\-M (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a1e71efa688844baa111aac395d35d845}
+
+
+Definition at line 80 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_aa82f77dd136a6ef209a7c556bb4e15a6}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-P\-O\-W\-E\-L\-L@{grid\-\_\-\-P\-O\-W\-E\-L\-L}}
+\index{grid\-\_\-\-P\-O\-W\-E\-L\-L@{grid\-\_\-\-P\-O\-W\-E\-L\-L}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-P\-O\-W\-E\-L\-L}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-P\-O\-W\-E\-L\-L (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_aa82f77dd136a6ef209a7c556bb4e15a6}
+
+
+Definition at line 83 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_aa4cdd33a0cab1b7337fd889940fc20f8}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-r\-\_\-faces@{grid\-\_\-r\-\_\-faces}}
+\index{grid\-\_\-r\-\_\-faces@{grid\-\_\-r\-\_\-faces}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-r\-\_\-faces}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-r\-\_\-faces (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid, }
+\item[{int}]{i}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_aa4cdd33a0cab1b7337fd889940fc20f8}
+
+
+Definition at line 11 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_aee6d4119b739f5b9e2e1999694ed0b24}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-Restart@{grid\-\_\-\-Restart}}
+\index{grid\-\_\-\-Restart@{grid\-\_\-\-Restart}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-Restart}]{\setlength{\rightskip}{0pt plus 5cm}int grid\-\_\-\-Restart (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_aee6d4119b739f5b9e2e1999694ed0b24}
+
+
+Definition at line 26 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_a778c9486e22f595df19060daeb368825}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-R\-H\-O\-\_\-\-F\-L\-O\-O\-R@{grid\-\_\-\-R\-H\-O\-\_\-\-F\-L\-O\-O\-R}}
+\index{grid\-\_\-\-R\-H\-O\-\_\-\-F\-L\-O\-O\-R@{grid\-\_\-\-R\-H\-O\-\_\-\-F\-L\-O\-O\-R}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-R\-H\-O\-\_\-\-F\-L\-O\-O\-R}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-R\-H\-O\-\_\-\-F\-L\-O\-O\-R (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_a778c9486e22f595df19060daeb368825}
+
+
+Definition at line 95 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_ab04b2f780fd0041cf8977001c422e4e5}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-\-V\-E\-L\-\_\-\-C\-A\-P@{grid\-\_\-\-V\-E\-L\-\_\-\-C\-A\-P}}
+\index{grid\-\_\-\-V\-E\-L\-\_\-\-C\-A\-P@{grid\-\_\-\-V\-E\-L\-\_\-\-C\-A\-P}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-\-V\-E\-L\-\_\-\-C\-A\-P}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-\-V\-E\-L\-\_\-\-C\-A\-P (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_ab04b2f780fd0041cf8977001c422e4e5}
+
+
+Definition at line 104 of file grid\-\_\-access.\-c.
+
+\hypertarget{grid__access_8c_afec7a2fd4c6d34b5d0d58b4371bd4e3f}{\index{grid\-\_\-access.\-c@{grid\-\_\-access.\-c}!grid\-\_\-z\-\_\-faces@{grid\-\_\-z\-\_\-faces}}
+\index{grid\-\_\-z\-\_\-faces@{grid\-\_\-z\-\_\-faces}!grid_access.c@{grid\-\_\-access.\-c}}
+\subsubsection[{grid\-\_\-z\-\_\-faces}]{\setlength{\rightskip}{0pt plus 5cm}double grid\-\_\-z\-\_\-faces (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid, }
+\item[{int}]{k}
+\end{DoxyParamCaption}
+)}}\label{grid__access_8c_afec7a2fd4c6d34b5d0d58b4371bd4e3f}
+
+
+Definition at line 14 of file grid\-\_\-access.\-c.
+

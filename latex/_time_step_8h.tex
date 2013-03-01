@@ -1,0 +1,218 @@
+\hypertarget{_time_step_8h}{\section{src/\-Headers/\-Time\-Step.h File Reference}
+\label{_time_step_8h}\index{src/\-Headers/\-Time\-Step.\-h@{src/\-Headers/\-Time\-Step.\-h}}
+}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct Time\-Step $\ast$ \hyperlink{_time_step_8h_a991f9e5c79c1abb5967371197faacddf}{timestep\-\_\-create} ()
+\item 
+void \hyperlink{_time_step_8h_a7d985d66faee0eeaa8208a73f1e5e046}{timestep\-\_\-destroy} (struct Time\-Step $\ast$)
+\item 
+void \hyperlink{_time_step_8h_a62e04abe1db9ebcb608970c057872fa1}{timestep\-\_\-set\-\_\-dt} (struct Time\-Step $\ast$, struct Cell $\ast$$\ast$$\ast$, struct Grid $\ast$)
+\item 
+void \hyperlink{_time_step_8h_ad2d66678675216063b3b43d564094386}{timestep\-\_\-update\-\_\-t} (struct Time\-Step $\ast$)
+\item 
+void \hyperlink{_time_step_8h_aed8d6bd6c7f6067956aa82720d9f26b7}{timestep\-\_\-set\-\_\-\-R\-K} (struct Time\-Step $\ast$, double)
+\item 
+void \hyperlink{_time_step_8h_a193fb3a7b2e31eaf09530d94d5ddc86e}{timestep\-\_\-substep} (struct Time\-Step $\ast$, struct Cell $\ast$$\ast$$\ast$, struct Grid $\ast$, struct Grav\-Mass $\ast$, struct M\-P\-Isetup $\ast$, double)
+\item 
+void \hyperlink{_time_step_8h_a0dec6641907ebf9315fa1a001e9e3af0}{timestep\-\_\-update\-\_\-\-Psi} (struct Time\-Step $\ast$, struct Cell $\ast$$\ast$$\ast$, struct Grid $\ast$, struct M\-P\-Isetup $\ast$)
+\item 
+double \hyperlink{_time_step_8h_a16fb79bd640ccaf74d033ea5cfa3318d}{timestep\-\_\-get\-\_\-t} (struct Time\-Step $\ast$)
+\item 
+double \hyperlink{_time_step_8h_aba9f102367d1e2f82a83732c62b81a63}{timestep\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X} (struct Time\-Step $\ast$)
+\item 
+double \hyperlink{_time_step_8h_aade25bcb28cdb7cb5003a2858f4e0d92}{timestep\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S} (struct Time\-Step $\ast$)
+\item 
+int $\ast$ \hyperlink{_time_step_8h_a30139a216259ea612d14f4b86fa44ec1}{timestep\-\_\-nri} (struct Time\-Step $\ast$)
+\item 
+int $\ast$ \hyperlink{_time_step_8h_a8c97e7cd230816e8739645d6d6929111}{timestep\-\_\-nzk} (struct Time\-Step $\ast$)
+\item 
+void \hyperlink{_time_step_8h_aaa2c6ea2350ef365cd3789f2a32f1d83}{timestep\-\_\-set\-\_\-\-Nfr} (struct Time\-Step $\ast$, struct Grid $\ast$)
+\item 
+void \hyperlink{_time_step_8h_a19f1e7af19a49da26a7aa4a65fb25d79}{timestep\-\_\-set\-\_\-\-Nfz} (struct Time\-Step $\ast$, struct Grid $\ast$)
+\item 
+int \hyperlink{_time_step_8h_abe05cb3b8d0b1cec0e76d78ba7981779}{timestep\-\_\-\-Nfr} (struct Time\-Step $\ast$)
+\item 
+int \hyperlink{_time_step_8h_a1bdccf97ba40ef486a5a38c8bfdd6479}{timestep\-\_\-\-Nfz} (struct Time\-Step $\ast$)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{_time_step_8h_a991f9e5c79c1abb5967371197faacddf}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-create@{timestep\-\_\-create}}
+\index{timestep\-\_\-create@{timestep\-\_\-create}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-create}]{\setlength{\rightskip}{0pt plus 5cm}struct Time\-Step$\ast$ timestep\-\_\-create (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [read]}}}\label{_time_step_8h_a991f9e5c79c1abb5967371197faacddf}
+\hypertarget{_time_step_8h_a7d985d66faee0eeaa8208a73f1e5e046}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-destroy@{timestep\-\_\-destroy}}
+\index{timestep\-\_\-destroy@{timestep\-\_\-destroy}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-destroy}]{\setlength{\rightskip}{0pt plus 5cm}void timestep\-\_\-destroy (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_a7d985d66faee0eeaa8208a73f1e5e046}
+
+
+Definition at line 17 of file timestep\-\_\-create\-\_\-destroy.\-c.
+
+\hypertarget{_time_step_8h_a16fb79bd640ccaf74d033ea5cfa3318d}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-get\-\_\-t@{timestep\-\_\-get\-\_\-t}}
+\index{timestep\-\_\-get\-\_\-t@{timestep\-\_\-get\-\_\-t}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-get\-\_\-t}]{\setlength{\rightskip}{0pt plus 5cm}double timestep\-\_\-get\-\_\-t (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_a16fb79bd640ccaf74d033ea5cfa3318d}
+
+
+Definition at line 29 of file timestep\-\_\-routines.\-c.
+
+\hypertarget{_time_step_8h_aba9f102367d1e2f82a83732c62b81a63}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X@{timestep\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X}}
+\index{timestep\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X@{timestep\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X}]{\setlength{\rightskip}{0pt plus 5cm}double timestep\-\_\-get\-\_\-\-T\-\_\-\-M\-A\-X (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_aba9f102367d1e2f82a83732c62b81a63}
+\hypertarget{_time_step_8h_abe05cb3b8d0b1cec0e76d78ba7981779}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-\-Nfr@{timestep\-\_\-\-Nfr}}
+\index{timestep\-\_\-\-Nfr@{timestep\-\_\-\-Nfr}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-\-Nfr}]{\setlength{\rightskip}{0pt plus 5cm}int timestep\-\_\-\-Nfr (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_abe05cb3b8d0b1cec0e76d78ba7981779}
+
+
+Definition at line 164 of file timestep\-\_\-routines.\-c.
+
+\hypertarget{_time_step_8h_a1bdccf97ba40ef486a5a38c8bfdd6479}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-\-Nfz@{timestep\-\_\-\-Nfz}}
+\index{timestep\-\_\-\-Nfz@{timestep\-\_\-\-Nfz}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-\-Nfz}]{\setlength{\rightskip}{0pt plus 5cm}int timestep\-\_\-\-Nfz (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_a1bdccf97ba40ef486a5a38c8bfdd6479}
+
+
+Definition at line 167 of file timestep\-\_\-routines.\-c.
+
+\hypertarget{_time_step_8h_a30139a216259ea612d14f4b86fa44ec1}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-nri@{timestep\-\_\-nri}}
+\index{timestep\-\_\-nri@{timestep\-\_\-nri}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-nri}]{\setlength{\rightskip}{0pt plus 5cm}int$\ast$ timestep\-\_\-nri (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_a30139a216259ea612d14f4b86fa44ec1}
+
+
+Definition at line 150 of file timestep\-\_\-routines.\-c.
+
+\hypertarget{_time_step_8h_aade25bcb28cdb7cb5003a2858f4e0d92}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S@{timestep\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S}}
+\index{timestep\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S@{timestep\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S}]{\setlength{\rightskip}{0pt plus 5cm}double timestep\-\_\-\-N\-U\-M\-\_\-\-C\-H\-E\-C\-K\-P\-O\-I\-N\-T\-S (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_aade25bcb28cdb7cb5003a2858f4e0d92}
+\hypertarget{_time_step_8h_a8c97e7cd230816e8739645d6d6929111}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-nzk@{timestep\-\_\-nzk}}
+\index{timestep\-\_\-nzk@{timestep\-\_\-nzk}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-nzk}]{\setlength{\rightskip}{0pt plus 5cm}int$\ast$ timestep\-\_\-nzk (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_a8c97e7cd230816e8739645d6d6929111}
+
+
+Definition at line 153 of file timestep\-\_\-routines.\-c.
+
+\hypertarget{_time_step_8h_a62e04abe1db9ebcb608970c057872fa1}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-set\-\_\-dt@{timestep\-\_\-set\-\_\-dt}}
+\index{timestep\-\_\-set\-\_\-dt@{timestep\-\_\-set\-\_\-dt}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-set\-\_\-dt}]{\setlength{\rightskip}{0pt plus 5cm}void timestep\-\_\-set\-\_\-dt (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{, }
+\item[{struct Cell $\ast$$\ast$$\ast$}]{, }
+\item[{struct Grid $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_a62e04abe1db9ebcb608970c057872fa1}
+
+
+Definition at line 16 of file timestep\-\_\-routines.\-c.
+
+\hypertarget{_time_step_8h_aaa2c6ea2350ef365cd3789f2a32f1d83}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-set\-\_\-\-Nfr@{timestep\-\_\-set\-\_\-\-Nfr}}
+\index{timestep\-\_\-set\-\_\-\-Nfr@{timestep\-\_\-set\-\_\-\-Nfr}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-set\-\_\-\-Nfr}]{\setlength{\rightskip}{0pt plus 5cm}void timestep\-\_\-set\-\_\-\-Nfr (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{, }
+\item[{struct Grid $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_aaa2c6ea2350ef365cd3789f2a32f1d83}
+
+
+Definition at line 156 of file timestep\-\_\-routines.\-c.
+
+\hypertarget{_time_step_8h_a19f1e7af19a49da26a7aa4a65fb25d79}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-set\-\_\-\-Nfz@{timestep\-\_\-set\-\_\-\-Nfz}}
+\index{timestep\-\_\-set\-\_\-\-Nfz@{timestep\-\_\-set\-\_\-\-Nfz}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-set\-\_\-\-Nfz}]{\setlength{\rightskip}{0pt plus 5cm}void timestep\-\_\-set\-\_\-\-Nfz (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{, }
+\item[{struct Grid $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_a19f1e7af19a49da26a7aa4a65fb25d79}
+
+
+Definition at line 160 of file timestep\-\_\-routines.\-c.
+
+\hypertarget{_time_step_8h_aed8d6bd6c7f6067956aa82720d9f26b7}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-set\-\_\-\-R\-K@{timestep\-\_\-set\-\_\-\-R\-K}}
+\index{timestep\-\_\-set\-\_\-\-R\-K@{timestep\-\_\-set\-\_\-\-R\-K}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-set\-\_\-\-R\-K}]{\setlength{\rightskip}{0pt plus 5cm}void timestep\-\_\-set\-\_\-\-R\-K (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{, }
+\item[{double}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_aed8d6bd6c7f6067956aa82720d9f26b7}
+
+
+Definition at line 26 of file timestep\-\_\-routines.\-c.
+
+\hypertarget{_time_step_8h_a193fb3a7b2e31eaf09530d94d5ddc86e}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-substep@{timestep\-\_\-substep}}
+\index{timestep\-\_\-substep@{timestep\-\_\-substep}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-substep}]{\setlength{\rightskip}{0pt plus 5cm}void timestep\-\_\-substep (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{, }
+\item[{struct Cell $\ast$$\ast$$\ast$}]{, }
+\item[{struct Grid $\ast$}]{, }
+\item[{struct Grav\-Mass $\ast$}]{, }
+\item[{struct M\-P\-Isetup $\ast$}]{, }
+\item[{double}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_a193fb3a7b2e31eaf09530d94d5ddc86e}
+
+
+Definition at line 34 of file timestep\-\_\-routines.\-c.
+
+\hypertarget{_time_step_8h_a0dec6641907ebf9315fa1a001e9e3af0}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-update\-\_\-\-Psi@{timestep\-\_\-update\-\_\-\-Psi}}
+\index{timestep\-\_\-update\-\_\-\-Psi@{timestep\-\_\-update\-\_\-\-Psi}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-update\-\_\-\-Psi}]{\setlength{\rightskip}{0pt plus 5cm}void timestep\-\_\-update\-\_\-\-Psi (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{, }
+\item[{struct Cell $\ast$$\ast$$\ast$}]{, }
+\item[{struct Grid $\ast$}]{, }
+\item[{struct M\-P\-Isetup $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_a0dec6641907ebf9315fa1a001e9e3af0}
+
+
+Definition at line 124 of file timestep\-\_\-routines.\-c.
+
+\hypertarget{_time_step_8h_ad2d66678675216063b3b43d564094386}{\index{Time\-Step.\-h@{Time\-Step.\-h}!timestep\-\_\-update\-\_\-t@{timestep\-\_\-update\-\_\-t}}
+\index{timestep\-\_\-update\-\_\-t@{timestep\-\_\-update\-\_\-t}!TimeStep.h@{Time\-Step.\-h}}
+\subsubsection[{timestep\-\_\-update\-\_\-t}]{\setlength{\rightskip}{0pt plus 5cm}void timestep\-\_\-update\-\_\-t (
+\begin{DoxyParamCaption}
+\item[{struct Time\-Step $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_time_step_8h_ad2d66678675216063b3b43d564094386}
+
+
+Definition at line 23 of file timestep\-\_\-routines.\-c.
+

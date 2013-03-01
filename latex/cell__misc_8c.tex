@@ -1,0 +1,105 @@
+\hypertarget{cell__misc_8c}{\section{src/\-Cell/cell\-\_\-misc.c File Reference}
+\label{cell__misc_8c}\index{src/\-Cell/cell\-\_\-misc.\-c@{src/\-Cell/cell\-\_\-misc.\-c}}
+}
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$math.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Cell.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Grid.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Face.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Grav\-Mass.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/header.\-h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{cell__misc_8c_aebdd5460bae6401009fc1dc103d1997a}{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{cell__misc_8c_a79b1fdd36cd20126077a2c79c4febd01}{cell\-\_\-clean\-\_\-pi} (struct Cell $\ast$$\ast$$\ast$the\-Cells, struct Grid $\ast$the\-Grid)
+\item 
+void \hyperlink{cell__misc_8c_a5d514d3601b03c906b548ee334b79b81}{cell\-\_\-copy} (struct Cell $\ast$$\ast$$\ast$the\-Cells, struct Grid $\ast$the\-Grid)
+\item 
+void \hyperlink{cell__misc_8c_ad8c0a5978776de6ee33a9b05bcd42877}{cell\-\_\-adjust\-\_\-\-R\-K\-\_\-cons} (struct Cell $\ast$$\ast$$\ast$the\-Cells, struct Grid $\ast$the\-Grid, double R\-K)
+\item 
+void \hyperlink{cell__misc_8c_a496ca71c6b9181bef6e20a417b529eba}{cell\-\_\-update\-\_\-phi} (struct Cell $\ast$$\ast$$\ast$the\-Cells, struct Grid $\ast$the\-Grid, double R\-K, double dt)
+\item 
+void \hyperlink{cell__misc_8c_adef9a0715f8f049e39c3d1abdfa40353}{cell\-\_\-update\-\_\-dphi} (struct Cell $\ast$$\ast$$\ast$the\-Cells, struct Grid $\ast$the\-Grid)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{cell__misc_8c_aebdd5460bae6401009fc1dc103d1997a}{\index{cell\-\_\-misc.\-c@{cell\-\_\-misc.\-c}!C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S@{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}}
+\index{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S@{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}!cell_misc.c@{cell\-\_\-misc.\-c}}
+\subsubsection[{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}}\label{cell__misc_8c_aebdd5460bae6401009fc1dc103d1997a}
+
+
+Definition at line 1 of file cell\-\_\-misc.\-c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{cell__misc_8c_ad8c0a5978776de6ee33a9b05bcd42877}{\index{cell\-\_\-misc.\-c@{cell\-\_\-misc.\-c}!cell\-\_\-adjust\-\_\-\-R\-K\-\_\-cons@{cell\-\_\-adjust\-\_\-\-R\-K\-\_\-cons}}
+\index{cell\-\_\-adjust\-\_\-\-R\-K\-\_\-cons@{cell\-\_\-adjust\-\_\-\-R\-K\-\_\-cons}!cell_misc.c@{cell\-\_\-misc.\-c}}
+\subsubsection[{cell\-\_\-adjust\-\_\-\-R\-K\-\_\-cons}]{\setlength{\rightskip}{0pt plus 5cm}void cell\-\_\-adjust\-\_\-\-R\-K\-\_\-cons (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$$\ast$$\ast$}]{the\-Cells, }
+\item[{struct Grid $\ast$}]{the\-Grid, }
+\item[{double}]{R\-K}
+\end{DoxyParamCaption}
+)}}\label{cell__misc_8c_ad8c0a5978776de6ee33a9b05bcd42877}
+
+
+Definition at line 47 of file cell\-\_\-misc.\-c.
+
+\hypertarget{cell__misc_8c_a79b1fdd36cd20126077a2c79c4febd01}{\index{cell\-\_\-misc.\-c@{cell\-\_\-misc.\-c}!cell\-\_\-clean\-\_\-pi@{cell\-\_\-clean\-\_\-pi}}
+\index{cell\-\_\-clean\-\_\-pi@{cell\-\_\-clean\-\_\-pi}!cell_misc.c@{cell\-\_\-misc.\-c}}
+\subsubsection[{cell\-\_\-clean\-\_\-pi}]{\setlength{\rightskip}{0pt plus 5cm}void cell\-\_\-clean\-\_\-pi (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$$\ast$$\ast$}]{the\-Cells, }
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{cell__misc_8c_a79b1fdd36cd20126077a2c79c4febd01}
+
+
+Definition at line 12 of file cell\-\_\-misc.\-c.
+
+\hypertarget{cell__misc_8c_a5d514d3601b03c906b548ee334b79b81}{\index{cell\-\_\-misc.\-c@{cell\-\_\-misc.\-c}!cell\-\_\-copy@{cell\-\_\-copy}}
+\index{cell\-\_\-copy@{cell\-\_\-copy}!cell_misc.c@{cell\-\_\-misc.\-c}}
+\subsubsection[{cell\-\_\-copy}]{\setlength{\rightskip}{0pt plus 5cm}void cell\-\_\-copy (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$$\ast$$\ast$}]{the\-Cells, }
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{cell__misc_8c_a5d514d3601b03c906b548ee334b79b81}
+
+
+Definition at line 30 of file cell\-\_\-misc.\-c.
+
+\hypertarget{cell__misc_8c_adef9a0715f8f049e39c3d1abdfa40353}{\index{cell\-\_\-misc.\-c@{cell\-\_\-misc.\-c}!cell\-\_\-update\-\_\-dphi@{cell\-\_\-update\-\_\-dphi}}
+\index{cell\-\_\-update\-\_\-dphi@{cell\-\_\-update\-\_\-dphi}!cell_misc.c@{cell\-\_\-misc.\-c}}
+\subsubsection[{cell\-\_\-update\-\_\-dphi}]{\setlength{\rightskip}{0pt plus 5cm}void cell\-\_\-update\-\_\-dphi (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$$\ast$$\ast$}]{the\-Cells, }
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{cell__misc_8c_adef9a0715f8f049e39c3d1abdfa40353}
+
+
+Definition at line 87 of file cell\-\_\-misc.\-c.
+
+\hypertarget{cell__misc_8c_a496ca71c6b9181bef6e20a417b529eba}{\index{cell\-\_\-misc.\-c@{cell\-\_\-misc.\-c}!cell\-\_\-update\-\_\-phi@{cell\-\_\-update\-\_\-phi}}
+\index{cell\-\_\-update\-\_\-phi@{cell\-\_\-update\-\_\-phi}!cell_misc.c@{cell\-\_\-misc.\-c}}
+\subsubsection[{cell\-\_\-update\-\_\-phi}]{\setlength{\rightskip}{0pt plus 5cm}void cell\-\_\-update\-\_\-phi (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$$\ast$$\ast$}]{the\-Cells, }
+\item[{struct Grid $\ast$}]{the\-Grid, }
+\item[{double}]{R\-K, }
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)}}\label{cell__misc_8c_a496ca71c6b9181bef6e20a417b529eba}
+
+
+Definition at line 65 of file cell\-\_\-misc.\-c.
+

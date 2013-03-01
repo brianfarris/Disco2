@@ -1,0 +1,96 @@
+\hypertarget{_i_o_8h}{\section{src/\-Headers/\-I\-O.h File Reference}
+\label{_i_o_8h}\index{src/\-Headers/\-I\-O.\-h@{src/\-Headers/\-I\-O.\-h}}
+}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct I\-O $\ast$ \hyperlink{_i_o_8h_a1a3cc6cffefd1fdf83cc2aa4bc57e99f}{io\-\_\-create} (struct Grid $\ast$)
+\item 
+void \hyperlink{_i_o_8h_a49ffb4b132139aa764ba827fec234d13}{io\-\_\-destroy} (struct I\-O $\ast$, struct Grid $\ast$)
+\item 
+void \hyperlink{_i_o_8h_a94f5c1fce4aae9dbba619ba296d17e63}{io\-\_\-flattened\-\_\-prim} (struct I\-O $\ast$, struct Cell $\ast$$\ast$$\ast$, struct Grid $\ast$)
+\item 
+void \hyperlink{_i_o_8h_a09b258a395d251abcd2d0be9ad27587c}{io\-\_\-unflattened\-\_\-prim} (struct I\-O $\ast$, struct Cell $\ast$$\ast$$\ast$, struct Grid $\ast$)
+\item 
+void \hyperlink{_i_o_8h_a2557c9c2afdfe599df9f6cbd8bb9d78e}{io\-\_\-hdf5\-\_\-out} (struct I\-O $\ast$, struct Grid $\ast$, char $\ast$)
+\item 
+void \hyperlink{_i_o_8h_a78f991a23933303c035c23a7c771ef0e}{io\-\_\-hdf5\-\_\-in} (struct I\-O $\ast$, struct Grid $\ast$, char $\ast$)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{_i_o_8h_a1a3cc6cffefd1fdf83cc2aa4bc57e99f}{\index{I\-O.\-h@{I\-O.\-h}!io\-\_\-create@{io\-\_\-create}}
+\index{io\-\_\-create@{io\-\_\-create}!IO.h@{I\-O.\-h}}
+\subsubsection[{io\-\_\-create}]{\setlength{\rightskip}{0pt plus 5cm}struct I\-O$\ast$ io\-\_\-create (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [read]}}}\label{_i_o_8h_a1a3cc6cffefd1fdf83cc2aa4bc57e99f}
+
+
+Definition at line 14 of file io\-\_\-create\-\_\-destroy.\-c.
+
+\hypertarget{_i_o_8h_a49ffb4b132139aa764ba827fec234d13}{\index{I\-O.\-h@{I\-O.\-h}!io\-\_\-destroy@{io\-\_\-destroy}}
+\index{io\-\_\-destroy@{io\-\_\-destroy}!IO.h@{I\-O.\-h}}
+\subsubsection[{io\-\_\-destroy}]{\setlength{\rightskip}{0pt plus 5cm}void io\-\_\-destroy (
+\begin{DoxyParamCaption}
+\item[{struct I\-O $\ast$}]{, }
+\item[{struct Grid $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_i_o_8h_a49ffb4b132139aa764ba827fec234d13}
+
+
+Definition at line 32 of file io\-\_\-create\-\_\-destroy.\-c.
+
+\hypertarget{_i_o_8h_a94f5c1fce4aae9dbba619ba296d17e63}{\index{I\-O.\-h@{I\-O.\-h}!io\-\_\-flattened\-\_\-prim@{io\-\_\-flattened\-\_\-prim}}
+\index{io\-\_\-flattened\-\_\-prim@{io\-\_\-flattened\-\_\-prim}!IO.h@{I\-O.\-h}}
+\subsubsection[{io\-\_\-flattened\-\_\-prim}]{\setlength{\rightskip}{0pt plus 5cm}void io\-\_\-flattened\-\_\-prim (
+\begin{DoxyParamCaption}
+\item[{struct I\-O $\ast$}]{, }
+\item[{struct Cell $\ast$$\ast$$\ast$}]{, }
+\item[{struct Grid $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_i_o_8h_a94f5c1fce4aae9dbba619ba296d17e63}
+
+
+Definition at line 14 of file io\-\_\-flatten\-\_\-unflatten.\-c.
+
+\hypertarget{_i_o_8h_a78f991a23933303c035c23a7c771ef0e}{\index{I\-O.\-h@{I\-O.\-h}!io\-\_\-hdf5\-\_\-in@{io\-\_\-hdf5\-\_\-in}}
+\index{io\-\_\-hdf5\-\_\-in@{io\-\_\-hdf5\-\_\-in}!IO.h@{I\-O.\-h}}
+\subsubsection[{io\-\_\-hdf5\-\_\-in}]{\setlength{\rightskip}{0pt plus 5cm}void io\-\_\-hdf5\-\_\-in (
+\begin{DoxyParamCaption}
+\item[{struct I\-O $\ast$}]{, }
+\item[{struct Grid $\ast$}]{, }
+\item[{char $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_i_o_8h_a78f991a23933303c035c23a7c771ef0e}
+
+
+Definition at line 87 of file io\-\_\-hdf5.\-c.
+
+\hypertarget{_i_o_8h_a2557c9c2afdfe599df9f6cbd8bb9d78e}{\index{I\-O.\-h@{I\-O.\-h}!io\-\_\-hdf5\-\_\-out@{io\-\_\-hdf5\-\_\-out}}
+\index{io\-\_\-hdf5\-\_\-out@{io\-\_\-hdf5\-\_\-out}!IO.h@{I\-O.\-h}}
+\subsubsection[{io\-\_\-hdf5\-\_\-out}]{\setlength{\rightskip}{0pt plus 5cm}void io\-\_\-hdf5\-\_\-out (
+\begin{DoxyParamCaption}
+\item[{struct I\-O $\ast$}]{, }
+\item[{struct Grid $\ast$}]{, }
+\item[{char $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_i_o_8h_a2557c9c2afdfe599df9f6cbd8bb9d78e}
+
+
+Definition at line 14 of file io\-\_\-hdf5.\-c.
+
+\hypertarget{_i_o_8h_a09b258a395d251abcd2d0be9ad27587c}{\index{I\-O.\-h@{I\-O.\-h}!io\-\_\-unflattened\-\_\-prim@{io\-\_\-unflattened\-\_\-prim}}
+\index{io\-\_\-unflattened\-\_\-prim@{io\-\_\-unflattened\-\_\-prim}!IO.h@{I\-O.\-h}}
+\subsubsection[{io\-\_\-unflattened\-\_\-prim}]{\setlength{\rightskip}{0pt plus 5cm}void io\-\_\-unflattened\-\_\-prim (
+\begin{DoxyParamCaption}
+\item[{struct I\-O $\ast$}]{, }
+\item[{struct Cell $\ast$$\ast$$\ast$}]{, }
+\item[{struct Grid $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{_i_o_8h_a09b258a395d251abcd2d0be9ad27587c}
+
+
+Definition at line 35 of file io\-\_\-flatten\-\_\-unflatten.\-c.
+

@@ -25,11 +25,11 @@ void cell_flux_p( struct Cell *** theCells ,struct Grid *theGrid, double dt ){
       for( j=0 ; j<grid_N_p(theGrid,i)-1 ; ++j ){
         struct Cell * cL = cell_single(theCells,i,j,k);
         struct Cell * cR = cell_single(theCells,i,j+1,k);
-        riemann_blah( cL , cR ,theGrid, dr*dz , dt , r ,0.,0.,cell_dphi(cL),cell_dphi(cR),1);
+        riemann_driver( cL , cR ,theGrid, dr*dz , dt , r ,0.,0.,cell_dphi(cL),cell_dphi(cR),1);
       }
       struct Cell * cL = cell_single(theCells,i,grid_N_p(theGrid,i)-1,k);
       struct Cell * cR = cell_single(theCells,i,0,k);
-      riemann_blah( cL , cR ,theGrid, dr*dz , dt , r,0.,0.,cell_dphi(cL),cell_dphi(cR),1 );
+      riemann_driver( cL , cR ,theGrid, dr*dz , dt , r,0.,0.,cell_dphi(cL),cell_dphi(cR),1 );
     }
   }
 }

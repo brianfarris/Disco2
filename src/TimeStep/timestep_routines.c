@@ -73,7 +73,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
     while( dpR < -M_PI ) dpR += 2.*M_PI;
     r = face_r(face_pointer(theFaces_r,n));
     dA = face_dA(face_pointer(theFaces_r,n));
-    riemann_blah(cL,cR,theGrid,dA,dt,r,deltaL,deltaR, dpL, dpR,0); 
+    riemann_driver(cL,cR,theGrid,dA,dt,r,deltaL,deltaR, dpL, dpR,0); 
   }
   //Z Flux
   if( grid_N_z_global(theGrid) != 1 ){
@@ -93,7 +93,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
       while( dpR < -M_PI ) dpR += 2.*M_PI;
       r = face_r(face_pointer(theFaces_z,n));
       dA = face_dA(face_pointer(theFaces_z,n));
-   riemann_blah(cL,cR,theGrid,dA,dt,r,deltaL,deltaR, dpL, dpR,2); 
+   riemann_driver(cL,cR,theGrid,dA,dt,r,deltaL,deltaR, dpL, dpR,2); 
     }
   }
   //Source Terms

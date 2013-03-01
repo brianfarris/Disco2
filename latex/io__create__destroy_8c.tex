@@ -1,0 +1,85 @@
+\hypertarget{io__create__destroy_8c}{\section{src/\-I\-O/io\-\_\-create\-\_\-destroy.c File Reference}
+\label{io__create__destroy_8c}\index{src/\-I\-O/io\-\_\-create\-\_\-destroy.\-c@{src/\-I\-O/io\-\_\-create\-\_\-destroy.\-c}}
+}
+{\ttfamily \#include $<$string.\-h$>$}\\*
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Grid.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Cell.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}hdf5.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-I\-O.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/header.\-h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{io__create__destroy_8c_adec9c8c242f2ed06e92770ec778a67d0}{I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}
+\item 
+\#define \hyperlink{io__create__destroy_8c_ad7fc3ae742bec278239a58edad998ade}{H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E}~\char`\"{}testout.\-h5\char`\"{}
+\item 
+\#define \hyperlink{io__create__destroy_8c_ab71ef18f468ca81eceb78268128c3f46}{D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E}~\char`\"{}Double\-Array\char`\"{}
+\item 
+\#define \hyperlink{io__create__destroy_8c_a4e76a9ce86d91fa75775a7ae3f8d3aa5}{R\-A\-N\-K}~2
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct I\-O $\ast$ \hyperlink{io__create__destroy_8c_a50fcf9a614f627a49b76e712eb981b7c}{io\-\_\-create} (struct Grid $\ast$the\-Grid)
+\item 
+void \hyperlink{io__create__destroy_8c_af38bb51b437e319121bde4c8210aab0c}{io\-\_\-destroy} (struct I\-O $\ast$the\-I\-O, struct Grid $\ast$the\-Grid)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{io__create__destroy_8c_ab71ef18f468ca81eceb78268128c3f46}{\index{io\-\_\-create\-\_\-destroy.\-c@{io\-\_\-create\-\_\-destroy.\-c}!D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E@{D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E}}
+\index{D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E@{D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E}!io_create_destroy.c@{io\-\_\-create\-\_\-destroy.\-c}}
+\subsubsection[{D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\-A\-T\-A\-S\-E\-T\-N\-A\-M\-E~\char`\"{}Double\-Array\char`\"{}}}\label{io__create__destroy_8c_ab71ef18f468ca81eceb78268128c3f46}
+
+
+Definition at line 3 of file io\-\_\-create\-\_\-destroy.\-c.
+
+\hypertarget{io__create__destroy_8c_ad7fc3ae742bec278239a58edad998ade}{\index{io\-\_\-create\-\_\-destroy.\-c@{io\-\_\-create\-\_\-destroy.\-c}!H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E@{H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E}}
+\index{H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E@{H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E}!io_create_destroy.c@{io\-\_\-create\-\_\-destroy.\-c}}
+\subsubsection[{H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define H5\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E~\char`\"{}testout.\-h5\char`\"{}}}\label{io__create__destroy_8c_ad7fc3ae742bec278239a58edad998ade}
+
+
+Definition at line 2 of file io\-\_\-create\-\_\-destroy.\-c.
+
+\hypertarget{io__create__destroy_8c_adec9c8c242f2ed06e92770ec778a67d0}{\index{io\-\_\-create\-\_\-destroy.\-c@{io\-\_\-create\-\_\-destroy.\-c}!I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S@{I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}}
+\index{I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S@{I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}!io_create_destroy.c@{io\-\_\-create\-\_\-destroy.\-c}}
+\subsubsection[{I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\-O\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}}\label{io__create__destroy_8c_adec9c8c242f2ed06e92770ec778a67d0}
+
+
+Definition at line 1 of file io\-\_\-create\-\_\-destroy.\-c.
+
+\hypertarget{io__create__destroy_8c_a4e76a9ce86d91fa75775a7ae3f8d3aa5}{\index{io\-\_\-create\-\_\-destroy.\-c@{io\-\_\-create\-\_\-destroy.\-c}!R\-A\-N\-K@{R\-A\-N\-K}}
+\index{R\-A\-N\-K@{R\-A\-N\-K}!io_create_destroy.c@{io\-\_\-create\-\_\-destroy.\-c}}
+\subsubsection[{R\-A\-N\-K}]{\setlength{\rightskip}{0pt plus 5cm}\#define R\-A\-N\-K~2}}\label{io__create__destroy_8c_a4e76a9ce86d91fa75775a7ae3f8d3aa5}
+
+
+Definition at line 4 of file io\-\_\-create\-\_\-destroy.\-c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{io__create__destroy_8c_a50fcf9a614f627a49b76e712eb981b7c}{\index{io\-\_\-create\-\_\-destroy.\-c@{io\-\_\-create\-\_\-destroy.\-c}!io\-\_\-create@{io\-\_\-create}}
+\index{io\-\_\-create@{io\-\_\-create}!io_create_destroy.c@{io\-\_\-create\-\_\-destroy.\-c}}
+\subsubsection[{io\-\_\-create}]{\setlength{\rightskip}{0pt plus 5cm}struct I\-O$\ast$ io\-\_\-create (
+\begin{DoxyParamCaption}
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [read]}}}\label{io__create__destroy_8c_a50fcf9a614f627a49b76e712eb981b7c}
+
+
+Definition at line 14 of file io\-\_\-create\-\_\-destroy.\-c.
+
+\hypertarget{io__create__destroy_8c_af38bb51b437e319121bde4c8210aab0c}{\index{io\-\_\-create\-\_\-destroy.\-c@{io\-\_\-create\-\_\-destroy.\-c}!io\-\_\-destroy@{io\-\_\-destroy}}
+\index{io\-\_\-destroy@{io\-\_\-destroy}!io_create_destroy.c@{io\-\_\-create\-\_\-destroy.\-c}}
+\subsubsection[{io\-\_\-destroy}]{\setlength{\rightskip}{0pt plus 5cm}void io\-\_\-destroy (
+\begin{DoxyParamCaption}
+\item[{struct I\-O $\ast$}]{the\-I\-O, }
+\item[{struct Grid $\ast$}]{the\-Grid}
+\end{DoxyParamCaption}
+)}}\label{io__create__destroy_8c_af38bb51b437e319121bde4c8210aab0c}
+
+
+Definition at line 32 of file io\-\_\-create\-\_\-destroy.\-c.
+

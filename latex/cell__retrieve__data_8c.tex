@@ -1,0 +1,126 @@
+\hypertarget{cell__retrieve__data_8c}{\section{src/\-Cell/cell\-\_\-retrieve\-\_\-data.c File Reference}
+\label{cell__retrieve__data_8c}\index{src/\-Cell/cell\-\_\-retrieve\-\_\-data.\-c@{src/\-Cell/cell\-\_\-retrieve\-\_\-data.\-c}}
+}
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$math.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Cell.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Grid.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Face.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Grav\-Mass.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/header.\-h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{cell__retrieve__data_8c_aebdd5460bae6401009fc1dc103d1997a}{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+double $\ast$ \hyperlink{cell__retrieve__data_8c_a57f1c30590194068c8787a8171771a8f}{cell\-\_\-prims} (struct Cell $\ast$the\-Cell)
+\item 
+double $\ast$ \hyperlink{cell__retrieve__data_8c_a52f7a1cd056d2ea7867e5ddbf1979f8e}{cell\-\_\-grad} (struct Cell $\ast$the\-Cell)
+\item 
+double $\ast$ \hyperlink{cell__retrieve__data_8c_ab2426804c920f8eadc264f845ddd8426}{cell\-\_\-gradp} (struct Cell $\ast$the\-Cell)
+\item 
+struct Cell $\ast$ \hyperlink{cell__retrieve__data_8c_ac8d73b7cc4db64dadeb2d969b17288a6}{cell\-\_\-single} (struct Cell $\ast$$\ast$$\ast$the\-Cells, int i, int j, int k)
+\item 
+double \hyperlink{cell__retrieve__data_8c_aa171559a29fc009284b7f38b7ab64b7f}{cell\-\_\-tiph} (struct Cell $\ast$one\-Cell)
+\item 
+double \hyperlink{cell__retrieve__data_8c_a6af2bde3037010c9683a46eea8f1674a}{cell\-\_\-dphi} (struct Cell $\ast$one\-Cell)
+\item 
+double \hyperlink{cell__retrieve__data_8c_aa87e03929e64f18733c6afd255eb6c16}{cell\-\_\-wiph} (struct Cell $\ast$one\-Cell)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{cell__retrieve__data_8c_aebdd5460bae6401009fc1dc103d1997a}{\index{cell\-\_\-retrieve\-\_\-data.\-c@{cell\-\_\-retrieve\-\_\-data.\-c}!C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S@{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}}
+\index{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S@{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}!cell_retrieve_data.c@{cell\-\_\-retrieve\-\_\-data.\-c}}
+\subsubsection[{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}}\label{cell__retrieve__data_8c_aebdd5460bae6401009fc1dc103d1997a}
+
+
+Definition at line 1 of file cell\-\_\-retrieve\-\_\-data.\-c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{cell__retrieve__data_8c_a6af2bde3037010c9683a46eea8f1674a}{\index{cell\-\_\-retrieve\-\_\-data.\-c@{cell\-\_\-retrieve\-\_\-data.\-c}!cell\-\_\-dphi@{cell\-\_\-dphi}}
+\index{cell\-\_\-dphi@{cell\-\_\-dphi}!cell_retrieve_data.c@{cell\-\_\-retrieve\-\_\-data.\-c}}
+\subsubsection[{cell\-\_\-dphi}]{\setlength{\rightskip}{0pt plus 5cm}double cell\-\_\-dphi (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$}]{one\-Cell}
+\end{DoxyParamCaption}
+)}}\label{cell__retrieve__data_8c_a6af2bde3037010c9683a46eea8f1674a}
+
+
+Definition at line 26 of file cell\-\_\-retrieve\-\_\-data.\-c.
+
+\hypertarget{cell__retrieve__data_8c_a52f7a1cd056d2ea7867e5ddbf1979f8e}{\index{cell\-\_\-retrieve\-\_\-data.\-c@{cell\-\_\-retrieve\-\_\-data.\-c}!cell\-\_\-grad@{cell\-\_\-grad}}
+\index{cell\-\_\-grad@{cell\-\_\-grad}!cell_retrieve_data.c@{cell\-\_\-retrieve\-\_\-data.\-c}}
+\subsubsection[{cell\-\_\-grad}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ cell\-\_\-grad (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$}]{the\-Cell}
+\end{DoxyParamCaption}
+)}}\label{cell__retrieve__data_8c_a52f7a1cd056d2ea7867e5ddbf1979f8e}
+
+
+Definition at line 14 of file cell\-\_\-retrieve\-\_\-data.\-c.
+
+\hypertarget{cell__retrieve__data_8c_ab2426804c920f8eadc264f845ddd8426}{\index{cell\-\_\-retrieve\-\_\-data.\-c@{cell\-\_\-retrieve\-\_\-data.\-c}!cell\-\_\-gradp@{cell\-\_\-gradp}}
+\index{cell\-\_\-gradp@{cell\-\_\-gradp}!cell_retrieve_data.c@{cell\-\_\-retrieve\-\_\-data.\-c}}
+\subsubsection[{cell\-\_\-gradp}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ cell\-\_\-gradp (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$}]{the\-Cell}
+\end{DoxyParamCaption}
+)}}\label{cell__retrieve__data_8c_ab2426804c920f8eadc264f845ddd8426}
+
+
+Definition at line 17 of file cell\-\_\-retrieve\-\_\-data.\-c.
+
+\hypertarget{cell__retrieve__data_8c_a57f1c30590194068c8787a8171771a8f}{\index{cell\-\_\-retrieve\-\_\-data.\-c@{cell\-\_\-retrieve\-\_\-data.\-c}!cell\-\_\-prims@{cell\-\_\-prims}}
+\index{cell\-\_\-prims@{cell\-\_\-prims}!cell_retrieve_data.c@{cell\-\_\-retrieve\-\_\-data.\-c}}
+\subsubsection[{cell\-\_\-prims}]{\setlength{\rightskip}{0pt plus 5cm}double$\ast$ cell\-\_\-prims (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$}]{the\-Cell}
+\end{DoxyParamCaption}
+)}}\label{cell__retrieve__data_8c_a57f1c30590194068c8787a8171771a8f}
+
+
+Definition at line 11 of file cell\-\_\-retrieve\-\_\-data.\-c.
+
+\hypertarget{cell__retrieve__data_8c_ac8d73b7cc4db64dadeb2d969b17288a6}{\index{cell\-\_\-retrieve\-\_\-data.\-c@{cell\-\_\-retrieve\-\_\-data.\-c}!cell\-\_\-single@{cell\-\_\-single}}
+\index{cell\-\_\-single@{cell\-\_\-single}!cell_retrieve_data.c@{cell\-\_\-retrieve\-\_\-data.\-c}}
+\subsubsection[{cell\-\_\-single}]{\setlength{\rightskip}{0pt plus 5cm}struct Cell$\ast$ cell\-\_\-single (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$$\ast$$\ast$}]{the\-Cells, }
+\item[{int}]{i, }
+\item[{int}]{j, }
+\item[{int}]{k}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [read]}}}\label{cell__retrieve__data_8c_ac8d73b7cc4db64dadeb2d969b17288a6}
+
+
+Definition at line 20 of file cell\-\_\-retrieve\-\_\-data.\-c.
+
+\hypertarget{cell__retrieve__data_8c_aa171559a29fc009284b7f38b7ab64b7f}{\index{cell\-\_\-retrieve\-\_\-data.\-c@{cell\-\_\-retrieve\-\_\-data.\-c}!cell\-\_\-tiph@{cell\-\_\-tiph}}
+\index{cell\-\_\-tiph@{cell\-\_\-tiph}!cell_retrieve_data.c@{cell\-\_\-retrieve\-\_\-data.\-c}}
+\subsubsection[{cell\-\_\-tiph}]{\setlength{\rightskip}{0pt plus 5cm}double cell\-\_\-tiph (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$}]{one\-Cell}
+\end{DoxyParamCaption}
+)}}\label{cell__retrieve__data_8c_aa171559a29fc009284b7f38b7ab64b7f}
+
+
+Definition at line 23 of file cell\-\_\-retrieve\-\_\-data.\-c.
+
+\hypertarget{cell__retrieve__data_8c_aa87e03929e64f18733c6afd255eb6c16}{\index{cell\-\_\-retrieve\-\_\-data.\-c@{cell\-\_\-retrieve\-\_\-data.\-c}!cell\-\_\-wiph@{cell\-\_\-wiph}}
+\index{cell\-\_\-wiph@{cell\-\_\-wiph}!cell_retrieve_data.c@{cell\-\_\-retrieve\-\_\-data.\-c}}
+\subsubsection[{cell\-\_\-wiph}]{\setlength{\rightskip}{0pt plus 5cm}double cell\-\_\-wiph (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$}]{one\-Cell}
+\end{DoxyParamCaption}
+)}}\label{cell__retrieve__data_8c_aa87e03929e64f18733c6afd255eb6c16}
+
+
+Definition at line 29 of file cell\-\_\-retrieve\-\_\-data.\-c.
+

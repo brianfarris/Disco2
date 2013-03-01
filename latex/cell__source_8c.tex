@@ -1,0 +1,83 @@
+\hypertarget{cell__source_8c}{\section{src/\-Cell/cell\-\_\-source.c File Reference}
+\label{cell__source_8c}\index{src/\-Cell/cell\-\_\-source.\-c@{src/\-Cell/cell\-\_\-source.\-c}}
+}
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$math.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Cell.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Grid.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Face.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/\-Grav\-Mass.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../\-Headers/header.\-h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{cell__source_8c_aebdd5460bae6401009fc1dc103d1997a}{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+double \hyperlink{cell__source_8c_a41d4d0d57be180f85633adadd2fa2ac8}{fgrav} (double M, double r, double eps, double n)
+\item 
+void \hyperlink{cell__source_8c_a4df940ced92888bdaa8a2f4266f59b44}{grav\-Mass\-Force} (struct Grav\-Mass $\ast$the\-Grav\-Masses, struct Grid $\ast$the\-Grid, int p, double r, double phi, double $\ast$fr, double $\ast$fp)
+\item 
+void \hyperlink{cell__source_8c_a2d0fde02d2250039865c9a8499092050}{cell\-\_\-add\-\_\-src} (struct Cell $\ast$$\ast$$\ast$the\-Cells, struct Grid $\ast$the\-Grid, struct Grav\-Mass $\ast$the\-Grav\-Masses, double dt)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{cell__source_8c_aebdd5460bae6401009fc1dc103d1997a}{\index{cell\-\_\-source.\-c@{cell\-\_\-source.\-c}!C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S@{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}}
+\index{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S@{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}!cell_source.c@{cell\-\_\-source.\-c}}
+\subsubsection[{C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\-E\-L\-L\-\_\-\-P\-R\-I\-V\-A\-T\-E\-\_\-\-D\-E\-F\-S}}\label{cell__source_8c_aebdd5460bae6401009fc1dc103d1997a}
+
+
+Definition at line 1 of file cell\-\_\-source.\-c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{cell__source_8c_a2d0fde02d2250039865c9a8499092050}{\index{cell\-\_\-source.\-c@{cell\-\_\-source.\-c}!cell\-\_\-add\-\_\-src@{cell\-\_\-add\-\_\-src}}
+\index{cell\-\_\-add\-\_\-src@{cell\-\_\-add\-\_\-src}!cell_source.c@{cell\-\_\-source.\-c}}
+\subsubsection[{cell\-\_\-add\-\_\-src}]{\setlength{\rightskip}{0pt plus 5cm}void cell\-\_\-add\-\_\-src (
+\begin{DoxyParamCaption}
+\item[{struct Cell $\ast$$\ast$$\ast$}]{the\-Cells, }
+\item[{struct Grid $\ast$}]{the\-Grid, }
+\item[{struct Grav\-Mass $\ast$}]{the\-Grav\-Masses, }
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+)}}\label{cell__source_8c_a2d0fde02d2250039865c9a8499092050}
+
+
+Definition at line 119 of file cell\-\_\-source.\-c.
+
+\hypertarget{cell__source_8c_a41d4d0d57be180f85633adadd2fa2ac8}{\index{cell\-\_\-source.\-c@{cell\-\_\-source.\-c}!fgrav@{fgrav}}
+\index{fgrav@{fgrav}!cell_source.c@{cell\-\_\-source.\-c}}
+\subsubsection[{fgrav}]{\setlength{\rightskip}{0pt plus 5cm}double fgrav (
+\begin{DoxyParamCaption}
+\item[{double}]{M, }
+\item[{double}]{r, }
+\item[{double}]{eps, }
+\item[{double}]{n}
+\end{DoxyParamCaption}
+)}}\label{cell__source_8c_a41d4d0d57be180f85633adadd2fa2ac8}
+
+
+Definition at line 12 of file cell\-\_\-source.\-c.
+
+\hypertarget{cell__source_8c_a4df940ced92888bdaa8a2f4266f59b44}{\index{cell\-\_\-source.\-c@{cell\-\_\-source.\-c}!grav\-Mass\-Force@{grav\-Mass\-Force}}
+\index{grav\-Mass\-Force@{grav\-Mass\-Force}!cell_source.c@{cell\-\_\-source.\-c}}
+\subsubsection[{grav\-Mass\-Force}]{\setlength{\rightskip}{0pt plus 5cm}void grav\-Mass\-Force (
+\begin{DoxyParamCaption}
+\item[{struct Grav\-Mass $\ast$}]{the\-Grav\-Masses, }
+\item[{struct Grid $\ast$}]{the\-Grid, }
+\item[{int}]{p, }
+\item[{double}]{r, }
+\item[{double}]{phi, }
+\item[{double $\ast$}]{fr, }
+\item[{double $\ast$}]{fp}
+\end{DoxyParamCaption}
+)}}\label{cell__source_8c_a4df940ced92888bdaa8a2f4266f59b44}
+
+
+Definition at line 16 of file cell\-\_\-source.\-c.
+
