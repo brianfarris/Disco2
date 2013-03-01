@@ -1,24 +1,24 @@
-#define FLUX_PRIVATE_DEFS
+#define RIEMANN_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "../Headers/Flux.h"
+#include "../Headers/Riemann.h"
 #include "../Headers/header.h"
 
-void flux_set_primL(struct Flux * theFlux,int q,double input){
-  theFlux->primL[q] = input;
+void riemann_set_primL(struct Riemann * theRiemann,int q,double input){
+  theRiemann->primL[q] = input;
 }
-void flux_set_primR(struct Flux * theFlux,int q,double input){
-  theFlux->primR[q] = input;
+void riemann_set_primR(struct Riemann * theRiemann,int q,double input){
+  theRiemann->primR[q] = input;
 }
-void flux_set_vel(struct Flux * theFlux,double *n,double r,double *Bpack,double GAMMALAW,double DIVB_CH){
+void riemann_set_vel(struct Riemann * theRiemann,double *n,double r,double *Bpack,double GAMMALAW,double DIVB_CH){
   double wp = 0.0*n[1];
   double ch = DIVB_CH;
 
   double L_Mins, L_Plus, L_Star;
 
-  double * prim1 = theFlux->primL;
-  double * prim2 = theFlux->primR;
+  double * prim1 = theRiemann->primL;
+  double * prim2 = theRiemann->primR;
 
   double P1   = prim1[PPP];
   double rho1 = prim1[RHO];
@@ -129,24 +129,39 @@ void flux_set_vel(struct Flux * theFlux,double *n,double r,double *Bpack,double 
   Bpack[4] = vdotB;
   Bpack[5] = psi;
 
-  theFlux->Sl = L_Mins;
-  theFlux->Sr = L_Plus;
-  theFlux->Ss = L_Star;
+  theRiemann->Sl = L_Mins;
+  theRiemann->Sr = L_Plus;
+  theRiemann->Ss = L_Star;
 
 }
 
-flux_set_Ustar(struct Flux * theFlux,double *n,double r,double *Bpack,double GAMMALAW,double w){
+void riemann_set_state(struct Riemann * theRiemann,int w ){
+  if (w < theRiemann->Sl){
+    theRiemann->state=LEFT;
+  }else if( w > theRiemann->Sr ){
+    theRiemann->state=RIGHT;
+  }else{
+    if( w < theRiemann->Ss ){
+      theRiemann->state=LEFTSTAR;
+    }else{
+      theRiemann->state=RIGHTSTAR;
+    }
+  }
+}
+
+
+void riemann_set_Ustar(struct Riemann * theRiemann,double *n,double r,double *Bpack,double GAMMALAW,int whichside){
   double *prim;
   double Sk;
-  if (w<(theFlux->Ss)){
-    prim = theFlux->primL;
-    Sk = theFlux->Sl;
+  if (whichside==LEFT){
+    prim = theRiemann->primL;
+    Sk = theRiemann->Sl;
   }else{
-    prim = theFlux->primR;
-    Sk = theFlux->Sr;
+    prim = theRiemann->primR;
+    Sk = theRiemann->Sr;
   }
-  double Ss=theFlux->Ss;
-  
+  double Ss=theRiemann->Ss;
+
   double Bsn = Bpack[0];
   double Bsr = Bpack[1];
   double Bsp = Bpack[2];
@@ -195,27 +210,27 @@ flux_set_Ustar(struct Flux * theFlux,double *n,double r,double *Bpack,double GAM
   Msp += n[1]*( Msn - mn );
   Msz += n[2]*( Msn - mn );
 
-  theFlux->Ustar[DDD] = Dstar;
-  theFlux->Ustar[SRR] = Msr;
-  theFlux->Ustar[LLL] = r*Msp;
-  theFlux->Ustar[SZZ] = Msz;
-  theFlux->Ustar[TAU] = Estar;
+  theRiemann->Ustar[DDD] = Dstar;
+  theRiemann->Ustar[SRR] = Msr;
+  theRiemann->Ustar[LLL] = r*Msp;
+  theRiemann->Ustar[SZZ] = Msz;
+  theRiemann->Ustar[TAU] = Estar;
 
-  theFlux->Ustar[BRR] = Bsr/r;
-  theFlux->Ustar[BPP] = Bsp/r;
-  theFlux->Ustar[BZZ] = Bsz;
+  theRiemann->Ustar[BRR] = Bsr/r;
+  theRiemann->Ustar[BPP] = Bsp/r;
+  theRiemann->Ustar[BZZ] = Bsz;
 
-  theFlux->Ustar[PSI] = psi;
+  theRiemann->Ustar[PSI] = psi;
 
 
 }
 
-void flux_set_flux(struct Flux * theFlux, double r , double * n ,double GAMMALAW,double DIVB_CH, double w){
+void riemann_set_flux(struct Riemann * theRiemann, double r , double * n ,double GAMMALAW,double DIVB_CH){
   double *prim;
-  if (w<(theFlux->Ss)){
-    prim = theFlux->primL;
+  if ((theRiemann->state==LEFT)||(theRiemann->state==LEFTSTAR)){
+    prim = theRiemann->primL;
   }else{
-    prim = theFlux->primR;
+    prim = theRiemann->primR;
   }
 
   double rho = prim[RHO];
@@ -236,19 +251,19 @@ void flux_set_flux(struct Flux * theFlux, double r , double * n ,double GAMMALAW
   double v2 = vr*vr + vp*vp + vz*vz;
   double B2 = Br*Br + Bp*Bp + Bz*Bz;
 
-  theFlux->F[DDD] = rho*vn;
-  theFlux->F[SRR] =     rho*vr*vn + (Pp+.5*B2)*n[0] - Br*Bn;
-  theFlux->F[LLL] = r*( rho*vp*vn + (Pp+.5*B2)*n[1] - Bp*Bn );
-  theFlux->F[SZZ] =     rho*vz*vn + (Pp+.5*B2)*n[2] - Bz*Bn;
-  theFlux->F[TAU] = ( .5*rho*v2 + rhoe + Pp + B2 )*vn - vB*Bn;
+  theRiemann->F[DDD] = rho*vn;
+  theRiemann->F[SRR] =     rho*vr*vn + (Pp+.5*B2)*n[0] - Br*Bn;
+  theRiemann->F[LLL] = r*( rho*vp*vn + (Pp+.5*B2)*n[1] - Bp*Bn );
+  theRiemann->F[SZZ] =     rho*vz*vn + (Pp+.5*B2)*n[2] - Bz*Bn;
+  theRiemann->F[TAU] = ( .5*rho*v2 + rhoe + Pp + B2 )*vn - vB*Bn;
 
   double psi = prim[PSI];
-  theFlux->F[BRR] =(Br*vn - vr*Bn + psi*n[0])/r;
-  theFlux->F[BPP] =(Bp*vn - vp*Bn + psi*n[1])/r;
-  theFlux->F[BZZ] = Bz*vn - vz*Bn + psi*n[2];
+  theRiemann->F[BRR] =(Br*vn - vr*Bn + psi*n[0])/r;
+  theRiemann->F[BPP] =(Bp*vn - vp*Bn + psi*n[1])/r;
+  theRiemann->F[BZZ] = Bz*vn - vz*Bn + psi*n[2];
 
   double wp = 0.0;
-  theFlux->F[PSI] = wp*psi*n[1] + pow(DIVB_CH,2.)*Bn;
+  theRiemann->F[PSI] = wp*psi*n[1] + pow(DIVB_CH,2.)*Bn;
 
   /*
      int q;
@@ -259,29 +274,39 @@ void flux_set_flux(struct Flux * theFlux, double r , double * n ,double GAMMALAW
 
 }
 
-void flux_addto_flux(struct Flux * theFlux,double w,int NUM_Q){
-  double Sk;
-  if (w<(theFlux->Ss)){
-    Sk = theFlux->Sl;
-  }else{
-    Sk = theFlux->Sr;
-  }
+void riemann_addto_flux_general(struct Riemann * theRiemann,double w,int NUM_Q){
   int q;
-  for( q=0 ; q<NUM_Q ; ++q ){
-    theFlux->F[q] += Sk*( theFlux->Ustar[q] - theFlux->Uk[q] ) - w*theFlux->Ustar[q];
+  for (q=0;q<NUM_Q;++q){
+    if ((theRiemann->state==LEFT)||(theRiemann->state==RIGHT)){
+      theRiemann->F[q] -= w*theRiemann->Uk[q];
+    }else if(theRiemann->state==LEFTSTAR){
+      theRiemann->F[q] += theRiemann->Sl*( theRiemann->Ustar[q] - theRiemann->Uk[q] ) - w*theRiemann->Ustar[q];
+    }else{
+      theRiemann->F[q] += theRiemann->Sr*( theRiemann->Ustar[q] - theRiemann->Uk[q] ) - w*theRiemann->Ustar[q]; 
+    }
   }
-
 }
 
 
 
-void flux_set_Uk(struct Flux *theFlux,double * Uk_in){
-  theFlux->Uk = Uk_in; 
+double * riemann_Uk(struct Riemann *theRiemann){
+  return(theRiemann->Uk); 
 }
 
-double * flux_primL(struct Flux * theFlux){
-  return(theFlux->primL);
+
+double * riemann_prim(struct Riemann * theRiemann,int state){
+  if ((state==LEFT)||(state==LEFTSTAR)){
+    return(theRiemann->primL);
+  } else{
+    return(theRiemann->primR);
+  }
 }
-double * flux_primR(struct Flux * theFlux){
-  return(theFlux->primR);
+
+double *riemann_F(struct Riemann * theRiemann){
+  return(theRiemann->F);
 }
+
+int riemann_state(struct Riemann * theRiemann){
+  return(theRiemann->state);
+}
+
