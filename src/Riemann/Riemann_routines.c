@@ -345,7 +345,7 @@ void riemann_driver(struct Cell * cL , struct Cell * cR, struct Grid *theGrid, d
 
   double Bk_face;
   if (direction==0){
-    Bk_face = 0.5*(riemann_prim(theRiemann,LEFT)[BRR]+riemann_prim(theRiemann,RIGHT)[BRR]);  
+    //Bk_face = 0.5*(riemann_prim(theRiemann,LEFT)[BRR]+riemann_prim(theRiemann,RIGHT)[BRR]);  
   } else if (direction==1){
     Bk_face = 0.5*(riemann_prim(theRiemann,LEFT)[BPP]+riemann_prim(theRiemann,RIGHT)[BPP]);
   } else if (direction==2){
