@@ -1,4 +1,4 @@
-1) create flux class
+1) get rid of unnecessary functions
 2) have a pure hydro version option
 3) generalize planets
 4) remove unnecessary includes from .c files 

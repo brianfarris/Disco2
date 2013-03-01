@@ -31,8 +31,4 @@ double face_deltaR( struct Face *);
 double face_cm( struct Face *);
 double face_dA( struct Face *);
 double face_r( struct Face *);
-
-//riemann routines
-//void face_riemann_r( struct Cell * , struct Cell * ,struct Grid *, double,double,double ,double ,double , double , double,int );
-//void face_riemann_z( struct Cell * , struct Cell * ,struct Grid *, double,double,double ,double ,double , double , double,int );
 #endif

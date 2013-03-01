@@ -32,8 +32,8 @@ double *cell_prims(struct Cell *);
 double *cell_grad(struct Cell *);
 double *cell_gradp(struct Cell *);
 struct Cell *cell_single(struct Cell ***,int,int,int);
-double cell_tiph(struct Cell *);//redundant
-double cell_dphi(struct Cell *);//redundant
+double cell_tiph(struct Cell *);
+double cell_dphi(struct Cell *);
 double cell_wiph(struct Cell *);
 //modify cell data
 void cell_add_cons(struct Cell *, int, double);
