@@ -29,6 +29,9 @@ double face_cm( struct Face * thisface){
 double face_dA( struct Face * thisface){
   return(thisface->dA);
 }
+double face_r( struct Face * thisface){
+  return(thisface->r);
+}
 
 
 

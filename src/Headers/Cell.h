@@ -56,7 +56,7 @@ void cell_set_wrigid(struct Cell ***,struct Grid *);
 void cell_syncproc_r( struct Cell *** , struct Grid *,struct MPIsetup *);
 void cell_syncproc_z( struct Cell *** , struct Grid *,struct MPIsetup *);
 //riemann
-void cell_riemann_p( struct Cell * , struct Cell * ,struct Grid *, double , double , double );
+//void cell_riemann_p( struct Cell * , struct Cell * ,struct Grid *, double , double , double ,double,double,double,double,int);
 void cell_plm_rz( struct Cell *** ,struct Grid *, struct Face * , int , int );
 void cell_plm_p( struct Cell *** ,struct Grid * );
 void cell_flux_p( struct Cell *** ,struct Grid *, double );

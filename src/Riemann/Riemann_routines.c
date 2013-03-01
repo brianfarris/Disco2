@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Riemann.h"
+#include "../Headers/Grid.h"
+#include "../Headers/Cell.h"
 #include "../Headers/header.h"
 
 void riemann_set_primL(struct Riemann * theRiemann,int q,double input){
@@ -150,10 +152,10 @@ void riemann_set_state(struct Riemann * theRiemann,int w ){
 }
 
 
-void riemann_set_Ustar(struct Riemann * theRiemann,double *n,double r,double *Bpack,double GAMMALAW,int whichside){
+void riemann_set_Ustar(struct Riemann * theRiemann,double *n,double r,double *Bpack,double GAMMALAW){
   double *prim;
   double Sk;
-  if (whichside==LEFT){
+  if (theRiemann->state==LEFTSTAR){
     prim = theRiemann->primL;
     Sk = theRiemann->Sl;
   }else{
@@ -292,6 +294,10 @@ void riemann_addto_flux_general(struct Riemann * theRiemann,double w,int NUM_Q){
 double * riemann_Uk(struct Riemann *theRiemann){
   return(theRiemann->Uk); 
 }
+double * riemann_Ustar(struct Riemann *theRiemann){
+  return(theRiemann->Ustar); 
+}
+
 
 
 double * riemann_prim(struct Riemann * theRiemann,int state){
@@ -309,4 +315,72 @@ double *riemann_F(struct Riemann * theRiemann){
 int riemann_state(struct Riemann * theRiemann){
   return(theRiemann->state);
 }
+double riemann_Ss(struct Riemann * theRiemann){
+  return(theRiemann->Ss);
+}
+
+void riemann_blah(struct Cell * cL , struct Cell * cR, struct Grid *theGrid, double dA,double dt, double r,double deltaL,double deltaR, double dpL, double dpR , int direction ){
+  int NUM_Q = grid_NUM_Q(theGrid);
+  double GAMMALAW = grid_GAMMALAW(theGrid);
+  double DIVB_CH = grid_DIVB_CH(theGrid);
+
+  struct Riemann * theRiemann = riemann_create(theGrid);
+
+  int q;
+  for (q=0;q<NUM_Q;++q){
+    riemann_set_primL(theRiemann,q,cell_prims(cL)[q] + cell_grad(cL)[q]*deltaL + cell_gradp(cL)[q]*dpL);
+    riemann_set_primR(theRiemann,q,cell_prims(cR)[q] + cell_grad(cR)[q]*deltaR + cell_gradp(cR)[q]*dpR);
+  }
+
+  //initialize
+  double n[3];int i;
+  for (i=0;i<3;++i){
+    n[i]=0;
+  }
+  //set
+  n[direction]=1.0;
+
+  double Bpack[6];
+  riemann_set_vel(theRiemann,n,r,Bpack,GAMMALAW,DIVB_CH);
+
+  double Bk_face;
+  if (direction==0){
+    Bk_face = 0.5*(riemann_prim(theRiemann,LEFT)[BRR]+riemann_prim(theRiemann,RIGHT)[BRR]);  
+  } else if (direction==1){
+    Bk_face = 0.5*(riemann_prim(theRiemann,LEFT)[BPP]+riemann_prim(theRiemann,RIGHT)[BPP]);
+  } else if (direction==2){
+    Bk_face = 0.5*(riemann_prim(theRiemann,LEFT)[BZZ]+riemann_prim(theRiemann,RIGHT)[BZZ]);
+  }
+  double Psi_face = 0.5*(riemann_prim(theRiemann,LEFT)[PSI]+riemann_prim(theRiemann,RIGHT)[PSI]);
+
+    double w;
+  if (direction==1){
+    if( grid_MOVE_CELLS(theGrid) == C_WRIEMANN ) cell_add_wiph(cL,riemann_Ss(theRiemann));
+    w = cell_wiph(cL);
+  } else{
+    w = 0.0;
+  }
+
+  riemann_set_state(theRiemann,w);
+
+  riemann_set_flux( theRiemann , r , n,GAMMALAW,DIVB_CH );
+  if((riemann_state(theRiemann)==LEFTSTAR)||(riemann_state(theRiemann)==RIGHTSTAR)){
+    cell_prim2cons( riemann_prim(theRiemann,riemann_state(theRiemann)) , riemann_Uk(theRiemann) , r , 1.0 ,GAMMALAW);
+    riemann_set_Ustar(theRiemann,n,r,Bpack,GAMMALAW);
+  }
+  riemann_addto_flux_general(theRiemann,w,grid_NUM_Q(theGrid));
+
+  for( q=0 ; q<NUM_Q ; ++q ){
+    cell_add_cons(cL,q,-dt*dA*riemann_F(theRiemann)[q]);
+    cell_add_cons(cR,q,dt*dA*riemann_F(theRiemann)[q]);
+  }
+
+  cell_add_divB(cL,dA*Bk_face);
+  cell_add_divB(cR,-dA*Bk_face);
+  cell_add_GradPsi(cL,direction,Psi_face);
+  cell_add_GradPsi(cR,direction,-Psi_face);
+
+}
+
+
 

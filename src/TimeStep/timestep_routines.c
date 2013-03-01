@@ -4,6 +4,7 @@
 #include <math.h>
 #include "../Headers/Cell.h"
 #include "../Headers/TimeStep.h"
+#include "../Headers/Riemann.h"
 #include "../Headers/Grid.h"
 #include "../Headers/Cell.h"
 #include "../Headers/GravMass.h"
@@ -52,14 +53,47 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_plm_rz( theCells ,theGrid, theFaces_r , timestep_Nfr(theTimeStep) , 0 );
   int n;
 
+  struct Cell * cL;
+  struct Cell * cR;
+  double deltaL,deltaR;
+  double pL,pR,dpL,dpR;
+  double r,dA;
   for( n=0 ; n<timestep_Nfr(theTimeStep) ; ++n ){
-    face_riemann_r( face_pointer(theFaces_r,n) , theGrid, dt );
+    deltaL = face_deltaL(face_pointer(theFaces_r,n));
+    deltaR = face_deltaR(face_pointer(theFaces_r,n));
+    cL = face_L_pointer(theFaces_r,n);
+    cR = face_R_pointer(theFaces_r,n);
+    pL = cell_tiph(cL) - .5*cell_dphi(cL);
+    pR = cell_tiph(cR) - .5*cell_dphi(cR);   
+    dpL =  face_cm(face_pointer(theFaces_r,n)) - pL;
+    dpR = -face_cm(face_pointer(theFaces_r,n)) + pR;
+    while( dpL >  M_PI ) dpL -= 2.*M_PI;
+    while( dpL < -M_PI ) dpL += 2.*M_PI;
+    while( dpR >  M_PI ) dpR -= 2.*M_PI;
+    while( dpR < -M_PI ) dpR += 2.*M_PI;
+    r = face_r(face_pointer(theFaces_r,n));
+    dA = face_dA(face_pointer(theFaces_r,n));
+    riemann_blah(cL,cR,theGrid,dA,dt,r,deltaL,deltaR, dpL, dpR,0); 
   }
   //Z Flux
   if( grid_N_z_global(theGrid) != 1 ){
     cell_plm_rz( theCells ,theGrid, theFaces_z , timestep_Nfz(theTimeStep) , 1 );
     for( n=0 ; n<timestep_Nfz(theTimeStep) ; ++n ){
-      face_riemann_z( face_pointer(theFaces_z,n) ,theGrid, dt );
+      deltaL = face_deltaL(face_pointer(theFaces_z,n));
+      deltaR = face_deltaR(face_pointer(theFaces_z,n));
+      cL = face_L_pointer(theFaces_z,n);
+      cR = face_R_pointer(theFaces_z,n);
+      pL = cell_tiph(cL) - .5*cell_dphi(cL);
+      pR = cell_tiph(cR) - .5*cell_dphi(cR);
+      dpL =  face_cm(face_pointer(theFaces_z,n)) - pL;
+      dpR = -face_cm(face_pointer(theFaces_z,n)) + pR;
+      while( dpL >  M_PI ) dpL -= 2.*M_PI;
+      while( dpL < -M_PI ) dpL += 2.*M_PI;
+      while( dpR >  M_PI ) dpR -= 2.*M_PI;
+      while( dpR < -M_PI ) dpR += 2.*M_PI;
+      r = face_r(face_pointer(theFaces_z,n));
+      dA = face_dA(face_pointer(theFaces_z,n));
+   riemann_blah(cL,cR,theGrid,dA,dt,r,deltaL,deltaR, dpL, dpR,2); 
     }
   }
   //Source Terms
