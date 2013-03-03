@@ -46,6 +46,7 @@ struct Grid {
   double CS_FLOOR;
   double CS_CAP;
   double VEL_CAP;
+  int runtype;
 };
 #endif
 
@@ -88,6 +89,7 @@ double grid_VEL_CAP(struct Grid *);
 int grid_NUM_Q(struct Grid *);
 double grid_get_T_MAX(struct Grid * );
 double grid_NUM_CHECKPOINTS(struct Grid * );
+double grid_runtype(struct Grid * );
 
 
 //set grid data

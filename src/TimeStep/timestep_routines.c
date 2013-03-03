@@ -48,7 +48,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_clear_GradPsi(theCells,theGrid);
   //Phi Flux
   cell_plm_p( theCells,theGrid );
-  //cell_flux_p( theCells ,theGrid, dt );
   int i,j,k;
   for( k=0 ; k<N_z_withghost ; ++k ){
     for( i=0 ; i<N_r_withghost ; ++i ){

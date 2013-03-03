@@ -1,15 +1,13 @@
-1) having cell_flux_p is stupid
-2) riemann_driver is now in Riemann class, so get rid of all the access functions, etc
-1) get rid of unnecessary functions
-2) have a pure hydro version option
-3) generalize planets
-4) remove unnecessary includes from .c files 
-5) check that checkpoint restart agrees to machine precision
-6) restore viscosity
-7) add error checking wherever possible
-8) see if it is possible to not use buffers in syncing and IO
-9) restore NUM_C stuff
-10) unify face_riemann_r and face_riemann_z
-11)restore bc_damp
-12) openMP support
-13) doxygen
+make it so that we can run on any number of procs
+have a pure hydro version option
+generalize planets
+remove unnecessary includes from .c files 
+check that checkpoint restart agrees to machine precision
+restore viscosity
+get rid of unnecessary functions
+add error checking wherever possible
+see if it is possible to not use buffers in syncing and IO
+restore NUM_C stuff
+restore bc_damp
+openMP support
+doxygen

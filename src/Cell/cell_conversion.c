@@ -8,35 +8,34 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_prim2cons( double * prim , double * cons , double r , double dV ,double GAMMALAW){
+void cell_prim2cons( double * prim , double * cons , double r , double dV ,double GAMMALAW, int runtype){
 
   double rho = prim[RHO];
   double Pp  = prim[PPP];
   double vr  = prim[URR];
   double vp  = prim[UPP]*r;
   double vz  = prim[UZZ];
-
-  double Br  = prim[BRR];
-  double Bp  = prim[BPP];
-  double Bz  = prim[BZZ];
-
   double v2  = vr*vr + vp*vp + vz*vz;
-
   double rhoe = Pp/(GAMMALAW - 1.);
-
-  double B2 = Br*Br + Bp*Bp + Bz*Bz;
 
   cons[DDD] = rho*dV;
   cons[SRR] = rho*vr*dV;
   cons[LLL] = r*rho*vp*dV;
   cons[SZZ] = rho*vz*dV;
-  cons[TAU] = ( .5*rho*v2 + rhoe + .5*B2 )*dV;
+  cons[TAU] = ( .5*rho*v2 + rhoe )*dV;
 
-  cons[BRR] = Br*dV/r;
-  cons[BPP] = Bp*dV/r;
-  cons[BZZ] = Bz*dV;
+  if (runtype==MHD){
+    double Br  = prim[BRR];
+    double Bp  = prim[BPP];
+    double Bz  = prim[BZZ];
+    double B2 = Br*Br + Bp*Bp + Bz*Bz;
 
-  cons[PSI] = prim[PSI]*dV;
+    cons[TAU] += .5*B2*dV;
+    cons[BRR] = Br*dV/r;
+    cons[BPP] = Bp*dV/r;
+    cons[BZZ] = Bz*dV;
+    cons[PSI] = prim[PSI]*dV;
+  }
 }
 
 void cell_calc_cons( struct Cell *** theCells,struct Grid *theGrid ){
@@ -56,13 +55,13 @@ void cell_calc_cons( struct Cell *** theCells,struct Grid *theGrid ){
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         double dV = .5*(rp*rp - rm*rm)*c->dphi*dz;
-        cell_prim2cons( c->prim , c->cons , r , dV,GAMMALAW );
+        cell_prim2cons( c->prim , c->cons , r , dV,GAMMALAW ,grid_runtype(theGrid));
       }    
     }    
   }
 }
 
-void cell_cons2prim( double * cons , double * prim , double r , double dV ,struct Grid * theGrid){
+void cell_cons2prim( double * cons , double * prim , double r , double dV ,struct Grid * theGrid,int runtype){
   double CS_FLOOR = grid_CS_FLOOR(theGrid);
   double CS_CAP = grid_CS_CAP(theGrid);
   double RHO_FLOOR = grid_RHO_FLOOR(theGrid);
@@ -76,18 +75,25 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
   double Sz  = cons[SZZ]/dV;
   double E   = cons[TAU]/dV;
 
-  double Br  = cons[BRR]/dV*r;
-  double Bp  = cons[BPP]/dV*r;
-  double Bz  = cons[BZZ]/dV;
-
-  double B2 = Br*Br+Bp*Bp+Bz*Bz;
   double vr = Sr/rho;
   double vp = Sp/rho;
   double vz = Sz/rho;
   double KE = .5*( Sr*vr + Sp*vp + Sz*vz );
+  double v_magnitude = sqrt(2.*KE/rho);
+
+  double B2 = 0.0;
+  if (runtype==MHD){
+    double Br  = cons[BRR]/dV*r;
+    double Bp  = cons[BPP]/dV*r;
+    double Bz  = cons[BZZ]/dV;
+    double B2 = Br*Br+Bp*Bp+Bz*Bz;
+    prim[BRR] = Br;
+    prim[BPP] = Bp;
+    prim[BZZ] = Bz;
+    prim[PSI] = cons[PSI]/dV;
+   }
   double rhoe = E - KE - .5*B2;
   double Pp = (GAMMALAW-1.)*rhoe;
-  double v_magnitude = sqrt(2.*KE/rho);
 
   if( Pp < CS_FLOOR*CS_FLOOR*rho/GAMMALAW ) Pp = CS_FLOOR*CS_FLOOR*rho/GAMMALAW;
   if ( Pp > CS_CAP*CS_CAP*rho/GAMMALAW) Pp = CS_CAP*CS_CAP*rho/GAMMALAW;
@@ -101,12 +107,6 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
   prim[URR] = vr;
   prim[UPP] = vp/r;
   prim[UZZ] = vz;
-
-  prim[BRR] = Br;
-  prim[BPP] = Bp;
-  prim[BZZ] = Bz;
-
-  prim[PSI] = cons[PSI]/dV;
 }
 
 void cell_calc_prim( struct Cell *** theCells ,struct Grid * theGrid){
@@ -125,7 +125,7 @@ void cell_calc_prim( struct Cell *** theCells ,struct Grid * theGrid){
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         double dV = .5*(rp*rp-rm*rm)*c->dphi*dz;
-        cell_cons2prim( c->cons , c->prim , r , dV ,theGrid);
+        cell_cons2prim( c->cons , c->prim , r , dV ,theGrid,grid_runtype(theGrid));
       }
     }
   }

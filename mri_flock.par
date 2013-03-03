@@ -42,4 +42,4 @@ Cs_Floor		0.0001
 Cs_Cap			1.0
 Vel_Cap			10.0
 
-
+runtype                 1

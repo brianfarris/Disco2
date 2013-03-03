@@ -9,7 +9,6 @@
 #include "../Headers/header.h"
 
 void riemann_set_vel(struct Riemann * theRiemann,double *n,double r,double *Bpack,double GAMMALAW,double DIVB_CH){
-  double wp = 0.0*n[1];
   double ch = DIVB_CH;
 
   double L_Mins, L_Plus, L_Star;
@@ -19,81 +18,84 @@ void riemann_set_vel(struct Riemann * theRiemann,double *n,double r,double *Bpac
 
   double P1   = prim1[PPP];
   double rho1 = prim1[RHO];
-
   double vr1  =   prim1[URR];
   double vp1  = r*prim1[UPP];
   double vz1  =   prim1[UZZ];
-
   double vn1  = vr1*n[0] + vp1*n[1] + vz1*n[2];
+  double cf21  = sqrt( GAMMALAW*(P1/rho1) );
+  double mrL = rho1*vr1;
+  double mpL = rho1*vp1;
+  double mzL = rho1*vz1;
 
-  double cs1  = sqrt( GAMMALAW*(P1/rho1) );
+  double FmrL = rho1*vr1*vn1 + P1*n[0];
+  double FmpL = rho1*vp1*vn1 + P1*n[1];
+  double FmzL = rho1*vz1*vn1 + P1*n[2];
+
+  
 
   double Br1 = prim1[BRR];
   double Bp1 = prim1[BPP];
   double Bz1 = prim1[BZZ];
+  double psiL = prim1[PSI];
 
   double Bn1 =  Br1*n[0] + Bp1*n[1] + Bz1*n[2];
   double B21 = (Br1*Br1  + Bp1*Bp1  + Bz1*Bz1);
   double b21 = B21/rho1;
-  double psiL = prim1[PSI];
-  double FpsL = wp*psiL + pow(DIVB_CH,2.)*Bn1;
+  double FpsL = pow(DIVB_CH,2.)*Bn1;
 
   double FrL = vn1*Br1 - Bn1*vr1 + psiL*n[0];
   double FpL = vn1*Bp1 - Bn1*vp1 + psiL*n[1];
   double FzL = vn1*Bz1 - Bn1*vz1 + psiL*n[2];
 
-  double mrL = rho1*vr1;
-  double mpL = rho1*vp1;
-  double mzL = rho1*vz1;
+  FmrL +=  .5*B21*n[0] - Br1*Bn1;
+  FmpL +=  .5*B21*n[1] - Bp1*Bn1;
+  FmzL +=  .5*B21*n[2] - Bz1*Bn1;
 
-  double FmrL = rho1*vr1*vn1 + (P1+.5*B21)*n[0] - Br1*Bn1;
-  double FmpL = rho1*vp1*vn1 + (P1+.5*B21)*n[1] - Bp1*Bn1;
-  double FmzL = rho1*vz1*vn1 + (P1+.5*B21)*n[2] - Bz1*Bn1;
-
-  double cf21 = .5*( cs1*cs1 + b21 + sqrt(fabs(  (cs1*cs1+b21)*(cs1*cs1+b21) - 4.0*cs1*cs1*Bn1*Bn1/rho1 )) );
+  cf21 = .5*( cf21*cf21 + b21 + sqrt(fabs(  (cf21*cf21+b21)*(cf21*cf21+b21) - 4.0*cf21*cf21*Bn1*Bn1/rho1 )) );
 
   L_Mins = vn1 - sqrt( cf21 );
   L_Plus = vn1 + sqrt( cf21 );
 
   double P2   = prim2[PPP];
   double rho2 = prim2[RHO];
-
   double vr2  =   prim2[URR];
   double vp2  = r*prim2[UPP];
   double vz2  =   prim2[UZZ];
-
   double vn2  = vr2*n[0] + vp2*n[1] + vz2*n[2];
+  double cf22  = sqrt( GAMMALAW*(P2/rho2) );
+  double mrR = rho2*vr2;
+  double mpR = rho2*vp2;
+  double mzR = rho2*vz2;
 
-  double cs2  = sqrt( GAMMALAW*(P2/rho2) );
+  double FmrR = rho2*vr2*vn2 + P2*n[0];
+  double FmpR = rho2*vp2*vn2 + P2*n[1];
+  double FmzR = rho2*vz2*vn2 + P2*n[2];
+
 
   double Br2 = prim2[BRR];
   double Bp2 = prim2[BPP];
   double Bz2 = prim2[BZZ];
+  double psiR = prim2[PSI];
 
   double Bn2 =  Br2*n[0] + Bp2*n[1] + Bz2*n[2];
   double B22 = (Br2*Br2  + Bp2*Bp2  + Bz2*Bz2);
   double b22 = B22/rho2;
-  double psiR = prim2[PSI];
-  double FpsR = wp*psiR + pow(DIVB_CH,2.)*Bn2;
+  double FpsR = pow(DIVB_CH,2.)*Bn2;
 
   double FrR = vn2*Br2 - Bn2*vr2 + psiR*n[0];
   double FpR = vn2*Bp2 - Bn2*vp2 + psiR*n[1];
   double FzR = vn2*Bz2 - Bn2*vz2 + psiR*n[2];
 
-  double mrR = rho2*vr2;
-  double mpR = rho2*vp2;
-  double mzR = rho2*vz2;
+  FmrR +=  .5*B22*n[0] - Br2*Bn2;
+  FmpR +=  .5*B22*n[1] - Bp2*Bn2;
+  FmzR +=  .5*B22*n[2] - Bz2*Bn2;
 
-  double FmrR = rho2*vr2*vn2 + (P2+.5*B22)*n[0] - Br2*Bn2;
-  double FmpR = rho2*vp2*vn2 + (P2+.5*B22)*n[1] - Bp2*Bn2;
-  double FmzR = rho2*vz2*vn2 + (P2+.5*B22)*n[2] - Bz2*Bn2;
-
-  double cf22 = .5*( cs2*cs2 + b22 + sqrt(fabs(  (cs2*cs2+b22)*(cs2*cs2+b22) - 4.0*cs2*cs2*Bn2*Bn2/rho2 )) );
+  cf22 = .5*( cf22*cf22 + b22 + sqrt(fabs(  (cf22*cf22+b22)*(cf22*cf22+b22) - 4.0*cf22*cf22*Bn2*Bn2/rho2 )) );
 
   if( L_Mins > vn2 - sqrt( cf22 ) ) L_Mins = vn2 - sqrt( cf22 );
   if( L_Plus < vn2 + sqrt( cf22 ) ) L_Plus = vn2 + sqrt( cf22 );
-  if( L_Mins > -ch+wp ) L_Mins = -ch+wp;
-  if( L_Plus <  ch+wp ) L_Plus =  ch+wp;
+  if( L_Mins > -ch ) L_Mins = -ch;
+  if( L_Plus <  ch ) L_Plus =  ch;
 
   double aL = L_Plus;
   double aR = -L_Mins;
@@ -258,8 +260,7 @@ void riemann_set_flux(struct Riemann * theRiemann, double r , double * n ,double
   theRiemann->F[BPP] =(Bp*vn - vp*Bn + psi*n[1])/r;
   theRiemann->F[BZZ] = Bz*vn - vz*Bn + psi*n[2];
 
-  double wp = 0.0;
-  theRiemann->F[PSI] = wp*psi*n[1] + pow(DIVB_CH,2.)*Bn;
+  theRiemann->F[PSI] = pow(DIVB_CH,2.)*Bn;
 
 }
 
@@ -372,10 +373,10 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
 
   riemann_set_flux( theRiemann , theRiemann->r , n,GAMMALAW,DIVB_CH );
   if (theRiemann->state==LEFTSTAR){
-    cell_prim2cons( theRiemann->primL , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW);
+    cell_prim2cons( theRiemann->primL , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW,grid_runtype(theGrid));
     riemann_set_Ustar(theRiemann,n,theRiemann->r,Bpack,GAMMALAW);
   } else if(theRiemann->state==RIGHTSTAR){
-    cell_prim2cons( theRiemann->primR , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW);
+    cell_prim2cons( theRiemann->primR , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW,grid_runtype(theGrid));
     riemann_set_Ustar(theRiemann,n,theRiemann->r,Bpack,GAMMALAW);
   }
   riemann_addto_flux_general(theRiemann,w,grid_NUM_Q(theGrid));

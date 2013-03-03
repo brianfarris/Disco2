@@ -131,7 +131,7 @@ int grid_read_par_file(struct Grid * theGrid, struct MPIsetup * theMPIsetup, cha
       err += readvar( pfile , "NumGravMass"        , VAR_INT  , &(theGrid->NumGravMass)  );
       err += readvar( pfile , "Adiabatic_Index"   , VAR_DOUB , &(theGrid->GAMMALAW)  );
       err += readvar( pfile , "Include_Viscosity" , VAR_INT  , &(theGrid->INCLUDE_VISCOSITY)  );
-      err += readvar( pfile , "Explicit_Viscosity" , VAR_INT  , &(theGrid->EXPLICIT_VISCOSITY)  );
+      err += readvar( pfile , "Explicit_Viscosity" , VAR_DOUB  , &(theGrid->EXPLICIT_VISCOSITY)  );
       err += readvar( pfile , "DivB_Ch"           , VAR_DOUB , &(theGrid->DIVB_CH)  );
       err += readvar( pfile , "DivB_l"            , VAR_DOUB , &(theGrid->DIVB_L)  );
       err += readvar( pfile , "CFL"               , VAR_DOUB , &(theGrid->CFL)  );
@@ -144,6 +144,7 @@ int grid_read_par_file(struct Grid * theGrid, struct MPIsetup * theMPIsetup, cha
       err += readvar( pfile , "Cs_Floor"          , VAR_DOUB , &(theGrid->CS_FLOOR)  );
       err += readvar( pfile , "Cs_Cap"            , VAR_DOUB , &(theGrid->CS_CAP)  );
       err += readvar( pfile , "Vel_Cap"           , VAR_DOUB , &(theGrid->VEL_CAP)  );
+      err += readvar( pfile , "runtype"           , VAR_INT , &(theGrid->runtype)  );
       //err += readvar( pfile , "BC_Damp"           , VAR_INT  , &(theGrid->BC_DAMP));
       //err += readvar( pfile , "Num_Reports"       , VAR_INT  , &(theGrid->NUM_REPORTS)  );
       //err += readvar( pfile , "Num_Outputs"       , VAR_INT  , &(theGrid->NUM_OUTPUTS)  );

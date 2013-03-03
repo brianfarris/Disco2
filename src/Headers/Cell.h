@@ -55,8 +55,7 @@ void cell_set_wrigid(struct Cell ***,struct Grid *);
 //processor syncs
 void cell_syncproc_r( struct Cell *** , struct Grid *,struct MPIsetup *);
 void cell_syncproc_z( struct Cell *** , struct Grid *,struct MPIsetup *);
-//riemann
-//void cell_riemann_p( struct Cell * , struct Cell * ,struct Grid *, double , double , double ,double,double,double,double,int);
+//PLM
 void cell_plm_rz( struct Cell *** ,struct Grid *, struct Face * , int , int );
 void cell_plm_p( struct Cell *** ,struct Grid * );
 //boundary conditions
@@ -65,15 +64,13 @@ void cell_boundary_outflow_z( struct Cell *** , struct Face * , struct Grid * ,s
 void cell_boundary_fixed_r( struct Cell ***, struct Grid *,struct MPIsetup *);
 //primitive-conservative conversion routines
 void cell_calc_prim( struct Cell ***,struct Grid *);
-void cell_prim2cons( double * , double * , double , double ,double );
+void cell_prim2cons( double * , double * , double , double ,double,int );
 void cell_calc_cons(struct Cell ***,struct Grid *); 
-void cell_cons2prim( double * , double * , double , double ,struct Grid * );
+void cell_cons2prim( double * , double * , double , double ,struct Grid *,int );
 //miscellaneous
 double cell_mindt( struct Cell *** , struct Grid * );
 void cell_copy(struct Cell ***,struct Grid * );
 void cell_adjust_RK_cons( struct Cell *** , struct Grid * , double );
 void cell_set_prim(struct Cell ***,int,int,int,int,double);//this will morph into a checkpoint restart routine
 void cell_set_tiph(struct Cell ***,int,int,int,double);//this will morph into a checkpoint restart routine
-
-//void cell_printscreen(struct Cell ***,struct Grid * );
 #endif
