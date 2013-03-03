@@ -48,52 +48,39 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_clear_GradPsi(theCells,theGrid);
   //Phi Flux
   cell_plm_p( theCells,theGrid );
-  cell_flux_p( theCells ,theGrid, dt );
+  //cell_flux_p( theCells ,theGrid, dt );
+  int i,j,k;
+  for( k=0 ; k<N_z_withghost ; ++k ){
+    for( i=0 ; i<N_r_withghost ; ++i ){
+      for( j=0 ; j<grid_N_p(theGrid,i)-1 ; ++j ){
+        struct Riemann * theRiemann = riemann_create(theGrid);
+        riemann_setup_p(theRiemann,theCells,theGrid,i,j,j+1,k);
+        riemann_hllc( theRiemann,theGrid,dt,1);
+        riemann_destroy(theRiemann);
+      }
+      struct Riemann * theRiemann = riemann_create(theGrid);
+      riemann_setup_p(theRiemann,theCells,theGrid,i,grid_N_p(theGrid,i)-1,0,k);
+      riemann_hllc(theRiemann, theGrid,dt,1 );
+      riemann_destroy(theRiemann);
+    }
+  }
   //R Flux
   cell_plm_rz( theCells ,theGrid, theFaces_r , timestep_Nfr(theTimeStep) , 0 );
   int n;
-
-  struct Cell * cL;
-  struct Cell * cR;
-  double deltaL,deltaR;
-  double pL,pR,dpL,dpR;
-  double r,dA;
   for( n=0 ; n<timestep_Nfr(theTimeStep) ; ++n ){
-    deltaL = face_deltaL(face_pointer(theFaces_r,n));
-    deltaR = face_deltaR(face_pointer(theFaces_r,n));
-    cL = face_L_pointer(theFaces_r,n);
-    cR = face_R_pointer(theFaces_r,n);
-    pL = cell_tiph(cL) - .5*cell_dphi(cL);
-    pR = cell_tiph(cR) - .5*cell_dphi(cR);   
-    dpL =  face_cm(face_pointer(theFaces_r,n)) - pL;
-    dpR = -face_cm(face_pointer(theFaces_r,n)) + pR;
-    while( dpL >  M_PI ) dpL -= 2.*M_PI;
-    while( dpL < -M_PI ) dpL += 2.*M_PI;
-    while( dpR >  M_PI ) dpR -= 2.*M_PI;
-    while( dpR < -M_PI ) dpR += 2.*M_PI;
-    r = face_r(face_pointer(theFaces_r,n));
-    dA = face_dA(face_pointer(theFaces_r,n));
-    riemann_driver(cL,cR,theGrid,dA,dt,r,deltaL,deltaR, dpL, dpR,0); 
+    struct Riemann * theRiemann = riemann_create(theGrid);
+    riemann_setup_rz(theRiemann,theFaces_r,theGrid,n);
+    riemann_hllc(theRiemann,theGrid,dt,0); 
+    riemann_destroy(theRiemann);
   }
   //Z Flux
   if( grid_N_z_global(theGrid) != 1 ){
     cell_plm_rz( theCells ,theGrid, theFaces_z , timestep_Nfz(theTimeStep) , 1 );
     for( n=0 ; n<timestep_Nfz(theTimeStep) ; ++n ){
-      deltaL = face_deltaL(face_pointer(theFaces_z,n));
-      deltaR = face_deltaR(face_pointer(theFaces_z,n));
-      cL = face_L_pointer(theFaces_z,n);
-      cR = face_R_pointer(theFaces_z,n);
-      pL = cell_tiph(cL) - .5*cell_dphi(cL);
-      pR = cell_tiph(cR) - .5*cell_dphi(cR);
-      dpL =  face_cm(face_pointer(theFaces_z,n)) - pL;
-      dpR = -face_cm(face_pointer(theFaces_z,n)) + pR;
-      while( dpL >  M_PI ) dpL -= 2.*M_PI;
-      while( dpL < -M_PI ) dpL += 2.*M_PI;
-      while( dpR >  M_PI ) dpR -= 2.*M_PI;
-      while( dpR < -M_PI ) dpR += 2.*M_PI;
-      r = face_r(face_pointer(theFaces_z,n));
-      dA = face_dA(face_pointer(theFaces_z,n));
-   riemann_driver(cL,cR,theGrid,dA,dt,r,deltaL,deltaR, dpL, dpR,2); 
+      struct Riemann * theRiemann = riemann_create(theGrid);
+      riemann_setup_rz(theRiemann,theFaces_z,theGrid,n);
+      riemann_hllc(theRiemann,theGrid,dt,2); 
+      riemann_destroy(theRiemann);
     }
   }
   //Source Terms

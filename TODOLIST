@@ -1,3 +1,5 @@
+1) having cell_flux_p is stupid
+2) riemann_driver is now in Riemann class, so get rid of all the access functions, etc
 1) get rid of unnecessary functions
 2) have a pure hydro version option
 3) generalize planets

@@ -5,14 +5,9 @@
 #include "../Headers/Riemann.h"
 #include "../Headers/Grid.h"
 #include "../Headers/Cell.h"
+#include "../Headers/Face.h"
 #include "../Headers/header.h"
 
-void riemann_set_primL(struct Riemann * theRiemann,int q,double input){
-  theRiemann->primL[q] = input;
-}
-void riemann_set_primR(struct Riemann * theRiemann,int q,double input){
-  theRiemann->primR[q] = input;
-}
 void riemann_set_vel(struct Riemann * theRiemann,double *n,double r,double *Bpack,double GAMMALAW,double DIVB_CH){
   double wp = 0.0*n[1];
   double ch = DIVB_CH;
@@ -224,7 +219,6 @@ void riemann_set_Ustar(struct Riemann * theRiemann,double *n,double r,double *Bp
 
   theRiemann->Ustar[PSI] = psi;
 
-
 }
 
 void riemann_set_flux(struct Riemann * theRiemann, double r , double * n ,double GAMMALAW,double DIVB_CH){
@@ -267,13 +261,6 @@ void riemann_set_flux(struct Riemann * theRiemann, double r , double * n ,double
   double wp = 0.0;
   theRiemann->F[PSI] = wp*psi*n[1] + pow(DIVB_CH,2.)*Bn;
 
-  /*
-     int q;
-     for( q=NUM_C ; q<NUM_Q ; ++q ){
-     flux[q] = prim[q]*flux[DDD];
-     }
-     */
-
 }
 
 void riemann_addto_flux_general(struct Riemann * theRiemann,double w,int NUM_Q){
@@ -289,49 +276,69 @@ void riemann_addto_flux_general(struct Riemann * theRiemann,double w,int NUM_Q){
   }
 }
 
+void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct Grid * theGrid,int n){
+  int NUM_Q = grid_NUM_Q(theGrid);
+  double deltaL = face_deltaL(face_pointer(theFaces,n));
+  double deltaR = face_deltaR(face_pointer(theFaces,n));
+  theRiemann->cL = face_L_pointer(theFaces,n);
+  theRiemann->cR = face_R_pointer(theFaces,n);
+  double pL = cell_tiph(theRiemann->cL) - .5*cell_dphi(theRiemann->cL);
+  double pR = cell_tiph(theRiemann->cR) - .5*cell_dphi(theRiemann->cR);   
+  double dpL =  face_cm(face_pointer(theFaces,n)) - pL;
+  double dpR = -face_cm(face_pointer(theFaces,n)) + pR;
+  while( dpL >  M_PI ) dpL -= 2.*M_PI;
+  while( dpL < -M_PI ) dpL += 2.*M_PI;
+  while( dpR >  M_PI ) dpR -= 2.*M_PI;
+  while( dpR < -M_PI ) dpR += 2.*M_PI;
+  dpL = dpL;
+  dpR = dpR;
+  theRiemann->r = face_r(face_pointer(theFaces,n));
+  theRiemann->dA = face_dA(face_pointer(theFaces,n));
 
-
-double * riemann_Uk(struct Riemann *theRiemann){
-  return(theRiemann->Uk); 
-}
-double * riemann_Ustar(struct Riemann *theRiemann){
-  return(theRiemann->Ustar); 
-}
-
-
-
-double * riemann_prim(struct Riemann * theRiemann,int state){
-  if ((state==LEFT)||(state==LEFTSTAR)){
-    return(theRiemann->primL);
-  } else{
-    return(theRiemann->primR);
+  int q;
+  for (q=0;q<NUM_Q;++q){
+    theRiemann->primL[q] = cell_prims(theRiemann->cL)[q] + cell_grad(theRiemann->cL)[q]*deltaL + cell_gradp(theRiemann->cL)[q]*dpL;
+    theRiemann->primR[q] = cell_prims(theRiemann->cR)[q] + cell_grad(theRiemann->cR)[q]*deltaR + cell_gradp(theRiemann->cR)[q]*dpR;
   }
 }
 
-double *riemann_F(struct Riemann * theRiemann){
-  return(theRiemann->F);
+void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct Grid * theGrid,int i,int j_low,int j_hi,int k){
+  int NUM_Q = grid_NUM_Q(theGrid);
+  theRiemann->cL = cell_single(theCells,i,j_low,k);
+  theRiemann->cR = cell_single(theCells,i,j_hi ,k);
+  double dpL = cell_dphi(theRiemann->cL);
+  double dpR = cell_dphi(theRiemann->cR);
+  double zm = grid_z_faces(theGrid,k-1);
+  double zp = grid_z_faces(theGrid,k);
+  double dz = zp-zm;
+  double rm = grid_r_faces(theGrid,i-1);
+  double rp = grid_r_faces(theGrid,i);
+  double dr = rp-rm;
+  double r = .5*(rp+rm);
+  theRiemann->dA = dr*dz;
+  theRiemann->r = r; 
+  int q;
+  for (q=0;q<NUM_Q;++q){
+    theRiemann->primL[q] = cell_prims(theRiemann->cL)[q] + cell_gradp(theRiemann->cL)[q]*dpL;
+    theRiemann->primR[q] = cell_prims(theRiemann->cR)[q] + cell_gradp(theRiemann->cR)[q]*dpR;
+  }
+
 }
 
-int riemann_state(struct Riemann * theRiemann){
-  return(theRiemann->state);
-}
-double riemann_Ss(struct Riemann * theRiemann){
-  return(theRiemann->Ss);
-}
 
-void riemann_driver(struct Cell * cL , struct Cell * cR, struct Grid *theGrid, double dA,double dt, double r,double deltaL,double deltaR, double dpL, double dpR , int direction ){
+//void riemann_hllc(struct Riemann * theRiemann, struct Cell * cL , struct Cell * cR, struct Grid *theGrid, double dA,double dt, double r,double deltaL,double deltaR, double dpL, double dpR , int direction ){
+void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, int direction ){
   int NUM_Q = grid_NUM_Q(theGrid);
   double GAMMALAW = grid_GAMMALAW(theGrid);
   double DIVB_CH = grid_DIVB_CH(theGrid);
 
-  struct Riemann * theRiemann = riemann_create(theGrid);
-
+/*
   int q;
   for (q=0;q<NUM_Q;++q){
-    riemann_set_primL(theRiemann,q,cell_prims(cL)[q] + cell_grad(cL)[q]*deltaL + cell_gradp(cL)[q]*dpL);
-    riemann_set_primR(theRiemann,q,cell_prims(cR)[q] + cell_grad(cR)[q]*deltaR + cell_gradp(cR)[q]*dpR);
+    theRiemann->primL[q] = cell_prims(cL)[q] + cell_grad(cL)[q]*deltaL + cell_gradp(cL)[q]*dpL;
+    theRiemann->primR[q] = cell_prims(cR)[q] + cell_grad(cR)[q]*deltaR + cell_gradp(cR)[q]*dpR;
   }
-
+*/
   //initialize
   double n[3];int i;
   for (i=0;i<3;++i){
@@ -341,44 +348,48 @@ void riemann_driver(struct Cell * cL , struct Cell * cR, struct Grid *theGrid, d
   n[direction]=1.0;
 
   double Bpack[6];
-  riemann_set_vel(theRiemann,n,r,Bpack,GAMMALAW,DIVB_CH);
+  riemann_set_vel(theRiemann,n,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
 
   double Bk_face;
   if (direction==0){
-    //Bk_face = 0.5*(riemann_prim(theRiemann,LEFT)[BRR]+riemann_prim(theRiemann,RIGHT)[BRR]);  
+    Bk_face = 0.5*(theRiemann->primL[BRR]+theRiemann->primR[BRR]);  
   } else if (direction==1){
-    Bk_face = 0.5*(riemann_prim(theRiemann,LEFT)[BPP]+riemann_prim(theRiemann,RIGHT)[BPP]);
+    Bk_face = 0.5*(theRiemann->primL[BPP]+theRiemann->primR[BPP]);
   } else if (direction==2){
-    Bk_face = 0.5*(riemann_prim(theRiemann,LEFT)[BZZ]+riemann_prim(theRiemann,RIGHT)[BZZ]);
+    Bk_face = 0.5*(theRiemann->primL[BZZ]+theRiemann->primR[BZZ]);
   }
-  double Psi_face = 0.5*(riemann_prim(theRiemann,LEFT)[PSI]+riemann_prim(theRiemann,RIGHT)[PSI]);
+  double Psi_face = 0.5*(theRiemann->primL[PSI]+theRiemann->primR[PSI]);
 
-    double w;
+  double w;
   if (direction==1){
-    if( grid_MOVE_CELLS(theGrid) == C_WRIEMANN ) cell_add_wiph(cL,riemann_Ss(theRiemann));
-    w = cell_wiph(cL);
+    if( grid_MOVE_CELLS(theGrid) == C_WRIEMANN ) cell_add_wiph(theRiemann->cL,theRiemann->Ss);
+    w = cell_wiph(theRiemann->cL);
   } else{
     w = 0.0;
   }
 
   riemann_set_state(theRiemann,w);
 
-  riemann_set_flux( theRiemann , r , n,GAMMALAW,DIVB_CH );
-  if((riemann_state(theRiemann)==LEFTSTAR)||(riemann_state(theRiemann)==RIGHTSTAR)){
-    cell_prim2cons( riemann_prim(theRiemann,riemann_state(theRiemann)) , riemann_Uk(theRiemann) , r , 1.0 ,GAMMALAW);
-    riemann_set_Ustar(theRiemann,n,r,Bpack,GAMMALAW);
+  riemann_set_flux( theRiemann , theRiemann->r , n,GAMMALAW,DIVB_CH );
+  if (theRiemann->state==LEFTSTAR){
+    cell_prim2cons( theRiemann->primL , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW);
+    riemann_set_Ustar(theRiemann,n,theRiemann->r,Bpack,GAMMALAW);
+  } else if(theRiemann->state==RIGHTSTAR){
+    cell_prim2cons( theRiemann->primR , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW);
+    riemann_set_Ustar(theRiemann,n,theRiemann->r,Bpack,GAMMALAW);
   }
   riemann_addto_flux_general(theRiemann,w,grid_NUM_Q(theGrid));
 
-  for( q=0 ; q<NUM_Q ; ++q ){
-    cell_add_cons(cL,q,-dt*dA*riemann_F(theRiemann)[q]);
-    cell_add_cons(cR,q,dt*dA*riemann_F(theRiemann)[q]);
+int q;
+for( q=0 ; q<NUM_Q ; ++q ){
+    cell_add_cons(theRiemann->cL,q,-dt*theRiemann->dA*theRiemann->F[q]);
+    cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->F[q]);
   }
 
-  cell_add_divB(cL,dA*Bk_face);
-  cell_add_divB(cR,-dA*Bk_face);
-  cell_add_GradPsi(cL,direction,Psi_face);
-  cell_add_GradPsi(cR,direction,-Psi_face);
+  cell_add_divB(theRiemann->cL,theRiemann->dA*Bk_face);
+  cell_add_divB(theRiemann->cR,-theRiemann->dA*Bk_face);
+  cell_add_GradPsi(theRiemann->cL,direction,Psi_face);
+  cell_add_GradPsi(theRiemann->cR,direction,-Psi_face);
 
 }
 
