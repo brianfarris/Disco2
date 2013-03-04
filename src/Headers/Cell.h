@@ -41,6 +41,7 @@ void cell_add_divB(struct Cell *, double);
 void cell_add_GradPsi(struct Cell *, int, double);
 void cell_add_wiph(struct Cell *, double);
 void cell_add_src( struct Cell *** ,struct Grid * , struct GravMass * , double );
+void cell_add_visc_src( struct Cell *** ,struct Grid * , double );
 void cell_mult_psi(struct Cell *, double);
 void cell_clean_pi(struct Cell *** ,struct Grid *);
 void cell_update_phi( struct Cell *** , struct Grid * , double , double );

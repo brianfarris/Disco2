@@ -30,6 +30,7 @@ void riemann_destroy(struct Riemann *);
 void riemann_set_vel(struct Riemann * ,struct Grid *,double *,double ,double *,double ,double );
 void riemann_set_Ustar(struct Riemann * ,struct Grid *,double *,double ,double *,double );
 void riemann_addto_flux_general(struct Riemann * ,double ,int );
+void riemann_visc_flux(struct Riemann * ,struct Grid * , double * );
 void riemann_set_flux(struct Riemann * ,struct Grid *, double , double * ,double ,double );
 void riemann_setup_rz(struct Riemann *,struct Face * , struct Grid *,int );
 void riemann_setup_p(struct Riemann * ,struct Cell *** ,struct Grid * ,int ,int ,int ,int );

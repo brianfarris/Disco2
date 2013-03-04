@@ -48,8 +48,6 @@ void cell_add_src( struct Cell *** theCells ,struct Grid * theGrid, struct GravM
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int GRAV2D=grid_GRAV2D(theGrid);
   int POWELL=grid_POWELL(theGrid);
-  int INCLUDE_VISCOSITY=grid_INCLUDE_VISCOSITY(theGrid);
-  double EXPLICIT_VISCOSITY=grid_EXPLICIT_VISCOSITY(theGrid);
   int i,j,k;
   for( k=0 ; k<N_z_withghost ; ++k ){
     double zm = grid_z_faces(theGrid,k-1);
@@ -124,6 +122,35 @@ void cell_add_src( struct Cell *** theCells ,struct Grid * theGrid, struct GravM
           c->cons[BPP] -= POWELL*dt*divB*vp/r;
           c->cons[BZZ] -= POWELL*dt*divB*vz;
           c->cons[PSI] -= POWELL*dt*vdotGradPsi;
+        }
+      }
+    }
+  }
+}
+
+void cell_add_visc_src( struct Cell *** theCells ,struct Grid * theGrid, double dt ){
+  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
+  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
+  int INCLUDE_VISCOSITY=grid_INCLUDE_VISCOSITY(theGrid);
+  double EXPLICIT_VISCOSITY=grid_EXPLICIT_VISCOSITY(theGrid);
+  int i,j,k;
+  for( k=0 ; k<N_z_withghost ; ++k ){
+    double zm = grid_z_faces(theGrid,k-1);
+    double zp = grid_z_faces(theGrid,k);
+    for( i=0 ; i<N_r_withghost ; ++i ){
+      double rm = grid_r_faces(theGrid,i-1);
+      double rp = grid_r_faces(theGrid,i);
+      for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+        struct Cell * c = &(theCells[k][i][j]);
+        double dphi = c->dphi;
+        double rho = c->prim[RHO];
+        double r   = .5*(rp+rm);
+        double vr  = c->prim[URR];
+        double dz = zp-zm;
+        double dV = dphi*.5*(rp*rp-rm*rm)*dz;
+         if (grid_INCLUDE_VISCOSITY(theGrid)){
+          double nu = grid_EXPLICIT_VISCOSITY(theGrid);
+          c->cons[SRR] += -dt*dV*nu*rho*vr/r/r;
         }
       }
     }
