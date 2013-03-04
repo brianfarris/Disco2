@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
   struct Cell ***theCells = cell_create(theGrid,theMPIsetup);
   cell_clean_pi(theCells,theGrid);
   // set initial data 
-  int restart=1;
+  int restart=0;
   if (grid_Restart(theGrid)==1){
     char input_filename[256];
     sprintf(input_filename,"input.h5");

@@ -4,8 +4,8 @@
 Restart			0		//If this=1 restart using input.h5
 
 //Computational Grid
-NumR			128			//Radial Zones
-NumZ			128			//Vertical Zones
+NumR			8			//Radial Zones
+NumZ			8			//Vertical Zones
 ng                      2
 R_Min			1.0
 R_Max			4.0
