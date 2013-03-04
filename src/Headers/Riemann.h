@@ -27,7 +27,7 @@ struct Riemann {
 struct Riemann *riemann_create(struct Grid * );
 void riemann_destroy(struct Riemann *); 
 //other routines
-void riemann_set_vel(struct Riemann * ,double *,double ,double *,double ,double );
+void riemann_set_vel(struct Riemann * ,struct Grid *,double *,double ,double *,double ,double );
 void riemann_set_Ustar(struct Riemann * ,double *,double ,double *,double );
 void riemann_addto_flux_general(struct Riemann * ,double ,int );
 void riemann_set_flux(struct Riemann * , double , double * ,double ,double );
