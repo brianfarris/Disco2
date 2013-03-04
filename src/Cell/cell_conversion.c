@@ -86,7 +86,7 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
     double Br  = cons[BRR]/dV*r;
     double Bp  = cons[BPP]/dV*r;
     double Bz  = cons[BZZ]/dV;
-    double B2 = Br*Br+Bp*Bp+Bz*Bz;
+    B2 = Br*Br+Bp*Bp+Bz*Bz;
     prim[BRR] = Br;
     prim[BPP] = Bp;
     prim[BZZ] = Bz;

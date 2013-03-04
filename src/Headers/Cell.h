@@ -73,5 +73,6 @@ void cell_copy(struct Cell ***,struct Grid * );
 void cell_adjust_RK_cons( struct Cell *** , struct Grid * , double );
 void cell_set_prim(struct Cell ***,int,int,int,int,double);//this will morph into a checkpoint restart routine
 void cell_set_tiph(struct Cell ***,int,int,int,double);//this will morph into a checkpoint restart routine
-void cell_print_cons_Br(struct Cell *** ,int);
+void cell_print_cons(struct Cell *** ,int);
+void cell_print_prim(struct Cell *** ,int);
 #endif

@@ -72,6 +72,7 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Grid * theGrid, double *
   }
   L_Mins = vnL - sqrt( cf21 );
   L_Plus = vnL + sqrt( cf21 );
+//  printf("1 L_Mins: %e L_Plus: %e\n",L_Mins,L_Plus);
 
   double vnR,cf22,mnR,BnR,B2R;
   double FR[3],FmR[3];
@@ -81,6 +82,7 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Grid * theGrid, double *
   }
   if( L_Mins > vnR - sqrt( cf22 ) ) L_Mins = vnR - sqrt( cf22 );
   if( L_Plus < vnR + sqrt( cf22 ) ) L_Plus = vnR + sqrt( cf22 );
+//  printf("2 L_Mins: %e L_Plus: %e\n",L_Mins,L_Plus);
   
   if (grid_runtype(theGrid)==MHD){
     if( L_Mins > -DIVB_CH ) L_Mins = -DIVB_CH;
@@ -91,12 +93,13 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Grid * theGrid, double *
   double aR = -L_Mins;
 
   double mr = ( aR*theRiemann->primL[RHO]*theRiemann->primL[URR] + aL*theRiemann->primR[RHO]*theRiemann->primR[URR] + FmL[0] - FmR[0] )/( aL + aR );
-  double mp = ( aR*theRiemann->primL[RHO]*theRiemann->primL[UPP] + aL*theRiemann->primR[RHO]*theRiemann->primR[UPP] + FmL[1] - FmR[1] )/( aL + aR );
+  double mp = ( aR*theRiemann->primL[RHO]*theRiemann->primL[UPP]*r + aL*theRiemann->primR[RHO]*theRiemann->primR[UPP]*r + FmL[1] - FmR[1] )/( aL + aR );
   double mz = ( aR*theRiemann->primL[RHO]*theRiemann->primL[UZZ] + aL*theRiemann->primR[RHO]*theRiemann->primR[UZZ] + FmL[2] - FmR[2] )/( aL + aR );
   double rho = ( aR*theRiemann->primL[RHO] + aL*theRiemann->primR[RHO] + mnL - mnR )/( aL + aR );
 
   L_Star = (theRiemann->primR[RHO]*vnR*(L_Plus-vnR)-theRiemann->primL[RHO]*vnL*(L_Mins-vnL)+theRiemann->primL[PPP]-theRiemann->primR[PPP])
     /(theRiemann->primR[RHO]*(L_Plus-vnR)-theRiemann->primL[RHO]*(L_Mins-vnL));
+//  printf("3a L_Star: %e\n",L_Star);
 
   if (grid_runtype(theGrid)==MHD){  
     double Br = ( aR*theRiemann->primL[BRR] + aL*theRiemann->primR[BRR] + FL[0] - FR[0] )/( aL + aR );
@@ -110,10 +113,19 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Grid * theGrid, double *
     Bpack[4] = (mr*Br + mp*Bp + mz*Bz)/rho; // v dot B
     Bpack[5] = psi;
 
-    L_Star += ((.5*B2L-BnL*BnL)-.5*B2R-BnR*BnR)
+    L_Star += ((.5*B2L-BnL*BnL)-.5*B2R+BnR*BnR)
       /(theRiemann->primR[RHO]*(L_Plus-vnR)-theRiemann->primL[RHO]*(L_Mins-vnL));
+// printf("blah: %e\n",((.5*B2L-BnL*BnL)-.5*B2R+BnR*BnR)
+ //     /(theRiemann->primR[RHO]*(L_Plus-vnR)-theRiemann->primL[RHO]*(L_Mins-vnL)));
+ //printf("3b L_Star: %e\n",L_Star);
   }
-
+//  printf("mr: %e, mp: %e, mz: %e, rho: %e\n",mr,mp,mz,rho);
+/*
+  int q;
+  for (q=0;q<6;++q){
+    printf("Bpack[%d]: %e\n",q,Bpack[q]);
+  }
+  */
   theRiemann->Sl = L_Mins;
   theRiemann->Sr = L_Plus;
   theRiemann->Ss = L_Star;
@@ -384,22 +396,24 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
   if (theRiemann->state==LEFTSTAR){
     cell_prim2cons( theRiemann->primL , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW,grid_runtype(theGrid));
     riemann_set_Ustar(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW);
-  /*
-    if (fabs(theRiemann->r-2.875)<0.00001){
-      printf("r: %e, Sl: %e, Sr: %e, Ss: %e\n",theRiemann->r,theRiemann->Sl,theRiemann->Sr,theRiemann->Ss);
-      printf("Flux[TAU]: %e, Ustar[TAU]: %e, Uk[TAU]: %e\n",theRiemann->F[TAU],theRiemann->Ustar[TAU],theRiemann->Uk[TAU]);
-      int q;
-      for (q=0;q<NUM_Q;++q){
-        printf("primL[%d]: %e\n",q,theRiemann->primL[q]);
-      }
-    }
-    */
-
+  
   } else if(theRiemann->state==RIGHTSTAR){
     cell_prim2cons( theRiemann->primR , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW,grid_runtype(theGrid));
     riemann_set_Ustar(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW);
   }
   riemann_addto_flux_general(theRiemann,w,grid_NUM_Q(theGrid));
+/*
+ if ((fabs(theRiemann->r-2.6875)<0.00001)&&(direction==2)){
+      printf("r: %e, Sl: %e, Sr: %e, Ss: %e\n",theRiemann->r,theRiemann->Sl,theRiemann->Sr,theRiemann->Ss);
+      printf("Flux[TAU]: %e, Uk[TAU]: %e\n",theRiemann->F[TAU],theRiemann->Uk[TAU]);
+      int q;
+      for (q=0;q<NUM_Q;++q){
+        printf("primL[%d]: %e\n",q,theRiemann->primL[q]);
+        printf("primR[%d]: %e\n",q,theRiemann->primR[q]);
+      }
+exit(0);
+    }
+    */
   //  if ((theRiemann->primL[BZZ]>0.00001)&&(direction==0)){
   int q;
   for( q=0 ; q<NUM_Q ; ++q ){
