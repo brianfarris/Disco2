@@ -135,7 +135,7 @@ void riemann_set_state(struct Riemann * theRiemann,int w ){
 }
 
 
-void riemann_set_Ustar(struct Riemann * theRiemann,double *n,double r,double *Bpack,double GAMMALAW){
+void riemann_set_Ustar(struct Riemann * theRiemann,struct Grid * theGrid, double *n,double r,double *Bpack,double GAMMALAW){
   double *prim;
   double Sk;
   if (theRiemann->state==LEFTSTAR){
@@ -147,48 +147,53 @@ void riemann_set_Ustar(struct Riemann * theRiemann,double *n,double r,double *Bp
   }
   double Ss=theRiemann->Ss;
 
-  double Bsn = Bpack[0];
-  double Bsr = Bpack[1];
-  double Bsp = Bpack[2];
-  double Bsz = Bpack[3];
-  double vBs = Bpack[4];
-  double psi = Bpack[5];
-
   double rho = prim[RHO];
   double vr  = prim[URR];
   double vp  = prim[UPP]*r;
   double vz  = prim[UZZ];
   double Pp  = prim[PPP];
-
-  double Br  = prim[BRR];
-  double Bp  = prim[BPP];
-  double Bz  = prim[BZZ];
-
   double v2 = vr*vr+vp*vp+vz*vz;
-  double B2 = Br*Br+Bp*Bp+Bz*Bz;
-
   double vn = vr*n[0] + vp*n[1] + vz*n[2];
-  double Bn = Br*n[0] + Bp*n[1] + Bz*n[2];
-  double vB = vr*Br   + vp*Bp   + vz*Bz;
-
   double rhoe = Pp/(GAMMALAW-1.);
-
   double D  = rho;
   double mr = rho*vr;
   double mp = rho*vp;
   double mz = rho*vz;
-  double E  = .5*rho*v2 + rhoe + .5*B2;
-
-  double Bs2 = Bsr*Bsr+Bsp*Bsp+Bsz*Bsz;
-  double Ps  = rho*( Sk - vn )*( Ss - vn ) + (Pp+.5*B2-Bn*Bn) - .5*Bs2 + Bsn*Bsn;
-
+  double E_hydro  = .5*rho*v2 + rhoe;
+  double Ps  = rho*( Sk - vn )*( Ss - vn ) + Pp;
   double Dstar = ( Sk - vn )*D/( Sk - Ss );
-  double Msr   = ( ( Sk - vn )*mr + ( Br*Bn - Bsr*Bsn ) ) / ( Sk - Ss );
-  double Msp   = ( ( Sk - vn )*mp + ( Bp*Bn - Bsp*Bsn ) ) / ( Sk - Ss );
-  double Msz   = ( ( Sk - vn )*mz + ( Bz*Bn - Bsz*Bsn ) ) / ( Sk - Ss );
-  double Estar = ( ( Sk - vn )*E + (Ps+.5*Bs2)*Ss - (Pp+.5*B2)*vn - vBs*Bsn + vB*Bn ) / ( Sk - Ss );
-
   double Msn = Dstar*Ss;
+  double Msr   = ( Sk - vn )*mr / ( Sk - Ss );
+  double Msp   = ( Sk - vn )*mp / ( Sk - Ss );
+  double Msz   = ( Sk - vn )*mz / ( Sk - Ss );
+  double Estar = ( ( Sk - vn )*E_hydro + Ps*Ss - Pp*vn ) / ( Sk - Ss );
+
+  if (grid_runtype(theGrid)==MHD){
+    double Bsn = Bpack[0];
+    double Bsr = Bpack[1];
+    double Bsp = Bpack[2];
+    double Bsz = Bpack[3];
+    double vBs = Bpack[4];
+    double psi = Bpack[5];
+
+    double Br  = prim[BRR];
+    double Bp  = prim[BPP];
+    double Bz  = prim[BZZ];
+    double B2 = Br*Br+Bp*Bp+Bz*Bz;
+    double Bn = Br*n[0] + Bp*n[1] + Bz*n[2];
+    double vB = vr*Br   + vp*Bp   + vz*Bz;
+    double Bs2 = Bsr*Bsr+Bsp*Bsp+Bsz*Bsz;
+    Ps    +=  (.5*B2-Bn*Bn) - .5*Bs2 + Bsn*Bsn;
+    Msr   += ( Br*Bn - Bsr*Bsn ) / ( Sk - Ss );
+    Msp   += ( Bp*Bn - Bsp*Bsn ) / ( Sk - Ss );
+    Msz   += ( Bz*Bn - Bsz*Bsn ) / ( Sk - Ss );
+    Estar += ( ( Sk - vn )*.5*B2 + .5*Bs2*Ss - .5*B2*vn - vBs*Bsn + vB*Bn ) / ( Sk - Ss );
+    theRiemann->Ustar[BRR] = Bsr/r;
+    theRiemann->Ustar[BPP] = Bsp/r;
+    theRiemann->Ustar[BZZ] = Bsz;
+    theRiemann->Ustar[PSI] = psi;
+  }
+
   double mn  = Msr*n[0] + Msp*n[1] + Msz*n[2];
 
   Msr += n[0]*( Msn - mn );
@@ -201,15 +206,9 @@ void riemann_set_Ustar(struct Riemann * theRiemann,double *n,double r,double *Bp
   theRiemann->Ustar[SZZ] = Msz;
   theRiemann->Ustar[TAU] = Estar;
 
-  theRiemann->Ustar[BRR] = Bsr/r;
-  theRiemann->Ustar[BPP] = Bsp/r;
-  theRiemann->Ustar[BZZ] = Bsz;
-
-  theRiemann->Ustar[PSI] = psi;
-
 }
 
-void riemann_set_flux(struct Riemann * theRiemann, double r , double * n ,double GAMMALAW,double DIVB_CH){
+void riemann_set_flux(struct Riemann * theRiemann, struct Grid * theGrid, double r , double * n ,double GAMMALAW,double DIVB_CH){
   double *prim;
   if ((theRiemann->state==LEFT)||(theRiemann->state==LEFTSTAR)){
     prim = theRiemann->primL;
@@ -222,32 +221,33 @@ void riemann_set_flux(struct Riemann * theRiemann, double r , double * n ,double
   double vr  = prim[URR];
   double vp  = prim[UPP]*r;
   double vz  = prim[UZZ];
-
-  double Br  = prim[BRR];
-  double Bp  = prim[BPP];
-  double Bz  = prim[BZZ];
-
   double vn = vr*n[0] + vp*n[1] + vz*n[2];
-  double Bn = Br*n[0] + Bp*n[1] + Bz*n[2];
-  double vB = vr*Br + vp*Bp + vz*Bz;
-
   double rhoe = Pp/(GAMMALAW-1.);
   double v2 = vr*vr + vp*vp + vz*vz;
-  double B2 = Br*Br + Bp*Bp + Bz*Bz;
-
   theRiemann->F[DDD] = rho*vn;
-  theRiemann->F[SRR] =     rho*vr*vn + (Pp+.5*B2)*n[0] - Br*Bn;
-  theRiemann->F[LLL] = r*( rho*vp*vn + (Pp+.5*B2)*n[1] - Bp*Bn );
-  theRiemann->F[SZZ] =     rho*vz*vn + (Pp+.5*B2)*n[2] - Bz*Bn;
-  theRiemann->F[TAU] = ( .5*rho*v2 + rhoe + Pp + B2 )*vn - vB*Bn;
+  theRiemann->F[SRR] =     rho*vr*vn + Pp*n[0] ;
+  theRiemann->F[LLL] = r*( rho*vp*vn + Pp*n[1] );
+  theRiemann->F[SZZ] =     rho*vz*vn + Pp*n[2] ;
+  theRiemann->F[TAU] = ( .5*rho*v2 + rhoe + Pp )*vn ;
 
-  double psi = prim[PSI];
-  theRiemann->F[BRR] =(Br*vn - vr*Bn + psi*n[0])/r;
-  theRiemann->F[BPP] =(Bp*vn - vp*Bn + psi*n[1])/r;
-  theRiemann->F[BZZ] = Bz*vn - vz*Bn + psi*n[2];
+  if (grid_runtype(theGrid)==MHD){ 
+    double Br  = prim[BRR];
+    double Bp  = prim[BPP];
+    double Bz  = prim[BZZ];
+    double Bn = Br*n[0] + Bp*n[1] + Bz*n[2];
+    double vB = vr*Br + vp*Bp + vz*Bz;
+    double B2 = Br*Br + Bp*Bp + Bz*Bz;
 
-  theRiemann->F[PSI] = pow(DIVB_CH,2.)*Bn;
-
+    theRiemann->F[SRR] +=     .5*B2*n[0] - Br*Bn;
+    theRiemann->F[LLL] += r*( .5*B2*n[1] - Bp*Bn );
+    theRiemann->F[SZZ] +=     .5*B2*n[2] - Bz*Bn;
+    theRiemann->F[TAU] += B2*vn - vB*Bn;
+    double psi = prim[PSI];
+    theRiemann->F[BRR] =(Br*vn - vr*Bn + psi*n[0])/r;
+    theRiemann->F[BPP] =(Bp*vn - vp*Bn + psi*n[1])/r;
+    theRiemann->F[BZZ] = Bz*vn - vz*Bn + psi*n[2];
+    theRiemann->F[PSI] = pow(DIVB_CH,2.)*Bn;
+  }
 }
 
 void riemann_addto_flux_general(struct Riemann * theRiemann,double w,int NUM_Q){
@@ -357,13 +357,13 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
 
   riemann_set_state(theRiemann,w);
 
-  riemann_set_flux( theRiemann , theRiemann->r , n,GAMMALAW,DIVB_CH );
+  riemann_set_flux( theRiemann , theGrid, theRiemann->r , n,GAMMALAW,DIVB_CH );
   if (theRiemann->state==LEFTSTAR){
     cell_prim2cons( theRiemann->primL , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW,grid_runtype(theGrid));
-    riemann_set_Ustar(theRiemann,n,theRiemann->r,Bpack,GAMMALAW);
+    riemann_set_Ustar(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW);
   } else if(theRiemann->state==RIGHTSTAR){
     cell_prim2cons( theRiemann->primR , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW,grid_runtype(theGrid));
-    riemann_set_Ustar(theRiemann,n,theRiemann->r,Bpack,GAMMALAW);
+    riemann_set_Ustar(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW);
   }
   riemann_addto_flux_general(theRiemann,w,grid_NUM_Q(theGrid));
 
