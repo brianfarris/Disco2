@@ -110,7 +110,7 @@ double grid_get_T_MAX(struct Grid * theGrid){
 double grid_NUM_CHECKPOINTS(struct Grid * theGrid){
   return(theGrid->NUM_CHECKPOINTS);
 }
-double grid_runtype(struct Grid * theGrid){
+int grid_runtype(struct Grid * theGrid){
   return(theGrid->runtype);
 }
 

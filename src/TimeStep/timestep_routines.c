@@ -65,6 +65,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   }
   //R Flux
   cell_plm_rz( theCells ,theGrid, theFaces_r , timestep_Nfr(theTimeStep) , 0 );
+  //cell_print_cons_Br(theCells,1);
   int n;
   for( n=0 ; n<timestep_Nfr(theTimeStep) ; ++n ){
     struct Riemann * theRiemann = riemann_create(theGrid);
@@ -72,6 +73,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
     riemann_hllc(theRiemann,theGrid,dt,0); 
     riemann_destroy(theRiemann);
   }
+  //cell_print_cons_Br(theCells,2);
   //Z Flux
   if( grid_N_z_global(theGrid) != 1 ){
     cell_plm_rz( theCells ,theGrid, theFaces_z , timestep_Nfz(theTimeStep) , 1 );
@@ -82,9 +84,12 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
       riemann_destroy(theRiemann);
     }
   }
+ // cell_print_cons_Br(theCells,3);
+  
   //Source Terms
   cell_add_src( theCells ,theGrid, theGravMasses , dt );
   //forceGravMasss( theCells , theGravMasses );
+  //cell_print_cons_Br(theCells,4);
 
   //Bookkeeping
   cell_update_phi( theCells ,theGrid, theTimeStep->RK , dt );
@@ -105,6 +110,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_syncproc_z(theCells,theGrid,theMPIsetup);
 
   cell_calc_cons( theCells,theGrid );
+ // cell_print_cons_Br(theCells,5);
+  
 }
 
 void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCells , struct Grid * theGrid,struct MPIsetup * theMPIsetup){
@@ -127,6 +134,9 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
   cell_calc_prim( theCells,theGrid );
   cell_calc_cons( theCells,theGrid );
 
+  //cell_print_cons_Br(theCells,6);
+  //exit(0);
+ 
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid,theMPIsetup);
   cell_syncproc_z(theCells,theGrid,theMPIsetup);

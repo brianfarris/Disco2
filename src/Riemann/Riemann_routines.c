@@ -183,17 +183,38 @@ void riemann_set_Ustar(struct Riemann * theRiemann,struct Grid * theGrid, double
     double Bn = Br*n[0] + Bp*n[1] + Bz*n[2];
     double vB = vr*Br   + vp*Bp   + vz*Bz;
     double Bs2 = Bsr*Bsr+Bsp*Bsp+Bsz*Bsz;
-    Ps    +=  (.5*B2-Bn*Bn) - .5*Bs2 + Bsn*Bsn;
+    //Ps    +=  (.5*B2-Bn*Bn) - .5*Bs2 + Bsn*Bsn;
+    double Ps_mag = (.5*B2-Bn*Bn) - .5*Bs2 + Bsn*Bsn;
     Msr   += ( Br*Bn - Bsr*Bsn ) / ( Sk - Ss );
     Msp   += ( Bp*Bn - Bsp*Bsn ) / ( Sk - Ss );
     Msz   += ( Bz*Bn - Bsz*Bsn ) / ( Sk - Ss );
-    Estar += ( ( Sk - vn )*.5*B2 + .5*Bs2*Ss - .5*B2*vn - vBs*Bsn + vB*Bn ) / ( Sk - Ss );
+    Estar += ( ( Sk - vn )*.5*B2 + (Ps_mag+.5*Bs2)*Ss - .5*B2*vn - vBs*Bsn + vB*Bn ) / ( Sk - Ss );
+    /*
+    if (fabs(r-2.875)<0.00001){
+      printf("Estar: %e\n",Estar);
+      printf("Sk - vn: %e\n",Sk-vn);
+      printf("Sk - Ss: %e\n",Sk-Ss);
+      printf("Ps: %e\n",Ps+Ps_mag);
+      printf("Pp: %e\n",Pp);
+      printf("vBs: %e\n",vBs);
+      printf("Bn: %e\n",Bn);
+      printf("Bsn: %e\n",Bsn);
+      printf("vn: %e\n",vn);
+      printf("B2: %e\n",B2);
+      printf("Bs2: %e\n",Bs2);
+      printf("rhoe: %e\n",rhoe);
+      printf("vB: %e\n",vB);
+      printf("rho: %e\n",rho);
+      printf("v2: %e\n",v2);
+  exit(0); 
+    }
+    */
+
     theRiemann->Ustar[BRR] = Bsr/r;
     theRiemann->Ustar[BPP] = Bsp/r;
     theRiemann->Ustar[BZZ] = Bsz;
     theRiemann->Ustar[PSI] = psi;
   }
-
   double mn  = Msr*n[0] + Msp*n[1] + Msz*n[2];
 
   Msr += n[0]*( Msn - mn );
@@ -337,6 +358,8 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
   double Bpack[6];
   riemann_set_vel(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
 
+  //printf("Sl: %e, Sr: %e, Ss: %e\n",theRiemann->Sl,theRiemann->Sr,theRiemann->Ss);
+
   double Bk_face;
   if (direction==0){
     Bk_face = 0.5*(theRiemann->primL[BRR]+theRiemann->primR[BRR]);  
@@ -361,12 +384,23 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
   if (theRiemann->state==LEFTSTAR){
     cell_prim2cons( theRiemann->primL , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW,grid_runtype(theGrid));
     riemann_set_Ustar(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW);
+  /*
+    if (fabs(theRiemann->r-2.875)<0.00001){
+      printf("r: %e, Sl: %e, Sr: %e, Ss: %e\n",theRiemann->r,theRiemann->Sl,theRiemann->Sr,theRiemann->Ss);
+      printf("Flux[TAU]: %e, Ustar[TAU]: %e, Uk[TAU]: %e\n",theRiemann->F[TAU],theRiemann->Ustar[TAU],theRiemann->Uk[TAU]);
+      int q;
+      for (q=0;q<NUM_Q;++q){
+        printf("primL[%d]: %e\n",q,theRiemann->primL[q]);
+      }
+    }
+    */
+
   } else if(theRiemann->state==RIGHTSTAR){
     cell_prim2cons( theRiemann->primR , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW,grid_runtype(theGrid));
     riemann_set_Ustar(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW);
   }
   riemann_addto_flux_general(theRiemann,w,grid_NUM_Q(theGrid));
-
+  //  if ((theRiemann->primL[BZZ]>0.00001)&&(direction==0)){
   int q;
   for( q=0 ; q<NUM_Q ; ++q ){
     cell_add_cons(theRiemann->cL,q,-dt*theRiemann->dA*theRiemann->F[q]);

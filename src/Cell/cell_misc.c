@@ -103,5 +103,6 @@ void cell_update_dphi( struct Cell *** theCells,struct Grid * theGrid ){
   }
 }
 
-
-
+void cell_print_cons_Br(struct Cell *** theCells,int number){
+  printf("%d tau at 4,2,2: %e\n",number,theCells[2][4][2].cons[TAU]);
+}

@@ -1,9 +1,10 @@
-make it so that we can run on any number of procs
-have a pure hydro version option
-generalize planets
-remove unnecessary includes from .c files 
-check that checkpoint restart agrees to machine precision
+go back to night of Feb 27 and compare with current version. Find out what has gone wrong.
 restore viscosity
+generalize planets
+make it so that we can restart from checkpoint without a par file
+check that checkpoint restart agrees to machine precision
+make it so that we can run on any number of procs
+remove unnecessary includes from .c files 
 get rid of unnecessary functions
 add error checking wherever possible
 see if it is possible to not use buffers in syncing and IO
