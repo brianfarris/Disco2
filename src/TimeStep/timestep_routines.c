@@ -29,6 +29,9 @@ void timestep_set_RK(struct TimeStep * theTimeStep,double RK){
 double timestep_get_t(struct TimeStep * theTimeStep){
   return(theTimeStep->t);
 }
+double timestep_dt(struct TimeStep * theTimeStep){
+  return(theTimeStep->dt);
+}
 
 
 void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,struct Grid * theGrid,struct GravMass * theGravMasses,struct MPIsetup * theMPIsetup,double timestep_fac){
@@ -40,6 +43,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   struct Face *theFaces_r = face_create_r(theCells,theGrid,theTimeStep);
   struct Face *theFaces_z = face_create_z(theCells,theGrid,theTimeStep);
   cell_clean_pi(theCells,theGrid);
+  gravMass_clean_pi(theGravMasses,theGrid);
   cell_clear_w(theCells,theGrid);
   if( grid_MOVE_CELLS(theGrid) == C_WCELL ) cell_set_wcell( theCells ,theGrid);
   if( grid_MOVE_CELLS(theGrid) == C_RIGID ) cell_set_wrigid( theCells ,theGrid);
@@ -98,7 +102,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
  //Bookkeeping
  cell_update_phi( theCells ,theGrid, theTimeStep->RK , dt );
  cell_update_dphi( theCells ,theGrid);
- // update_RK_gravMasses( theGravMasses , RK , dt );
+ gravMass_update_RK( theGravMasses ,theGrid, theTimeStep->RK );
  cell_calc_prim( theCells ,theGrid);
  cell_print_prim(theCells,2);
 
@@ -169,3 +173,5 @@ int timestep_Nfr(struct TimeStep * theTimeStep){
 int timestep_Nfz(struct TimeStep * theTimeStep){
   return(theTimeStep->Nfz);
 }
+
+

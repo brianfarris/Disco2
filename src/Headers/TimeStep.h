@@ -30,6 +30,7 @@ void timestep_substep(struct TimeStep * , struct Cell *** ,struct Grid * ,struct
 void timestep_update_Psi( struct TimeStep * , struct Cell *** , struct Grid *,struct MPIsetup * );
 //access data 
 double timestep_get_t(struct TimeStep *);
+double timestep_dt(struct TimeStep * );
 double timestep_get_T_MAX(struct TimeStep * );
 double timestep_NUM_CHECKPOINTS(struct TimeStep *);
 int * timestep_nri(struct TimeStep *);

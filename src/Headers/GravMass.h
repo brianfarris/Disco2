@@ -8,17 +8,20 @@ struct GravMass{
    double r;
    double phi;
    double M;
-   double E;
-   double L;
-   double vr;
+   double omega;
+   //   double E;
+   //   double L;
+   //   double vr;
    double RK_r;
    double RK_phi;
    double RK_M;
-   double RK_E;
-   double RK_L;
-   double RK_vr;
-   double Fr;
-   double Fp;
+   double RK_omega;
+   //   double RK_E;
+   //   double RK_L;
+   //   double RK_vr;
+   //   double Fr;
+   //   double Fp;
+
 };
 #endif
 
@@ -34,4 +37,7 @@ double gravMass_M(struct GravMass * ,int);
 //miscellaneous
 void gravMass_clean_pi(struct GravMass *,struct Grid *);
 void gravMass_copy(struct GravMass *,struct Grid *);
+void gravMass_move(struct GravMass *,double);
+void gravMass_update_RK( struct GravMass * ,struct Grid * , double );
+
 #endif 

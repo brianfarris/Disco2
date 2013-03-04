@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 
   // gravMass
   struct GravMass *theGravMasses = gravMass_create(grid_NumGravMass(theGrid));
-  gravMass_initialize(theGravMasses);
+  gravMass_initialize_single(theGravMasses);
   gravMass_clean_pi(theGravMasses,theGrid);
 
   // allocate memory for data 
@@ -109,8 +109,10 @@ int main(int argc, char **argv) {
     gravMass_copy(theGravMasses,theGrid);
     timestep_set_RK(theTimeStep,0.0);
     timestep_substep(theTimeStep,theCells,theGrid,theGravMasses,theMPIsetup,1.0);
+    gravMass_move(theGravMasses,1.0*timestep_dt(theTimeStep));
     timestep_set_RK(theTimeStep,0.5);
     timestep_substep(theTimeStep,theCells,theGrid,theGravMasses,theMPIsetup,0.5);
+    gravMass_move(theGravMasses,0.5*timestep_dt(theTimeStep));
     timestep_update_Psi(theTimeStep,theCells,theGrid,theMPIsetup);
     timestep_update_t(theTimeStep); 
     if( timestep_get_t(theTimeStep)>tcheck){

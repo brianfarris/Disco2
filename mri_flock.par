@@ -19,7 +19,6 @@ Num_Checkpoints		100
 Z_Periodic		1
 
 Move_Cells              3
-NumGravMass             1
 Adiabatic_Index		1.6666666666
 Include_Viscosity	0		//If this=1, include viscosity
 Explicit_Viscosity      0.01

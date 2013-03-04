@@ -41,7 +41,9 @@ struct Grid *grid_create(struct MPIsetup * theMPIsetup) {
   theGrid->NUM_CHECKPOINTS = 100;
   */
   grid_read_par_file(theGrid,theMPIsetup,"mri_flock.par");
-
+  
+  theGrid->NumGravMass = 2;
+  
   int N_r = theGrid->N_r_global/mpisetup_dim_NumProcs(theMPIsetup)[0];
   int N_z = theGrid->N_z_global/mpisetup_dim_NumProcs(theMPIsetup)[1];
 

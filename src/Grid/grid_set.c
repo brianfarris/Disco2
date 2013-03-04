@@ -128,7 +128,7 @@ int grid_read_par_file(struct Grid * theGrid, struct MPIsetup * theMPIsetup, cha
       err += readvar( pfile , "Num_Checkpoints"   , VAR_INT  , &(theGrid->NUM_CHECKPOINTS)  );
       err += readvar( pfile , "Z_Periodic"        , VAR_INT  , &(theGrid->Z_PERIODIC)  );
       err += readvar( pfile , "Move_Cells"        , VAR_INT  , &(theGrid->MOVE_CELLS)  );
-      err += readvar( pfile , "NumGravMass"        , VAR_INT  , &(theGrid->NumGravMass)  );
+ //     err += readvar( pfile , "NumGravMass"        , VAR_INT  , &(theGrid->NumGravMass)  );
       err += readvar( pfile , "Adiabatic_Index"   , VAR_DOUB , &(theGrid->GAMMALAW)  );
       err += readvar( pfile , "Include_Viscosity" , VAR_INT  , &(theGrid->INCLUDE_VISCOSITY)  );
       err += readvar( pfile , "Explicit_Viscosity" , VAR_DOUB  , &(theGrid->EXPLICIT_VISCOSITY)  );
