@@ -16,16 +16,19 @@ double maxvel(double * prim , double w , double r ,struct Grid * theGrid){
   double cs  = sqrt(grid_GAMMALAW(theGrid)*Pp/rho);
   double cf2 = cs*cs;
 
-
-  double Br  = prim[BRR];
-  double Bp  = prim[BPP];
-  double Bz  = prim[BZZ];
-  double b2  = (Br*Br+Bp*Bp+Bz*Bz)/rho;
-  cf2 += b2;
-
+  if (grid_runtype(theGrid)==MHD){
+    double Br  = prim[BRR];
+    double Bp  = prim[BPP];
+    double Bz  = prim[BZZ];
+    double b2  = (Br*Br+Bp*Bp+Bz*Bz)/rho;
+    cf2 += b2;
+  }
   double maxv = sqrt(cf2) + sqrt( vr*vr + vp*vp + vz*vz );
-  double ch = grid_DIVB_CH(theGrid); 
-  if( maxv < ch ) maxv = ch;
+
+  if (grid_runtype(theGrid)==MHD){
+    double ch = grid_DIVB_CH(theGrid); 
+    if( maxv < ch ) maxv = ch;
+  }
 
   return(maxv);
 
