@@ -137,6 +137,7 @@ void face_build_z( struct Cell *** theCells , struct Face * theFaces, int * nzk 
           jpmin = jp;
         }
       }
+      
       jp = jpmin;
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         int jm = j-1;
@@ -189,6 +190,7 @@ void face_build_z( struct Cell *** theCells , struct Face * theFaces, int * nzk 
       }
     }
   }
+  
   if( mode==0 ) nzk[N_z_withghost-1] = n;
 }
 

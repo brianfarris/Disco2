@@ -10,7 +10,7 @@
 void grid_set_N_p(struct Grid * theGrid){
   int i;
   for(i = 0; i < theGrid->N_r+theGrid->Nghost_rmin+theGrid->Nghost_rmax; i++){
-    theGrid->N_p[i] = 4;
+    theGrid->N_p[i] = 128;
   }
 }
 
@@ -74,7 +74,6 @@ int readvar( char * filename , char * varname , int vartype , void * ptr ){
   char nm[512];
   char s1[512];
   int found = 0;
-
   while( (fgets(s,512,inFile) != NULL) && found==0 ){
     sscanf(s,"%s ",nm);
     if( strcmp(nm,varname)==0 ){
@@ -111,7 +110,6 @@ int grid_read_par_file(struct Grid * theGrid, struct MPIsetup * theMPIsetup, cha
 
   char * pfile = inputfilename;
   int err=0;  
-
   int nrank;
   for( nrank=0 ; nrank<mpisetup_NumProcs(theMPIsetup) ; ++nrank ){
     if( mpisetup_MyProc(theMPIsetup)==nrank ){
@@ -128,7 +126,7 @@ int grid_read_par_file(struct Grid * theGrid, struct MPIsetup * theMPIsetup, cha
       err += readvar( pfile , "Num_Checkpoints"   , VAR_INT  , &(theGrid->NUM_CHECKPOINTS)  );
       err += readvar( pfile , "Z_Periodic"        , VAR_INT  , &(theGrid->Z_PERIODIC)  );
       err += readvar( pfile , "Move_Cells"        , VAR_INT  , &(theGrid->MOVE_CELLS)  );
- //     err += readvar( pfile , "NumGravMass"        , VAR_INT  , &(theGrid->NumGravMass)  );
+      //     err += readvar( pfile , "NumGravMass"        , VAR_INT  , &(theGrid->NumGravMass)  );
       err += readvar( pfile , "Adiabatic_Index"   , VAR_DOUB , &(theGrid->GAMMALAW)  );
       err += readvar( pfile , "Include_Viscosity" , VAR_INT  , &(theGrid->INCLUDE_VISCOSITY)  );
       err += readvar( pfile , "Explicit_Viscosity" , VAR_DOUB  , &(theGrid->EXPLICIT_VISCOSITY)  );

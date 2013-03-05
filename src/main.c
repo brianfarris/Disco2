@@ -115,6 +115,7 @@ int main(int argc, char **argv) {
     gravMass_move(theGravMasses,0.5*timestep_dt(theTimeStep));
     timestep_update_Psi(theTimeStep,theCells,theGrid,theMPIsetup);
     timestep_update_t(theTimeStep); 
+
     if( timestep_get_t(theTimeStep)>tcheck){
       sprintf(filename,"checkpoint_%04d.h5",nfile);
       struct IO *theIO = io_create(theGrid);

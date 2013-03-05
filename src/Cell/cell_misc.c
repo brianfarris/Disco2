@@ -103,9 +103,19 @@ void cell_update_dphi( struct Cell *** theCells,struct Grid * theGrid ){
   }
 }
 
-void cell_print_cons(struct Cell *** theCells,int number){
-//  printf("%d tau at 4,2,2: %e\n",number,theCells[2][4][2].cons[TAU]);
+void cell_print_cons(struct Cell *** theCells,struct Grid * theGrid, int number){
+  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
+  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
+
+   printf("%d tau at 4,2,2: %e\n",number,theCells[2][4][2].cons[TAU]);
 }
-void cell_print_prim(struct Cell *** theCells,int number){
-//  printf("%d P at 4,2,2: %e\n",number,theCells[2][4][2].prim[PPP]);
+void cell_print_prim(struct Cell *** theCells,struct Grid * theGrid,int number){
+  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
+  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
+
+  printf("inside cell_print_prim\n");
+  printf("N_r_withghost: %d\n",N_r_withghost);
+  printf("N_z_withghost: %d\n",N_z_withghost);
+  printf("number %d\n",number);
+  printf("%d P at 4,2,2: %e\n",number,theCells[2][4][2].prim[PPP]);
 }

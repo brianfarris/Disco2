@@ -69,7 +69,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   }
   //R Flux
   cell_plm_rz( theCells ,theGrid, theFaces_r , timestep_Nfr(theTimeStep) , 0 );
-  cell_print_cons(theCells,1);
   int n;
   for( n=0 ; n<timestep_Nfr(theTimeStep) ; ++n ){
     struct Riemann * theRiemann = riemann_create(theGrid);
@@ -77,7 +76,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
     riemann_hllc(theRiemann,theGrid,dt,0); 
     riemann_destroy(theRiemann);
   }
-  cell_print_cons(theCells,2);
   //Z Flux
   if( grid_N_z_global(theGrid) != 1 ){
     cell_plm_rz( theCells ,theGrid, theFaces_z , timestep_Nfz(theTimeStep) , 1 );
@@ -88,7 +86,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
       riemann_destroy(theRiemann);
     }
   }
- cell_print_cons(theCells,3);
   
  //Source Terms
  cell_add_src( theCells ,theGrid, theGravMasses , dt );
@@ -96,21 +93,17 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
    cell_add_visc_src( theCells ,theGrid,dt );
  }
  //forceGravMasss( theCells , theGravMasses );
- cell_print_cons(theCells,4);
- cell_print_prim(theCells,1);
 
  //Bookkeeping
  cell_update_phi( theCells ,theGrid, theTimeStep->RK , dt );
  cell_update_dphi( theCells ,theGrid);
  gravMass_update_RK( theGravMasses ,theGrid, theTimeStep->RK );
  cell_calc_prim( theCells ,theGrid);
- cell_print_prim(theCells,2);
 
  //Boundary Data
  //cell_boundary_outflow_r( theCells , theFaces_r ,theGrid, nri );
  //if( N_z_global > 1 ) cell_boundary_z( theCells , theFaces_z ,theGrid, nzk );
  cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
- cell_print_prim(theCells,3);
 
  face_destroy(theFaces_r);
  face_destroy(theFaces_z);
@@ -120,7 +113,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
  cell_syncproc_z(theCells,theGrid,theMPIsetup);
 
  cell_calc_cons( theCells,theGrid );
- cell_print_cons(theCells,5);
 
 }
 
@@ -144,7 +136,7 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
   cell_calc_prim( theCells,theGrid );
   cell_calc_cons( theCells,theGrid );
 
-  cell_print_cons(theCells,6);
+ // cell_print_cons(theCells,theGrid,6);
   //  exit(0);
 
   //inter-processor syncs
