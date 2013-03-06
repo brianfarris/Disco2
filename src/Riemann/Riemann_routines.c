@@ -274,8 +274,12 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Grid * theGrid, double
   int q;
   for (q=0;q<NUM_Q;++q){
     AvgPrim[q] = .5*(theRiemann->primL[q]+theRiemann->primR[q]);
-   // Gprim[q] = .5*((theRiemann->cL)->grad[q]+(theRiemann->cR)->grad[q]);
-    Gprim[q] = .5*(cell_grad(theRiemann->cL)[q]+cell_grad(theRiemann->cR)[q]);
+    // Gprim[q] = .5*((theRiemann->cL)->grad[q]+(theRiemann->cR)->grad[q]);
+    if (fabs(n[1]-1.)<0.00001){
+      Gprim[q] = .5*(cell_gradp(theRiemann->cL)[q]+cell_gradp(theRiemann->cR)[q]);    
+    } else{
+      Gprim[q] = .5*(cell_grad(theRiemann->cL)[q]+cell_grad(theRiemann->cR)[q]);
+    }
     VFlux[q] = 0.0;
   }
 
@@ -292,13 +296,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Grid * theGrid, double
   VFlux[LLL] = -nu*rho*( r*r*dnom + n[0]*2.*vr );
   VFlux[SZZ] = -nu*rho*dnvz;
   VFlux[TAU] = -nu*rho*(vr*dnvr+r*r*om*dnom+vz*dnvz);  
- 
-  /*
-  if ((fabs(r-1.)<0.01)&&(n[1]==1.)&&(fabs(cell_tiph(theRiemann->cL))<0.01)){
-    printf("r: %e, VFlux[SRR]: %e\n",r,VFlux[SRR]);
-  }
-  */
-  
+
   for (q=0;q<NUM_Q;++q){
     theRiemann->F[q] += VFlux[q];
   }
@@ -372,7 +370,8 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
 
   double Bpack[6];
   riemann_set_vel(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
-
+  if (direction==0){
+  }
   double Bk_face,Psi_face;
   if (grid_runtype(theGrid)==1){
     if (direction==0){
@@ -420,7 +419,7 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
     cell_add_GradPsi(theRiemann->cL,direction,Psi_face);
     cell_add_GradPsi(theRiemann->cR,direction,-Psi_face);
   }
-  
+
 }
 
 

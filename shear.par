@@ -14,7 +14,7 @@ Z_Max			1.0
 
 NUM_Q                   5
 Time_Max                0.1
-Num_Checkpoints	        100	
+Num_Checkpoints	        2	
 
 Z_Periodic		1
 

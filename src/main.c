@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
   //set conserved quantities
   cell_calc_cons(theCells,theGrid);
 
-  cell_set_wrigid(theCells,theGrid);
+  if( grid_MOVE_CELLS(theGrid) == C_RIGID ) cell_set_wrigid( theCells ,theGrid);
 
   struct TimeStep * theTimeStep = timestep_create(theGrid);
 
@@ -122,7 +122,9 @@ int main(int argc, char **argv) {
     timestep_set_RK(theTimeStep,0.5);
     timestep_substep(theTimeStep,theCells,theGrid,theGravMasses,theMPIsetup,0.5);
     gravMass_move(theGravMasses,0.5*timestep_dt(theTimeStep));
-    timestep_update_Psi(theTimeStep,theCells,theGrid,theMPIsetup);
+    if (grid_runtype(theGrid)==1){
+      timestep_update_Psi(theTimeStep,theCells,theGrid,theMPIsetup);
+    }
     timestep_update_t(theTimeStep); 
 
     if( timestep_get_t(theTimeStep)>tcheck){

@@ -66,7 +66,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
       riemann_destroy(theRiemann);
     }
   }
- 
   //R Flux
   cell_plm_rz( theCells ,theGrid, theFaces_r , timestep_Nfr(theTimeStep) , 0 );
   int n;
@@ -87,24 +86,24 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
       riemann_destroy(theRiemann);
     }
   }
-  
- //Source Terms
- cell_add_src( theCells ,theGrid, theGravMasses , dt );
- if (grid_INCLUDE_VISCOSITY(theGrid)){
-   cell_add_visc_src( theCells ,theGrid,dt );
- }
 
- //Bookkeeping
- cell_update_phi( theCells ,theGrid, theTimeStep->RK , dt );
- cell_update_dphi( theCells ,theGrid);
- gravMass_update_RK( theGravMasses ,theGrid, theTimeStep->RK );
- cell_calc_prim( theCells ,theGrid);
+  //Source Terms
+  cell_add_src( theCells ,theGrid, theGravMasses , dt );
+  if (grid_INCLUDE_VISCOSITY(theGrid)){
+    cell_add_visc_src( theCells ,theGrid,dt );
+  }
 
- //Boundary Data
- //cell_boundary_outflow_r( theCells , theFaces_r ,theGrid, nri );
- //if( N_z_global > 1 ) cell_boundary_z( theCells , theFaces_z ,theGrid, nzk );
- //cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
-  cell_boundary_outflow_r( theCells , theFaces_r ,theGrid,theMPIsetup, theTimeStep->nri );
+  //Bookkeeping
+  cell_update_phi( theCells ,theGrid, theTimeStep->RK , dt );
+  cell_update_dphi( theCells ,theGrid);
+  gravMass_update_RK( theGravMasses ,theGrid, theTimeStep->RK );
+  cell_calc_prim( theCells ,theGrid);
+
+  //Boundary Data
+  //cell_boundary_outflow_r( theCells , theFaces_r ,theGrid, nri );
+  //if( N_z_global > 1 ) cell_boundary_z( theCells , theFaces_z ,theGrid, nzk );
+  cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
+  // cell_boundary_outflow_r( theCells , theFaces_r ,theGrid,theMPIsetup, theTimeStep->nri );
 
   face_destroy(theFaces_r);
   if (grid_N_z_global(theGrid)>1){

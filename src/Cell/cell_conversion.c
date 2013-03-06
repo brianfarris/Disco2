@@ -67,7 +67,6 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
   double RHO_FLOOR = grid_RHO_FLOOR(theGrid);
   double VEL_CAP = grid_VEL_CAP(theGrid);
   double GAMMALAW = grid_GAMMALAW(theGrid);
-
   double rho = cons[DDD]/dV;
   if( rho < RHO_FLOOR ) rho = RHO_FLOOR;
   double Sr  = cons[SRR]/dV;
@@ -91,12 +90,16 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
     prim[BPP] = Bp;
     prim[BZZ] = Bz;
     prim[PSI] = cons[PSI]/dV;
-   }
+  }
   double rhoe = E - KE - .5*B2;
   double Pp = (GAMMALAW-1.)*rhoe;
 
-  if( Pp < CS_FLOOR*CS_FLOOR*rho/GAMMALAW ) Pp = CS_FLOOR*CS_FLOOR*rho/GAMMALAW;
-  if ( Pp > CS_CAP*CS_CAP*rho/GAMMALAW) Pp = CS_CAP*CS_CAP*rho/GAMMALAW;
+  if( Pp < CS_FLOOR*CS_FLOOR*rho/GAMMALAW ) {
+    Pp = CS_FLOOR*CS_FLOOR*rho/GAMMALAW;
+  }
+  if ( Pp > CS_CAP*CS_CAP*rho/GAMMALAW) {
+    Pp = CS_CAP*CS_CAP*rho/GAMMALAW;
+  }
   if ( v_magnitude>VEL_CAP ){
     vr = vr*VEL_CAP/v_magnitude;
     vp = vp*VEL_CAP/v_magnitude;
@@ -123,7 +126,8 @@ void cell_calc_prim( struct Cell *** theCells ,struct Grid * theGrid){
       double rp = grid_r_faces(theGrid,i);
       double r = .5*(rp+rm);
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-        struct Cell * c = &(theCells[k][i][j]);
+        //struct Cell * c = &(theCells[k][i][j]);
+        struct Cell * c = cell_single(theCells,i,j,k);
         double dV = .5*(rp*rp-rm*rm)*c->dphi*dz;
         cell_cons2prim( c->cons , c->prim , r , dV ,theGrid,grid_runtype(theGrid));
       }

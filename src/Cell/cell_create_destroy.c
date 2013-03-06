@@ -55,7 +55,8 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
   for(k = 0; k < N_z_withghost; k++){
     for(i = 0; i < N_r_withghost; i++){
       //double tiph_0 = 2.*M_PI*(double)rand()/(double)RAND_MAX;
-      double tiph_0 = 0.0;
+      //double tiph_0 = 0.0;
+      double tiph_0 = 2*M_PI*(double)grid_r_faces(theGrid,i)/4.;
       double dphi = 2.*M_PI/(double)grid_N_p(theGrid,i);
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         double tiph = tiph_0 + (double)j*dphi;

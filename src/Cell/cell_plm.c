@@ -133,7 +133,6 @@ void cell_plm_p( struct Cell *** theCells ,struct Grid * theGrid){
 
         double dpL = .5*( c->dphi + cL->dphi );
         double dpR = .5*( c->dphi + cR->dphi );
-
         for( q=Qmin ; q<Qmax ; ++q ){
           double sL = ( c->prim[q]  - cL->prim[q] )/dpL;
           double sR = ( cR->prim[q] - c->prim[q]  )/dpR;
