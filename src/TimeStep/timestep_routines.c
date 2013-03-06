@@ -48,7 +48,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_adjust_RK_cons( theCells, theGrid, theTimeStep->RK);
   cell_clear_divB(theCells,theGrid);
   cell_clear_GradPsi(theCells,theGrid);
-
+  //cell_print_cons(theCells,theGrid,1);
   //Phi Flux
   cell_plm_p( theCells,theGrid );
   int i,j,k;
@@ -66,15 +66,70 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
       riemann_destroy(theRiemann);
     }
   }
+  //cell_print_cons(theCells,theGrid,2);
   //R Flux
   cell_plm_rz( theCells ,theGrid, theFaces_r , timestep_Nfr(theTimeStep) , 0 );
   int n;
   for( n=0 ; n<timestep_Nfr(theTimeStep) ; ++n ){
     struct Riemann * theRiemann = riemann_create(theGrid);
     riemann_setup_rz(theRiemann,theFaces_r,theGrid,n);
-    riemann_hllc(theRiemann,theGrid,dt,0); 
+    riemann_hllc(theRiemann,theGrid,dt,0);
+    /*
+    if ((mpisetup_NumProcs(theMPIsetup)==1)&&(n==81)){
+      int q;
+      for (q=0;q<grid_NUM_Q(theGrid);++q){
+        printf("0 theRiemann->primL[%d]: %16.12e\n",q,theRiemann->primL[q]);
+        printf("0 theRiemann->primR[%d]: %16.12e\n",q,theRiemann->primR[q]);
+      }
+        printf("0 theRiemann->Ss: %16.12e\n",theRiemann->Ss);
+        printf("0 theRiemann->dA: %16.12e\n",theRiemann->dA);
+        printf("0 theRiemann->F[LLL]: %16.12e\n",theRiemann->F[LLL]);
+        printf("0 theRiemann->cL->cons[LLL]: %16.12e\n",theRiemann->cR->cons[LLL]);
+    } 
+    if ((mpisetup_NumProcs(theMPIsetup)==2)&&(n==41)){
+      int q;
+      for (q=0;q<grid_NUM_Q(theGrid);++q){
+        printf("1 theRiemann->primL[%d]: %16.12e\n",q,theRiemann->primL[q]);
+        printf("1 theRiemann->primR[%d]: %16.12e\n",q,theRiemann->primR[q]);
+      }
+        printf("1 theRiemann->Ss: %16.12e\n",theRiemann->Ss);
+        printf("1 theRiemann->dA: %16.12e\n",theRiemann->dA);
+        printf("1 theRiemann->F[LLL]: %16.12e\n",theRiemann->F[LLL]);
+        printf("1 theRiemann->cL->cons[LLL]: %16.12e\n",theRiemann->cR->cons[LLL]);
+    } 
+
+
+    if ((mpisetup_NumProcs(theMPIsetup)==1)&&(mpisetup_dim_MyProc(theMPIsetup,0)==0)&&(fabs(theRiemann->cR->tiph-2.15984)<0.0001)&&(fabs(theRiemann->r-1.)<0.0001)){
+      printf("0 single proc n: %d,theRiemann->cR->cons[LLL]: %16.12e\n",n,theRiemann->cR->cons[LLL]);
+    }
+    if ((mpisetup_NumProcs(theMPIsetup)==2)&&(mpisetup_dim_MyProc(theMPIsetup,0)==1)&&(fabs(theRiemann->cR->tiph-2.15984)<0.0001)&&(fabs(theRiemann->r-1.)<0.0001)){
+      printf("1 single proc n: %d,theRiemann->cR->cons[LLL]: %16.12e\n",n,theRiemann->cR->cons[LLL]);
+    }
+
+    if (n==120&&(mpisetup_dim_MyProc(theMPIsetup,0)==0)){
+      printf("0 theRiemann->cL->cons[LLL]: %16.12e\n",(theRiemann->cL)->cons[LLL]);    
+      printf("0 theRiemann->cL->tiph: %16.12e\n",(theRiemann->cL)->tiph);    
+      printf("0 theRiemann->r: %16.12e\n",theRiemann->r);    
+      printf("0 theRiemann->primL[UPP]: %16.12e\n",theRiemann->primL[UPP]);    
+      printf("0 theRiemann->F[LLL]: %16.12e\n",theRiemann->F[LLL]);
+    }
+    
+    
+       if (n==121&&(mpisetup_dim_MyProc(theMPIsetup,0)==0)){
+       printf("0 theRiemann->cR->cons[LLL]: %16.12e\n",(theRiemann->cR)->cons[LLL]);    
+       printf("0 theRiemann->primR[UPP]: %16.12e\n",theRiemann->primR[UPP]);    
+       printf("0 theRiemann->F[LLL]: %16.12e\n",theRiemann->F[LLL]);
+       }
+       
+    if (n==80&&(mpisetup_dim_MyProc(theMPIsetup,0)==1)){
+      printf("1 theRiemann->cL->cons[LLL]: %16.12e\n",(theRiemann->cL)->cons[LLL]);
+      printf("1 theRiemann->primL[UPP]: %16.12e\n",theRiemann->primL[UPP]);    
+      printf("1 theRiemann->F[LLL]: %16.12e\n",theRiemann->F[LLL]);
+    }
+    */
     riemann_destroy(theRiemann);
   }
+ // cell_print_cons(theCells,theGrid,3);
 
   //Z Flux
   if( grid_N_z_global(theGrid) != 1 ){

@@ -8,15 +8,20 @@
 #include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
-void addFace( struct Face * theFaces , int n , struct Cell * cL , struct Cell * cR , double r , double deltaL , double deltaR , double dphi , double tp , double dz ){
+void addFace( struct Face * theFaces , int n , struct Cell * cL , struct Cell * cR , double r , double deltaL , double deltaR , double dphi , double tp , double deltaPerp ){
   theFaces[n].L = cL;
   theFaces[n].R = cR;
   theFaces[n].r = r;
   theFaces[n].deltaL = deltaL;
   theFaces[n].deltaR = deltaR;
   theFaces[n].dphi= dphi;
-  theFaces[n].dA  = r*dphi*dz;
+  theFaces[n].dA  = r*dphi*deltaPerp;
   theFaces[n].cm  = tp - .5*dphi;
+/*
+ if (n==41||n==81){
+    printf("n: %d, dA: %e, r: %e, dphi: %e, deltaPerp: %e\n",n,theFaces[n].dA,r,dphi,deltaPerp);
+  }
+  */
 } 
 
 void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells,struct Face * theFaces,struct Grid * theGrid, int mode){
@@ -79,8 +84,22 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
       }
       ++(*pn);
       ++jp;
-      if( jp == grid_N_p(theGrid,i+rDir) ) jp = 0;
+      if( jp == grid_N_p(theGrid,i+rDir) ) {
+        jp = 0;
+      }
       dp  = cell_tiph(cell_single(theCells,i,j,k))-cell_tiph(cell_single(theCells,i+rDir,jp,k+zDir));
+      /*
+         if( *pn==41){
+         printf("j: %d, jp: %d\n",j,jp);
+         printf("i: %d\n",i);
+         printf(" cell_tiph(cell_single(theCells,i,0,k)): %e,grid_r_faces(theGrid,i): %e\n", cell_tiph(cell_single(theCells,i,0,k)),grid_r_faces(theGrid,i));
+         printf(" cell_tiph(cell_single(theCells,i+1,0,k)): %e, grid_r_faces(theGrid,i+1): %e\n", cell_tiph(cell_single(theCells,i+1,0,k)),grid_r_faces(theGrid,i+1));
+         printf("jp: %d\n",jp);
+         printf("rDir: %d\n",rDir);
+         printf("zDir: %d\n",zDir);
+         printf("dp before 1: %e\n",dp);
+         }
+         */
       while( dp > M_PI ) dp -= 2.*M_PI;
       while( dp < -M_PI ) dp += 2.*M_PI;
       while( dp > 0.0 ){
@@ -98,6 +117,14 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
       }
       dp = cell_dphi(cell_single(theCells,i+rDir,jp,k+zDir))+dp;
       //Step C: face formed out of end of cell- and beginning of cell+.
+      /*
+         if( *pn==41||*pn==81){
+         printf("*pn: %d\n",*pn);
+         printf("khar 4\n");
+         printf("dp: %e\n",dp);
+         printf("cell_dphi(cell_single(theCells,i+rDir,jp,k+zDir)): %e\n",cell_dphi(cell_single(theCells,i+rDir,jp,k+zDir)));
+         }
+         */
       if ( mode==1 ){
         addFace(theFaces,*pn,cell_single(theCells,i,j,k),cell_single(theCells,i+rDir,jp,k+zDir),
             r,deltaL,deltaR,dp,cell_tiph(cell_single(theCells,i,j,k)),deltaPerp);

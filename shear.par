@@ -14,13 +14,13 @@ Z_Max			1.0
 
 NUM_Q                   5
 Time_Max                0.1
-Num_Checkpoints	        2	
+Num_Checkpoints	        10	
 
 Z_Periodic		1
 
 Move_Cells              0
 Adiabatic_Index		1.6666666666
-Include_Viscosity	1		//If this=1, include viscosity
+Include_Viscosity	0		//If this=1, include viscosity
 Explicit_Viscosity      0.1
 
 DivB_Ch			0.06		//Dedner divergence cleaning

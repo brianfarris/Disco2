@@ -28,6 +28,7 @@ void grid_set_rz(struct Grid * theGrid,struct MPIsetup * theMPIsetup){
     int ig = i-theGrid->Nghost_rmin+N_r_0;
     double delta = (theGrid->RMAX-theGrid->RMIN)/(double)theGrid->N_r_global;
     theGrid->r_faces[i] = theGrid->RMIN+(double)ig*delta;
+  //  printf("theGrid->r_faces[i]: %e\n",theGrid->r_faces[i]);
   }
   for(i = 0; i < theGrid->N_z+theGrid->Nghost_zmin+theGrid->Nghost_zmax+1; i++){
     int ig = i-theGrid->Nghost_zmin+N_z_0;

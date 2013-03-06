@@ -142,7 +142,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
             theCells[k][i][j].RKcons[q] = buffer_r_in_recv[count];
             ++count;
           }
-          theCells[k][i][j].tiph = buffer_r_out_recv[count];
+          theCells[k][i][j].tiph = buffer_r_in_recv[count];
           ++count;
         }
       }

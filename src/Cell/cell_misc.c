@@ -107,10 +107,9 @@ void cell_print_cons(struct Cell *** theCells,struct Grid * theGrid, int number)
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int i;
-//  for (i=0;i<N_r_withghost;++i){
-    printf("%d, r: %e, SRR: %e, LLL:  %e, TAU: %e, DDD: %e\n",number,grid_r_faces(theGrid,0),theCells[0][0][0].cons[SRR],theCells[0][0][0].cons[LLL],theCells[0][0][0].cons[TAU],theCells[0][0][0].cons[DDD]);
-//  }
-
+  for (i=grid_Nghost_rmin(theGrid);i<(grid_N_r(theGrid)+grid_Nghost_rmin(theGrid));++i){
+    printf("%d,r: %e, SRR:  %16.12e, LLL:  %16.12e, TAU:  %16.12e\n",number,grid_r_faces(theGrid,i),theCells[2][i][0].cons[SRR],theCells[2][i][0].cons[LLL],theCells[2][i][0].cons[TAU]);
+  }
 }
 void cell_print_prim(struct Cell *** theCells,struct Grid * theGrid,int number){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);

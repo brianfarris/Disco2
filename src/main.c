@@ -74,9 +74,29 @@ int main(int argc, char **argv) {
 
   // allocate memory for data 
   struct Cell ***theCells = cell_create(theGrid,theMPIsetup);
+
+  //printf("proc: %d, grid_r_faces(theGrid,1): %e\n",mpisetup_MyProc(theMPIsetup),grid_r_faces(theGrid,1));
+  //printf("proc: %d, grid_r_faces(theGrid,2): %e\n",mpisetup_MyProc(theMPIsetup),grid_r_faces(theGrid,2));
+  //printf("proc: %d, grid_r_faces(theGrid,3): %e\n",mpisetup_MyProc(theMPIsetup),grid_r_faces(theGrid,3));
+
+  //printf("1 proc: %d, cell_tiph(cell_single(theCells,1,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,1,0,2)));
+  //printf("1 proc: %d, cell_tiph(cell_single(theCells,2,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,2,0,2)));
+  //printf("1 proc: %d, cell_tiph(cell_single(theCells,3,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,3,0,2)));
+  
   cell_clean_pi(theCells,theGrid);
-  //inter-processor syncs
+  //printf("2 proc: %d, cell_tiph(cell_single(theCells,1,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,1,0,2)));
+  //printf("2 proc: %d, cell_tiph(cell_single(theCells,2,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,2,0,2)));
+  //printf("2 proc: %d, cell_tiph(cell_single(theCells,3,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,3,0,2)));
+   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid,theMPIsetup);
+  /*
+  printf("3 proc: %d, cell_tiph(cell_single(theCells,0,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,0,0,2)));
+  printf("3 proc: %d, cell_tiph(cell_single(theCells,1,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,1,0,2)));
+  printf("3 proc: %d, cell_tiph(cell_single(theCells,2,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,2,0,2)));
+  printf("3 proc: %d, cell_tiph(cell_single(theCells,3,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,3,0,2)));
+  printf("3 proc: %d, cell_tiph(cell_single(theCells,4,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,4,0,2)));
+  printf("3 proc: %d, cell_tiph(cell_single(theCells,5,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,5,0,2)));
+*/
   if (grid_N_z_global(theGrid)>1){
     cell_syncproc_z(theCells,theGrid,theMPIsetup);
   }
