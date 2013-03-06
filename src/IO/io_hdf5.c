@@ -26,7 +26,6 @@ void io_hdf5_out(struct IO *io_pointer,struct Grid * theGrid, char * output_file
   hsize_t	offset[2];
   hid_t	plist_id;                 /* property list identifier */
   herr_t	status;
-
   // MPI variables
   MPI_Info info  = MPI_INFO_NULL;
 

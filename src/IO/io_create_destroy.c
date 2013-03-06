@@ -1,5 +1,4 @@
 #define IO_PRIVATE_DEFS
-#define H5FILE_NAME     "testout.h5"
 #define DATASETNAME 	"DoubleArray" 
 #define RANK   2
 
@@ -18,7 +17,6 @@ struct IO *io_create(struct Grid *theGrid) {
   int Ncells = grid_Ncells(theGrid)*(NUM_Q+3);
   int N_r = grid_N_r(theGrid);
   int N_z = grid_N_z(theGrid);
-
 
   theIO->primitives = malloc(sizeof(double *)*grid_Ncells(theGrid));
   theIO->primitives[0] = malloc(sizeof(double )*grid_Ncells(theGrid)*(NUM_Q+3));

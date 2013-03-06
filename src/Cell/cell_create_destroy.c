@@ -63,10 +63,12 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
         theCells[k][i][j].prim[URR] = 0.0;
         theCells[k][i][j].prim[UPP] = 0.0;
         theCells[k][i][j].prim[UZZ] = 0.0;
+        if (grid_runtype(theGrid)==1){
         theCells[k][i][j].prim[BRR] = 0.0;
         theCells[k][i][j].prim[BPP] = 0.0;
         theCells[k][i][j].prim[BZZ] = 0.0;
         theCells[k][i][j].prim[PSI] = 0.0;
+        }
         theCells[k][i][j].wiph = 0.0;
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;
@@ -75,11 +77,10 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
         theCells[k][i][j].tiph = tiph;
         theCells[k][i][j].RKtiph = tiph;
         theCells[k][i][j].dphi = dphi;
-        theCells[k][i][j].wiph = 0.0;
-        theCells[k][i][j].divB = 0.0;
       }
     }
   }
+  
   return theCells;
 }
 

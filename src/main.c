@@ -61,13 +61,15 @@ int main(int argc, char **argv) {
 
   //grid
   struct Grid * theGrid = grid_create(theMPIsetup);
+  grid_read_par_file(theGrid,theMPIsetup,"shear.par");
+  grid_alloc_arr(theGrid,theMPIsetup); 
   grid_set_N_p(theGrid);
   grid_set_rz(theGrid,theMPIsetup);
   grid_set_Ncells_and_offset(theGrid,theMPIsetup);
 
   // gravMass
   struct GravMass *theGravMasses = gravMass_create(grid_NumGravMass(theGrid));
-  gravMass_initialize_single(theGravMasses);
+  gravMass_initialize_none(theGravMasses);
   gravMass_clean_pi(theGravMasses,theGrid);
 
   // allocate memory for data 
@@ -82,21 +84,23 @@ int main(int argc, char **argv) {
     io_hdf5_in(theIO,theGrid,input_filename);
     io_unflattened_prim(theIO,theCells,theGrid);
   }else{
-    cell_init(theCells,theGrid,theMPIsetup);
+    cell_init_shear(theCells,theGrid);
   }
-  
+
   cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
-  
+
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid,theMPIsetup);
-  cell_syncproc_z(theCells,theGrid,theMPIsetup);
+  if (grid_N_z_global(theGrid)>1){
+    cell_syncproc_z(theCells,theGrid,theMPIsetup);
+  }
 
   //set conserved quantities
   cell_calc_cons(theCells,theGrid);
 
   cell_set_wrigid(theCells,theGrid);
-  
-  struct TimeStep * theTimeStep = timestep_create();
+
+  struct TimeStep * theTimeStep = timestep_create(theGrid);
 
   double dtcheck = grid_get_T_MAX(theGrid)/grid_NUM_CHECKPOINTS(theGrid);
   double tcheck = dtcheck;
@@ -129,8 +133,9 @@ int main(int argc, char **argv) {
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid,theMPIsetup);
-  cell_syncproc_z(theCells,theGrid,theMPIsetup);
-
+  if (grid_N_z_global(theGrid)>1){
+    cell_syncproc_z(theCells,theGrid,theMPIsetup);
+  }
   // clean up
   cell_destroy(theCells,theGrid);
   grid_destroy(theGrid);

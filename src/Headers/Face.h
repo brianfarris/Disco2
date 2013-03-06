@@ -19,8 +19,7 @@ struct Face{
 #endif
 
 //create and destroy
-struct Face *face_create_r(struct Cell *** ,struct Grid *,struct TimeStep *);
-struct Face *face_create_z(struct Cell *** ,struct Grid *,struct TimeStep *);
+struct Face *face_create(struct Cell *** ,struct Grid *,struct TimeStep *, int);
 void face_destroy(struct Face *);
 //access face data
 struct Face *face_pointer( struct Face *,int);

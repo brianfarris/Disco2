@@ -169,7 +169,7 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Grid *theGrid,struc
     for( i=0 ; i<grid_Nghost_rmin(theGrid) ; ++i ){
       for( k=0 ; k<N_z_withghost ; ++k ){
         for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-          cell_single_init(theCells,theGrid,i,j,k);
+          cell_single_init_shear(theCells,theGrid,i,j,k);
         }
       }
     }
@@ -179,7 +179,7 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Grid *theGrid,struc
     for( i=N_r_withghost-1 ; i>N_r_withghost-grid_Nghost_rmax(theGrid)-1 ; --i ){
       for( k=0 ; k<N_z_withghost ; ++k ){
         for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-          cell_single_init(theCells,theGrid,i,j,k);
+          cell_single_init_shear(theCells,theGrid,i,j,k);
         }
       }
     }

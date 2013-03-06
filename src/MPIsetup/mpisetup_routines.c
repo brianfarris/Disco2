@@ -5,16 +5,33 @@
 #include "../Headers/header.h"
 
 void mpisetup_setprocs(struct MPIsetup * theMPIsetup){
+  int readvar(char *,char *, int,void *);
+  int err=0;
+  int N_r_global,N_z_global;
+  readvar( "shear.par" , "NumR" , VAR_INT  , &(N_r_global) );
+  readvar( "shear.par" , "NumZ" , VAR_INT  , &(N_z_global  ));
+   
   int ierr;
   int NumProcs,MyProc;
   //int dim_NumProcs[2];
   theMPIsetup->dim_NumProcs[0] = 0;
   theMPIsetup->dim_NumProcs[1] = 0;
+
+  if (N_z_global==1){
+    theMPIsetup->ndims_mpi = 1;
+    theMPIsetup->dim_NumProcs[1] = 1;
+    theMPIsetup->dim_MyProc[1] = 0;
+  } else{
+    theMPIsetup->ndims_mpi = 2;
+  }
+  
   ierr = MPI_Comm_size(MPI_COMM_WORLD, &NumProcs);
   ierr = MPI_Comm_rank(MPI_COMM_WORLD, &MyProc);
   //This gives me the most efficient factorization of
   //the number of processes being used into a j-by-k grid.
   MPI_Dims_create(NumProcs,theMPIsetup->ndims_mpi,theMPIsetup->dim_NumProcs);
+printf("dim_NumProcs[0]: %d\n",theMPIsetup->dim_NumProcs[0]);
+printf("dim_NumProcs[1]: %d\n",theMPIsetup->dim_NumProcs[1]);
   //Just in case the dimensions don't make sense; I don't know how
   //the MPI_Dims_create funcition works, so you never know.
   if( (theMPIsetup->dim_NumProcs[0])*(theMPIsetup->dim_NumProcs[1]) != NumProcs ){
@@ -67,8 +84,8 @@ int mpisetup_MyProc(struct MPIsetup * theMPIsetup){
 int mpisetup_NumProcs(struct MPIsetup * theMPIsetup){
   return(theMPIsetup->NumProcs);
 }
-int * mpisetup_dim_MyProc(struct MPIsetup * theMPIsetup){
-  return(theMPIsetup->dim_MyProc);
+int mpisetup_dim_MyProc(struct MPIsetup * theMPIsetup,int dim){
+  return(theMPIsetup->dim_MyProc[dim]);
 }
 int * mpisetup_dim_NumProcs(struct MPIsetup * theMPIsetup){
   return(theMPIsetup->dim_NumProcs);

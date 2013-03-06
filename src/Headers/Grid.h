@@ -17,6 +17,7 @@ struct Grid {
   int Ncells;
   int Ncells_global;
   int offset;
+  //fixed parameters
   int Restart;
   int N_r_global;
   int N_z_global;
@@ -52,6 +53,7 @@ struct Grid {
 
 //create and destroy
 struct Grid *grid_create(struct MPIsetup * );
+void grid_alloc_arr(struct Grid * , struct MPIsetup * );
 void grid_destroy(struct Grid *); 
 //access grid data
 int grid_N_p(struct Grid *,int);

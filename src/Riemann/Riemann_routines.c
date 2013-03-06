@@ -72,7 +72,6 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Grid * theGrid, double *
   }
   L_Mins = vnL - sqrt( cf21 );
   L_Plus = vnL + sqrt( cf21 );
-//  printf("1 L_Mins: %e L_Plus: %e\n",L_Mins,L_Plus);
 
   double vnR,cf22,mnR,BnR,B2R;
   double FR[3],FmR[3];
@@ -82,7 +81,6 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Grid * theGrid, double *
   }
   if( L_Mins > vnR - sqrt( cf22 ) ) L_Mins = vnR - sqrt( cf22 );
   if( L_Plus < vnR + sqrt( cf22 ) ) L_Plus = vnR + sqrt( cf22 );
-//  printf("2 L_Mins: %e L_Plus: %e\n",L_Mins,L_Plus);
   
   if (grid_runtype(theGrid)==MHD){
     if( L_Mins > -DIVB_CH ) L_Mins = -DIVB_CH;
@@ -99,7 +97,6 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Grid * theGrid, double *
 
   L_Star = (theRiemann->primR[RHO]*vnR*(L_Plus-vnR)-theRiemann->primL[RHO]*vnL*(L_Mins-vnL)+theRiemann->primL[PPP]-theRiemann->primR[PPP])
     /(theRiemann->primR[RHO]*(L_Plus-vnR)-theRiemann->primL[RHO]*(L_Mins-vnL));
-//  printf("3a L_Star: %e\n",L_Star);
 
   if (grid_runtype(theGrid)==MHD){  
     double Br = ( aR*theRiemann->primL[BRR] + aL*theRiemann->primR[BRR] + FL[0] - FR[0] )/( aL + aR );
@@ -115,17 +112,7 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Grid * theGrid, double *
 
     L_Star += ((.5*B2L-BnL*BnL)-.5*B2R+BnR*BnR)
       /(theRiemann->primR[RHO]*(L_Plus-vnR)-theRiemann->primL[RHO]*(L_Mins-vnL));
-// printf("blah: %e\n",((.5*B2L-BnL*BnL)-.5*B2R+BnR*BnR)
- //     /(theRiemann->primR[RHO]*(L_Plus-vnR)-theRiemann->primL[RHO]*(L_Mins-vnL)));
- //printf("3b L_Star: %e\n",L_Star);
   }
-//  printf("mr: %e, mp: %e, mz: %e, rho: %e\n",mr,mp,mz,rho);
-/*
-  int q;
-  for (q=0;q<6;++q){
-    printf("Bpack[%d]: %e\n",q,Bpack[q]);
-  }
-  */
   theRiemann->Sl = L_Mins;
   theRiemann->Sr = L_Plus;
   theRiemann->Ss = L_Star;
@@ -195,33 +182,12 @@ void riemann_set_Ustar(struct Riemann * theRiemann,struct Grid * theGrid, double
     double Bn = Br*n[0] + Bp*n[1] + Bz*n[2];
     double vB = vr*Br   + vp*Bp   + vz*Bz;
     double Bs2 = Bsr*Bsr+Bsp*Bsp+Bsz*Bsz;
-    //Ps    +=  (.5*B2-Bn*Bn) - .5*Bs2 + Bsn*Bsn;
     double Ps_mag = (.5*B2-Bn*Bn) - .5*Bs2 + Bsn*Bsn;
     Msr   += ( Br*Bn - Bsr*Bsn ) / ( Sk - Ss );
     Msp   += ( Bp*Bn - Bsp*Bsn ) / ( Sk - Ss );
     Msz   += ( Bz*Bn - Bsz*Bsn ) / ( Sk - Ss );
     Estar += ( ( Sk - vn )*.5*B2 + (Ps_mag+.5*Bs2)*Ss - .5*B2*vn - vBs*Bsn + vB*Bn ) / ( Sk - Ss );
-    /*
-    if (fabs(r-2.875)<0.00001){
-      printf("Estar: %e\n",Estar);
-      printf("Sk - vn: %e\n",Sk-vn);
-      printf("Sk - Ss: %e\n",Sk-Ss);
-      printf("Ps: %e\n",Ps+Ps_mag);
-      printf("Pp: %e\n",Pp);
-      printf("vBs: %e\n",vBs);
-      printf("Bn: %e\n",Bn);
-      printf("Bsn: %e\n",Bsn);
-      printf("vn: %e\n",vn);
-      printf("B2: %e\n",B2);
-      printf("Bs2: %e\n",Bs2);
-      printf("rhoe: %e\n",rhoe);
-      printf("vB: %e\n",vB);
-      printf("rho: %e\n",rho);
-      printf("v2: %e\n",v2);
-  exit(0); 
-    }
-    */
-
+   
     theRiemann->Ustar[BRR] = Bsr/r;
     theRiemann->Ustar[BPP] = Bsp/r;
     theRiemann->Ustar[BZZ] = Bsz;
@@ -385,19 +351,11 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
 }
 
 
-//void riemann_hllc(struct Riemann * theRiemann, struct Cell * cL , struct Cell * cR, struct Grid *theGrid, double dA,double dt, double r,double deltaL,double deltaR, double dpL, double dpR , int direction ){
 void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, int direction ){
   int NUM_Q = grid_NUM_Q(theGrid);
   double GAMMALAW = grid_GAMMALAW(theGrid);
   double DIVB_CH = grid_DIVB_CH(theGrid);
 
-  /*
-     int q;
-     for (q=0;q<NUM_Q;++q){
-     theRiemann->primL[q] = cell_prims(cL)[q] + cell_grad(cL)[q]*deltaL + cell_gradp(cL)[q]*dpL;
-     theRiemann->primR[q] = cell_prims(cR)[q] + cell_grad(cR)[q]*deltaR + cell_gradp(cR)[q]*dpR;
-     }
-     */
   //initialize
   double n[3];int i;
   for (i=0;i<3;++i){
@@ -409,18 +367,17 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
   double Bpack[6];
   riemann_set_vel(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
 
-  //printf("Sl: %e, Sr: %e, Ss: %e\n",theRiemann->Sl,theRiemann->Sr,theRiemann->Ss);
-
-  double Bk_face;
-  if (direction==0){
-    Bk_face = 0.5*(theRiemann->primL[BRR]+theRiemann->primR[BRR]);  
-  } else if (direction==1){
-    Bk_face = 0.5*(theRiemann->primL[BPP]+theRiemann->primR[BPP]);
-  } else if (direction==2){
-    Bk_face = 0.5*(theRiemann->primL[BZZ]+theRiemann->primR[BZZ]);
+  double Bk_face,Psi_face;
+  if (grid_runtype(theGrid)==1){
+    if (direction==0){
+      Bk_face = 0.5*(theRiemann->primL[BRR]+theRiemann->primR[BRR]);  
+    } else if (direction==1){
+      Bk_face = 0.5*(theRiemann->primL[BPP]+theRiemann->primR[BPP]);
+    } else if (direction==2){
+      Bk_face = 0.5*(theRiemann->primL[BZZ]+theRiemann->primR[BZZ]);
+    }
+    Psi_face = 0.5*(theRiemann->primL[PSI]+theRiemann->primR[PSI]);
   }
-  double Psi_face = 0.5*(theRiemann->primL[PSI]+theRiemann->primR[PSI]);
-
   double w;
   if (direction==1){
     if( grid_MOVE_CELLS(theGrid) == C_WRIEMANN ) cell_add_wiph(theRiemann->cL,theRiemann->Ss);
@@ -428,7 +385,6 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
   } else{
     w = 0.0;
   }
-
   riemann_set_state(theRiemann,w);
 
   riemann_set_flux( theRiemann , theGrid, theRiemann->r , n,GAMMALAW,DIVB_CH );
@@ -441,35 +397,24 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
     riemann_set_Ustar(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW);
   }
   riemann_addto_flux_general(theRiemann,w,grid_NUM_Q(theGrid));
-  /*
-     if ((fabs(theRiemann->r-2.6875)<0.00001)&&(direction==2)){
-     printf("r: %e, Sl: %e, Sr: %e, Ss: %e\n",theRiemann->r,theRiemann->Sl,theRiemann->Sr,theRiemann->Ss);
-     printf("Flux[TAU]: %e, Uk[TAU]: %e\n",theRiemann->F[TAU],theRiemann->Uk[TAU]);
-     int q;
-     for (q=0;q<NUM_Q;++q){
-     printf("primL[%d]: %e\n",q,theRiemann->primL[q]);
-     printf("primR[%d]: %e\n",q,theRiemann->primR[q]);
-     }
-     exit(0);
-     }
-     */
-  //  if ((theRiemann->primL[BZZ]>0.00001)&&(direction==0)){
 
   if (grid_INCLUDE_VISCOSITY(theGrid)){
     riemann_visc_flux(theRiemann,theGrid,n );
   }
-  
+
   int q;
   for( q=0 ; q<NUM_Q ; ++q ){
     cell_add_cons(theRiemann->cL,q,-dt*theRiemann->dA*theRiemann->F[q]);
     cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->F[q]);
   }
 
-  cell_add_divB(theRiemann->cL,theRiemann->dA*Bk_face);
-  cell_add_divB(theRiemann->cR,-theRiemann->dA*Bk_face);
-  cell_add_GradPsi(theRiemann->cL,direction,Psi_face);
-  cell_add_GradPsi(theRiemann->cR,direction,-Psi_face);
-
+  if (grid_runtype(theGrid)==1){
+    cell_add_divB(theRiemann->cL,theRiemann->dA*Bk_face);
+    cell_add_divB(theRiemann->cR,-theRiemann->dA*Bk_face);
+    cell_add_GradPsi(theRiemann->cL,direction,Psi_face);
+    cell_add_GradPsi(theRiemann->cR,direction,-Psi_face);
+  }
+  
 }
 
 

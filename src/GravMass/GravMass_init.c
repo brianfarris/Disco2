@@ -4,6 +4,21 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
+void gravMass_initialize_none(struct GravMass * theGravMasses){
+  theGravMasses[0].M   = 0.0;
+//  theGravMasses[0].E   = 0.0;
+//  theGravMasses[0].L   = 0.0;
+  theGravMasses[0].r   = 0.0;
+  theGravMasses[0].phi = 0.0;
+  theGravMasses[0].omega = 0.0;
+  theGravMasses[1].M   = 0.0;
+//  theGravMasses[0].E   = 0.0;
+//  theGravMasses[0].L   = 0.0;
+  theGravMasses[1].r   = 0.0;
+  theGravMasses[1].phi = 0.0;
+  theGravMasses[1].omega = 0.0;
+
+}
 void gravMass_initialize_single(struct GravMass * theGravMasses){
   theGravMasses[0].M   = 1.0;
 //  theGravMasses[0].E   = 0.0;

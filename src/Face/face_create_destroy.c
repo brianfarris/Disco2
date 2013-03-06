@@ -19,7 +19,29 @@ void addFace( struct Face * theFaces , int n , struct Cell * cL , struct Cell * 
   theFaces[n].cm  = tp - .5*dphi;
 } 
 
-void build(int *pn,int i, int k,double r,int rDir,int zDir,double deltaL,double deltaR,double deltaPerp,struct Cell *** theCells,struct Face * theFaces,struct Grid * theGrid,int * nri, int mode){
+void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells,struct Face * theFaces,struct Grid * theGrid, int mode){
+
+  double deltaL,deltaR,deltaPerp;
+  double r;
+  if (rDir){
+    deltaL = .5*(grid_r_faces(theGrid,i)-grid_r_faces(theGrid,i-1));
+    deltaR = .5*(grid_r_faces(theGrid,i+1)-grid_r_faces(theGrid,i));
+    r = grid_r_faces(theGrid,i);
+
+    double zp = grid_z_faces(theGrid,k);
+    double zm = grid_z_faces(theGrid,k-1);
+    deltaPerp = zp-zm;
+  }
+  if (zDir){
+    deltaL = .5*(grid_z_faces(theGrid,k)-grid_z_faces(theGrid,k-1));
+    deltaR = .5*(grid_z_faces(theGrid,k+1)-grid_z_faces(theGrid,k));
+
+    double rp=grid_r_faces(theGrid,i);
+    double rm = grid_r_faces(theGrid,i-1);
+    deltaPerp = rp-rm;
+    r = .5*(rp+rm);
+  }
+
   int j,jp;
   double p0 = cell_tiph(cell_single(theCells,i,grid_N_p(theGrid,i)-1,k));
   int jpmin=0;
@@ -85,80 +107,67 @@ void build(int *pn,int i, int k,double r,int rDir,int zDir,double deltaL,double 
   }
 }
 
-void face_build_r( struct Cell *** theCells , struct Face * theFaces , int * nri , int mode , struct Grid *theGrid){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
-
-  int i,k; 
-  int n=0;
-  for( i=0 ; i<N_r_withghost-1 ; ++i ){
-    if ( mode == 0 ) nri[i] = n;
-    for( k=0 ; k<N_z_withghost ; ++k ){
-      double deltaL,deltaR;
-      deltaL = .5*(grid_r_faces(theGrid,i)-grid_r_faces(theGrid,i-1));
-      deltaR = .5*(grid_r_faces(theGrid,i+1)-grid_r_faces(theGrid,i));
-      double r = grid_r_faces(theGrid,i);
-
-      double zp = grid_z_faces(theGrid,k);
-      double zm = grid_z_faces(theGrid,k-1);
-      double deltaPerp = zp-zm;
-
-      //this lets us generalize face_build
-      build(&n,i,k,r,1,0,deltaL,deltaR,deltaPerp,theCells,theFaces,theGrid,nri,mode);
-    }
-  }
-  if ( mode==0 ) nri[N_r_withghost-1] = n;
-
-}
-
-void face_build_z( struct Cell *** theCells , struct Face * theFaces, int * nzk , int mode , struct Grid *theGrid){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
-
-  int i,j,k;
-  int n=0;
-  for( k=0 ; k<N_z_withghost-1 ; ++k ){
-    if ( mode == 0 ) nzk[k] = n;
-    for( i=0 ; i<N_r_withghost ; ++i ){
-
-      double deltaL,deltaR;
-      deltaL = .5*(grid_z_faces(theGrid,k)-grid_z_faces(theGrid,k-1));
-      deltaR = .5*(grid_z_faces(theGrid,k+1)-grid_z_faces(theGrid,k));
-
-      double rp=grid_r_faces(theGrid,i);
-      double rm = grid_r_faces(theGrid,i-1);
-      double deltaPerp = rp-rm;
-      double r = .5*(rp+rm);
-
-      //this lets us generalize face_build
-      build(&n,i,k,r,0,1,deltaL,deltaR,deltaPerp,theCells,theFaces,theGrid,nzk,mode);
-      
-    }
-  }
-  if ( mode==0 ) nzk[N_z_withghost-1] = n;
-}
-
 //try to consolidate using function pointers
-struct Face *face_create_r(struct Cell *** theCells ,struct Grid *theGrid, struct TimeStep * theTimeStep){
-//  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  struct Face * theFaces_r;
-  //Count them first.  Buildfaces with argument zero says "just count", doesn't create any faces.
-  face_build_r( theCells , NULL , timestep_nri(theTimeStep) , 0 ,theGrid);
-  timestep_set_Nfr(theTimeStep,theGrid);
-  theFaces_r = (struct Face *) malloc( timestep_Nfr(theTimeStep)*sizeof(struct Face) );
-  face_build_r( theCells , theFaces_r , timestep_nri(theTimeStep) , 1 ,theGrid);
-  return(theFaces_r);
-}
+struct Face *face_create(struct Cell *** theCells ,struct Grid *theGrid, struct TimeStep * theTimeStep,int direction){
+  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
+  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
-struct Face *face_create_z(struct Cell *** theCells ,struct Grid *theGrid, struct TimeStep * theTimeStep){
-//  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
-  struct Face * theFaces_z;
-  //Count them first.  Buildfaces with argument zero says "just count", doesn't create any faces.
-  face_build_z( theCells , NULL , timestep_nzk(theTimeStep) , 0 ,theGrid);
-  timestep_set_Nfz(theTimeStep,theGrid);
-  theFaces_z = (struct Face *) malloc( timestep_Nfz(theTimeStep)*sizeof(struct Face) );
-  face_build_z( theCells , theFaces_z , timestep_nzk(theTimeStep) , 1 ,theGrid);
-  return(theFaces_z);
+  struct Face * theFaces;
+
+  if (direction==0){ // r-direction
+
+    //Count them first.  build_jloop with argument zero says "just count", doesn't create any faces.
+    int i,k; 
+    int n=0;
+    for( i=0 ; i<N_r_withghost-1 ; ++i ){
+      timestep_nri(theTimeStep)[i] = n;
+      for( k=0 ; k<N_z_withghost ; ++k ){
+        build_jloop(&n,i,k,1,0,theCells,theFaces,theGrid,0);
+      }
+    }
+    timestep_nri(theTimeStep)[N_r_withghost-1] = n; 
+    timestep_set_Nfr(theTimeStep,theGrid);
+
+    //allocate memory for array of Faces
+    theFaces = (struct Face *) malloc( timestep_Nfr(theTimeStep)*sizeof(struct Face) );
+
+    //now actually build the faces
+    n=0;
+    for( i=0 ; i<N_r_withghost-1 ; ++i ){
+      for( k=0 ; k<N_z_withghost ; ++k ){
+        build_jloop(&n,i,k,1,0,theCells,theFaces,theGrid,1);
+      }
+    }
+  }
+
+  if (direction==1){ // z-direction
+
+    if (grid_N_z_global(theGrid)>1){
+      //Count them first.  build_jloop with argument zero says "just count", doesn't create any faces.
+      int i,k;
+      int n=0;
+      for( k=0 ; k<N_z_withghost-1 ; ++k ){
+        timestep_nzk(theTimeStep)[k] = n;
+        for( i=0 ; i<N_r_withghost ; ++i ){
+          build_jloop(&n,i,k,0,1,theCells,theFaces,theGrid,0);
+        }
+      }
+      timestep_nzk(theTimeStep)[N_z_withghost-1] = n;
+      timestep_set_Nfz(theTimeStep,theGrid);
+
+      //allocate memory for array of Faces
+      theFaces = (struct Face *) malloc( timestep_Nfz(theTimeStep)*sizeof(struct Face) );
+
+      //now actually build the faces
+      n=0;
+      for( k=0 ; k<N_z_withghost-1 ; ++k ){
+        for( i=0 ; i<N_r_withghost ; ++i ){
+          build_jloop(&n,i,k,0,1,theCells,theFaces,theGrid,1);
+        }
+      }
+    }
+  }
+  return(theFaces);
 }
 
 void face_destroy(struct Face * theFaces){

@@ -38,12 +38,13 @@ double cell_mindt( struct Cell *** theCells, struct Grid * theGrid ){
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
-  double dt_m = HUGE_VAL;
+  double dt_m = 1.e100;//HUGE_VAL;
   int i,j,k;
   for( k=0 ; k<N_z_withghost ; ++k ){
     double zm = grid_z_faces(theGrid,k-1);
     double zp = grid_z_faces(theGrid,k);
     double dz = zp-zm;
+    //exit(0);
     for( i=0 ; i<N_r_withghost ; ++i ){
       double rm = grid_r_faces(theGrid,i-1);
       double rp = grid_r_faces(theGrid,i);
@@ -55,15 +56,21 @@ double cell_mindt( struct Cell *** theCells, struct Grid * theGrid ){
         double w = .5*(theCells[k][i][j].wiph+theCells[k][i][jm].wiph);
         double dx = dr;
         double rdphi = .5*(rp+rm)*theCells[k][i][j].dphi;
-        if( rdphi<dr ) dx = rdphi;
-        if( dx>dz ) dx = dz;
+        if( rdphi<dr ) {
+          dx = rdphi;
+        }
+        if( dx>dz ) {
+          dx = dz;
+        }
         double a  = maxvel( theCells[k][i][j].prim , w , r ,theGrid);
         double dt = grid_CFL(theGrid)*dx/a;
         if( grid_INCLUDE_VISCOSITY(theGrid)==1 ){
           double dt_visc = .9*dx*dx/(grid_EXPLICIT_VISCOSITY(theGrid));
           dt = dt/( 1. + dt/dt_visc );
         }
-        if( dt_m > dt ) dt_m = dt;
+        if( dt_m > dt ) {
+          dt_m = dt;
+        }
       } 
     }
   }

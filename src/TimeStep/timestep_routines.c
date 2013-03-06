@@ -33,14 +33,13 @@ double timestep_dt(struct TimeStep * theTimeStep){
   return(theTimeStep->dt);
 }
 
-
 void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,struct Grid * theGrid,struct GravMass * theGravMasses,struct MPIsetup * theMPIsetup,double timestep_fac){
 
   double dt = timestep_fac*theTimeStep->dt;
   int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
   int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
-  struct Face *theFaces_r = face_create_r(theCells,theGrid,theTimeStep);
-  struct Face *theFaces_z = face_create_z(theCells,theGrid,theTimeStep);
+  struct Face *theFaces_r = face_create(theCells,theGrid,theTimeStep,0); // r-direction
+  struct Face *theFaces_z = face_create(theCells,theGrid,theTimeStep,1); // z-direction
   cell_clean_pi(theCells,theGrid);
   gravMass_clean_pi(theGravMasses,theGrid);
   cell_clear_w(theCells,theGrid);
@@ -104,16 +103,20 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
  //Boundary Data
  //cell_boundary_outflow_r( theCells , theFaces_r ,theGrid, nri );
  //if( N_z_global > 1 ) cell_boundary_z( theCells , theFaces_z ,theGrid, nzk );
- cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
+ //cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
+  cell_boundary_outflow_r( theCells , theFaces_r ,theGrid,theMPIsetup, theTimeStep->nri );
 
- face_destroy(theFaces_r);
- face_destroy(theFaces_z);
+  face_destroy(theFaces_r);
+  if (grid_N_z_global(theGrid)>1){
+    face_destroy(theFaces_z);
+  }
 
- //inter-processor syncs
- cell_syncproc_r(theCells,theGrid,theMPIsetup);
- cell_syncproc_z(theCells,theGrid,theMPIsetup);
-
- cell_calc_cons( theCells,theGrid );
+  //inter-processor syncs
+  cell_syncproc_r(theCells,theGrid,theMPIsetup);
+  if (grid_N_z_global(theGrid)>1){
+    cell_syncproc_z(theCells,theGrid,theMPIsetup);
+  }
+  cell_calc_cons( theCells,theGrid );
 
 }
 
@@ -139,8 +142,9 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid,theMPIsetup);
-  cell_syncproc_z(theCells,theGrid,theMPIsetup);
-
+  if (grid_N_z_global(theGrid)>1){
+    cell_syncproc_z(theCells,theGrid,theMPIsetup);
+  }
 }
 
 int * timestep_nri(struct TimeStep * theTimeStep){

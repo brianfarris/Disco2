@@ -29,6 +29,7 @@ struct GravMass{
 struct GravMass *gravMass_create(int);
 void gravMass_destroy(struct GravMass *);
 //initialization
+void gravMass_initialize_none(struct GravMass *);
 void gravMass_initialize_single(struct GravMass *);
 void gravMass_initialize_binary(struct GravMass *);
 //access data

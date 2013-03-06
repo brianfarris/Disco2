@@ -19,7 +19,7 @@ struct TimeStep {
 #endif
 
 //create and destroy
-struct TimeStep *timestep_create();
+struct TimeStep *timestep_create(struct Grid * );
 void timestep_destroy(struct TimeStep *); 
 //adjust t, dt, and RK
 void timestep_set_dt(struct TimeStep * , struct Cell *** , struct Grid * );

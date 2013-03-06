@@ -1,4 +1,4 @@
-why does the number of procs need to be a square?
+get 2D working
 do a 2d viscous test and a 2d binary test
 make it so that we can restart from checkpoint without a par file
 check that checkpoint restart agrees to machine precision

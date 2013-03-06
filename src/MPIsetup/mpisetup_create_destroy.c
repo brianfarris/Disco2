@@ -6,7 +6,6 @@
 
 struct MPIsetup *mpisetup_create(int argc,char **argv) {
   struct MPIsetup *theMPIsetup = (struct MPIsetup *) malloc(sizeof(struct MPIsetup));
-  theMPIsetup->ndims_mpi = 2;
   theMPIsetup->wraparound[0]=1;
   theMPIsetup->wraparound[1]=1;
   theMPIsetup->reorder = 1;
