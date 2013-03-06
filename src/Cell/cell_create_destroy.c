@@ -54,7 +54,8 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
   srand(666+mpisetup_MyProc(theMPIsetup));
   for(k = 0; k < N_z_withghost; k++){
     for(i = 0; i < N_r_withghost; i++){
-      double tiph_0 = 2.*M_PI*(double)rand()/(double)RAND_MAX;
+      //double tiph_0 = 2.*M_PI*(double)rand()/(double)RAND_MAX;
+      double tiph_0 = 0.0;
       double dphi = 2.*M_PI/(double)grid_N_p(theGrid,i);
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         double tiph = tiph_0 + (double)j*dphi;
@@ -63,11 +64,29 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
         theCells[k][i][j].prim[URR] = 0.0;
         theCells[k][i][j].prim[UPP] = 0.0;
         theCells[k][i][j].prim[UZZ] = 0.0;
+        theCells[k][i][j].cons[DDD] = 0.0;
+        theCells[k][i][j].cons[TAU] = 0.0;
+        theCells[k][i][j].cons[SRR] = 0.0;
+        theCells[k][i][j].cons[LLL] = 0.0;
+        theCells[k][i][j].cons[SZZ] = 0.0;
+        theCells[k][i][j].RKcons[DDD] = 0.0;
+        theCells[k][i][j].RKcons[TAU] = 0.0;
+        theCells[k][i][j].RKcons[SRR] = 0.0;
+        theCells[k][i][j].RKcons[LLL] = 0.0;
+        theCells[k][i][j].RKcons[SZZ] = 0.0;
         if (grid_runtype(theGrid)==1){
-        theCells[k][i][j].prim[BRR] = 0.0;
-        theCells[k][i][j].prim[BPP] = 0.0;
-        theCells[k][i][j].prim[BZZ] = 0.0;
-        theCells[k][i][j].prim[PSI] = 0.0;
+          theCells[k][i][j].prim[BRR] = 0.0;
+          theCells[k][i][j].prim[BPP] = 0.0;
+          theCells[k][i][j].prim[BZZ] = 0.0;
+          theCells[k][i][j].prim[PSI] = 0.0;
+          theCells[k][i][j].cons[BRR] = 0.0;
+          theCells[k][i][j].cons[BPP] = 0.0;
+          theCells[k][i][j].cons[BZZ] = 0.0;
+          theCells[k][i][j].cons[PSI] = 0.0;
+          theCells[k][i][j].RKcons[BRR] = 0.0;
+          theCells[k][i][j].RKcons[BPP] = 0.0;
+          theCells[k][i][j].RKcons[BZZ] = 0.0;
+          theCells[k][i][j].RKcons[PSI] = 0.0;
         }
         theCells[k][i][j].wiph = 0.0;
         theCells[k][i][j].divB = 0.0;
@@ -80,7 +99,7 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
       }
     }
   }
-  
+
   return theCells;
 }
 

@@ -1,4 +1,4 @@
-get 2D working
+get 2D working. Results are bad with multiple procs. Check viscous flux terms first.
 do a 2d viscous test and a 2d binary test
 make it so that we can restart from checkpoint without a par file
 check that checkpoint restart agrees to machine precision

@@ -75,6 +75,11 @@ int main(int argc, char **argv) {
   // allocate memory for data 
   struct Cell ***theCells = cell_create(theGrid,theMPIsetup);
   cell_clean_pi(theCells,theGrid);
+  //inter-processor syncs
+  cell_syncproc_r(theCells,theGrid,theMPIsetup);
+  if (grid_N_z_global(theGrid)>1){
+    cell_syncproc_z(theCells,theGrid,theMPIsetup);
+  }
   // set initial data 
   int restart=0;
   if (grid_Restart(theGrid)==1){

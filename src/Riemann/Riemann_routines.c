@@ -292,6 +292,12 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Grid * theGrid, double
   VFlux[LLL] = -nu*rho*( r*r*dnom + n[0]*2.*vr );
   VFlux[SZZ] = -nu*rho*dnvz;
   VFlux[TAU] = -nu*rho*(vr*dnvr+r*r*om*dnom+vz*dnvz);  
+ 
+  /*
+  if ((fabs(r-1.)<0.01)&&(n[1]==1.)&&(fabs(cell_tiph(theRiemann->cL))<0.01)){
+    printf("r: %e, VFlux[SRR]: %e\n",r,VFlux[SRR]);
+  }
+  */
   
   for (q=0;q<NUM_Q;++q){
     theRiemann->F[q] += VFlux[q];
