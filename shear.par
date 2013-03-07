@@ -15,15 +15,15 @@ NP_CONST                -1
 aspect                  1.0
 
 NUM_Q                   5
-Time_Max                0.1
-Num_Checkpoints	        10	
+Time_Max                1.0
+Num_Checkpoints	        100	
 
 Z_Periodic		1
 
 Move_Cells              0
 Adiabatic_Index		1.6666666666
 Include_Viscosity	0		//If this=1, include viscosity
-Explicit_Viscosity      0.1
+Explicit_Viscosity      0.01
 
 DivB_Ch			0.06		//Dedner divergence cleaning
 DivB_l			0.1
