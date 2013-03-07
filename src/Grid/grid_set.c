@@ -70,7 +70,7 @@ void grid_set_misc(struct Grid *theGrid,struct MPIsetup * theMPIsetup) {
   // For now, we will always say that there are two masses, and we will set masses to 0 when we need to
   theGrid->NumGravMass = 2;
 
-
+}
 
 
 

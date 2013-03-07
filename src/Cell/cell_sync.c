@@ -139,7 +139,7 @@ void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   int buffersize_z_low_recv = get_buffersize(0,grid_N_r(theGrid),0,grid_Nghost_zmin(theGrid),theGrid);
   double * buffer_z_low_send = malloc(sizeof(double)*buffersize_z_low_send);
   double * buffer_z_low_recv = malloc(sizeof(double)*buffersize_z_low_recv);
-  set_buffer(0,grid_N_r(theGrid), grid_Nghost_zmin(theGrid),k< 2*grid_Nghost_zmin(theGrid),theGrid,theCells,buffer_z_low_send);
+  set_buffer(0,grid_N_r(theGrid), grid_Nghost_zmin(theGrid), 2*grid_Nghost_zmin(theGrid),theGrid,theCells,buffer_z_low_send);
 
   MPI_Status status;
   MPI_Sendrecv(buffer_z_low_send,buffersize_z_low_send,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[1],14,buffer_z_hi_recv,buffersize_z_hi_recv,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[1],14,grid_comm,&status);
