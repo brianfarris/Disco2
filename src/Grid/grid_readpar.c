@@ -60,6 +60,8 @@ int grid_read_par_file(struct Grid * theGrid, struct MPIsetup * theMPIsetup, cha
       err += readvar( pfile , "R_Max"             , VAR_DOUB , &(theGrid->RMAX)  );
       err += readvar( pfile , "Z_Min"             , VAR_DOUB , &(theGrid->ZMIN)  );
       err += readvar( pfile , "Z_Max"             , VAR_DOUB , &(theGrid->ZMAX)  );
+      err += readvar( pfile , "NP_CONST"             , VAR_INT , &(theGrid->NP_CONST)  );
+      err += readvar( pfile , "aspect"             , VAR_DOUB , &(theGrid->aspect)  );
       err += readvar( pfile , "NUM_Q"              , VAR_INT  , &(theGrid->NUM_Q) );
       err += readvar( pfile , "Time_Max"       , VAR_DOUB , &(theGrid->T_MAX)  );
       err += readvar( pfile , "Num_Checkpoints"   , VAR_INT  , &(theGrid->NUM_CHECKPOINTS)  );

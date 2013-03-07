@@ -21,6 +21,8 @@ struct Grid {
   int Restart;
   int N_r_global;
   int N_z_global;
+  int NP_CONST;
+  double aspect;
   int ng;
   double T_MAX;
   int NUM_CHECKPOINTS;

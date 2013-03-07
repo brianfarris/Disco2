@@ -27,13 +27,15 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
   theCells[0] = (struct Cell **)malloc(sizeof(struct Cell *)*grid_N_r(theGrid)*grid_N_z(theGrid));
   theCells[0][0] = (struct Cell *)malloc(sizeof(struct Cell)*Ncells);
 
+  int position = 0;
   for (k=0; k<grid_N_z(theGrid); k++) {
     theCells[k] = theCells[0]+k*grid_N_r(theGrid);
     for (i=0; i<grid_N_r(theGrid);i++){
-      theCells[k][i] = theCells[0][0]+grid_N_p(theGrid,i)*(k*grid_N_r(theGrid)+i);
+      theCells[k][i] = theCells[0][0]+position;//grid_N_p(theGrid,i)*(k*grid_N_r(theGrid)+i);
+      position += grid_N_p(theGrid,i);
     }
   }
-
+  Ncells=0;
   for (k=0; k<grid_N_z(theGrid); k++) {
     for (i=0; i<grid_N_r(theGrid);i++){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
@@ -42,11 +44,10 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
         theCells[k][i][j].RKcons = malloc(NUM_Q*sizeof(double));
         theCells[k][i][j].grad = malloc(NUM_Q*sizeof(double));
         theCells[k][i][j].gradp = malloc(NUM_Q*sizeof(double));
+        ++Ncells;
       }
     }
   }
-
-
 
   //  initialize
   srand(666+mpisetup_MyProc(theMPIsetup));

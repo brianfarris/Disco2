@@ -1,19 +1,29 @@
 #define GRID_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "../Headers/Grid.h"
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
 void grid_set_N_p(struct Grid * theGrid){
   int i;
-  for(i = 0; i < grid_N_r(theGrid); i++){
-    theGrid->N_p[i] = 1024;
+  if (theGrid->NP_CONST>0){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
+      theGrid->N_p[i]=theGrid->NP_CONST;
+    }
+  }else{
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
+      double r = grid_r_faces(theGrid,i);
+      double dr = grid_r_faces(theGrid,i)-grid_r_faces(theGrid,i-1);
+      theGrid->N_p[i] = (int)( 2.*M_PI*( 1. + (r/dr-1.)/theGrid->aspect ) ) ;
+    }
   }
+
 }
 
 void grid_set_rz(struct Grid * theGrid,struct MPIsetup * theMPIsetup){
- 
+
   int N_r_0 = theGrid->N_r_noghost*mpisetup_dim_MyProc(theMPIsetup,0);
   int N_z_0 = theGrid->N_z_noghost*mpisetup_dim_MyProc(theMPIsetup,1);
 
@@ -36,7 +46,7 @@ void grid_set_Ncells_and_offset(struct Grid *theGrid,struct MPIsetup * theMPIset
   int Ncells=0;
   int Ncells_global;
 
-  for (i=0;i<theGrid->N_r_noghost;++i){
+  for (i=theGrid->Nghost_rmin;i<theGrid->N_r_noghost+theGrid->Nghost_rmin;++i){
     Ncells += theGrid->N_p[i]*theGrid->N_z_noghost;
   }
 

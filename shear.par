@@ -11,6 +11,8 @@ R_Min			0.25
 R_Max			1.75
 Z_Min			-1.0
 Z_Max			1.0
+NP_CONST                -1
+aspect                  1.0
 
 NUM_Q                   5
 Time_Max                0.1

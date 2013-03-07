@@ -53,7 +53,6 @@
 
 int main(int argc, char **argv) {
   char* inputfilename = argv[1];
-
   // start MPI 
   struct MPIsetup * theMPIsetup = mpisetup_create(argc,argv);
   mpisetup_setprocs(theMPIsetup,inputfilename);
@@ -64,8 +63,8 @@ int main(int argc, char **argv) {
   struct Grid * theGrid = grid_create(theMPIsetup);
   grid_read_par_file(theGrid,theMPIsetup,inputfilename);
   grid_alloc_arr(theGrid,theMPIsetup); 
-  grid_set_N_p(theGrid);
   grid_set_rz(theGrid,theMPIsetup);
+  grid_set_N_p(theGrid);
   grid_set_Ncells_and_offset(theGrid,theMPIsetup);
 
   // gravMass

@@ -112,6 +112,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   if (grid_N_z_global(theGrid)>1){
     cell_syncproc_z(theCells,theGrid,theMPIsetup);
   }
+  
   cell_calc_cons( theCells,theGrid );
 
 }
