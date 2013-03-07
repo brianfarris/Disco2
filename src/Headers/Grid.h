@@ -1,6 +1,7 @@
 #ifndef GRID_H
 #define GRID_H
 struct Grid;
+struct Cell;
 struct MPIsetup;
 
 #ifdef GRID_PRIVATE_DEFS
@@ -18,6 +19,9 @@ struct Grid {
   int Ncells_global;
   int offset;
   //fixed parameters
+  int InitialDataType;
+  int BoundTypeR;
+  int BoundTypeZ;
   int Restart;
   int N_r_global;
   int N_z_global;
@@ -31,7 +35,6 @@ struct Grid {
   double ZMIN;
   double ZMAX;
   int NUM_Q;
-  int Z_PERIODIC;
   int MOVE_CELLS;   
   int NumGravMass;
   double GAMMALAW;
@@ -50,6 +53,8 @@ struct Grid {
   double CS_CAP;
   double VEL_CAP;
   int runtype;
+  void (*single_init_ptr)(struct Cell ***,struct Grid *,int,int,int);
+  void (*init_ptr)(struct Cell ***,struct Grid *);
 };
 #endif
 
@@ -64,6 +69,8 @@ double grid_z_faces(struct Grid *,int);
 int grid_N_r(struct Grid *);
 int grid_N_z(struct Grid *);
 int grid_Restart(struct Grid *);
+int grid_BoundTypeR(struct Grid *);
+int grid_BoundTypeZ(struct Grid *);
 int grid_N_z_global(struct Grid *);
 int grid_Ncells(struct Grid *);
 int grid_Ncells_global(struct Grid *);
@@ -94,11 +101,17 @@ int grid_NUM_Q(struct Grid *);
 double grid_get_T_MAX(struct Grid * );
 double grid_NUM_CHECKPOINTS(struct Grid * );
 int grid_runtype(struct Grid * );
+int grid_InitialDataType(struct Grid * );
+//void (*init_ptr)/*(struct Cell ***,struct Grid *)*/ grid_init_ptr(struct Grid * );
+//void (*single_init_ptr)/*(struct Cell ***,struct Grid *,int,int,int)*/ grid_single_init_ptr(struct Grid * );
+//void (*grid_init_ptr(struct Grid * ));
+//void (*grid_single_init_ptr(struct Grid * ));
+
 
 
 //set grid data
 int grid_read_par_file(struct Grid * ,struct MPIsetup *, char * );
 void grid_set_N_p(struct Grid *);
 void grid_set_rz(struct Grid *,struct MPIsetup *);
-void grid_set_Ncells_and_offset(struct Grid *,struct MPIsetup *);
+void grid_set_misc(struct Grid *,struct MPIsetup *);
 #endif

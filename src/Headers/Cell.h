@@ -29,6 +29,8 @@ void cell_init_flock(struct Cell ***,struct Grid *);
 void cell_single_init_flock(struct Cell ***, struct Grid *,int ,int ,int );
 void cell_init_shear(struct Cell ***,struct Grid *);
 void cell_single_init_shear(struct Cell ***, struct Grid *,int ,int ,int );
+void (*cell_init_ptr(struct Grid * ))(struct Cell *** , struct Grid * );
+void (*cell_single_init_ptr(struct Grid * ))(struct Cell *** , struct Grid *,int,int,int );
 ///retrieve data
 double *cell_prims(struct Cell *);
 double *cell_grad(struct Cell *);
@@ -64,7 +66,8 @@ void cell_plm_p( struct Cell *** ,struct Grid * );
 //boundary conditions
 void cell_boundary_outflow_r( struct Cell *** , struct Face * ,struct Grid * ,struct MPIsetup *, int * );
 void cell_boundary_outflow_z( struct Cell *** , struct Face * , struct Grid * ,struct MPIsetup *,int * );
-void cell_boundary_fixed_r( struct Cell ***, struct Grid *,struct MPIsetup *);
+void cell_boundary_fixed_r( struct Cell ***, struct Grid *,struct MPIsetup *,void (*)(struct Cell ***,struct Grid *,int,int,int));
+void cell_boundary_fixed_z( struct Cell ***, struct Grid *,struct MPIsetup *,void (*)(struct Cell ***,struct Grid *,int,int,int));
 //primitive-conservative conversion routines
 void cell_calc_prim( struct Cell ***,struct Grid *);
 void cell_prim2cons( double * , double * , double , double ,double,int );

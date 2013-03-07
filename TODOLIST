@@ -1,6 +1,4 @@
-fix Gprim in visc_flux
-get 2D working. Results are bad with multiple procs. Check viscous flux terms first.
-do a 2d viscous test and a 2d binary test
+make it so that we can choose boundary conditions and initial data in par file
 make it so that we can restart from checkpoint without a par file
 check that checkpoint restart agrees to machine precision
 make it so that we can run on any number of procs

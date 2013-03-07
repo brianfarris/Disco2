@@ -273,8 +273,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Grid * theGrid, double
   int q;
   for (q=0;q<NUM_Q;++q){
     AvgPrim[q] = .5*(theRiemann->primL[q]+theRiemann->primR[q]);
-    // Gprim[q] = .5*((theRiemann->cL)->grad[q]+(theRiemann->cR)->grad[q]);
-    if (fabs(n[1]-1.)<0.00001){
+    if (fabs(n[1]-1.)<0.00001){ //is there a better way to check if n[1]==1?
       Gprim[q] = .5*(cell_gradp(theRiemann->cL)[q]+cell_gradp(theRiemann->cR)[q]);    
     } else{
       Gprim[q] = .5*(cell_grad(theRiemann->cL)[q]+cell_grad(theRiemann->cR)[q]);

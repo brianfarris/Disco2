@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Grid.h"
+#include "../Headers/Cell.h"
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
@@ -40,9 +41,10 @@ void grid_set_rz(struct Grid * theGrid,struct MPIsetup * theMPIsetup){
   } 
 }
 
-void grid_set_Ncells_and_offset(struct Grid *theGrid,struct MPIsetup * theMPIsetup) {
+void grid_set_misc(struct Grid *theGrid,struct MPIsetup * theMPIsetup) {
   int i,j,k,q;
 
+  // Stuff that involves counting cells  
   int Ncells=0;
   int Ncells_global;
 
@@ -64,7 +66,11 @@ void grid_set_Ncells_and_offset(struct Grid *theGrid,struct MPIsetup * theMPIset
   theGrid->Ncells = Ncells;
   theGrid->Ncells_global = Ncells_global;
   theGrid->offset = offset;
-}
+
+  // For now, we will always say that there are two masses, and we will set masses to 0 when we need to
+  theGrid->NumGravMass = 2;
+
+
 
 
 

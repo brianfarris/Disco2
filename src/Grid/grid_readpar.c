@@ -53,6 +53,9 @@ int grid_read_par_file(struct Grid * theGrid, struct MPIsetup * theMPIsetup, cha
   for( nrank=0 ; nrank<mpisetup_NumProcs(theMPIsetup) ; ++nrank ){
     if( mpisetup_MyProc(theMPIsetup)==nrank ){
       err += readvar( pfile , "Restart"              , VAR_INT  , &(theGrid->Restart)  );
+      err += readvar( pfile , "InitialDataType"      , VAR_INT  , &(theGrid->InitialDataType)  );
+      err += readvar( pfile , "BoundTypeR"         , VAR_INT  , &(theGrid->BoundTypeR)  );
+      err += readvar( pfile , "BoundTypeZ"         , VAR_INT  , &(theGrid->BoundTypeZ)  );
       err += readvar( pfile , "NumR"              , VAR_INT  , &(theGrid->N_r_global) );
       err += readvar( pfile , "NumZ"              , VAR_INT  , &(theGrid->N_z_global  ));
       err += readvar( pfile , "ng"              , VAR_INT  , &(theGrid->ng));
@@ -65,7 +68,6 @@ int grid_read_par_file(struct Grid * theGrid, struct MPIsetup * theMPIsetup, cha
       err += readvar( pfile , "NUM_Q"              , VAR_INT  , &(theGrid->NUM_Q) );
       err += readvar( pfile , "Time_Max"       , VAR_DOUB , &(theGrid->T_MAX)  );
       err += readvar( pfile , "Num_Checkpoints"   , VAR_INT  , &(theGrid->NUM_CHECKPOINTS)  );
-      err += readvar( pfile , "Z_Periodic"        , VAR_INT  , &(theGrid->Z_PERIODIC)  );
       err += readvar( pfile , "Move_Cells"        , VAR_INT  , &(theGrid->MOVE_CELLS)  );
       //     err += readvar( pfile , "NumGravMass"        , VAR_INT  , &(theGrid->NumGravMass)  );
       err += readvar( pfile , "Adiabatic_Index"   , VAR_DOUB , &(theGrid->GAMMALAW)  );
@@ -95,7 +97,6 @@ int grid_read_par_file(struct Grid * theGrid, struct MPIsetup * theMPIsetup, cha
       //err += readvar( pfile , "Np_Const"          , VAR_INT  , &(theGrid->NP_CONST)           );
       //err += readvar( pfile , "Cell_Aspect_Ratio" , VAR_DOUB , &(theGrid->CELL_ASPECT_RATIO)  );
       //err += readvar( pfile , "Logarithmic_Zoning", VAR_DOUB , &(theGrid->LOG_ZONING)  );
-      theGrid->NumGravMass = 2;
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }

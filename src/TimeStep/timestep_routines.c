@@ -97,10 +97,20 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_calc_prim( theCells ,theGrid);
 
   //Boundary Data
-  //cell_boundary_outflow_r( theCells , theFaces_r ,theGrid, nri );
   //if( N_z_global > 1 ) cell_boundary_z( theCells , theFaces_z ,theGrid, nzk );
-  //cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
-  cell_boundary_outflow_r( theCells , theFaces_r ,theGrid,theMPIsetup, theTimeStep->nri );
+  if (grid_BoundTypeR(theGrid)==BOUND_OUTFLOW){
+    cell_boundary_outflow_r( theCells , theFaces_r ,theGrid,theMPIsetup, theTimeStep->nri );
+  }else if (grid_BoundTypeR(theGrid)==BOUND_FIXED){
+    cell_boundary_fixed_r(theCells,theGrid,theMPIsetup,(*cell_single_init_ptr(theGrid)));    
+  }
+  if (grid_BoundTypeZ(theGrid)==BOUND_OUTFLOW){
+    cell_boundary_outflow_z( theCells , theFaces_r ,theGrid,theMPIsetup, theTimeStep->nzk );
+  }else if (grid_BoundTypeZ(theGrid)==BOUND_FIXED){
+    cell_boundary_fixed_z(theCells,theGrid,theMPIsetup,(*cell_single_init_ptr(theGrid)));    
+  } else if (grid_BoundTypeZ(theGrid)==BOUND_PERIODIC){
+    //do nothing, this is already handled by the syncing routine
+  }
+   
 
   face_destroy(theFaces_r);
   if (grid_N_z_global(theGrid)>1){

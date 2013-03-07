@@ -51,6 +51,7 @@
 #include "Headers/TimeStep.h"
 #include "Headers/header.h"
 
+
 int main(int argc, char **argv) {
   char* inputfilename = argv[1];
   // start MPI 
@@ -65,7 +66,7 @@ int main(int argc, char **argv) {
   grid_alloc_arr(theGrid,theMPIsetup); 
   grid_set_rz(theGrid,theMPIsetup);
   grid_set_N_p(theGrid);
-  grid_set_Ncells_and_offset(theGrid,theMPIsetup);
+  grid_set_misc(theGrid,theMPIsetup);
 
   // gravMass
   struct GravMass *theGravMasses = gravMass_create(grid_NumGravMass(theGrid));
@@ -89,10 +90,10 @@ int main(int argc, char **argv) {
     io_hdf5_in(theIO,theGrid,checkpoint_filename);
     io_unflattened_prim(theIO,theCells,theGrid);
   }else{
-    cell_init_shear(theCells,theGrid);
+    (*cell_init_ptr(theGrid))(theCells,theGrid);
   }
 
-  cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
+  //cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid,theMPIsetup);

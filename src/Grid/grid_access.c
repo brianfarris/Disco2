@@ -20,6 +20,12 @@ int grid_N_r(struct Grid *theGrid){
 int grid_N_z(struct Grid *theGrid){
   return(theGrid->N_z_noghost+theGrid->Nghost_zmin+theGrid->Nghost_zmax);
 }
+int grid_BoundTypeR(struct Grid *theGrid){
+  return(theGrid->BoundTypeR);
+}
+int grid_BoundTypeZ(struct Grid *theGrid){
+  return(theGrid->BoundTypeZ);
+}
 int grid_Ncells(struct Grid *theGrid){
   return(theGrid->Ncells);
 }
@@ -113,6 +119,7 @@ double grid_NUM_CHECKPOINTS(struct Grid * theGrid){
 int grid_runtype(struct Grid * theGrid){
   return(theGrid->runtype);
 }
-
-
+int grid_InitialDataType(struct Grid * theGrid){
+  return(theGrid->InitialDataType);
+}
 

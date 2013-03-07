@@ -154,14 +154,14 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
 
 }
 
-void cell_boundary_fixed_r( struct Cell *** theCells, struct Grid *theGrid,struct MPIsetup * theMPIsetup ){
+void cell_boundary_fixed_r( struct Cell *** theCells, struct Grid *theGrid,struct MPIsetup * theMPIsetup, 
+    void (*cell_single_init_ptr)(struct Cell ***,struct Grid *,int,int,int) ){
   int i,j,k;
-
   if(mpisetup_check_rin_bndry(theMPIsetup)){
     for( i=0 ; i<grid_Nghost_rmin(theGrid) ; ++i ){
       for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
         for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-          cell_single_init_shear(theCells,theGrid,i,j,k);
+          (*cell_single_init_ptr)(theCells,theGrid,i,j,k);
         }
       }
     }
@@ -171,7 +171,32 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Grid *theGrid,struc
     for( i=grid_N_r(theGrid)-1 ; i>grid_N_r(theGrid)-grid_Nghost_rmax(theGrid)-1 ; --i ){
       for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
         for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-          cell_single_init_shear(theCells,theGrid,i,j,k);
+          (*cell_single_init_ptr)(theCells,theGrid,i,j,k);
+        }
+      }
+    }
+  }
+
+}
+
+void cell_boundary_fixed_z( struct Cell *** theCells, struct Grid *theGrid,struct MPIsetup * theMPIsetup,
+    void (*cell_single_init_ptr)(struct Cell ***,struct Grid *,int,int,int)  ){
+  int i,j,k;
+  if(mpisetup_check_zbot_bndry(theMPIsetup)){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
+      for( k=0 ; k<grid_Nghost_zmin(theGrid) ; ++k ){
+        for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+          (*cell_single_init_ptr)(theCells,theGrid,i,j,k);
+        }
+      }
+    }
+  }
+
+  if( mpisetup_check_ztop_bndry(theMPIsetup) ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
+      for( k=grid_N_z(theGrid)-1 ; k>grid_N_z(theGrid)-grid_Nghost_zmax(theGrid)-1 ; --k ){
+        for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+          (*cell_single_init_ptr)(theCells,theGrid,i,j,k);
         }
       }
     }
