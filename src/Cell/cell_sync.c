@@ -10,8 +10,6 @@
 #include "../Headers/header.h"
 
 void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPIsetup * theMPIsetup){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
 
   int i,j,k,q;
@@ -22,8 +20,8 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   double *buffer_r_out_recv;
 
   int count=0;
-  for (k=0;k<N_z_withghost;++k){
-    for (i= N_r_withghost-2*grid_ng(theGrid);i< N_r_withghost-grid_ng(theGrid);++i){
+  for (k=0;k<grid_N_z(theGrid);++k){
+    for (i= grid_N_r(theGrid)-2*grid_ng(theGrid);i< grid_N_r(theGrid)-grid_ng(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         buffersize_r_out_send++;
       }
@@ -31,8 +29,8 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   }
   buffersize_r_out_send *= (2*NUM_Q+1);
 
-  for (k=0;k<N_z_withghost;++k){
-    for (i= N_r_withghost-grid_ng(theGrid);i< N_r_withghost;++i){
+  for (k=0;k<grid_N_z(theGrid);++k){
+    for (i= grid_N_r(theGrid)-grid_ng(theGrid);i< grid_N_r(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         buffersize_r_out_recv++;
       }
@@ -44,8 +42,8 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   buffer_r_out_recv = malloc(sizeof(double)*buffersize_r_out_recv);
   
   count=0;
-  for (k=0;k<N_z_withghost;++k){
-    for (i= N_r_withghost-2*grid_ng(theGrid);i< N_r_withghost-grid_ng(theGrid);++i){
+  for (k=0;k<grid_N_z(theGrid);++k){
+    for (i= grid_N_r(theGrid)-2*grid_ng(theGrid);i< grid_N_r(theGrid)-grid_ng(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         for (q=0;q<NUM_Q;++q){
           buffer_r_out_send[count] = theCells[k][i][j].prim[q];
@@ -66,7 +64,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   double *buffer_r_in_send;
   double *buffer_r_in_recv;
 
-  for (k=0;k<N_z_withghost;++k){
+  for (k=0;k<grid_N_z(theGrid);++k){
     for (i= grid_ng(theGrid);i< 2*grid_ng(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         buffersize_r_in_send++;
@@ -74,7 +72,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
     }
   }
   buffersize_r_in_send *= (2*NUM_Q+1);
-  for (k=0;k<N_z_withghost;++k){
+  for (k=0;k<grid_N_z(theGrid);++k){
     for (i=0;i<grid_ng(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         buffersize_r_in_recv++;
@@ -86,7 +84,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   buffer_r_in_send = malloc(sizeof(double)*buffersize_r_in_send);
   buffer_r_in_recv = malloc(sizeof(double)*buffersize_r_in_recv);
   count=0;
-  for (k=0;k<N_z_withghost;++k){
+  for (k=0;k<grid_N_z(theGrid);++k){
     for (i= grid_ng(theGrid);i< 2*grid_ng(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         for (q=0;q<NUM_Q;++q){
@@ -108,11 +106,10 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   MPI_Sendrecv(buffer_r_out_send,buffersize_r_out_send,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[0],13,buffer_r_in_recv,buffersize_r_in_recv,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[0],13,grid_comm,&status);
 
 
-  //if (dim_MyProc[0]!=(dim_NumProcs[0]-1)){
   if (!mpisetup_check_rout_bndry(theMPIsetup)){
     count=0;
-    for (k=0;k<N_z_withghost;++k){
-      for (i= N_r_withghost-grid_Nghost_rmax(theGrid);i< N_r_withghost;++i){
+    for (k=0;k<grid_N_z(theGrid);++k){
+      for (i= grid_N_r(theGrid)-grid_Nghost_rmax(theGrid);i< grid_N_r(theGrid);++i){
         for(j = 0; j < grid_N_p(theGrid,i); j++){
           for (q=0;q<NUM_Q;++q){
             theCells[k][i][j].prim[q] = buffer_r_out_recv[count];
@@ -131,7 +128,7 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
 
   if (!mpisetup_check_rin_bndry(theMPIsetup)){
     count=0;
-    for (k=0;k<N_z_withghost;++k){
+    for (k=0;k<grid_N_z(theGrid);++k){
       for (i=0;i<grid_Nghost_rmin(theGrid);++i){
         for(j = 0; j < grid_N_p(theGrid,i); j++){
           for (q=0;q<NUM_Q;++q){
@@ -156,8 +153,6 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
 
 
 void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid,struct MPIsetup * theMPIsetup){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
 
   int i,j,k,q;
@@ -168,8 +163,8 @@ void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   double *buffer_z_top_recv;
 
   int count=0;
-  for (k= N_z_withghost-2*grid_Nghost_zmax(theGrid);k< N_z_withghost-grid_Nghost_zmax(theGrid);++k){
-    for (i=0;i<N_r_withghost;++i){
+  for (k= grid_N_z(theGrid)-2*grid_Nghost_zmax(theGrid);k< grid_N_z(theGrid)-grid_Nghost_zmax(theGrid);++k){
+    for (i=0;i<grid_N_r(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         buffersize_z_top_send++;
       }
@@ -177,8 +172,8 @@ void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   }
   buffersize_z_top_send *= (2*NUM_Q+1);
 
-  for (k= N_z_withghost-grid_Nghost_zmax(theGrid);k< N_z_withghost;++k){
-    for (i=0;i<N_r_withghost;++i){
+  for (k= grid_N_z(theGrid)-grid_Nghost_zmax(theGrid);k< grid_N_z(theGrid);++k){
+    for (i=0;i<grid_N_r(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         buffersize_z_top_recv++;
       }
@@ -189,8 +184,8 @@ void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   buffer_z_top_send = malloc(sizeof(double)*buffersize_z_top_send);
   buffer_z_top_recv = malloc(sizeof(double)*buffersize_z_top_recv);
   count=0;
-  for (k= N_z_withghost-2*grid_Nghost_zmax(theGrid);k< N_z_withghost-grid_Nghost_zmax(theGrid);++k){
-    for (i=0;i<N_r_withghost;++i){
+  for (k= grid_N_z(theGrid)-2*grid_Nghost_zmax(theGrid);k< grid_N_z(theGrid)-grid_Nghost_zmax(theGrid);++k){
+    for (i=0;i<grid_N_r(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         for (q=0;q<NUM_Q;++q){
           buffer_z_top_send[count] = theCells[k][i][j].prim[q];
@@ -212,7 +207,7 @@ void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   double *buffer_z_bot_recv;
 
   for (k= grid_Nghost_zmin(theGrid);k< 2*grid_Nghost_zmin(theGrid);++k){
-    for (i=0;i<N_r_withghost;++i){
+    for (i=0;i<grid_N_r(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         buffersize_z_bot_send++;
       }
@@ -220,7 +215,7 @@ void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   }
   buffersize_z_bot_send *= (2*NUM_Q+1);
   for (k=0;k<grid_Nghost_zmin(theGrid);++k){
-    for (i=0;i<N_r_withghost;++i){
+    for (i=0;i<grid_N_r(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         buffersize_z_bot_recv++;
       }
@@ -232,7 +227,7 @@ void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   buffer_z_bot_recv = malloc(sizeof(double)*buffersize_z_bot_recv);
   count=0;
   for (k= grid_Nghost_zmin(theGrid);k< 2*grid_Nghost_zmin(theGrid);++k){
-    for (i=0;i<N_r_withghost;++i){
+    for (i=0;i<grid_N_r(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         for (q=0;q<NUM_Q;++q){
           buffer_z_bot_send[count] = theCells[k][i][j].prim[q];
@@ -253,8 +248,8 @@ void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid,struct MPI
   MPI_Sendrecv(buffer_z_top_send,buffersize_z_top_send,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[1],15,buffer_z_bot_recv,buffersize_z_bot_recv,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[1],15,grid_comm,&status);
 
   count=0;
-  for (k= N_z_withghost-grid_Nghost_zmax(theGrid);k< N_z_withghost;++k){
-    for (i=0;i<N_r_withghost;++i){
+  for (k= grid_N_z(theGrid)-grid_Nghost_zmax(theGrid);k< grid_N_z(theGrid);++k){
+    for (i=0;i<grid_N_r(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         for (q=0;q<NUM_Q;++q){
           theCells[k][i][j].prim[q] = buffer_z_top_recv[count];
@@ -272,7 +267,7 @@ void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid,struct MPI
 
   count=0;
   for (k=0;k<grid_Nghost_zmin(theGrid);++k){
-    for (i=0;i<N_r_withghost;++i){
+    for (i=0;i<grid_N_r(theGrid);++i){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         for (q=0;q<NUM_Q;++q){
           theCells[k][i][j].prim[q] = buffer_z_bot_recv[count];

@@ -44,15 +44,13 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Grid * theGrid, int 
 }
 
 void cell_add_src( struct Cell *** theCells ,struct Grid * theGrid, struct GravMass * theGravMasses , double dt ){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int GRAV2D=grid_GRAV2D(theGrid);
   int POWELL=grid_POWELL(theGrid);
   int i,j,k;
-  for( k=0 ; k<N_z_withghost ; ++k ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
     double zm = grid_z_faces(theGrid,k-1);
     double zp = grid_z_faces(theGrid,k);
-    for( i=0 ; i<N_r_withghost ; ++i ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       double rm = grid_r_faces(theGrid,i-1);
       double rp = grid_r_faces(theGrid,i);
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
@@ -129,15 +127,13 @@ void cell_add_src( struct Cell *** theCells ,struct Grid * theGrid, struct GravM
 }
 
 void cell_add_visc_src( struct Cell *** theCells ,struct Grid * theGrid, double dt ){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int INCLUDE_VISCOSITY=grid_INCLUDE_VISCOSITY(theGrid);
   double EXPLICIT_VISCOSITY=grid_EXPLICIT_VISCOSITY(theGrid);
   int i,j,k;
-  for( k=0 ; k<N_z_withghost ; ++k ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
     double zm = grid_z_faces(theGrid,k-1);
     double zp = grid_z_faces(theGrid,k);
-    for( i=0 ; i<N_r_withghost ; ++i ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       double rm = grid_r_faces(theGrid,i-1);
       double rp = grid_r_faces(theGrid,i);
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){

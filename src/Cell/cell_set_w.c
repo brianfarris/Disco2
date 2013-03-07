@@ -11,11 +11,9 @@
 
 
 void cell_set_wcell(struct Cell ***theCells,struct Grid *theGrid){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int i,j,k;
-  for( k=0 ; k<N_z_withghost ; ++k ){
-    for( i=0 ; i<N_r_withghost ; ++i ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       double rp = grid_r_faces(theGrid,i);
       double rm = grid_r_faces(theGrid,i-1);
       double r = 0.5*(rm+rp);
@@ -30,11 +28,9 @@ void cell_set_wcell(struct Cell ***theCells,struct Grid *theGrid){
 }
 
 void cell_set_wrigid(struct Cell ***theCells,struct Grid *theGrid){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int i,j,k;
-  for( k=0 ; k<N_z_withghost ; ++k ){
-    for( i=0 ; i<N_r_withghost ; ++i ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       double w=0.0;
       double rp = grid_r_faces(theGrid,i);
       double rm = grid_r_faces(theGrid,i-1);
@@ -48,7 +44,6 @@ void cell_set_wrigid(struct Cell ***theCells,struct Grid *theGrid){
       }
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         theCells[k][i][j].wiph = w/Mring;       
-        //printf("theCells[%d][%d][%d].wiph: %e\n",k,i,j,theCells[k][i][j].wiph);
       }
     }
   }

@@ -13,12 +13,10 @@
 
 void io_flattened_prim(struct IO *io_pointer,struct Cell ***theCells,struct Grid *theGrid){
   int NUM_Q = grid_NUM_Q(theGrid);
-  int N_r = grid_N_r(theGrid);
-  int N_z = grid_N_z(theGrid);
   int i,j,k,q;
   int index=0;
-  for (k=grid_Nghost_zmin(theGrid); k<(grid_Nghost_zmin(theGrid)+N_z); k++) {
-    for (i=grid_Nghost_rmin(theGrid); i<(grid_Nghost_rmin(theGrid)+N_r);i++){
+  for (k=grid_Nghost_zmin(theGrid); k<(grid_N_z(theGrid)-grid_Nghost_zmax(theGrid)); k++) {
+    for (i=grid_Nghost_rmin(theGrid); i<(grid_N_r(theGrid)-grid_Nghost_rmax(theGrid));i++){
       for (j=0; j<grid_N_p(theGrid,i);j++){
            io_pointer->primitives[index][0] = cell_tiph(cell_single(theCells,i,j,k));
           io_pointer->primitives[index][1] = 0.5*(grid_r_faces(theGrid,i-1)+grid_r_faces(theGrid,i));
@@ -34,12 +32,10 @@ void io_flattened_prim(struct IO *io_pointer,struct Cell ***theCells,struct Grid
 
 void io_unflattened_prim(struct IO *io_pointer,struct Cell ***theCells,struct Grid *theGrid){
   int NUM_Q = grid_NUM_Q(theGrid);
-  int N_r = grid_N_r(theGrid);
-  int N_z = grid_N_z(theGrid);
   int i,j,k,q;
   int index=0;
-  for (k=grid_Nghost_zmin(theGrid); k<(grid_Nghost_zmin(theGrid)+N_z); k++) {
-    for (i=grid_Nghost_rmin(theGrid); i<(grid_Nghost_rmin(theGrid)+N_r);i++){
+  for (k=grid_Nghost_zmin(theGrid); k<(grid_N_z(theGrid)-grid_Nghost_zmax(theGrid)); k++) {
+    for (i=grid_Nghost_rmin(theGrid); i<(grid_N_r(theGrid)-grid_Nghost_rmax(theGrid));i++){
       for (j=0; j<grid_N_p(theGrid,i);j++){
         cell_set_tiph(theCells,i,j,k,io_pointer->primitives[index][0]);
         for (q=0;q<NUM_Q;q++){

@@ -10,13 +10,11 @@
 
 
 void cell_clean_pi(struct Cell *** theCells,struct Grid *theGrid){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
 
   int i,j,k;
-  for( k=0 ; k<N_z_withghost ; ++k ){
-    for( i=0 ; i<N_r_withghost ; ++i ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         double phi = theCells[k][i][j].tiph;
         while( phi > 2.*M_PI ) phi -= 2.*M_PI;
@@ -28,12 +26,10 @@ void cell_clean_pi(struct Cell *** theCells,struct Grid *theGrid){
 }
 
 void cell_copy(struct Cell ***theCells,struct Grid * theGrid){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
   int i,j,k,q;
-  for( k=0 ; k<N_z_withghost ; ++k ){
-    for( i=0 ; i<N_r_withghost ; ++i ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         for (q=0;q<NUM_Q;++q){
           theCells[k][i][j].RKcons[q] = theCells[k][i][j].cons[q];
@@ -45,13 +41,11 @@ void cell_copy(struct Cell ***theCells,struct Grid * theGrid){
 }
 
 void cell_adjust_RK_cons( struct Cell *** theCells , struct Grid * theGrid, double RK ){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
 
   int i,j,k,q;
-  for( k=0 ; k<N_z_withghost ; ++k ){
-    for( i=0 ; i<N_r_withghost ; ++i ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         for( q=0 ; q<NUM_Q ; ++q ){
@@ -63,12 +57,10 @@ void cell_adjust_RK_cons( struct Cell *** theCells , struct Grid * theGrid, doub
 }
 
 void cell_update_phi( struct Cell *** theCells , struct Grid * theGrid, double RK , double dt ){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
   int i,j,k;
-  for( k=0 ; k<N_z_withghost ; ++k ){
-    for( i=0 ; i<N_r_withghost ; ++i ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       double rm = grid_r_faces(theGrid,i-1);
       double rp = grid_r_faces(theGrid,i);
       double r = .5*(rm+rp);
@@ -85,12 +77,10 @@ void cell_update_phi( struct Cell *** theCells , struct Grid * theGrid, double R
 }
 
 void cell_update_dphi( struct Cell *** theCells,struct Grid * theGrid ){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
   int i,j,k;
-  for( k=0 ; k<N_z_withghost ; ++k ){
-    for( i=0 ; i<N_r_withghost ; ++i ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         int jm = j-1;
         if( jm==-1 ) jm = grid_N_p(theGrid,i)-1;
@@ -103,19 +93,3 @@ void cell_update_dphi( struct Cell *** theCells,struct Grid * theGrid ){
   }
 }
 
-void cell_print_cons(struct Cell *** theCells,struct Grid * theGrid, int number){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
-  int i;
-  for (i=grid_Nghost_rmin(theGrid);i<(grid_N_r(theGrid)+grid_Nghost_rmin(theGrid));++i){
-    printf("%d,r: %e, SRR:  %16.12e, LLL:  %16.12e, TAU:  %16.12e\n",number,grid_r_faces(theGrid,i),theCells[2][i][0].cons[SRR],theCells[2][i][0].cons[LLL],theCells[2][i][0].cons[TAU]);
-  }
-}
-void cell_print_prim(struct Cell *** theCells,struct Grid * theGrid,int number){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
-  int i;
-  for (i=0;i<N_r_withghost;++i){
-    printf("%d, up:  %e\n",number,theCells[2][i][0].prim[UPP]);
-  }
-}

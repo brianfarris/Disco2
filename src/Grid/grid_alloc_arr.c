@@ -8,8 +8,8 @@
 
 void grid_alloc_arr(struct Grid * theGrid, struct MPIsetup * theMPIsetup) {
 
-  int N_r = theGrid->N_r_global/mpisetup_dim_NumProcs(theMPIsetup)[0];
-  int N_z = theGrid->N_z_global/mpisetup_dim_NumProcs(theMPIsetup)[1];
+  int N_r_noghost = theGrid->N_r_global/mpisetup_dim_NumProcs(theMPIsetup)[0];
+  int N_z_noghost = theGrid->N_z_global/mpisetup_dim_NumProcs(theMPIsetup)[1];
 
   printf("mpisetup_dim_MyProc(theMPIsetup,0): %d\n",mpisetup_dim_MyProc(theMPIsetup,0));
   int Nghost_rmin;
@@ -22,11 +22,12 @@ void grid_alloc_arr(struct Grid * theGrid, struct MPIsetup * theMPIsetup) {
   int Nghost_zmin = theGrid->ng;
   int Nghost_zmax = theGrid->ng;
 
-  int N_r_withghost = N_r+Nghost_rmin+Nghost_rmax;
-  int N_z_withghost = N_z+Nghost_zmin+Nghost_zmax;
+  int N_r_withghost = N_r_noghost+Nghost_rmin+Nghost_rmax;
+  int N_z_withghost = N_z_noghost+Nghost_zmin+Nghost_zmax;
 
-  theGrid->N_z = N_z;
-  theGrid->N_r = N_r;
+  theGrid->N_z_noghost = N_z_noghost;
+  theGrid->N_r_noghost = N_r_noghost;
+
 
   theGrid->Nghost_rmin = Nghost_rmin;
   theGrid->Nghost_rmax = Nghost_rmax;

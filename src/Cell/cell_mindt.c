@@ -35,17 +35,14 @@ double maxvel(double * prim , double w , double r ,struct Grid * theGrid){
 }
 
 double cell_mindt( struct Cell *** theCells, struct Grid * theGrid ){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
   double dt_m = 1.e100;//HUGE_VAL;
   int i,j,k;
-  for( k=0 ; k<N_z_withghost ; ++k ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
     double zm = grid_z_faces(theGrid,k-1);
     double zp = grid_z_faces(theGrid,k);
     double dz = zp-zm;
-    //exit(0);
-    for( i=0 ; i<N_r_withghost ; ++i ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       double rm = grid_r_faces(theGrid,i-1);
       double rp = grid_r_faces(theGrid,i);
       double dr = rp-rm;

@@ -137,10 +137,4 @@ void io_hdf5_in(struct IO *io_pointer,struct Grid * theGrid, char * input_filena
   H5Sclose(filespace);
   H5Sclose(memspace);
   H5Fclose(file);
-  int index;
-  if (1==0){
-    for (index=0;index<grid_N_r(theGrid);++index){
-      printf("io_pointer->primitives[index][0]: %f\n",io_pointer->primitives[index][0]);
-    }
-  }
 }

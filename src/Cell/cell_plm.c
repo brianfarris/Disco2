@@ -9,15 +9,13 @@
 #include "../Headers/header.h"
 
 void cell_plm_rz( struct Cell *** theCells ,struct Grid *theGrid, struct Face * theFaces , int Nf , int rz ){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
   double PLM = grid_PLM(theGrid);
 
   int i,j,k,q;
 
-  for( k=0 ; k<N_z_withghost ; ++k ){
-    for( i=0 ; i<N_r_withghost ; ++i ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         for( q=0 ; q<NUM_Q ; ++q ){
           theCells[k][i][j].grad[q] = 0.0;
@@ -51,11 +49,11 @@ void cell_plm_rz( struct Cell *** theCells ,struct Grid *theGrid, struct Face * 
       cR->grad[q] += S*dA; 
     }
   }
-  for( k=0 ; k<N_z_withghost ; ++k ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
     double zm = grid_z_faces(theGrid,k-1);
     double zp = grid_z_faces(theGrid,k);
     double dz = zp-zm;
-    for( i=0 ; i<N_r_withghost ; ++i ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       double rm = grid_r_faces(theGrid,i-1);
       double rp = grid_r_faces(theGrid,i);
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
@@ -105,8 +103,6 @@ void cell_plm_rz( struct Cell *** theCells ,struct Grid *theGrid, struct Face * 
 }
 
 void cell_plm_p( struct Cell *** theCells ,struct Grid * theGrid){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
   double PLM = grid_PLM(theGrid);
 
@@ -114,8 +110,8 @@ void cell_plm_p( struct Cell *** theCells ,struct Grid * theGrid){
   int Qmax = NUM_Q;
 
   int i,j,k,q;
-  for( k=0 ; k<N_z_withghost ; ++k ){
-    for( i=0 ; i<N_r_withghost ; ++i ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         struct Cell * cL;

@@ -21,7 +21,7 @@ struct MPIsetup {
 struct MPIsetup *mpisetup_create(int,char **);
 void mpisetup_destroy(struct MPIsetup *); 
 //set MPI info
-void mpisetup_setprocs(struct MPIsetup * );
+void mpisetup_setprocs(struct MPIsetup *,char * );
 void mpisetup_cart_create(struct MPIsetup * );
 void mpisetup_left_right(struct MPIsetup * );
 //check whether we are on a boundary proc

@@ -32,14 +32,3 @@ void cell_set_tiph(struct Cell ***theCells,int i,int j,int k,double value) {
   theCells[k][i][j].tiph = value;
 }
 
-/*
-void cell_printscreen(struct Cell ***theCells,struct Grid * theGrid){
-  int i;
-
-  for (i=0;i<(grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid)+grid_N_r(theGrid));++i){
-    double r = 0.5*(grid_r_faces(theGrid,i-1)+grid_r_faces(theGrid,i));
-    printf("MyProc: %d r: %e i: %d rho: %e theCells[5][i][5].prim[PPP]: %e theCells[5][i][5].prim[URR]: %e theCells[5][i][5].prim[UPP]: %e theCells[5][i][5].prim[UZZ]: %e\n",MyProc,r,i,theCells[5][i][5].prim[RHO],theCells[5][i][5].prim[PPP],theCells[5][i][5].prim[URR],theCells[5][i][5].prim[UPP],theCells[5][i][5].prim[UZZ]);
-  }
-
-}
-*/

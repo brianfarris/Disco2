@@ -11,12 +11,9 @@
 
 
 void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces ,struct Grid * theGrid,struct MPIsetup * theMPIsetup, int * nri ){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
-  int Nf = nri[N_r_withghost-1];
+  int Nf = nri[grid_N_r(theGrid)-1];
   int NUM_Q = grid_NUM_Q(theGrid);
-  //   int n0 = nri[1];
-  int n1 = nri[N_r_withghost-2];
+  int n1 = nri[grid_N_r(theGrid)-2];
 
   int n,q;
   int i,j,k;
@@ -40,7 +37,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         }
       }
 
-      for( k=0 ; k<N_z_withghost ; ++k ){
+      for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
         double zp = grid_z_faces(theGrid,k);
         double zm = grid_z_faces(theGrid,k-1);
         double dz = zp-zm;
@@ -69,18 +66,18 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         cR->prim[q] += cL->prim[q]*face_dA(f);
       }
     }
-    r = grid_r_faces(theGrid,N_r_withghost-2);
+    r = grid_r_faces(theGrid,grid_N_r(theGrid)-2);
 
-    for( k=0 ; k<N_z_withghost ; ++k ){
+    for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
       double zp = grid_z_faces(theGrid,k);
       double zm = grid_z_faces(theGrid,k-1);
       double dz = zp-zm;
-      for( j=0 ; j<grid_N_p(theGrid,N_r_withghost-1) ; ++j ){
-        double dA = dz*r*theCells[k][N_r_withghost-1][j].dphi;
+      for( j=0 ; j<grid_N_p(theGrid,grid_N_r(theGrid)-1) ; ++j ){
+        double dA = dz*r*theCells[k][grid_N_r(theGrid)-1][j].dphi;
         for( q=0 ; q<NUM_Q ; ++q ){
-          theCells[k][N_r_withghost-1][j].prim[q] /= dA;
+          theCells[k][grid_N_r(theGrid)-1][j].prim[q] /= dA;
         }
-        theCells[k][N_r_withghost-1][j].prim[URR] *= -1.;
+        theCells[k][grid_N_r(theGrid)-1][j].prim[URR] *= -1.;
       }
     }
 
@@ -89,14 +86,12 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
 }
 
 void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces, struct Grid * theGrid,struct MPIsetup * theMPIsetup,int * nzk ){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
 
   int j,i;
-  int Nf = nzk[N_z_withghost-1];
+  int Nf = nzk[grid_N_z(theGrid)-1];
   int n0 = nzk[1];
-  int n1 = nzk[N_z_withghost-2];
+  int n1 = nzk[grid_N_z(theGrid)-2];
 
   int n,q;
 
@@ -115,7 +110,7 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       }
     }
 
-    for( i=0 ; i<N_r_withghost ; ++i ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       double rp = grid_r_faces(theGrid,i);
       double rm = grid_r_faces(theGrid,i-1);
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
@@ -144,15 +139,15 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
     }
 
 
-    for( i=0 ; i<N_r_withghost ; ++i ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       double rp = grid_r_faces(theGrid,i);
       double rm = grid_r_faces(theGrid,i-1);
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-        double dA = .5*(rp*rp-rm*rm)*theCells[N_z_withghost-1][i][j].dphi;
+        double dA = .5*(rp*rp-rm*rm)*theCells[grid_N_z(theGrid)-1][i][j].dphi;
         for( q=0 ; q<NUM_Q ; ++q ){
-          theCells[N_z_withghost-1][i][j].prim[q] /= dA;
+          theCells[grid_N_z(theGrid)-1][i][j].prim[q] /= dA;
         }
-        theCells[N_z_withghost-1][i][j].prim[UZZ] *= -1.0;
+        theCells[grid_N_z(theGrid)-1][i][j].prim[UZZ] *= -1.0;
       }
     }
   }
@@ -160,14 +155,11 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
 }
 
 void cell_boundary_fixed_r( struct Cell *** theCells, struct Grid *theGrid,struct MPIsetup * theMPIsetup ){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
-
   int i,j,k;
 
   if(mpisetup_check_rin_bndry(theMPIsetup)){
     for( i=0 ; i<grid_Nghost_rmin(theGrid) ; ++i ){
-      for( k=0 ; k<N_z_withghost ; ++k ){
+      for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
         for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
           cell_single_init_shear(theCells,theGrid,i,j,k);
         }
@@ -176,8 +168,8 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Grid *theGrid,struc
   }
 
   if( mpisetup_check_rout_bndry(theMPIsetup) ){
-    for( i=N_r_withghost-1 ; i>N_r_withghost-grid_Nghost_rmax(theGrid)-1 ; --i ){
-      for( k=0 ; k<N_z_withghost ; ++k ){
+    for( i=grid_N_r(theGrid)-1 ; i>grid_N_r(theGrid)-grid_Nghost_rmax(theGrid)-1 ; --i ){
+      for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
         for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
           cell_single_init_shear(theCells,theGrid,i,j,k);
         }

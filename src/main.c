@@ -52,16 +52,17 @@
 #include "Headers/header.h"
 
 int main(int argc, char **argv) {
+  char* inputfilename = argv[1];
 
   // start MPI 
   struct MPIsetup * theMPIsetup = mpisetup_create(argc,argv);
-  mpisetup_setprocs(theMPIsetup);
+  mpisetup_setprocs(theMPIsetup,inputfilename);
   mpisetup_cart_create(theMPIsetup);
   mpisetup_left_right(theMPIsetup);
 
   //grid
   struct Grid * theGrid = grid_create(theMPIsetup);
-  grid_read_par_file(theGrid,theMPIsetup,"shear.par");
+  grid_read_par_file(theGrid,theMPIsetup,inputfilename);
   grid_alloc_arr(theGrid,theMPIsetup); 
   grid_set_N_p(theGrid);
   grid_set_rz(theGrid,theMPIsetup);
@@ -75,38 +76,18 @@ int main(int argc, char **argv) {
   // allocate memory for data 
   struct Cell ***theCells = cell_create(theGrid,theMPIsetup);
 
-  //printf("proc: %d, grid_r_faces(theGrid,1): %e\n",mpisetup_MyProc(theMPIsetup),grid_r_faces(theGrid,1));
-  //printf("proc: %d, grid_r_faces(theGrid,2): %e\n",mpisetup_MyProc(theMPIsetup),grid_r_faces(theGrid,2));
-  //printf("proc: %d, grid_r_faces(theGrid,3): %e\n",mpisetup_MyProc(theMPIsetup),grid_r_faces(theGrid,3));
-
-  //printf("1 proc: %d, cell_tiph(cell_single(theCells,1,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,1,0,2)));
-  //printf("1 proc: %d, cell_tiph(cell_single(theCells,2,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,2,0,2)));
-  //printf("1 proc: %d, cell_tiph(cell_single(theCells,3,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,3,0,2)));
-  
   cell_clean_pi(theCells,theGrid);
-  //printf("2 proc: %d, cell_tiph(cell_single(theCells,1,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,1,0,2)));
-  //printf("2 proc: %d, cell_tiph(cell_single(theCells,2,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,2,0,2)));
-  //printf("2 proc: %d, cell_tiph(cell_single(theCells,3,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,3,0,2)));
-   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid,theMPIsetup);
-  /*
-  printf("3 proc: %d, cell_tiph(cell_single(theCells,0,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,0,0,2)));
-  printf("3 proc: %d, cell_tiph(cell_single(theCells,1,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,1,0,2)));
-  printf("3 proc: %d, cell_tiph(cell_single(theCells,2,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,2,0,2)));
-  printf("3 proc: %d, cell_tiph(cell_single(theCells,3,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,3,0,2)));
-  printf("3 proc: %d, cell_tiph(cell_single(theCells,4,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,4,0,2)));
-  printf("3 proc: %d, cell_tiph(cell_single(theCells,5,0,2)): %e\n",mpisetup_MyProc(theMPIsetup),cell_tiph(cell_single(theCells,5,0,2)));
-*/
   if (grid_N_z_global(theGrid)>1){
     cell_syncproc_z(theCells,theGrid,theMPIsetup);
   }
   // set initial data 
   int restart=0;
   if (grid_Restart(theGrid)==1){
-    char input_filename[256];
-    sprintf(input_filename,"input.h5");
+    char checkpoint_filename[256];
+    sprintf(checkpoint_filename,"input.h5");
     struct IO *theIO = io_create(theGrid);
-    io_hdf5_in(theIO,theGrid,input_filename);
+    io_hdf5_in(theIO,theGrid,checkpoint_filename);
     io_unflattened_prim(theIO,theCells,theGrid);
   }else{
     cell_init_shear(theCells,theGrid);

@@ -10,34 +10,32 @@
 #include "../Headers/header.h"
 
 struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
   //count up the total number of cells
-  int Ncells_withghost=0;
+  int Ncells=0;
   int i,j,k;
-  for (k=0; k<N_z_withghost; k++) {
-    for (i=0; i<N_r_withghost;i++){
+  for (k=0; k<grid_N_z(theGrid); k++) {
+    for (i=0; i<grid_N_r(theGrid);i++){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
-        ++Ncells_withghost;
+        ++Ncells;
       }
     }
   }
 
   //I wanted to allocate memory contiguously. It's not quite there yet.
-  struct Cell ***theCells = (struct Cell ***)malloc(sizeof(struct Cell **)*N_z_withghost);
-  theCells[0] = (struct Cell **)malloc(sizeof(struct Cell *)*N_r_withghost*N_z_withghost);
-  theCells[0][0] = (struct Cell *)malloc(sizeof(struct Cell)*Ncells_withghost);
+  struct Cell ***theCells = (struct Cell ***)malloc(sizeof(struct Cell **)*grid_N_z(theGrid));
+  theCells[0] = (struct Cell **)malloc(sizeof(struct Cell *)*grid_N_r(theGrid)*grid_N_z(theGrid));
+  theCells[0][0] = (struct Cell *)malloc(sizeof(struct Cell)*Ncells);
 
-  for (k=0; k<N_z_withghost; k++) {
-    theCells[k] = theCells[0]+k*N_r_withghost;
-    for (i=0; i<N_r_withghost;i++){
-      theCells[k][i] = theCells[0][0]+grid_N_p(theGrid,i)*(k*N_r_withghost+i);
+  for (k=0; k<grid_N_z(theGrid); k++) {
+    theCells[k] = theCells[0]+k*grid_N_r(theGrid);
+    for (i=0; i<grid_N_r(theGrid);i++){
+      theCells[k][i] = theCells[0][0]+grid_N_p(theGrid,i)*(k*grid_N_r(theGrid)+i);
     }
   }
 
-  for (k=0; k<N_z_withghost; k++) {
-    for (i=0; i<N_r_withghost;i++){
+  for (k=0; k<grid_N_z(theGrid); k++) {
+    for (i=0; i<grid_N_r(theGrid);i++){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         theCells[k][i][j].prim = malloc(NUM_Q*sizeof(double));
         theCells[k][i][j].cons = malloc(NUM_Q*sizeof(double));
@@ -52,11 +50,9 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
 
   //  initialize
   srand(666+mpisetup_MyProc(theMPIsetup));
-  for(k = 0; k < N_z_withghost; k++){
-    for(i = 0; i < N_r_withghost; i++){
+  for(k = 0; k < grid_N_z(theGrid); k++){
+    for(i = 0; i < grid_N_r(theGrid); i++){
       double tiph_0 = 2.*M_PI*(double)rand()/(double)RAND_MAX;
-      //double tiph_0 = 0.0;
-      //double tiph_0 = 2*M_PI*(double)grid_r_faces(theGrid,i)/4.;
       double dphi = 2.*M_PI/(double)grid_N_p(theGrid,i);
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         double tiph = tiph_0 + (double)j*dphi;
@@ -105,11 +101,9 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
 }
 
 void cell_destroy(struct Cell ***theCells,struct Grid *theGrid){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int i,j,k;
-  for (k=0; k<N_z_withghost; k++) {
-    for (i=0; i<N_r_withghost;i++){
+  for (k=0; k<grid_N_z(theGrid); k++) {
+    for (i=0; i<grid_N_r(theGrid);i++){
       for(j = 0; j < grid_N_p(theGrid,i); j++){
         free(theCells[k][i][j].gradp);
         free(theCells[k][i][j].grad);

@@ -17,11 +17,6 @@ void addFace( struct Face * theFaces , int n , struct Cell * cL , struct Cell * 
   theFaces[n].dphi= dphi;
   theFaces[n].dA  = r*dphi*deltaPerp;
   theFaces[n].cm  = tp - .5*dphi;
-/*
- if (n==41||n==81){
-    printf("n: %d, dA: %e, r: %e, dphi: %e, deltaPerp: %e\n",n,theFaces[n].dA,r,dphi,deltaPerp);
-  }
-  */
 } 
 
 void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells,struct Face * theFaces,struct Grid * theGrid, int mode){
@@ -88,18 +83,6 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
         jp = 0;
       }
       dp  = cell_tiph(cell_single(theCells,i,j,k))-cell_tiph(cell_single(theCells,i+rDir,jp,k+zDir));
-      /*
-         if( *pn==41){
-         printf("j: %d, jp: %d\n",j,jp);
-         printf("i: %d\n",i);
-         printf(" cell_tiph(cell_single(theCells,i,0,k)): %e,grid_r_faces(theGrid,i): %e\n", cell_tiph(cell_single(theCells,i,0,k)),grid_r_faces(theGrid,i));
-         printf(" cell_tiph(cell_single(theCells,i+1,0,k)): %e, grid_r_faces(theGrid,i+1): %e\n", cell_tiph(cell_single(theCells,i+1,0,k)),grid_r_faces(theGrid,i+1));
-         printf("jp: %d\n",jp);
-         printf("rDir: %d\n",rDir);
-         printf("zDir: %d\n",zDir);
-         printf("dp before 1: %e\n",dp);
-         }
-         */
       while( dp > M_PI ) dp -= 2.*M_PI;
       while( dp < -M_PI ) dp += 2.*M_PI;
       while( dp > 0.0 ){
@@ -117,14 +100,6 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
       }
       dp = cell_dphi(cell_single(theCells,i+rDir,jp,k+zDir))+dp;
       //Step C: face formed out of end of cell- and beginning of cell+.
-      /*
-         if( *pn==41||*pn==81){
-         printf("*pn: %d\n",*pn);
-         printf("khar 4\n");
-         printf("dp: %e\n",dp);
-         printf("cell_dphi(cell_single(theCells,i+rDir,jp,k+zDir)): %e\n",cell_dphi(cell_single(theCells,i+rDir,jp,k+zDir)));
-         }
-         */
       if ( mode==1 ){
         addFace(theFaces,*pn,cell_single(theCells,i,j,k),cell_single(theCells,i+rDir,jp,k+zDir),
             r,deltaL,deltaR,dp,cell_tiph(cell_single(theCells,i,j,k)),deltaPerp);
@@ -134,10 +109,7 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
   }
 }
 
-//try to consolidate using function pointers
 struct Face *face_create(struct Cell *** theCells ,struct Grid *theGrid, struct TimeStep * theTimeStep,int direction){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
   struct Face * theFaces;
 
@@ -146,13 +118,13 @@ struct Face *face_create(struct Cell *** theCells ,struct Grid *theGrid, struct 
     //Count them first.  build_jloop with argument zero says "just count", doesn't create any faces.
     int i,k; 
     int n=0;
-    for( i=0 ; i<N_r_withghost-1 ; ++i ){
+    for( i=0 ; i<grid_N_r(theGrid)-1 ; ++i ){
       timestep_nri(theTimeStep)[i] = n;
-      for( k=0 ; k<N_z_withghost ; ++k ){
+      for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
         build_jloop(&n,i,k,1,0,theCells,theFaces,theGrid,0);
       }
     }
-    timestep_nri(theTimeStep)[N_r_withghost-1] = n; 
+    timestep_nri(theTimeStep)[grid_N_r(theGrid)-1] = n; 
     timestep_set_Nfr(theTimeStep,theGrid);
 
     //allocate memory for array of Faces
@@ -160,8 +132,8 @@ struct Face *face_create(struct Cell *** theCells ,struct Grid *theGrid, struct 
 
     //now actually build the faces
     n=0;
-    for( i=0 ; i<N_r_withghost-1 ; ++i ){
-      for( k=0 ; k<N_z_withghost ; ++k ){
+    for( i=0 ; i<grid_N_r(theGrid)-1 ; ++i ){
+      for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
         build_jloop(&n,i,k,1,0,theCells,theFaces,theGrid,1);
       }
     }
@@ -173,13 +145,13 @@ struct Face *face_create(struct Cell *** theCells ,struct Grid *theGrid, struct 
       //Count them first.  build_jloop with argument zero says "just count", doesn't create any faces.
       int i,k;
       int n=0;
-      for( k=0 ; k<N_z_withghost-1 ; ++k ){
+      for( k=0 ; k<grid_N_z(theGrid)-1 ; ++k ){
         timestep_nzk(theTimeStep)[k] = n;
-        for( i=0 ; i<N_r_withghost ; ++i ){
+        for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
           build_jloop(&n,i,k,0,1,theCells,theFaces,theGrid,0);
         }
       }
-      timestep_nzk(theTimeStep)[N_z_withghost-1] = n;
+      timestep_nzk(theTimeStep)[grid_N_z(theGrid)-1] = n;
       timestep_set_Nfz(theTimeStep,theGrid);
 
       //allocate memory for array of Faces
@@ -187,8 +159,8 @@ struct Face *face_create(struct Cell *** theCells ,struct Grid *theGrid, struct 
 
       //now actually build the faces
       n=0;
-      for( k=0 ; k<N_z_withghost-1 ; ++k ){
-        for( i=0 ; i<N_r_withghost ; ++i ){
+      for( k=0 ; k<grid_N_z(theGrid)-1 ; ++k ){
+        for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
           build_jloop(&n,i,k,0,1,theCells,theFaces,theGrid,1);
         }
       }

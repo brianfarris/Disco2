@@ -4,12 +4,12 @@
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
-void mpisetup_setprocs(struct MPIsetup * theMPIsetup){
+void mpisetup_setprocs(struct MPIsetup * theMPIsetup,char * filename){
   int readvar(char *,char *, int,void *);
   int err=0;
   int N_r_global,N_z_global;
-  readvar( "shear.par" , "NumR" , VAR_INT  , &(N_r_global) );
-  readvar( "shear.par" , "NumZ" , VAR_INT  , &(N_z_global  ));
+  readvar( filename , "NumR" , VAR_INT  , &(N_r_global) );
+  readvar( filename , "NumZ" , VAR_INT  , &(N_z_global  ));
    
   int ierr;
   int NumProcs,MyProc;

@@ -39,16 +39,14 @@ void cell_prim2cons( double * prim , double * cons , double r , double dV ,doubl
 }
 
 void cell_calc_cons( struct Cell *** theCells,struct Grid *theGrid ){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   double GAMMALAW = grid_GAMMALAW(theGrid);
 
   int i,j,k;
-  for( k=0 ; k<N_z_withghost ; ++k ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
     double zp = grid_z_faces(theGrid,k);
     double zm = grid_z_faces(theGrid,k-1);
     double dz = zp-zm;
-    for( i=0 ; i<N_r_withghost ; ++i ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       double rp = grid_r_faces(theGrid,i);
       double rm = grid_r_faces(theGrid,i-1);
       double r = .5*(rp+rm);
@@ -113,20 +111,16 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
 }
 
 void cell_calc_prim( struct Cell *** theCells ,struct Grid * theGrid){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
-
   int i,j,k;
-  for( k=0 ; k<N_z_withghost ; ++k ){
+  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
     double zm = grid_z_faces(theGrid,k-1);
     double zp = grid_z_faces(theGrid,k);
     double dz = zp-zm;
-    for( i=0 ; i<N_r_withghost ; ++i ){
+    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
       double rm = grid_r_faces(theGrid,i-1);
       double rp = grid_r_faces(theGrid,i);
       double r = .5*(rp+rm);
       for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-        //struct Cell * c = &(theCells[k][i][j]);
         struct Cell * c = cell_single(theCells,i,j,k);
         double dV = .5*(rp*rp-rm*rm)*c->dphi*dz;
         cell_cons2prim( c->cons , c->prim , r , dV ,theGrid,grid_runtype(theGrid));

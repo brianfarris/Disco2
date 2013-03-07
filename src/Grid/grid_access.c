@@ -15,10 +15,10 @@ double grid_z_faces(struct Grid *theGrid,int k){
   return(theGrid->z_faces[k+1]);
 }
 int grid_N_r(struct Grid *theGrid){
-  return(theGrid->N_r);
+  return(theGrid->N_r_noghost+theGrid->Nghost_rmin+theGrid->Nghost_rmax);
 }
 int grid_N_z(struct Grid *theGrid){
-  return(theGrid->N_z);
+  return(theGrid->N_z_noghost+theGrid->Nghost_zmin+theGrid->Nghost_zmax);
 }
 int grid_Ncells(struct Grid *theGrid){
   return(theGrid->Ncells);

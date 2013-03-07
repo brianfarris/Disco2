@@ -133,7 +133,6 @@ void riemann_set_state(struct Riemann * theRiemann,int w ){
   }
 }
 
-
 void riemann_set_Ustar(struct Riemann * theRiemann,struct Grid * theGrid, double *n,double r,double *Bpack,double GAMMALAW){
   double *prim;
   double Sk;
@@ -324,14 +323,6 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
   theRiemann->r = face_r(face_pointer(theFaces,n));
   theRiemann->dA = face_dA(face_pointer(theFaces,n));
 
-  /*
-  if (n==128){
-    printf("cell_prims(theRiemann->cR)[2]: %16.12e\n",cell_prims(theRiemann->cR)[2]);
-    printf("cell_grad(theRiemann->cR)[2]: %16.12e\n",cell_grad(theRiemann->cR)[2]);
-    printf("cell_gradp(theRiemann->cR)[2]: %16.12e\n",cell_gradp(theRiemann->cR)[2]);
-    printf("deltaR: %16.12e, dpR: %16.12e\n",deltaR,dpR);
-  }
-*/
   int q;
   for (q=0;q<NUM_Q;++q){
     theRiemann->primL[q] = cell_prims(theRiemann->cL)[q] + cell_grad(theRiemann->cL)[q]*deltaL + cell_gradp(theRiemann->cL)[q]*dpL;
@@ -378,7 +369,7 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
 
   double Bpack[6];
   riemann_set_vel(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
-  
+
   double Bk_face,Psi_face;
   if (grid_runtype(theGrid)==1){
     if (direction==0){

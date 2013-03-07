@@ -39,8 +39,6 @@ void cell_single_init_shear(struct Cell ***theCells, struct Grid *theGrid,int i,
 }
 
 void cell_init_shear(struct Cell ***theCells,struct Grid *theGrid) {
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
 
   double rho = 1.0;
   double Pp  = 1.0;
@@ -50,8 +48,8 @@ void cell_init_shear(struct Cell ***theCells,struct Grid *theGrid) {
   double nu = grid_EXPLICIT_VISCOSITY(theGrid);
   int i, j,k;
 
-  for (k = 0; k < N_z_withghost; k++) {
-    for (i = 0; i < N_r_withghost; i++) {
+  for (k = 0; k < grid_N_z(theGrid); k++) {
+    for (i = 0; i < grid_N_r(theGrid); i++) {
       double rm = grid_r_faces(theGrid,i-1);
       double rp = grid_r_faces(theGrid,i);
       double r = 0.5*(rm+rp);

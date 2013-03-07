@@ -8,8 +8,8 @@ struct Grid {
   double *r_faces;
   double *z_faces;
   int *N_p;
-  int N_r;
-  int N_z;
+  int N_r_noghost;
+  int N_z_noghost;
   int Nghost_rmin;
   int Nghost_rmax;
   int Nghost_zmin;
