@@ -45,7 +45,7 @@ void cell_init_shear(struct Cell ***theCells,struct Grid *theGrid) {
   double rho = 1.0;
   double Pp  = 1.0;
   double v0  = 0.1;
-  double t0  = 0.5;
+  double t0  = 0.2;
 
   double nu = grid_EXPLICIT_VISCOSITY(theGrid);
   int i, j,k;

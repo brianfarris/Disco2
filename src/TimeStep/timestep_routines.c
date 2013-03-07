@@ -157,8 +157,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   //Boundary Data
   //cell_boundary_outflow_r( theCells , theFaces_r ,theGrid, nri );
   //if( N_z_global > 1 ) cell_boundary_z( theCells , theFaces_z ,theGrid, nzk );
-  cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
-  // cell_boundary_outflow_r( theCells , theFaces_r ,theGrid,theMPIsetup, theTimeStep->nri );
+  //cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
+  cell_boundary_outflow_r( theCells , theFaces_r ,theGrid,theMPIsetup, theTimeStep->nri );
 
   face_destroy(theFaces_r);
   if (grid_N_z_global(theGrid)>1){
