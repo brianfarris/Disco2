@@ -49,6 +49,7 @@
 #include "Headers/GravMass.h"
 #include "Headers/IO.h"
 #include "Headers/TimeStep.h"
+#include "Headers/Diagnostics.h"
 #include "Headers/header.h"
 
 
@@ -126,12 +127,18 @@ int main(int argc, char **argv) {
     }
     timestep_update_t(theTimeStep); 
 
+    struct Diagnostics * theDiagnostics = diagnostics_create(theGrid);
+    printf("before destroy\n");
+    diagnostics_set(theDiagnostics,theCells,theGrid);
+    diagnostics_destroy(theDiagnostics);
+    printf("after destroy\n");
+
     if( timestep_get_t(theTimeStep)>tcheck){
       sprintf(filename,"checkpoint_%04d.h5",nfile);
       struct IO *theIO = io_create(theGrid);
       io_flattened_prim(theIO,theCells,theGrid);
       io_hdf5_out(theIO,theGrid,filename);
-      io_destroy(theIO,theGrid);
+      io_destroy(theIO);
       tcheck += dtcheck;
       ++nfile;
     }

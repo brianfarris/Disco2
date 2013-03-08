@@ -32,7 +32,7 @@ void cell_single_init_shear(struct Cell ***, struct Grid *,int ,int ,int );
 void (*cell_init_ptr(struct Grid * ))(struct Cell *** , struct Grid * );
 void (*cell_single_init_ptr(struct Grid * ))(struct Cell *** , struct Grid *,int,int,int );
 ///retrieve data
-double *cell_prims(struct Cell *);
+double cell_prim(struct Cell *, int);
 double *cell_grad(struct Cell *);
 double *cell_gradp(struct Cell *);
 struct Cell *cell_single(struct Cell ***,int,int,int);

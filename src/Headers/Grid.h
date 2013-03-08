@@ -64,6 +64,10 @@ struct Grid *grid_create(struct MPIsetup * );
 void grid_alloc_arr(struct Grid * , struct MPIsetup * );
 void grid_destroy(struct Grid *); 
 //access grid data
+double grid_RMIN(struct Grid * );
+double grid_RMAX(struct Grid * );
+double grid_ZMIN(struct Grid * );
+double grid_ZMAX(struct Grid * );
 int grid_N_p(struct Grid *,int);
 double grid_r_faces(struct Grid *,int);
 double grid_z_faces(struct Grid *,int);

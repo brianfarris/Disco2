@@ -22,7 +22,7 @@ void io_flattened_prim(struct IO *io_pointer,struct Cell ***theCells,struct Grid
           io_pointer->primitives[index][1] = 0.5*(grid_r_faces(theGrid,i-1)+grid_r_faces(theGrid,i));
           io_pointer->primitives[index][2] = 0.5*(grid_z_faces(theGrid,k-1)+grid_z_faces(theGrid,k));
         for (q=0;q<NUM_Q;q++){
-          io_pointer->primitives[index][q+3] = cell_prims(cell_single(theCells,i,j,k))[q]; 
+          io_pointer->primitives[index][q+3] = cell_prim(cell_single(theCells,i,j,k),q); 
         }
         index += 1;
       }

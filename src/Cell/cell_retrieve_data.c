@@ -8,8 +8,8 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-double *cell_prims(struct Cell *theCell){
-  return(theCell->prim);
+double cell_prim(struct Cell *theCell,int q){
+  return(theCell->prim[q]);
 }
 double *cell_grad(struct Cell *theCell){
   return(theCell->grad);

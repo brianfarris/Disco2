@@ -10,7 +10,7 @@ struct IO{
 #endif
 //create and destroy
 struct IO *io_create(struct Grid *);
-void io_destroy(struct IO *,struct Grid *);
+void io_destroy(struct IO *);
 //move data between theCells and IO buffer
 void io_flattened_prim(struct IO *,struct Cell ***,struct Grid *);
 void io_unflattened_prim(struct IO *,struct Cell ***,struct Grid *);

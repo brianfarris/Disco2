@@ -5,6 +5,18 @@
 #include "../Headers/header.h"
 
 
+double grid_RMIN(struct Grid * theGrid){
+  return(theGrid->RMIN);
+}
+double grid_RMAX(struct Grid * theGrid){
+  return(theGrid->RMAX);
+}
+double grid_ZMIN(struct Grid * theGrid){
+  return(theGrid->ZMIN);
+}
+double grid_ZMAX(struct Grid * theGrid){
+  return(theGrid->ZMAX);
+}
 int grid_N_p(struct Grid *theGrid,int i){
   return(theGrid->N_p[i]);
 }

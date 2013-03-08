@@ -25,8 +25,7 @@ struct IO *io_create(struct Grid *theGrid) {
   return(theIO);
 }
 
-void io_destroy(struct IO *theIO,struct Grid *theGrid){
-  int i;
+void io_destroy(struct IO *theIO){
   free(theIO->primitives[0]);
   free(theIO->primitives);
   free(theIO);
