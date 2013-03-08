@@ -54,6 +54,7 @@ int grid_read_par_file(struct Grid * theGrid, struct MPIsetup * theMPIsetup, cha
     if( mpisetup_MyProc(theMPIsetup)==nrank ){
       err += readvar( pfile , "Restart"              , VAR_INT  , &(theGrid->Restart)  );
       err += readvar( pfile , "InitialDataType"      , VAR_INT  , &(theGrid->InitialDataType)  );
+      err += readvar( pfile , "GravMassType"      , VAR_INT  , &(theGrid->GravMassType)  );
       err += readvar( pfile , "BoundTypeR"         , VAR_INT  , &(theGrid->BoundTypeR)  );
       err += readvar( pfile , "BoundTypeZ"         , VAR_INT  , &(theGrid->BoundTypeZ)  );
       err += readvar( pfile , "NumR"              , VAR_INT  , &(theGrid->N_r_global) );

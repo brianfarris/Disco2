@@ -122,4 +122,6 @@ int grid_runtype(struct Grid * theGrid){
 int grid_InitialDataType(struct Grid * theGrid){
   return(theGrid->InitialDataType);
 }
-
+int grid_GravMassType(struct Grid * theGrid){
+  return(theGrid->GravMassType);
+}

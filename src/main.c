@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
 
   // gravMass
   struct GravMass *theGravMasses = gravMass_create(grid_NumGravMass(theGrid));
-  gravMass_initialize_none(theGravMasses);
+  (*gravMass_init_ptr(theGrid))(theGravMasses);
   gravMass_clean_pi(theGravMasses,theGrid);
 
   // allocate memory for data 
@@ -92,8 +92,6 @@ int main(int argc, char **argv) {
   }else{
     (*cell_init_ptr(theGrid))(theCells,theGrid);
   }
-
-  //cell_boundary_fixed_r( theCells, theGrid,theMPIsetup );
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theGrid,theMPIsetup);

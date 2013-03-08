@@ -2,6 +2,7 @@
 //Disco Parameter File//
 
 InitialDataType         1               // 0 Flock, 1 Shear
+GravMassType            0               // 0 none, 1 single, 2 binary
 Restart			0		//If this=1 restart using input.h5
 
 //Computational Grid

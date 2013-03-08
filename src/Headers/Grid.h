@@ -20,6 +20,7 @@ struct Grid {
   int offset;
   //fixed parameters
   int InitialDataType;
+  int GravMassType;
   int BoundTypeR;
   int BoundTypeZ;
   int Restart;
@@ -102,12 +103,7 @@ double grid_get_T_MAX(struct Grid * );
 double grid_NUM_CHECKPOINTS(struct Grid * );
 int grid_runtype(struct Grid * );
 int grid_InitialDataType(struct Grid * );
-//void (*init_ptr)/*(struct Cell ***,struct Grid *)*/ grid_init_ptr(struct Grid * );
-//void (*single_init_ptr)/*(struct Cell ***,struct Grid *,int,int,int)*/ grid_single_init_ptr(struct Grid * );
-//void (*grid_init_ptr(struct Grid * ));
-//void (*grid_single_init_ptr(struct Grid * ));
-
-
+int grid_GravMassType(struct Grid * );
 
 //set grid data
 int grid_read_par_file(struct Grid * ,struct MPIsetup *, char * );
