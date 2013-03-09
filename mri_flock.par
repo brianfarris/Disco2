@@ -1,6 +1,8 @@
 
 //Disco Parameter File//
 
+InitialDataType         1               // 0 Flock, 1 Shear
+GravMassType            u               // 0 none, 1 single, 2 binary
 Restart			0		//If this=1 restart using input.h5
 
 //Computational Grid
@@ -11,12 +13,16 @@ R_Min			1.0
 R_Max			4.0
 Z_Min			-1.0
 Z_Max			1.0
+NP_CONST                -1
+aspect                  1.0
+
 
 NUM_Q                   9
 Time_Max                100.0
 Num_Checkpoints		25
 
-Z_Periodic		1
+BoundTypeR           0               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
 
 Move_Cells              3
 Adiabatic_Index		1.6666666666

@@ -128,9 +128,7 @@ int main(int argc, char **argv) {
     }
     timestep_update_t(theTimeStep); 
 
-    printf("before destroy\n");
     diagnostics_set(theDiagnostics,theCells,theGrid,theTimeStep);
-    printf("after destroy\n");
 
     if( timestep_get_t(theTimeStep)>tcheck){
       sprintf(filename,"checkpoint_%04d.h5",nfile);
