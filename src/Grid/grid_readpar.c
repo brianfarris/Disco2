@@ -69,6 +69,8 @@ int grid_read_par_file(struct Grid * theGrid, struct MPIsetup * theMPIsetup, cha
       err += readvar( pfile , "NUM_Q"              , VAR_INT  , &(theGrid->NUM_Q) );
       err += readvar( pfile , "Time_Max"       , VAR_DOUB , &(theGrid->T_MAX)  );
       err += readvar( pfile , "Num_Checkpoints"   , VAR_INT  , &(theGrid->NUM_CHECKPOINTS)  );
+      err += readvar( pfile , "Num_Diag_Dump"   , VAR_INT  , &(theGrid->NUM_DIAG_DUMP)  );
+      err += readvar( pfile , "Num_Diag_Measure"   , VAR_INT  , &(theGrid->NUM_DIAG_MEASURE)  );
       err += readvar( pfile , "Move_Cells"        , VAR_INT  , &(theGrid->MOVE_CELLS)  );
       //     err += readvar( pfile , "NumGravMass"        , VAR_INT  , &(theGrid->NumGravMass)  );
       err += readvar( pfile , "Adiabatic_Index"   , VAR_DOUB , &(theGrid->GAMMALAW)  );

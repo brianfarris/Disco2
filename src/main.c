@@ -109,6 +109,12 @@ int main(int argc, char **argv) {
 
   double dtcheck = grid_get_T_MAX(theGrid)/grid_NUM_CHECKPOINTS(theGrid);
   double tcheck = dtcheck;
+  double dtdiag_measure = grid_get_T_MAX(theGrid)/grid_NUM_DIAG_MEASURE(theGrid);
+  double tdiag_measure = dtdiag_measure;
+  double dtdiag_dump = grid_get_T_MAX(theGrid)/grid_NUM_DIAG_DUMP(theGrid);
+  double tdiag_dump = dtdiag_dump;
+
+
   int nfile=0;
   char filename[256];
 
@@ -128,7 +134,16 @@ int main(int argc, char **argv) {
     }
     timestep_update_t(theTimeStep); 
 
-    diagnostics_set(theDiagnostics,theCells,theGrid,theTimeStep);
+    if (timestep_get_t(theTimeStep)>tdiag_measure){
+      diagnostics_set(theDiagnostics,theCells,theGrid,theTimeStep);
+      tdiag_measure += dtdiag_measure;
+    }
+
+    if (timestep_get_t(theTimeStep)>tdiag_dump){
+      diagnostics_destroy(theDiagnostics,theGrid);
+      struct Diagnostics * theDiagnostics = diagnostics_create(theGrid,theTimeStep);
+      tdiag_dump += dtdiag_dump;
+    }
 
     if( timestep_get_t(theTimeStep)>tcheck){
       sprintf(filename,"checkpoint_%04d.h5",nfile);
@@ -147,7 +162,7 @@ int main(int argc, char **argv) {
     cell_syncproc_z(theCells,theGrid,theMPIsetup);
   }
   // clean up
-  diagnostics_destroy(theDiagnostics,theGrid);
+  //  diagnostics_destroy(theDiagnostics,theGrid);
   cell_destroy(theCells,theGrid);
   grid_destroy(theGrid);
   gravMass_destroy(theGravMasses);

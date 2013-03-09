@@ -134,8 +134,14 @@ double grid_VEL_CAP(struct Grid *theGrid) {
 double grid_get_T_MAX(struct Grid * theGrid){
   return(theGrid->T_MAX);
 }
-double grid_NUM_CHECKPOINTS(struct Grid * theGrid){
+int grid_NUM_CHECKPOINTS(struct Grid * theGrid){
   return(theGrid->NUM_CHECKPOINTS);
+}
+int grid_NUM_DIAG_DUMP(struct Grid * theGrid){
+  return(theGrid->NUM_DIAG_DUMP);
+}
+int grid_NUM_DIAG_MEASURE(struct Grid * theGrid){
+  return(theGrid->NUM_DIAG_MEASURE);
 }
 int grid_runtype(struct Grid * theGrid){
   return(theGrid->runtype);
