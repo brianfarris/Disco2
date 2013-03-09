@@ -25,11 +25,11 @@ struct Cell{
 struct Cell ***cell_create(struct Grid *,struct MPIsetup *);
 void cell_destroy(struct Cell ***,struct Grid *);
 //initial data
-void cell_init_flock(struct Cell ***,struct Grid *);
+void cell_init_flock(struct Cell ***,struct Grid *, struct MPIsetup *);
 void cell_single_init_flock(struct Cell ***, struct Grid *,int ,int ,int );
-void cell_init_shear(struct Cell ***,struct Grid *);
+void cell_init_shear(struct Cell ***,struct Grid *, struct MPIsetup *);
 void cell_single_init_shear(struct Cell ***, struct Grid *,int ,int ,int );
-void (*cell_init_ptr(struct Grid * ))(struct Cell *** , struct Grid * );
+void (*cell_init_ptr(struct Grid * ))(struct Cell *** , struct Grid * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Grid * ))(struct Cell *** , struct Grid *,int,int,int );
 ///retrieve data
 double cell_prim(struct Cell *, int);

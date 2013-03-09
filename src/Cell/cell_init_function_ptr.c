@@ -3,7 +3,7 @@
 #include "../Headers/Cell.h"
 #include "../Headers/Grid.h"
 #include "../Headers/header.h"
-void (*cell_init_ptr(struct Grid * theGrid))(struct Cell *** , struct Grid * ){
+void (*cell_init_ptr(struct Grid * theGrid))(struct Cell *** , struct Grid *,struct MPIsetup * ){
   if (grid_InitialDataType(theGrid)==FLOCK){
     return(&cell_init_flock);
   } else if (grid_InitialDataType(theGrid)==SHEAR){

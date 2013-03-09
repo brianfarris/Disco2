@@ -54,6 +54,7 @@ void grid_set_misc(struct Grid *theGrid,struct MPIsetup * theMPIsetup) {
   for (i=theGrid->Nghost_rmin;i<theGrid->N_r_noghost+theGrid->Nghost_rmin;++i){
     Ncells += theGrid->N_p[i]*theGrid->N_z_noghost;
   }
+  printf("Ncells: %d\n",Ncells);
 
   int *Ncells_arr = malloc(sizeof(int) * mpisetup_NumProcs(theMPIsetup));
   MPI_Allgather(&Ncells, 1, MPI_INT, Ncells_arr, 1, MPI_INT, MPI_COMM_WORLD);

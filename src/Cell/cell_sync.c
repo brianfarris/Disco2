@@ -10,8 +10,8 @@
 #include "../Headers/header.h"
 
 void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPIsetup * theMPIsetup){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
+  int N_r_withghost = grid_N_r(theGrid);//+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
+  int N_z_withghost = grid_N_z(theGrid);//+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
 
   int i,j,k,q;
@@ -156,8 +156,8 @@ void cell_syncproc_r( struct Cell *** theCells , struct Grid *theGrid,struct MPI
 
 
 void cell_syncproc_z( struct Cell *** theCells , struct Grid *theGrid,struct MPIsetup * theMPIsetup){
-  int N_r_withghost = grid_N_r(theGrid)+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
-  int N_z_withghost = grid_N_z(theGrid)+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
+  int N_r_withghost = grid_N_r(theGrid);//+grid_Nghost_rmin(theGrid)+grid_Nghost_rmax(theGrid);
+  int N_z_withghost = grid_N_z(theGrid);//+grid_Nghost_zmin(theGrid)+grid_Nghost_zmax(theGrid);
   int NUM_Q = grid_NUM_Q(theGrid);
 
   int i,j,k,q;

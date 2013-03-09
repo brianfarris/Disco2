@@ -13,7 +13,7 @@ R_Min			1.0
 R_Max			4.0
 Z_Min			-1.0
 Z_Max			1.0
-NP_CONST                -1
+NP_CONST                32 
 aspect                  1.0
 
 

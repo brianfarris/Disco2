@@ -36,12 +36,12 @@ void cell_single_init_flock(struct Cell ***theCells, struct Grid *theGrid,int i,
   theCells[k][i][j].GradPsi[2] = 0.0;
 }
 
-void cell_init_flock(struct Cell ***theCells,struct Grid *theGrid) {
+void cell_init_flock(struct Cell ***theCells,struct Grid *theGrid,struct MPIsetup * theMPIsetup) {
 
   double DISK_MACH = 10.;
   double GAMMALAW = grid_GAMMALAW(theGrid);
   
-  srand(666);
+  srand(666 + mpisetup_MyProc(theMPIsetup));
   double rho0 = 1.0;
   int i, j,k;
   for (k = 0; k < grid_N_z(theGrid); k++) {

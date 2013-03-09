@@ -38,7 +38,7 @@ void cell_single_init_shear(struct Cell ***theCells, struct Grid *theGrid,int i,
   theCells[k][i][j].GradPsi[2] = 0.0;
 }
 
-void cell_init_shear(struct Cell ***theCells,struct Grid *theGrid) {
+void cell_init_shear(struct Cell ***theCells,struct Grid *theGrid,struct MPIsetup * theMPIsetup) {
 
   double rho = 1.0;
   double Pp  = 1.0;

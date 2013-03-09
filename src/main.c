@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
     io_hdf5_in(theIO,theGrid,checkpoint_filename);
     io_unflattened_prim(theIO,theCells,theGrid);
   }else{
-    (*cell_init_ptr(theGrid))(theCells,theGrid);
+    (*cell_init_ptr(theGrid))(theCells,theGrid,theMPIsetup);
   }
 
   //inter-processor syncs
