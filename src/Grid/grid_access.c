@@ -17,6 +17,12 @@ double grid_ZMIN(struct Grid * theGrid){
 double grid_ZMAX(struct Grid * theGrid){
   return(theGrid->ZMAX);
 }
+int grid_N_r_0(struct Grid * theGrid){
+  return(theGrid->N_r_0);
+}
+int grid_N_z_0(struct Grid * theGrid){
+  return(theGrid->N_z_0);
+}
 int grid_N_p(struct Grid *theGrid,int i){
   return(theGrid->N_p[i]);
 }
@@ -64,6 +70,9 @@ int grid_Nghost_zmax(struct Grid *theGrid){
 }
 int grid_ng(struct Grid *theGrid){
   return(theGrid->ng);
+}
+int grid_N_r_global(struct Grid *theGrid){
+  return(theGrid->N_r_global);
 }
 int grid_N_z_global(struct Grid *theGrid){
   return(theGrid->N_z_global);

@@ -17,7 +17,7 @@ NP_CONST                -1
 aspect                  1.0
 
 NUM_Q                   5
-Time_Max                0.5
+Time_Max                0.02
 Num_Checkpoints	        50	
 
 BoundTypeR           0               // 0 fixed, 1 outflow, 2 periodic

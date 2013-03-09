@@ -28,6 +28,9 @@ void grid_set_rz(struct Grid * theGrid,struct MPIsetup * theMPIsetup){
   int N_r_0 = theGrid->N_r_noghost*mpisetup_dim_MyProc(theMPIsetup,0);
   int N_z_0 = theGrid->N_z_noghost*mpisetup_dim_MyProc(theMPIsetup,1);
 
+  theGrid->N_r_0 = N_r_0;
+  theGrid->N_z_0 = N_z_0;
+
   int i,k;
   for(i = 0; i < grid_N_r(theGrid)+1; i++){
     int ig = i-theGrid->Nghost_rmin+N_r_0;

@@ -1,11 +1,11 @@
+check that flock still works
+finish diagnostics
 make it so that we can restart from checkpoint without a par file
+put back passive scalar
+put back damping at inner boundary
 check that checkpoint restart agrees to machine precision
 make it so that we can run on any number of procs
-remove unnecessary includes from .c files 
-get rid of unnecessary functions
 add error checking wherever possible
 see if it is possible to not use buffers in syncing and IO
-restore NUM_C stuff
-restore bc_damp
 openMP support
 doxygen

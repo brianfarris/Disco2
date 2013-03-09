@@ -112,6 +112,7 @@ int main(int argc, char **argv) {
   int nfile=0;
   char filename[256];
 
+  struct Diagnostics * theDiagnostics = diagnostics_create(theGrid,theTimeStep);
   while( timestep_get_t(theTimeStep) < grid_get_T_MAX(theGrid) ){
     timestep_set_dt(theTimeStep,theCells,theGrid);
     cell_copy(theCells,theGrid);
@@ -127,10 +128,8 @@ int main(int argc, char **argv) {
     }
     timestep_update_t(theTimeStep); 
 
-    struct Diagnostics * theDiagnostics = diagnostics_create(theGrid);
     printf("before destroy\n");
-    diagnostics_set(theDiagnostics,theCells,theGrid);
-    diagnostics_destroy(theDiagnostics);
+    diagnostics_set(theDiagnostics,theCells,theGrid,theTimeStep);
     printf("after destroy\n");
 
     if( timestep_get_t(theTimeStep)>tcheck){
@@ -150,6 +149,7 @@ int main(int argc, char **argv) {
     cell_syncproc_z(theCells,theGrid,theMPIsetup);
   }
   // clean up
+  diagnostics_destroy(theDiagnostics,theGrid);
   cell_destroy(theCells,theGrid);
   grid_destroy(theGrid);
   gravMass_destroy(theGravMasses);
