@@ -89,16 +89,20 @@ int main(int argc, char **argv) {
     sprintf(checkpoint_filename,"input.h5");
     struct IO *theIO = io_create(theSim);
     io_hdf5_in(theIO,theSim,checkpoint_filename);
-    io_unflattened_prim(theIO,theCells,theSim);
+    io_readbuf(theIO,theCells,theSim);
   }else{
     (*cell_init_ptr(theSim))(theCells,theSim,theMPIsetup);
   }
 
+  cell_boundary_fixed_r(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   if (sim_N_global(theSim,Z_DIR)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
+
+  cell_boundary_fixed_r(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+  
 
   //set conserved quantities
   cell_calc_cons(theCells,theSim);
@@ -149,7 +153,7 @@ int main(int argc, char **argv) {
     if( timestep_get_t(theTimeStep)>tcheck){
       sprintf(filename,"checkpoint_%04d.h5",nfile);
       struct IO *theIO = io_create(theSim);
-      io_flattened_prim(theIO,theCells,theSim);
+      io_setbuf(theIO,theCells,theSim);
       io_hdf5_out(theIO,theSim,filename);
       io_destroy(theIO);
       tcheck += dtcheck;

@@ -11,7 +11,7 @@
 #include "../Headers/IO.h"
 #include "../Headers/header.h"
 
-void io_flattened_prim(struct IO *io_pointer,struct Cell ***theCells,struct Sim *theSim){
+void io_setbuf(struct IO *io_pointer,struct Cell ***theCells,struct Sim *theSim){
   int NUM_Q = sim_NUM_Q(theSim);
   int i,j,k,q;
   int index=0;
@@ -30,7 +30,7 @@ void io_flattened_prim(struct IO *io_pointer,struct Cell ***theCells,struct Sim 
   }
 }
 
-void io_unflattened_prim(struct IO *io_pointer,struct Cell ***theCells,struct Sim *theSim){
+void io_readbuf(struct IO *io_pointer,struct Cell ***theCells,struct Sim *theSim){
   int NUM_Q = sim_NUM_Q(theSim);
   int i,j,k,q;
   int index=0;

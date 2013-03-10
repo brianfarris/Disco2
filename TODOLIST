@@ -1,4 +1,3 @@
-if the version on ria works, do a pull on ria and try again. If that works, proceed.
 make it so that we can restart from checkpoint without a par file
 put back passive scalar
 put back damping at inner boundary
