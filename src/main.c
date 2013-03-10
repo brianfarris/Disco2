@@ -140,6 +140,7 @@ int main(int argc, char **argv) {
     }
 
     if (timestep_get_t(theTimeStep)>tdiag_dump){
+      diagnostics_print(theDiagnostics,theTimeStep,theGrid,theMPIsetup);
       diagnostics_destroy(theDiagnostics,theGrid);
       struct Diagnostics * theDiagnostics = diagnostics_create(theGrid,theTimeStep);
       tdiag_dump += dtdiag_dump;
