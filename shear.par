@@ -28,6 +28,7 @@ BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
 
 Move_Cells              0
 Adiabatic_Index		1.6666666666
+Include_Viscosity	1		//If this=1, include viscosity
 Explicit_Viscosity      0.01
 
 DivB_Ch			0.06		//Dedner divergence cleaning

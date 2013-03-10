@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
 
   cell_clean_pi(theCells,theSim);
   cell_syncproc_r(theCells,theSim,theMPIsetup);
-  if (sim_N_global(theSim,Z_DIR)>1){
+  if (sim_N_z_global(theSim)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
   // set initial data 
@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
-  if (sim_N_global(theSim,Z_DIR)>1){
+  if (sim_N_z_global(theSim)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
 
@@ -159,7 +159,7 @@ int main(int argc, char **argv) {
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
-  if (sim_N_global(theSim,Z_DIR)>1){
+  if (sim_N_z_global(theSim)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
   // clean up

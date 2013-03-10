@@ -75,10 +75,10 @@ void cell_syncproc_r( struct Cell *** theCells , struct Sim *theSim,struct MPIse
   double * buffer_r_hi_recv;
   
   if (!mpisetup_check_rout_bndry(theMPIsetup)){  
-    buffersize_r_hi_send = get_buffersize(sim_N(theSim,R_DIR)-2*sim_ng(theSim),sim_N(theSim,R_DIR)-sim_ng(theSim),0,sim_N(theSim,Z_DIR),theSim);
-    buffersize_r_hi_recv = get_buffersize(sim_N(theSim,R_DIR)-sim_ng(theSim),sim_N(theSim,R_DIR),0,sim_N(theSim,Z_DIR),theSim);
+    buffersize_r_hi_send = get_buffersize(sim_N_r(theSim)-2*sim_ng(theSim),sim_N_r(theSim)-sim_ng(theSim),0,sim_N_z(theSim),theSim);
+    buffersize_r_hi_recv = get_buffersize(sim_N_r(theSim)-sim_ng(theSim),sim_N_r(theSim),0,sim_N_z(theSim),theSim);
     buffer_r_hi_send = malloc(sizeof(double)*buffersize_r_hi_send);
-    set_buffer(sim_N(theSim,R_DIR)-2*sim_ng(theSim),sim_N(theSim,R_DIR)-sim_ng(theSim),0,sim_N(theSim,Z_DIR),theSim,theCells,buffer_r_hi_send);
+    set_buffer(sim_N_r(theSim)-2*sim_ng(theSim),sim_N_r(theSim)-sim_ng(theSim),0,sim_N_z(theSim),theSim,theCells,buffer_r_hi_send);
     buffer_r_hi_recv = malloc(sizeof(double)*buffersize_r_hi_recv);
   } else{
     buffersize_r_hi_send = 1;
@@ -93,10 +93,10 @@ void cell_syncproc_r( struct Cell *** theCells , struct Sim *theSim,struct MPIse
   double * buffer_r_low_recv;
 
   if (!mpisetup_check_rin_bndry(theMPIsetup)){  
-  buffersize_r_low_send = get_buffersize(sim_ng(theSim),2*sim_ng(theSim),0,sim_N(theSim,Z_DIR),theSim);
-  buffersize_r_low_recv = get_buffersize(0,sim_ng(theSim),0,sim_N(theSim,Z_DIR),theSim);
+  buffersize_r_low_send = get_buffersize(sim_ng(theSim),2*sim_ng(theSim),0,sim_N_z(theSim),theSim);
+  buffersize_r_low_recv = get_buffersize(0,sim_ng(theSim),0,sim_N_z(theSim),theSim);
   buffer_r_low_send = malloc(sizeof(double)*buffersize_r_low_send);
-  set_buffer(sim_ng(theSim), 2*sim_ng(theSim),0,sim_N(theSim,Z_DIR),theSim,theCells,buffer_r_low_send);
+  set_buffer(sim_ng(theSim), 2*sim_ng(theSim),0,sim_N_z(theSim),theSim,theCells,buffer_r_low_send);
   buffer_r_low_recv = malloc(sizeof(double)*buffersize_r_low_recv);
   } else{
     buffersize_r_low_send = 1;
@@ -111,11 +111,11 @@ void cell_syncproc_r( struct Cell *** theCells , struct Sim *theSim,struct MPIse
   MPI_Sendrecv(buffer_r_hi_send,buffersize_r_hi_send,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[0],13,buffer_r_low_recv,buffersize_r_low_recv,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[0],13,sim_comm,&status);
 
   if (!mpisetup_check_rout_bndry(theMPIsetup)){
-    set_cells(sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR),sim_N(theSim,R_DIR),0,sim_N(theSim,Z_DIR),theSim,theCells,buffer_r_hi_recv);
+    set_cells(sim_N_r(theSim)-sim_Nghost_rmax(theSim),sim_N_r(theSim),0,sim_N_z(theSim),theSim,theCells,buffer_r_hi_recv);
   }
 
   if (!mpisetup_check_rin_bndry(theMPIsetup)){
-    set_cells(0,sim_Nghost_min(theSim,R_DIR),0,sim_N(theSim,Z_DIR),theSim,theCells,buffer_r_low_recv);
+    set_cells(0,sim_Nghost_rmin(theSim),0,sim_N_z(theSim),theSim,theCells,buffer_r_low_recv);
   }
 
   free(buffer_r_low_send);
@@ -129,24 +129,24 @@ void cell_syncproc_z( struct Cell *** theCells , struct Sim *theSim,struct MPIse
 
   int i,j,k,q;
 
-  int buffersize_z_hi_send = get_buffersize(0,sim_N(theSim,R_DIR), sim_N(theSim,Z_DIR)-2*sim_Nghost_max(theSim,Z_DIR),sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR),theSim);
-  int buffersize_z_hi_recv = get_buffersize(0,sim_N(theSim,R_DIR),sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR),sim_N(theSim,Z_DIR),theSim);
+  int buffersize_z_hi_send = get_buffersize(0,sim_N_r(theSim), sim_N_z(theSim)-2*sim_Nghost_zmax(theSim),sim_N_z(theSim)-sim_Nghost_zmax(theSim),theSim);
+  int buffersize_z_hi_recv = get_buffersize(0,sim_N_r(theSim),sim_N_z(theSim)-sim_Nghost_zmax(theSim),sim_N_z(theSim),theSim);
   double * buffer_z_hi_send = malloc(sizeof(double)*buffersize_z_hi_send);
   double * buffer_z_hi_recv = malloc(sizeof(double)*buffersize_z_hi_recv);
-  set_buffer(0,sim_N(theSim,R_DIR), sim_N(theSim,Z_DIR)-2*sim_Nghost_max(theSim,Z_DIR),sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR),theSim,theCells,buffer_z_hi_send);
+  set_buffer(0,sim_N_r(theSim), sim_N_z(theSim)-2*sim_Nghost_zmax(theSim),sim_N_z(theSim)-sim_Nghost_zmax(theSim),theSim,theCells,buffer_z_hi_send);
 
-  int buffersize_z_low_send = get_buffersize(0,sim_N(theSim,R_DIR),sim_Nghost_min(theSim,Z_DIR), 2*sim_Nghost_min(theSim,Z_DIR),theSim);
-  int buffersize_z_low_recv = get_buffersize(0,sim_N(theSim,R_DIR),0,sim_Nghost_min(theSim,Z_DIR),theSim);
+  int buffersize_z_low_send = get_buffersize(0,sim_N_r(theSim),sim_Nghost_zmin(theSim), 2*sim_Nghost_zmin(theSim),theSim);
+  int buffersize_z_low_recv = get_buffersize(0,sim_N_r(theSim),0,sim_Nghost_zmin(theSim),theSim);
   double * buffer_z_low_send = malloc(sizeof(double)*buffersize_z_low_send);
   double * buffer_z_low_recv = malloc(sizeof(double)*buffersize_z_low_recv);
-  set_buffer(0,sim_N(theSim,R_DIR), sim_Nghost_min(theSim,Z_DIR), 2*sim_Nghost_min(theSim,Z_DIR),theSim,theCells,buffer_z_low_send);
+  set_buffer(0,sim_N_r(theSim), sim_Nghost_zmin(theSim), 2*sim_Nghost_zmin(theSim),theSim,theCells,buffer_z_low_send);
 
   MPI_Status status;
   MPI_Sendrecv(buffer_z_low_send,buffersize_z_low_send,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[1],14,buffer_z_hi_recv,buffersize_z_hi_recv,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[1],14,sim_comm,&status);
   MPI_Sendrecv(buffer_z_hi_send,buffersize_z_hi_send,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[1],15,buffer_z_low_recv,buffersize_z_low_recv,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[1],15,sim_comm,&status);
 
-  set_cells(0,sim_N(theSim,R_DIR),sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR),sim_N(theSim,Z_DIR),theSim,theCells,buffer_z_hi_recv);
-  set_cells(0,sim_N(theSim,R_DIR),0,sim_Nghost_min(theSim,Z_DIR),theSim,theCells,buffer_z_low_recv);
+  set_cells(0,sim_N_r(theSim),sim_N_z(theSim)-sim_Nghost_zmax(theSim),sim_N_z(theSim),theSim,theCells,buffer_z_hi_recv);
+  set_cells(0,sim_N_r(theSim),0,sim_Nghost_zmin(theSim),theSim,theCells,buffer_z_low_recv);
 
   free(buffer_z_low_send);
   free(buffer_z_low_recv);    

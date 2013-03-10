@@ -14,8 +14,8 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
   //count up the total number of cells
   int Ncells=0;
   int i,j,k;
-  for (k=0; k<sim_N(theSim,Z_DIR); k++) {
-    for (i=0; i<sim_N(theSim,R_DIR);i++){
+  for (k=0; k<sim_N_z(theSim); k++) {
+    for (i=0; i<sim_N_r(theSim);i++){
       for(j = 0; j < sim_N_p(theSim,i); j++){
         ++Ncells;
       }
@@ -23,21 +23,21 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
   }
 
   //I wanted to allocate memory contiguously. It's not quite there yet.
-  struct Cell ***theCells = (struct Cell ***)malloc(sizeof(struct Cell **)*sim_N(theSim,Z_DIR));
-  theCells[0] = (struct Cell **)malloc(sizeof(struct Cell *)*sim_N(theSim,R_DIR)*sim_N(theSim,Z_DIR));
+  struct Cell ***theCells = (struct Cell ***)malloc(sizeof(struct Cell **)*sim_N_z(theSim));
+  theCells[0] = (struct Cell **)malloc(sizeof(struct Cell *)*sim_N_r(theSim)*sim_N_z(theSim));
   theCells[0][0] = (struct Cell *)malloc(sizeof(struct Cell)*Ncells);
 
   int position = 0;
-  for (k=0; k<sim_N(theSim,Z_DIR); k++) {
-    theCells[k] = theCells[0]+k*sim_N(theSim,R_DIR);
-    for (i=0; i<sim_N(theSim,R_DIR);i++){
-      theCells[k][i] = theCells[0][0]+position;//sim_N_p(theSim,i)*(k*sim_N(theSim,R_DIR)+i);
+  for (k=0; k<sim_N_z(theSim); k++) {
+    theCells[k] = theCells[0]+k*sim_N_r(theSim);
+    for (i=0; i<sim_N_r(theSim);i++){
+      theCells[k][i] = theCells[0][0]+position;//sim_N_p(theSim,i)*(k*sim_N_r(theSim)+i);
       position += sim_N_p(theSim,i);
     }
   }
   Ncells=0;
-  for (k=0; k<sim_N(theSim,Z_DIR); k++) {
-    for (i=0; i<sim_N(theSim,R_DIR);i++){
+  for (k=0; k<sim_N_z(theSim); k++) {
+    for (i=0; i<sim_N_r(theSim);i++){
       for(j = 0; j < sim_N_p(theSim,i); j++){
         theCells[k][i][j].prim = malloc(NUM_Q*sizeof(double));
         theCells[k][i][j].cons = malloc(NUM_Q*sizeof(double));
@@ -51,8 +51,8 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
 
   //  initialize
   srand(666+mpisetup_MyProc(theMPIsetup));
-  for(k = 0; k < sim_N(theSim,Z_DIR); k++){
-    for(i = 0; i < sim_N(theSim,R_DIR); i++){
+  for(k = 0; k < sim_N_z(theSim); k++){
+    for(i = 0; i < sim_N_r(theSim); i++){
       double tiph_0 = 2.*M_PI*(double)rand()/(double)RAND_MAX;
       double dphi = 2.*M_PI/(double)sim_N_p(theSim,i);
       for(j = 0; j < sim_N_p(theSim,i); j++){
@@ -103,8 +103,8 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
 
 void cell_destroy(struct Cell ***theCells,struct Sim *theSim){
   int i,j,k;
-  for (k=0; k<sim_N(theSim,Z_DIR); k++) {
-    for (i=0; i<sim_N(theSim,R_DIR);i++){
+  for (k=0; k<sim_N_z(theSim); k++) {
+    for (i=0; i<sim_N_r(theSim);i++){
       for(j = 0; j < sim_N_p(theSim,i); j++){
         free(theCells[k][i][j].gradp);
         free(theCells[k][i][j].grad);

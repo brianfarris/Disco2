@@ -8,37 +8,34 @@
 
 void sim_alloc_arr(struct Sim * theSim, struct MPIsetup * theMPIsetup) {
 
-  int N_noghost[2];
-  N_noghost[R_DIR] = theSim->N_global[R_DIR]/mpisetup_dim_NumProcs(theMPIsetup)[0];
-  N_noghost[Z_DIR] = theSim->N_global[Z_DIR]/mpisetup_dim_NumProcs(theMPIsetup)[1];
+  int N_r_noghost = theSim->N_r_global/mpisetup_dim_NumProcs(theMPIsetup)[0];
+  int N_z_noghost = theSim->N_z_global/mpisetup_dim_NumProcs(theMPIsetup)[1];
 
-  int Nghost_min[2];
-  int Nghost_max[2];
+  int Nghost_rmin;
   if (mpisetup_dim_MyProc(theMPIsetup,0)==0){
-    Nghost_min[R_DIR]  = 1;
+    Nghost_rmin  = 1;
   }else{
-    Nghost_min[R_DIR]  = theSim->ng;
+    Nghost_rmin  = theSim->ng;
   }
-  Nghost_max[R_DIR] = theSim->ng;
-  Nghost_min[Z_DIR] = theSim->ng;
-  Nghost_max[Z_DIR] = theSim->ng;
+  int Nghost_rmax = theSim->ng;
+  int Nghost_zmin = theSim->ng;
+  int Nghost_zmax = theSim->ng;
 
 
-  int N_withghost[2];
-  N_withghost[R_DIR] = N_noghost[R_DIR]+Nghost_min[R_DIR]+Nghost_max[R_DIR];
-  N_withghost[Z_DIR] = N_noghost[Z_DIR]+Nghost_min[Z_DIR]+Nghost_max[Z_DIR];
+  int N_r_withghost = N_r_noghost+Nghost_rmin+Nghost_rmax;
+  int N_z_withghost = N_z_noghost+Nghost_zmin+Nghost_zmax;
 
-  theSim->N_noghost[R_DIR] = N_noghost[R_DIR];
-  theSim->N_noghost[Z_DIR] = N_noghost[Z_DIR];
- 
-  theSim->Nghost_min[R_DIR] = Nghost_min[R_DIR];
-  theSim->Nghost_max[R_DIR] = Nghost_max[R_DIR];
-  theSim->Nghost_min[Z_DIR] = Nghost_min[Z_DIR];
-  theSim->Nghost_max[Z_DIR] = Nghost_max[Z_DIR];
+  theSim->N_r_noghost = N_r_noghost;
+  theSim->N_z_noghost = N_z_noghost;
 
-  theSim->N_p = (int *) malloc(N_withghost[R_DIR]*sizeof(int));
-  theSim->r_faces   = (double *) malloc( (N_withghost[R_DIR]+1)*sizeof(double) );
-  theSim->z_faces   = (double *) malloc( (N_withghost[Z_DIR]+1)*sizeof(double) );
+  theSim->Nghost_rmin = Nghost_rmin;
+  theSim->Nghost_rmax = Nghost_rmax;
+  theSim->Nghost_zmin = Nghost_zmin;
+  theSim->Nghost_zmax = Nghost_zmax;
+
+  theSim->N_p = (int *) malloc(N_r_withghost*sizeof(int));
+  theSim->r_faces   = (double *) malloc( (N_r_withghost+1)*sizeof(double) );
+  theSim->z_faces   = (double *) malloc( (N_z_withghost+1)*sizeof(double) );
 }
 
 

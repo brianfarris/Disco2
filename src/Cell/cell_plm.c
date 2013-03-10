@@ -14,8 +14,8 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
 
   int i,j,k,q;
 
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         for( q=0 ; q<NUM_Q ; ++q ){
           theCells[k][i][j].grad[q] = 0.0;
@@ -26,20 +26,20 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
 
   int n;
   for( n=0 ; n<Nf ; ++n ){
-    //struct Face * f  = face_pointer(theFaces,n);
+    struct Face * f  = face_pointer(theFaces,n);
     struct Cell * cL = face_L_pointer(theFaces,n);
     struct Cell * cR = face_R_pointer(theFaces,n);
-    double deltaL = face_deltaL(theFaces,n);
-    double deltaR = face_deltaR(theFaces,n);
+    double deltaL = face_deltaL(f);
+    double deltaR = face_deltaR(f);
     double pL = cL->tiph - .5*cL->dphi;
     double pR = cR->tiph - .5*cR->dphi;
-    double dpL = face_cm(theFaces,n) - pL;
+    double dpL = face_cm(f) - pL;
     while( dpL >  M_PI ) dpL -= 2.*M_PI;
     while( dpL < -M_PI ) dpL += 2.*M_PI;
-    double dpR = pR - face_cm(theFaces,n);
+    double dpR = pR - face_cm(f);
     while( dpR >  M_PI ) dpR -= 2.*M_PI;
     while( dpR < -M_PI ) dpR += 2.*M_PI;
-    double dA  = face_dA(theFaces,n);
+    double dA  = face_dA(f);
     for( q=0 ; q<NUM_Q ; ++q ){
       double WL = cL->prim[q] + dpL*cL->gradp[q];
       double WR = cR->prim[q] - dpR*cR->gradp[q];
@@ -49,13 +49,13 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       cR->grad[q] += S*dA; 
     }
   }
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    double zm = sim_FacePos(theSim,k-1,Z_DIR);
-    double zp = sim_FacePos(theSim,k,Z_DIR);
+  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    double zm = sim_z_faces(theSim,k-1);
+    double zp = sim_z_faces(theSim,k);
     double dz = zp-zm;
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
-      double rm = sim_FacePos(theSim,i-1,R_DIR);
-      double rp = sim_FacePos(theSim,i,R_DIR);
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      double rm = sim_r_faces(theSim,i-1);
+      double rp = sim_r_faces(theSim,i);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         double dp = theCells[k][i][j].dphi;
         double dAtot;
@@ -68,17 +68,17 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
   }
 
   for( n=0 ; n<Nf ; ++n ){
-    //struct Face * f  = face_pointer(theFaces,n);
+    struct Face * f  = face_pointer(theFaces,n);
     struct Cell * cL = face_L_pointer(theFaces,n);
     struct Cell * cR = face_R_pointer(theFaces,n);
-    double deltaL = face_deltaL(theFaces,n);
-    double deltaR = face_deltaR(theFaces,n);
+    double deltaL = face_deltaL(f);
+    double deltaR = face_deltaR(f);
     double pL = cL->tiph - .5*cL->dphi;
     double pR = cR->tiph - .5*cR->dphi;
-    double dpL = face_cm(theFaces,n) - pL;
+    double dpL = face_cm(f) - pL;
     while( dpL >  M_PI ) dpL -= 2.*M_PI;
     while( dpL < -M_PI ) dpL += 2.*M_PI;
-    double dpR = pR - face_cm(theFaces,n);
+    double dpR = pR - face_cm(f);
     while( dpR >  M_PI ) dpR -= 2.*M_PI;
     while( dpR < -M_PI ) dpR += 2.*M_PI;
     for( q=0 ; q<NUM_Q ; ++q ){
@@ -110,8 +110,8 @@ void cell_plm_p( struct Cell *** theCells ,struct Sim * theSim){
   int Qmax = NUM_Q;
 
   int i,j,k,q;
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         struct Cell * cL;

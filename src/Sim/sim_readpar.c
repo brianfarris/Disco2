@@ -57,13 +57,13 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "GravMassType"      , VAR_INT  , &(theSim->GravMassType)  );
       err += readvar( pfile , "BoundTypeR"         , VAR_INT  , &(theSim->BoundTypeR)  );
       err += readvar( pfile , "BoundTypeZ"         , VAR_INT  , &(theSim->BoundTypeZ)  );
-      err += readvar( pfile , "NumR"              , VAR_INT  , &(theSim->N_global[R_DIR]) );
-      err += readvar( pfile , "NumZ"              , VAR_INT  , &(theSim->N_global[Z_DIR]) );
+      err += readvar( pfile , "NumR"              , VAR_INT  , &(theSim->N_r_global) );
+      err += readvar( pfile , "NumZ"              , VAR_INT  , &(theSim->N_z_global  ));
       err += readvar( pfile , "ng"              , VAR_INT  , &(theSim->ng));
-      err += readvar( pfile , "R_Min"             , VAR_DOUB , &(theSim->MIN[R_DIR])  );
-      err += readvar( pfile , "R_Max"             , VAR_DOUB , &(theSim->MAX[R_DIR])  );
-      err += readvar( pfile , "Z_Min"             , VAR_DOUB , &(theSim->MIN[Z_DIR])  );
-      err += readvar( pfile , "Z_Max"             , VAR_DOUB , &(theSim->MAX[Z_DIR])  );
+      err += readvar( pfile , "R_Min"             , VAR_DOUB , &(theSim->RMIN)  );
+      err += readvar( pfile , "R_Max"             , VAR_DOUB , &(theSim->RMAX)  );
+      err += readvar( pfile , "Z_Min"             , VAR_DOUB , &(theSim->ZMIN)  );
+      err += readvar( pfile , "Z_Max"             , VAR_DOUB , &(theSim->ZMAX)  );
       err += readvar( pfile , "NP_CONST"             , VAR_INT , &(theSim->NP_CONST)  );
       err += readvar( pfile , "aspect"             , VAR_DOUB , &(theSim->aspect)  );
       err += readvar( pfile , "NUM_Q"              , VAR_INT  , &(theSim->NUM_Q) );
@@ -74,6 +74,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Move_Cells"        , VAR_INT  , &(theSim->MOVE_CELLS)  );
       //     err += readvar( pfile , "NumGravMass"        , VAR_INT  , &(theSim->NumGravMass)  );
       err += readvar( pfile , "Adiabatic_Index"   , VAR_DOUB , &(theSim->GAMMALAW)  );
+      err += readvar( pfile , "Include_Viscosity" , VAR_INT  , &(theSim->INCLUDE_VISCOSITY)  );
       err += readvar( pfile , "Explicit_Viscosity" , VAR_DOUB  , &(theSim->EXPLICIT_VISCOSITY)  );
       err += readvar( pfile , "DivB_Ch"           , VAR_DOUB , &(theSim->DIVB_CH)  );
       err += readvar( pfile , "DivB_l"            , VAR_DOUB , &(theSim->DIVB_L)  );

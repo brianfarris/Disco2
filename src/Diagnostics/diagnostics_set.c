@@ -8,8 +8,8 @@
 #include "../Headers/header.h"
 
 void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCells,struct Sim * theSim,struct TimeStep * theTimeStep){
-  int num_r_points = sim_N(theSim,R_DIR)-sim_Nghost_min(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR);
-  int num_r_points_global = sim_N_global(theSim,R_DIR);
+  int num_r_points = sim_N_r(theSim)-sim_Nghost_rmin(theSim)-sim_Nghost_rmax(theSim);
+  int num_r_points_global = sim_N_r_global(theSim);
 
   int NUM_SCAL = theDiagnostics->NUM_DIAG;
   int NUM_VEC = theDiagnostics->NUM_DIAG+1;
@@ -21,10 +21,10 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 
   double dtout = timestep_get_t(theTimeStep)-theDiagnostics->toutprev;
   
-  int imin = sim_Nghost_min(theSim,R_DIR);
-  int imax = sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR);
-  int kmin = sim_Nghost_min(theSim,Z_DIR);
-  int kmax = sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR);
+  int imin = sim_Nghost_rmin(theSim);
+  int imax = sim_N_r(theSim)-sim_Nghost_rmax(theSim);
+  int kmin = sim_Nghost_zmin(theSim);
+  int kmax = sim_N_z(theSim)-sim_Nghost_zmax(theSim);
   int i,j,k,n;
   
   for (n=0;n<NUM_SCAL;++n){
@@ -38,38 +38,38 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
   }
 
   for (k=kmin;k<kmax;++k){
-    double zp = sim_FacePos(theSim,k,Z_DIR);
-    double zm = sim_FacePos(theSim,k-1,Z_DIR);
+    double zp = sim_z_faces(theSim,k);
+    double zm = sim_z_faces(theSim,k-1);
     double dz = zp-zm;
     for (i=imin;i<imax;++i){
-      double rp = sim_FacePos(theSim,i,R_DIR);
-      double rm = sim_FacePos(theSim,i-1,R_DIR);
+      double rp = sim_r_faces(theSim,i);
+      double rm = sim_r_faces(theSim,i-1);
       double r = 0.5*(rm+rp);
       for (j=0;j<sim_N_p(theSim,i);++j){
         // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
-        VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+0] += r/sim_N_p(theSim,i)*dz ;
-        VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1] += (cell_prim(cell_single(theCells,i,j,k),RHO)/sim_N_p(theSim,i)*dz) ;
-        VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+2] += (cell_prim(cell_single(theCells,i,j,k),PPP)/sim_N_p(theSim,i)*dz) ;
+        VectorDiag_temp[(sim_N_r_0(theSim)+i-imin)*NUM_VEC+0] += r/sim_N_p(theSim,i)*dz ;
+        VectorDiag_temp[(sim_N_r_0(theSim)+i-imin)*NUM_VEC+1] += (cell_prim(cell_single(theCells,i,j,k),RHO)/sim_N_p(theSim,i)*dz) ;
+        VectorDiag_temp[(sim_N_r_0(theSim)+i-imin)*NUM_VEC+2] += (cell_prim(cell_single(theCells,i,j,k),PPP)/sim_N_p(theSim,i)*dz) ;
         //etc
       }
     }
   }
 
   for (i=imin;i<imax;++i){
-    double rp = sim_FacePos(theSim,i,R_DIR);
-    double rm = sim_FacePos(theSim,i-1,R_DIR);
+    double rp = sim_r_faces(theSim,i);
+    double rm = sim_r_faces(theSim,i-1);
     for (n=0;n<NUM_SCAL;++n){
       // mult by delta r^2 because we are doing an r integration
-      ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1] * (rp*rp-rm*rm); 
+      ScalarDiag_temp[n] += VectorDiag_temp[(sim_N_r_0(theSim)+i-imin)*NUM_VEC+n+1] * (rp*rp-rm*rm); 
     }
   }
 
   MPI_Allreduce( ScalarDiag_temp,ScalarDiag_reduce , NUM_SCAL, MPI_DOUBLE, MPI_SUM, sim_comm);
   MPI_Allreduce( VectorDiag_temp,VectorDiag_reduce , num_r_points_global*NUM_VEC, MPI_DOUBLE, MPI_SUM, sim_comm);
-  double RMIN = sim_MIN(theSim,R_DIR);
-  double RMAX = sim_MAX(theSim,R_DIR);
-  double ZMIN = sim_MIN(theSim,Z_DIR);
-  double ZMAX = sim_MAX(theSim,Z_DIR);
+  double RMIN = sim_RMIN(theSim);
+  double RMAX = sim_RMAX(theSim);
+  double ZMIN = sim_ZMIN(theSim);
+  double ZMAX = sim_ZMAX(theSim);
 
   for (n=0;n<NUM_SCAL;++n){
     ScalarDiag_reduce[n] *= dtout/((ZMAX-ZMIN)*(RMAX*RMAX-RMIN*RMIN));

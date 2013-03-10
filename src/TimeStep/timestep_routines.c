@@ -49,8 +49,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   //Phi Flux
   cell_plm_p( theCells,theSim );
   int i,j,k;
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i)-1 ; ++j ){
         struct Riemann * theRiemann = riemann_create(theSim);
         riemann_setup_p(theRiemann,theCells,theSim,i,j,j+1,k);
@@ -74,7 +74,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   }
 
   //Z Flux
-  if( sim_N_global(theSim,Z_DIR) != 1 ){
+  if( sim_N_z_global(theSim) != 1 ){
     cell_plm_rz( theCells ,theSim, theFaces_z , timestep_Nfz(theTimeStep) , 1 );
     for( n=0 ; n<timestep_Nfz(theTimeStep) ; ++n ){
       struct Riemann * theRiemann = riemann_create(theSim);
@@ -86,7 +86,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
 
   //Source Terms
   cell_add_src( theCells ,theSim, theGravMasses , dt );
-  if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
+  if (sim_INCLUDE_VISCOSITY(theSim)){
     cell_add_visc_src( theCells ,theSim,dt );
   }
 
@@ -113,13 +113,13 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
    
 
   face_destroy(theFaces_r);
-  if (sim_N_global(theSim,Z_DIR)>1){
+  if (sim_N_z_global(theSim)>1){
     face_destroy(theFaces_z);
   }
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
-  if (sim_N_global(theSim,Z_DIR)>1){
+  if (sim_N_z_global(theSim)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
   
@@ -132,8 +132,8 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
   double DIVB_L = sim_DIVB_L(theSim);
 
   int i,j,k;
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         cell_mult_psi(cell_single(theCells,i,j,k),exp(-theTimeStep->dt*DIVB_CH/DIVB_L));
       }
@@ -147,7 +147,7 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
-  if (sim_N_global(theSim,Z_DIR)>1){
+  if (sim_N_z_global(theSim)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
 }
@@ -160,10 +160,10 @@ int * timestep_nzk(struct TimeStep * theTimeStep){
 }
 
 void timestep_set_Nfr(struct TimeStep * theTimeStep,struct Sim * theSim){
-  theTimeStep->Nfr = theTimeStep->nri[sim_N(theSim,R_DIR)-1];
+  theTimeStep->Nfr = theTimeStep->nri[sim_N_r(theSim)-1];
 }
 void timestep_set_Nfz(struct TimeStep * theTimeStep,struct Sim * theSim){
-  theTimeStep->Nfz = theTimeStep->nzk[sim_N(theSim,Z_DIR)-1];
+  theTimeStep->Nfz = theTimeStep->nzk[sim_N_z(theSim)-1];
 }
 
 int timestep_Nfr(struct TimeStep * theTimeStep){
