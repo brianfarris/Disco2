@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/Cell.h"
 #include "../Headers/header.h"

@@ -1,24 +1,24 @@
 #define DIAGNOSTICS_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Diagnostics.h"
 #include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
-struct Diagnostics *diagnostics_create(struct Grid * theGrid, struct TimeStep * theTimeStep) {
+struct Diagnostics *diagnostics_create(struct Sim * theSim, struct TimeStep * theTimeStep) {
   struct Diagnostics * theDiagnostics = (struct Diagnostics *) malloc(sizeof(struct Diagnostics));
   
-  theDiagnostics->VectorDiag = malloc(sizeof(double *) * grid_N_r_global(theGrid));
-  theDiagnostics->VectorDiag[0] = malloc(sizeof(double) * grid_N_r_global(theGrid) * theDiagnostics->NUM_DIAG);
+  theDiagnostics->VectorDiag = malloc(sizeof(double *) * sim_N_r_global(theSim));
+  theDiagnostics->VectorDiag[0] = malloc(sizeof(double) * sim_N_r_global(theSim) * theDiagnostics->NUM_DIAG);
   int i,n;
-  for (i=0;i<grid_N_r_global(theGrid);++i){
+  for (i=0;i<sim_N_r_global(theSim);++i){
     theDiagnostics->VectorDiag[i] = theDiagnostics->VectorDiag[0]+i*theDiagnostics->NUM_DIAG;
   }
 
   theDiagnostics->ScalarDiag = malloc(sizeof(double)*theDiagnostics->NUM_DIAG);
 
-  for (i=0;i<grid_N_r_global(theGrid);++i){
+  for (i=0;i<sim_N_r_global(theSim);++i){
     for (n=0;n<theDiagnostics->NUM_DIAG;++n){
        theDiagnostics->VectorDiag[i][n]=0.0;
     }
@@ -32,8 +32,8 @@ struct Diagnostics *diagnostics_create(struct Grid * theGrid, struct TimeStep * 
   return theDiagnostics;
 }
 
-void diagnostics_destroy(struct Diagnostics *theDiagnostics,struct Grid * theGrid) {
-  int num_r_points_global = grid_N_r_global(theGrid);
+void diagnostics_destroy(struct Diagnostics *theDiagnostics,struct Sim * theSim) {
+  int num_r_points_global = sim_N_r_global(theSim);
   int i,n;
   free(theDiagnostics->ScalarDiag);
   free(theDiagnostics->VectorDiag[0]);

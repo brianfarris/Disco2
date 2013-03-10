@@ -5,15 +5,15 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Cell.h"
 #include "hdf5.h"
 #include "../Headers/IO.h"
 #include "../Headers/header.h"
 
-void io_hdf5_out(struct IO *io_pointer,struct Grid * theGrid, char * output_filename){
-  int NUM_Q = grid_NUM_Q(theGrid);
-  int Ncells = grid_Ncells(theGrid);
+void io_hdf5_out(struct IO *io_pointer,struct Sim * theSim, char * output_filename){
+  int NUM_Q = sim_NUM_Q(theSim);
+  int Ncells = sim_Ncells(theSim);
   int i,q;
   // HDF5 APIs definitions
   hid_t       file_id, dset_id;         /* file and dataset identifiers */
@@ -31,16 +31,16 @@ void io_hdf5_out(struct IO *io_pointer,struct Grid * theGrid, char * output_file
 
   // Set up file access property list with parallel I/O access
   plist_id = H5Pcreate(H5P_FILE_ACCESS);
-  H5Pset_fapl_mpio(plist_id, grid_comm, info);
+  H5Pset_fapl_mpio(plist_id, sim_comm, info);
 
   // Create a new file collectively and release property list identifier.
   file_id = H5Fcreate(output_filename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
   H5Pclose(plist_id);
 
   // Create the dataspace for the dataset.
-  dimsf[0] = grid_Ncells_global(theGrid);
+  dimsf[0] = sim_Ncells_global(theSim);
   dimsf[1] = NUM_Q+3;
-  chunk_dims[0] = grid_Ncells(theGrid);
+  chunk_dims[0] = sim_Ncells(theSim);
   chunk_dims[1] = NUM_Q+3;
   filespace = H5Screate_simple(RANK, dimsf, NULL); 
   memspace  = H5Screate_simple(RANK, chunk_dims, NULL); 
@@ -61,7 +61,7 @@ void io_hdf5_out(struct IO *io_pointer,struct Grid * theGrid, char * output_file
   stride[1] = 1;
   block[0] = chunk_dims[0];
   block[1] = chunk_dims[1];
-  offset[0] = grid_offset(theGrid);
+  offset[0] = sim_offset(theSim);
   offset[1] = 0;
 
   // Select hyperslab in the file.
@@ -83,9 +83,9 @@ void io_hdf5_out(struct IO *io_pointer,struct Grid * theGrid, char * output_file
   H5Fclose(file_id);
 }    
 
-void io_hdf5_in(struct IO *io_pointer,struct Grid * theGrid, char * input_filename){
-  int NUM_Q = grid_NUM_Q(theGrid);
-  int Ncells = grid_Ncells(theGrid);
+void io_hdf5_in(struct IO *io_pointer,struct Sim * theSim, char * input_filename){
+  int NUM_Q = sim_NUM_Q(theSim);
+  int Ncells = sim_Ncells(theSim);
    // double **chunk_out = io_pointer->primitives;
   hid_t       file;                        /* handles */
   hid_t       dataset;  
@@ -110,7 +110,7 @@ void io_hdf5_in(struct IO *io_pointer,struct Grid * theGrid, char * input_filena
   rank      = H5Sget_simple_extent_ndims(filespace);
   status_n  = H5Sget_simple_extent_dims(filespace, dims, NULL);
 
-  chunk_dims[0] = grid_Ncells(theGrid);
+  chunk_dims[0] = sim_Ncells(theSim);
   chunk_dims[1] = NUM_Q+3;
 
   // Define the memory space to read a chunk.
@@ -123,7 +123,7 @@ void io_hdf5_in(struct IO *io_pointer,struct Grid * theGrid, char * input_filena
   block[0] = chunk_dims[0];
   block[1] = chunk_dims[1];
 
-  offset[0] = grid_offset(theGrid);
+  offset[0] = sim_offset(theSim);
   offset[1] = 0; 
 
   status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, stride, count, block);

@@ -1,15 +1,15 @@
 #define TIMESTEP_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
-struct TimeStep *timestep_create(struct Grid * theGrid) {
+struct TimeStep *timestep_create(struct Sim * theSim) {
   struct TimeStep *theTimeStep = (struct TimeStep *) malloc(sizeof(struct TimeStep));
   theTimeStep->t = 0.0;
-  theTimeStep->nri = (int *)malloc(grid_N_r(theGrid)*sizeof(int));
-  theTimeStep->nzk = (int *)malloc(grid_N_z(theGrid)*sizeof(int));
+  theTimeStep->nri = (int *)malloc(sim_N_r(theSim)*sizeof(int));
+  theTimeStep->nzk = (int *)malloc(sim_N_z(theSim)*sizeof(int));
   return theTimeStep;
 }
 

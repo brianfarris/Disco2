@@ -2,19 +2,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Riemann.h"
 #include "../Headers/header.h"
 
-struct Riemann *riemann_create(struct Grid *theGrid){
+struct Riemann *riemann_create(struct Sim *theSim){
   struct Riemann * theRiemann = malloc(sizeof(struct Riemann));
-  theRiemann->primL = malloc(sizeof(double)*grid_NUM_Q(theGrid));
-  theRiemann->primR = malloc(sizeof(double)*grid_NUM_Q(theGrid));
-  theRiemann->Uk = malloc(sizeof(double)*grid_NUM_Q(theGrid));
-  theRiemann->Ustar = malloc(sizeof(double)*grid_NUM_Q(theGrid));
-  theRiemann->F = malloc(sizeof(double)*grid_NUM_Q(theGrid));
+  theRiemann->primL = malloc(sizeof(double)*sim_NUM_Q(theSim));
+  theRiemann->primR = malloc(sizeof(double)*sim_NUM_Q(theSim));
+  theRiemann->Uk = malloc(sizeof(double)*sim_NUM_Q(theSim));
+  theRiemann->Ustar = malloc(sizeof(double)*sim_NUM_Q(theSim));
+  theRiemann->F = malloc(sizeof(double)*sim_NUM_Q(theSim));
   int q;
-  for (q=0;q<grid_NUM_Q(theGrid);++q){
+  for (q=0;q<sim_NUM_Q(theSim);++q){
     theRiemann->primL[q]=0.;
     theRiemann->primR[q]=0.;
     theRiemann->Uk[q]=0.;

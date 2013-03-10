@@ -1,15 +1,15 @@
 #define DIAGNOSTICS_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Cell.h"
 #include "../Headers/Diagnostics.h"
 #include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
-void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCells,struct Grid * theGrid,struct TimeStep * theTimeStep){
-  int num_r_points = grid_N_r(theGrid)-grid_Nghost_rmin(theGrid)-grid_Nghost_rmax(theGrid);
-  int num_r_points_global = grid_N_r_global(theGrid);
+void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCells,struct Sim * theSim,struct TimeStep * theTimeStep){
+  int num_r_points = sim_N_r(theSim)-sim_Nghost_rmin(theSim)-sim_Nghost_rmax(theSim);
+  int num_r_points_global = sim_N_r_global(theSim);
 
   double * VectorDiag_temp = malloc(sizeof(double) * num_r_points_global*theDiagnostics->NUM_DIAG);
   double * VectorDiag_reduce = malloc(sizeof(double) * num_r_points_global*theDiagnostics->NUM_DIAG);
@@ -18,10 +18,10 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 
   double dtout = timestep_get_t(theTimeStep)-theDiagnostics->toutprev;
   
-  int imin = grid_Nghost_rmin(theGrid);
-  int imax = grid_N_r(theGrid)-grid_Nghost_rmax(theGrid);
-  int kmin = grid_Nghost_zmin(theGrid);
-  int kmax = grid_N_z(theGrid)-grid_Nghost_zmax(theGrid);
+  int imin = sim_Nghost_rmin(theSim);
+  int imax = sim_N_r(theSim)-sim_Nghost_rmax(theSim);
+  int kmin = sim_Nghost_zmin(theSim);
+  int kmax = sim_N_z(theSim)-sim_Nghost_zmax(theSim);
   int i,j,k,n;
   
   for (n=0;n<theDiagnostics->NUM_DIAG;++n){
@@ -35,34 +35,34 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
   }
 
   for (k=kmin;k<kmax;++k){
-    double zp = grid_z_faces(theGrid,k);
-    double zm = grid_z_faces(theGrid,k-1);
+    double zp = sim_z_faces(theSim,k);
+    double zm = sim_z_faces(theSim,k-1);
     double dz = zp-zm;
     for (i=imin;i<imax;++i){
-     for (j=0;j<grid_N_p(theGrid,i);++j){
+     for (j=0;j<sim_N_p(theSim,i);++j){
         // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
-        VectorDiag_temp[(grid_N_r_0(theGrid)+i-imin)*theDiagnostics->NUM_DIAG+0] += (cell_prim(cell_single(theCells,i,j,k),RHO)/grid_N_p(theGrid,i)*dz) ;
-        VectorDiag_temp[(grid_N_r_0(theGrid)+i-imin)*theDiagnostics->NUM_DIAG+1] += (cell_prim(cell_single(theCells,i,j,k),PPP)/grid_N_p(theGrid,i)*dz) ;
+        VectorDiag_temp[(sim_N_r_0(theSim)+i-imin)*theDiagnostics->NUM_DIAG+0] += (cell_prim(cell_single(theCells,i,j,k),RHO)/sim_N_p(theSim,i)*dz) ;
+        VectorDiag_temp[(sim_N_r_0(theSim)+i-imin)*theDiagnostics->NUM_DIAG+1] += (cell_prim(cell_single(theCells,i,j,k),PPP)/sim_N_p(theSim,i)*dz) ;
         //etc
       }
     }
   }
 
   for (i=imin;i<imax;++i){
-    double rp = grid_r_faces(theGrid,i);
-    double rm = grid_r_faces(theGrid,i-1);
+    double rp = sim_r_faces(theSim,i);
+    double rm = sim_r_faces(theSim,i-1);
     for (n=0;n<theDiagnostics->NUM_DIAG;++n){
       // mult by delta r^2 because we are doing an r integration
-      ScalarDiag_temp[n] += VectorDiag_temp[(grid_N_r_0(theGrid)+i-imin)*theDiagnostics->NUM_DIAG+n] * (rp*rp-rm*rm); 
+      ScalarDiag_temp[n] += VectorDiag_temp[(sim_N_r_0(theSim)+i-imin)*theDiagnostics->NUM_DIAG+n] * (rp*rp-rm*rm); 
     }
   }
 
-  MPI_Allreduce( ScalarDiag_temp,ScalarDiag_reduce, theDiagnostics->NUM_DIAG, MPI_DOUBLE, MPI_SUM, grid_comm);
-  MPI_Allreduce( VectorDiag_temp,VectorDiag_reduce, num_r_points_global*theDiagnostics->NUM_DIAG, MPI_DOUBLE, MPI_SUM, grid_comm);
-  double RMIN = grid_RMIN(theGrid);
-  double RMAX = grid_RMAX(theGrid);
-  double ZMIN = grid_ZMIN(theGrid);
-  double ZMAX = grid_ZMAX(theGrid);
+  MPI_Allreduce( ScalarDiag_temp,ScalarDiag_reduce, theDiagnostics->NUM_DIAG, MPI_DOUBLE, MPI_SUM, sim_comm);
+  MPI_Allreduce( VectorDiag_temp,VectorDiag_reduce, num_r_points_global*theDiagnostics->NUM_DIAG, MPI_DOUBLE, MPI_SUM, sim_comm);
+  double RMIN = sim_RMIN(theSim);
+  double RMAX = sim_RMAX(theSim);
+  double ZMIN = sim_ZMIN(theSim);
+  double ZMAX = sim_ZMAX(theSim);
 
   for (n=0;n<theDiagnostics->NUM_DIAG;++n){
     ScalarDiag_reduce[n] /= ((ZMAX-ZMIN)*(RMAX*RMAX-RMIN*RMIN));

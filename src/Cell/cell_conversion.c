@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Cell.h"
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
@@ -38,33 +38,33 @@ void cell_prim2cons( double * prim , double * cons , double r , double dV ,doubl
   }
 }
 
-void cell_calc_cons( struct Cell *** theCells,struct Grid *theGrid ){
-  double GAMMALAW = grid_GAMMALAW(theGrid);
+void cell_calc_cons( struct Cell *** theCells,struct Sim *theSim ){
+  double GAMMALAW = sim_GAMMALAW(theSim);
 
   int i,j,k;
-  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
-    double zp = grid_z_faces(theGrid,k);
-    double zm = grid_z_faces(theGrid,k-1);
+  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    double zp = sim_z_faces(theSim,k);
+    double zm = sim_z_faces(theSim,k-1);
     double dz = zp-zm;
-    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
-      double rp = grid_r_faces(theGrid,i);
-      double rm = grid_r_faces(theGrid,i-1);
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      double rp = sim_r_faces(theSim,i);
+      double rm = sim_r_faces(theSim,i-1);
       double r = .5*(rp+rm);
-      for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         double dV = .5*(rp*rp - rm*rm)*c->dphi*dz;
-        cell_prim2cons( c->prim , c->cons , r , dV,GAMMALAW ,grid_runtype(theGrid));
+        cell_prim2cons( c->prim , c->cons , r , dV,GAMMALAW ,sim_runtype(theSim));
       }    
     }    
   }
 }
 
-void cell_cons2prim( double * cons , double * prim , double r , double dV ,struct Grid * theGrid,int runtype){
-  double CS_FLOOR = grid_CS_FLOOR(theGrid);
-  double CS_CAP = grid_CS_CAP(theGrid);
-  double RHO_FLOOR = grid_RHO_FLOOR(theGrid);
-  double VEL_CAP = grid_VEL_CAP(theGrid);
-  double GAMMALAW = grid_GAMMALAW(theGrid);
+void cell_cons2prim( double * cons , double * prim , double r , double dV ,struct Sim * theSim,int runtype){
+  double CS_FLOOR = sim_CS_FLOOR(theSim);
+  double CS_CAP = sim_CS_CAP(theSim);
+  double RHO_FLOOR = sim_RHO_FLOOR(theSim);
+  double VEL_CAP = sim_VEL_CAP(theSim);
+  double GAMMALAW = sim_GAMMALAW(theSim);
   double rho = cons[DDD]/dV;
   if( rho < RHO_FLOOR ) rho = RHO_FLOOR;
   double Sr  = cons[SRR]/dV;
@@ -110,20 +110,20 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
   prim[UZZ] = vz;
 }
 
-void cell_calc_prim( struct Cell *** theCells ,struct Grid * theGrid){
+void cell_calc_prim( struct Cell *** theCells ,struct Sim * theSim){
   int i,j,k;
-  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
-    double zm = grid_z_faces(theGrid,k-1);
-    double zp = grid_z_faces(theGrid,k);
+  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    double zm = sim_z_faces(theSim,k-1);
+    double zp = sim_z_faces(theSim,k);
     double dz = zp-zm;
-    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
-      double rm = grid_r_faces(theGrid,i-1);
-      double rp = grid_r_faces(theGrid,i);
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      double rm = sim_r_faces(theSim,i-1);
+      double rp = sim_r_faces(theSim,i);
       double r = .5*(rp+rm);
-      for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = cell_single(theCells,i,j,k);
         double dV = .5*(rp*rp-rm*rm)*c->dphi*dz;
-        cell_cons2prim( c->cons , c->prim , r , dV ,theGrid,grid_runtype(theGrid));
+        cell_cons2prim( c->cons , c->prim , r , dV ,theSim,sim_runtype(theSim));
       }
     }
   }

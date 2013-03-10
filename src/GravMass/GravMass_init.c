@@ -3,15 +3,15 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/GravMass.h"
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/header.h"
 
-void (*gravMass_init_ptr(struct Grid * theGrid))(struct GravMass *){
-  if (grid_GravMassType(theGrid)==NONE){
+void (*gravMass_init_ptr(struct Sim * theSim))(struct GravMass *){
+  if (sim_GravMassType(theSim)==NONE){
     return(&gravMass_init_none);
-  } else if (grid_GravMassType(theGrid)==SINGLE){
+  } else if (sim_GravMassType(theSim)==SINGLE){
     return(&gravMass_init_single);
-  } else if  (grid_GravMassType(theGrid)==BINARY){
+  } else if  (sim_GravMassType(theSim)==BINARY){
     return(&gravMass_init_binary);
   } else{
     printf("ERROR\n");

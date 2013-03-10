@@ -3,17 +3,17 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Cell.h"
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
-void cell_single_init_flock(struct Cell ***theCells, struct Grid *theGrid,int i,int j,int k){
+void cell_single_init_flock(struct Cell ***theCells, struct Sim *theSim,int i,int j,int k){
   double DISK_MACH = 10.;
-  double GAMMALAW = grid_GAMMALAW(theGrid);
-  double rm =  grid_r_faces(theGrid,i-1);
-  double rp =  grid_r_faces(theGrid,i);
+  double GAMMALAW = sim_GAMMALAW(theSim);
+  double rm =  sim_r_faces(theSim,i-1);
+  double rp =  sim_r_faces(theSim,i);
   double r = .5*(rm+rp);
   double omega = 1./pow(r,1.5);
   double cs = 1.0/DISK_MACH*omega*r;
@@ -36,18 +36,18 @@ void cell_single_init_flock(struct Cell ***theCells, struct Grid *theGrid,int i,
   theCells[k][i][j].GradPsi[2] = 0.0;
 }
 
-void cell_init_flock(struct Cell ***theCells,struct Grid *theGrid,struct MPIsetup * theMPIsetup) {
+void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 
   double DISK_MACH = 10.;
-  double GAMMALAW = grid_GAMMALAW(theGrid);
+  double GAMMALAW = sim_GAMMALAW(theSim);
   
   srand(666 + mpisetup_MyProc(theMPIsetup));
   double rho0 = 1.0;
   int i, j,k;
-  for (k = 0; k < grid_N_z(theGrid); k++) {
-    for (i = 0; i < grid_N_r(theGrid); i++) {
-      double rm = grid_r_faces(theGrid,i-1);
-      double rp = grid_r_faces(theGrid,i);
+  for (k = 0; k < sim_N_z(theSim); k++) {
+    for (i = 0; i < sim_N_r(theSim); i++) {
+      double rm = sim_r_faces(theSim,i-1);
+      double rp = sim_r_faces(theSim,i);
       double r = 0.5*(rm+rp);
       double omega = 1./pow(r,1.5);
       double cs = 1.0/DISK_MACH*omega*r;
@@ -63,7 +63,7 @@ void cell_init_flock(struct Cell ***theCells,struct Grid *theGrid,struct MPIsetu
       }
       double delta = .001*( (double)rand()/(double)RAND_MAX - .5 );
 
-      for (j = 0; j < grid_N_p(theGrid,i); j++) {
+      for (j = 0; j < sim_N_p(theSim,i); j++) {
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = Pp;
         theCells[k][i][j].prim[URR] = 0.0;

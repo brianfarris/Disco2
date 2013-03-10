@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Riemann.h"
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Cell.h"
 #include "../Headers/Face.h"
 #include "../Headers/header.h"
@@ -61,13 +61,13 @@ void LR_speed_mhd(double *prim,double *n,double r,double ch, double * p_cf2,doub
   *p_B2 = B2;
 }
 
-void riemann_set_vel(struct Riemann * theRiemann,struct Grid * theGrid, double *n,double r,double *Bpack,double GAMMALAW,double DIVB_CH){
+void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim, double *n,double r,double *Bpack,double GAMMALAW,double DIVB_CH){
   double L_Mins, L_Plus, L_Star;
 
   double vnL,cf21,mnL,BnL,B2L;
   double FL[3], FmL[3];
   LR_speed(theRiemann->primL,n,r,GAMMALAW,&vnL,&cf21,FmL,&mnL);
-  if (grid_runtype(theGrid)==MHD){
+  if (sim_runtype(theSim)==MHD){
     LR_speed_mhd(theRiemann->primL,n,r,DIVB_CH,&cf21,FL,FmL,&BnL,&B2L);
   }
   L_Mins = vnL - sqrt( cf21 );
@@ -76,13 +76,13 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Grid * theGrid, double *
   double vnR,cf22,mnR,BnR,B2R;
   double FR[3],FmR[3];
   LR_speed(theRiemann->primR,n,r,GAMMALAW,&vnR,&cf22,FmR,&mnR);
-  if (grid_runtype(theGrid)==MHD){
+  if (sim_runtype(theSim)==MHD){
     LR_speed_mhd(theRiemann->primR,n,r,DIVB_CH,&cf22,FR,FmR,&BnR,&B2R);
   }
   if( L_Mins > vnR - sqrt( cf22 ) ) L_Mins = vnR - sqrt( cf22 );
   if( L_Plus < vnR + sqrt( cf22 ) ) L_Plus = vnR + sqrt( cf22 );
   
-  if (grid_runtype(theGrid)==MHD){
+  if (sim_runtype(theSim)==MHD){
     if( L_Mins > -DIVB_CH ) L_Mins = -DIVB_CH;
     if( L_Plus <  DIVB_CH ) L_Plus =  DIVB_CH;
   }
@@ -98,7 +98,7 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Grid * theGrid, double *
   L_Star = (theRiemann->primR[RHO]*vnR*(L_Plus-vnR)-theRiemann->primL[RHO]*vnL*(L_Mins-vnL)+theRiemann->primL[PPP]-theRiemann->primR[PPP])
     /(theRiemann->primR[RHO]*(L_Plus-vnR)-theRiemann->primL[RHO]*(L_Mins-vnL));
 
-  if (grid_runtype(theGrid)==MHD){  
+  if (sim_runtype(theSim)==MHD){  
     double Br = ( aR*theRiemann->primL[BRR] + aL*theRiemann->primR[BRR] + FL[0] - FR[0] )/( aL + aR );
     double Bp = ( aR*theRiemann->primL[BPP] + aL*theRiemann->primR[BPP] + FL[1] - FR[1] )/( aL + aR );
     double Bz = ( aR*theRiemann->primL[BZZ] + aL*theRiemann->primR[BZZ] + FL[2] - FR[2] )/( aL + aR );
@@ -133,7 +133,7 @@ void riemann_set_state(struct Riemann * theRiemann,int w ){
   }
 }
 
-void riemann_set_Ustar(struct Riemann * theRiemann,struct Grid * theGrid, double *n,double r,double *Bpack,double GAMMALAW){
+void riemann_set_Ustar(struct Riemann * theRiemann,struct Sim * theSim, double *n,double r,double *Bpack,double GAMMALAW){
   double *prim;
   double Sk;
   if (theRiemann->state==LEFTSTAR){
@@ -166,7 +166,7 @@ void riemann_set_Ustar(struct Riemann * theRiemann,struct Grid * theGrid, double
   double Msz   = ( Sk - vn )*mz / ( Sk - Ss );
   double Estar = ( ( Sk - vn )*E_hydro + Ps*Ss - Pp*vn ) / ( Sk - Ss );
 
-  if (grid_runtype(theGrid)==MHD){
+  if (sim_runtype(theSim)==MHD){
     double Bsn = Bpack[0];
     double Bsr = Bpack[1];
     double Bsp = Bpack[2];
@@ -206,7 +206,7 @@ void riemann_set_Ustar(struct Riemann * theRiemann,struct Grid * theGrid, double
 
 }
 
-void riemann_set_flux(struct Riemann * theRiemann, struct Grid * theGrid, double r , double * n ,double GAMMALAW,double DIVB_CH){
+void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim, double r , double * n ,double GAMMALAW,double DIVB_CH){
   double *prim;
   if ((theRiemann->state==LEFT)||(theRiemann->state==LEFTSTAR)){
     prim = theRiemann->primL;
@@ -228,7 +228,7 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Grid * theGrid, double
   theRiemann->F[SZZ] =     rho*vz*vn + Pp*n[2] ;
   theRiemann->F[TAU] = ( .5*rho*v2 + rhoe + Pp )*vn ;
 
-  if (grid_runtype(theGrid)==MHD){ 
+  if (sim_runtype(theSim)==MHD){ 
     double Br  = prim[BRR];
     double Bp  = prim[BPP];
     double Bz  = prim[BZZ];
@@ -261,9 +261,9 @@ void riemann_addto_flux_general(struct Riemann * theRiemann,double w,int NUM_Q){
   }
 }
 
-void riemann_visc_flux(struct Riemann * theRiemann,struct Grid * theGrid, double * n ){
-  double nu = grid_EXPLICIT_VISCOSITY(theGrid);
-  int NUM_Q = grid_NUM_Q(theGrid);
+void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim, double * n ){
+  double nu = sim_EXPLICIT_VISCOSITY(theSim);
+  int NUM_Q = sim_NUM_Q(theSim);
 
   double r = theRiemann->r;
 
@@ -303,8 +303,8 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Grid * theGrid, double
   free(AvgPrim);
 }
 
-void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct Grid * theGrid,int n){
-  int NUM_Q = grid_NUM_Q(theGrid);
+void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct Sim * theSim,int n){
+  int NUM_Q = sim_NUM_Q(theSim);
   double deltaL = face_deltaL(face_pointer(theFaces,n));
   double deltaR = face_deltaR(face_pointer(theFaces,n));
   theRiemann->cL = face_L_pointer(theFaces,n);
@@ -329,17 +329,17 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
   }
 }
 
-void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct Grid * theGrid,int i,int j_low,int j_hi,int k){
-  int NUM_Q = grid_NUM_Q(theGrid);
+void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct Sim * theSim,int i,int j_low,int j_hi,int k){
+  int NUM_Q = sim_NUM_Q(theSim);
   theRiemann->cL = cell_single(theCells,i,j_low,k);
   theRiemann->cR = cell_single(theCells,i,j_hi ,k);
   double dpL = cell_dphi(theRiemann->cL);
   double dpR = cell_dphi(theRiemann->cR);
-  double zm = grid_z_faces(theGrid,k-1);
-  double zp = grid_z_faces(theGrid,k);
+  double zm = sim_z_faces(theSim,k-1);
+  double zp = sim_z_faces(theSim,k);
   double dz = zp-zm;
-  double rm = grid_r_faces(theGrid,i-1);
-  double rp = grid_r_faces(theGrid,i);
+  double rm = sim_r_faces(theSim,i-1);
+  double rp = sim_r_faces(theSim,i);
   double dr = rp-rm;
   double r = .5*(rp+rm);
   theRiemann->dA = dr*dz;
@@ -353,10 +353,10 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
 }
 
 
-void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, int direction ){
-  int NUM_Q = grid_NUM_Q(theGrid);
-  double GAMMALAW = grid_GAMMALAW(theGrid);
-  double DIVB_CH = grid_DIVB_CH(theGrid);
+void riemann_hllc(struct Riemann * theRiemann, struct Sim *theSim,double dt, int direction ){
+  int NUM_Q = sim_NUM_Q(theSim);
+  double GAMMALAW = sim_GAMMALAW(theSim);
+  double DIVB_CH = sim_DIVB_CH(theSim);
 
   //initialize
   double n[3];int i;
@@ -367,10 +367,10 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
   n[direction]=1.0;
 
   double Bpack[6];
-  riemann_set_vel(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
+  riemann_set_vel(theRiemann,theSim,n,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
 
   double Bk_face,Psi_face;
-  if (grid_runtype(theGrid)==1){
+  if (sim_runtype(theSim)==1){
     if (direction==0){
       Bk_face = 0.5*(theRiemann->primL[BRR]+theRiemann->primR[BRR]);  
     } else if (direction==1){
@@ -382,26 +382,26 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
   }
   double w;
   if (direction==1){
-    if( grid_MOVE_CELLS(theGrid) == C_WRIEMANN ) cell_add_wiph(theRiemann->cL,theRiemann->Ss);
+    if( sim_MOVE_CELLS(theSim) == C_WRIEMANN ) cell_add_wiph(theRiemann->cL,theRiemann->Ss);
     w = cell_wiph(theRiemann->cL);
   } else{
     w = 0.0;
   }
   riemann_set_state(theRiemann,w);
 
-  riemann_set_flux( theRiemann , theGrid, theRiemann->r , n,GAMMALAW,DIVB_CH );
+  riemann_set_flux( theRiemann , theSim, theRiemann->r , n,GAMMALAW,DIVB_CH );
   if (theRiemann->state==LEFTSTAR){
-    cell_prim2cons( theRiemann->primL , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW,grid_runtype(theGrid));
-    riemann_set_Ustar(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW);
+    cell_prim2cons( theRiemann->primL , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW,sim_runtype(theSim));
+    riemann_set_Ustar(theRiemann,theSim,n,theRiemann->r,Bpack,GAMMALAW);
 
   } else if(theRiemann->state==RIGHTSTAR){
-    cell_prim2cons( theRiemann->primR , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW,grid_runtype(theGrid));
-    riemann_set_Ustar(theRiemann,theGrid,n,theRiemann->r,Bpack,GAMMALAW);
+    cell_prim2cons( theRiemann->primR , theRiemann->Uk , theRiemann->r , 1.0 ,GAMMALAW,sim_runtype(theSim));
+    riemann_set_Ustar(theRiemann,theSim,n,theRiemann->r,Bpack,GAMMALAW);
   }
-  riemann_addto_flux_general(theRiemann,w,grid_NUM_Q(theGrid));
+  riemann_addto_flux_general(theRiemann,w,sim_NUM_Q(theSim));
 
-  if (grid_INCLUDE_VISCOSITY(theGrid)){
-    riemann_visc_flux(theRiemann,theGrid,n );
+  if (sim_INCLUDE_VISCOSITY(theSim)){
+    riemann_visc_flux(theRiemann,theSim,n );
   }
 
   int q;
@@ -410,7 +410,7 @@ void riemann_hllc(struct Riemann * theRiemann, struct Grid *theGrid,double dt, i
     cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->F[q]);
   }
 
-  if (grid_runtype(theGrid)==1){
+  if (sim_runtype(theSim)==1){
     cell_add_divB(theRiemann->cL,theRiemann->dA*Bk_face);
     cell_add_divB(theRiemann->cR,-theRiemann->dA*Bk_face);
     cell_add_GradPsi(theRiemann->cL,direction,Psi_face);

@@ -14,7 +14,7 @@ struct MPIsetup *mpisetup_create(int argc,char **argv) {
 }
 
 void mpisetup_destroy(struct MPIsetup *theMPIsetup) {
-  MPI_Barrier(grid_comm);
+  MPI_Barrier(sim_comm);
   MPI_Finalize();
   free(theMPIsetup);
 }

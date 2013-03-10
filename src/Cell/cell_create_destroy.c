@@ -3,42 +3,42 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Cell.h"
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
-struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
-  int NUM_Q = grid_NUM_Q(theGrid);
+struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
+  int NUM_Q = sim_NUM_Q(theSim);
   //count up the total number of cells
   int Ncells=0;
   int i,j,k;
-  for (k=0; k<grid_N_z(theGrid); k++) {
-    for (i=0; i<grid_N_r(theGrid);i++){
-      for(j = 0; j < grid_N_p(theGrid,i); j++){
+  for (k=0; k<sim_N_z(theSim); k++) {
+    for (i=0; i<sim_N_r(theSim);i++){
+      for(j = 0; j < sim_N_p(theSim,i); j++){
         ++Ncells;
       }
     }
   }
 
   //I wanted to allocate memory contiguously. It's not quite there yet.
-  struct Cell ***theCells = (struct Cell ***)malloc(sizeof(struct Cell **)*grid_N_z(theGrid));
-  theCells[0] = (struct Cell **)malloc(sizeof(struct Cell *)*grid_N_r(theGrid)*grid_N_z(theGrid));
+  struct Cell ***theCells = (struct Cell ***)malloc(sizeof(struct Cell **)*sim_N_z(theSim));
+  theCells[0] = (struct Cell **)malloc(sizeof(struct Cell *)*sim_N_r(theSim)*sim_N_z(theSim));
   theCells[0][0] = (struct Cell *)malloc(sizeof(struct Cell)*Ncells);
 
   int position = 0;
-  for (k=0; k<grid_N_z(theGrid); k++) {
-    theCells[k] = theCells[0]+k*grid_N_r(theGrid);
-    for (i=0; i<grid_N_r(theGrid);i++){
-      theCells[k][i] = theCells[0][0]+position;//grid_N_p(theGrid,i)*(k*grid_N_r(theGrid)+i);
-      position += grid_N_p(theGrid,i);
+  for (k=0; k<sim_N_z(theSim); k++) {
+    theCells[k] = theCells[0]+k*sim_N_r(theSim);
+    for (i=0; i<sim_N_r(theSim);i++){
+      theCells[k][i] = theCells[0][0]+position;//sim_N_p(theSim,i)*(k*sim_N_r(theSim)+i);
+      position += sim_N_p(theSim,i);
     }
   }
   Ncells=0;
-  for (k=0; k<grid_N_z(theGrid); k++) {
-    for (i=0; i<grid_N_r(theGrid);i++){
-      for(j = 0; j < grid_N_p(theGrid,i); j++){
+  for (k=0; k<sim_N_z(theSim); k++) {
+    for (i=0; i<sim_N_r(theSim);i++){
+      for(j = 0; j < sim_N_p(theSim,i); j++){
         theCells[k][i][j].prim = malloc(NUM_Q*sizeof(double));
         theCells[k][i][j].cons = malloc(NUM_Q*sizeof(double));
         theCells[k][i][j].RKcons = malloc(NUM_Q*sizeof(double));
@@ -51,11 +51,11 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
 
   //  initialize
   srand(666+mpisetup_MyProc(theMPIsetup));
-  for(k = 0; k < grid_N_z(theGrid); k++){
-    for(i = 0; i < grid_N_r(theGrid); i++){
+  for(k = 0; k < sim_N_z(theSim); k++){
+    for(i = 0; i < sim_N_r(theSim); i++){
       double tiph_0 = 2.*M_PI*(double)rand()/(double)RAND_MAX;
-      double dphi = 2.*M_PI/(double)grid_N_p(theGrid,i);
-      for(j = 0; j < grid_N_p(theGrid,i); j++){
+      double dphi = 2.*M_PI/(double)sim_N_p(theSim,i);
+      for(j = 0; j < sim_N_p(theSim,i); j++){
         double tiph = tiph_0 + (double)j*dphi;
         theCells[k][i][j].prim[RHO] = 0.0;
         theCells[k][i][j].prim[PPP] = 0.0;
@@ -72,7 +72,7 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
         theCells[k][i][j].RKcons[SRR] = 0.0;
         theCells[k][i][j].RKcons[LLL] = 0.0;
         theCells[k][i][j].RKcons[SZZ] = 0.0;
-        if (grid_runtype(theGrid)==1){
+        if (sim_runtype(theSim)==1){
           theCells[k][i][j].prim[BRR] = 0.0;
           theCells[k][i][j].prim[BPP] = 0.0;
           theCells[k][i][j].prim[BZZ] = 0.0;
@@ -101,11 +101,11 @@ struct Cell ***cell_create(struct Grid *theGrid,struct MPIsetup * theMPIsetup){
   return theCells;
 }
 
-void cell_destroy(struct Cell ***theCells,struct Grid *theGrid){
+void cell_destroy(struct Cell ***theCells,struct Sim *theSim){
   int i,j,k;
-  for (k=0; k<grid_N_z(theGrid); k++) {
-    for (i=0; i<grid_N_r(theGrid);i++){
-      for(j = 0; j < grid_N_p(theGrid,i); j++){
+  for (k=0; k<sim_N_z(theSim); k++) {
+    for (i=0; i<sim_N_r(theSim);i++){
+      for(j = 0; j < sim_N_p(theSim,i); j++){
         free(theCells[k][i][j].gradp);
         free(theCells[k][i][j].grad);
         free(theCells[k][i][j].RKcons);

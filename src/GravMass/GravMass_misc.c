@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <math.h>
 #include "../Headers/GravMass.h"
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/header.h"
 
-void gravMass_clean_pi(struct GravMass * theGravMasses,struct Grid * theGrid){
+void gravMass_clean_pi(struct GravMass * theGravMasses,struct Sim * theSim){
    int p;
-   for( p=0 ; p<grid_NumGravMass(theGrid) ; ++p ){
+   for( p=0 ; p<sim_NumGravMass(theSim) ; ++p ){
       double phi = theGravMasses[p].phi;
       while( phi > 2.*M_PI ) phi -= 2.*M_PI;
       while( phi < 0.0 ) phi += 2.*M_PI;
@@ -16,9 +16,9 @@ void gravMass_clean_pi(struct GravMass * theGravMasses,struct Grid * theGrid){
 }
 
 
-void gravMass_copy(struct GravMass * theGravMasses,struct Grid * theGrid){
+void gravMass_copy(struct GravMass * theGravMasses,struct Sim * theSim){
   int p;
-  for( p=0 ; p<grid_NumGravMass(theGrid) ; ++p ){
+  for( p=0 ; p<sim_NumGravMass(theSim) ; ++p ){
     theGravMasses[p].RK_r   = theGravMasses[p].r;
     theGravMasses[p].RK_phi = theGravMasses[p].phi;
     theGravMasses[p].RK_M   = theGravMasses[p].M;
@@ -35,9 +35,9 @@ void gravMass_move(struct GravMass * theGravMasses,double dt){
   theGravMasses[1].phi += theGravMasses[1].omega*dt;
 }
 
-void gravMass_update_RK( struct GravMass * theGravMasses,struct Grid * theGrid, double RK){
+void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, double RK){
   int i;
-  for( i=0 ; i<grid_NumGravMass(theGrid) ; ++i ){
+  for( i=0 ; i<sim_NumGravMass(theSim) ; ++i ){
     while( theGravMasses[i].phi-theGravMasses[i].RK_phi >  M_PI ) theGravMasses[i].RK_phi += 2.*M_PI;
     while( theGravMasses[i].phi-theGravMasses[i].RK_phi < -M_PI ) theGravMasses[i].RK_phi -= 2.*M_PI;
 

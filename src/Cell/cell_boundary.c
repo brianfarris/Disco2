@@ -3,17 +3,17 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Cell.h"
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
 
-void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces ,struct Grid * theGrid,struct MPIsetup * theMPIsetup, int * nri ){
-  int Nf = nri[grid_N_r(theGrid)-1];
-  int NUM_Q = grid_NUM_Q(theGrid);
-  int n1 = nri[grid_N_r(theGrid)-2];
+void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces ,struct Sim * theSim,struct MPIsetup * theMPIsetup, int * nri ){
+  int Nf = nri[sim_N_r(theSim)-1];
+  int NUM_Q = sim_NUM_Q(theSim);
+  int n1 = nri[sim_N_r(theSim)-2];
 
   int n,q;
   int i,j,k;
@@ -22,7 +22,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
   if( mpisetup_check_rin_bndry(theMPIsetup) ){
 
     for( i=0 ; i>=0 ; --i ){
-      r=grid_r_faces(theGrid,i);
+      r=sim_r_faces(theSim,i);
       for( n=nri[i] ; n<nri[i+1] ; ++n ){
         for( q=0 ; q<NUM_Q ; ++q ){
           face_L_pointer(theFaces,n)->prim[q] = 0.0;
@@ -37,11 +37,11 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         }
       }
 
-      for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
-        double zp = grid_z_faces(theGrid,k);
-        double zm = grid_z_faces(theGrid,k-1);
+      for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+        double zp = sim_z_faces(theSim,k);
+        double zm = sim_z_faces(theSim,k-1);
         double dz = zp-zm;
-        for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           double dA = dz*r*theCells[k][i][j].dphi;
           for( q=0 ; q<NUM_Q ; ++q ){
             theCells[k][i][j].prim[q] /= dA;
@@ -66,18 +66,18 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         cR->prim[q] += cL->prim[q]*face_dA(f);
       }
     }
-    r = grid_r_faces(theGrid,grid_N_r(theGrid)-2);
+    r = sim_r_faces(theSim,sim_N_r(theSim)-2);
 
-    for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
-      double zp = grid_z_faces(theGrid,k);
-      double zm = grid_z_faces(theGrid,k-1);
+    for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+      double zp = sim_z_faces(theSim,k);
+      double zm = sim_z_faces(theSim,k-1);
       double dz = zp-zm;
-      for( j=0 ; j<grid_N_p(theGrid,grid_N_r(theGrid)-1) ; ++j ){
-        double dA = dz*r*theCells[k][grid_N_r(theGrid)-1][j].dphi;
+      for( j=0 ; j<sim_N_p(theSim,sim_N_r(theSim)-1) ; ++j ){
+        double dA = dz*r*theCells[k][sim_N_r(theSim)-1][j].dphi;
         for( q=0 ; q<NUM_Q ; ++q ){
-          theCells[k][grid_N_r(theGrid)-1][j].prim[q] /= dA;
+          theCells[k][sim_N_r(theSim)-1][j].prim[q] /= dA;
         }
-        theCells[k][grid_N_r(theGrid)-1][j].prim[URR] *= -1.;
+        theCells[k][sim_N_r(theSim)-1][j].prim[URR] *= -1.;
       }
     }
 
@@ -85,13 +85,13 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
 
 }
 
-void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces, struct Grid * theGrid,struct MPIsetup * theMPIsetup,int * nzk ){
-  int NUM_Q = grid_NUM_Q(theGrid);
+void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces, struct Sim * theSim,struct MPIsetup * theMPIsetup,int * nzk ){
+  int NUM_Q = sim_NUM_Q(theSim);
 
   int j,i;
-  int Nf = nzk[grid_N_z(theGrid)-1];
+  int Nf = nzk[sim_N_z(theSim)-1];
   int n0 = nzk[1];
-  int n1 = nzk[grid_N_z(theGrid)-2];
+  int n1 = nzk[sim_N_z(theSim)-2];
 
   int n,q;
 
@@ -110,10 +110,10 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       }
     }
 
-    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
-      double rp = grid_r_faces(theGrid,i);
-      double rm = grid_r_faces(theGrid,i-1);
-      for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      double rp = sim_r_faces(theSim,i);
+      double rm = sim_r_faces(theSim,i-1);
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         double dA = .5*(rp*rp-rm*rm)*theCells[0][i][j].dphi;
         for( q=0 ; q<NUM_Q ; ++q ){
           theCells[0][i][j].prim[q] /= dA;
@@ -139,39 +139,39 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
     }
 
 
-    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
-      double rp = grid_r_faces(theGrid,i);
-      double rm = grid_r_faces(theGrid,i-1);
-      for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-        double dA = .5*(rp*rp-rm*rm)*theCells[grid_N_z(theGrid)-1][i][j].dphi;
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      double rp = sim_r_faces(theSim,i);
+      double rm = sim_r_faces(theSim,i-1);
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+        double dA = .5*(rp*rp-rm*rm)*theCells[sim_N_z(theSim)-1][i][j].dphi;
         for( q=0 ; q<NUM_Q ; ++q ){
-          theCells[grid_N_z(theGrid)-1][i][j].prim[q] /= dA;
+          theCells[sim_N_z(theSim)-1][i][j].prim[q] /= dA;
         }
-        theCells[grid_N_z(theGrid)-1][i][j].prim[UZZ] *= -1.0;
+        theCells[sim_N_z(theSim)-1][i][j].prim[UZZ] *= -1.0;
       }
     }
   }
 
 }
 
-void cell_boundary_fixed_r( struct Cell *** theCells, struct Grid *theGrid,struct MPIsetup * theMPIsetup, 
-    void (*cell_single_init_ptr)(struct Cell ***,struct Grid *,int,int,int) ){
+void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup, 
+    void (*cell_single_init_ptr)(struct Cell ***,struct Sim *,int,int,int) ){
   int i,j,k;
   if(mpisetup_check_rin_bndry(theMPIsetup)){
-    for( i=0 ; i<grid_Nghost_rmin(theGrid) ; ++i ){
-      for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
-        for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-          (*cell_single_init_ptr)(theCells,theGrid,i,j,k);
+    for( i=0 ; i<sim_Nghost_rmin(theSim) ; ++i ){
+      for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+          (*cell_single_init_ptr)(theCells,theSim,i,j,k);
         }
       }
     }
   }
 
   if( mpisetup_check_rout_bndry(theMPIsetup) ){
-    for( i=grid_N_r(theGrid)-1 ; i>grid_N_r(theGrid)-grid_Nghost_rmax(theGrid)-1 ; --i ){
-      for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
-        for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-          (*cell_single_init_ptr)(theCells,theGrid,i,j,k);
+    for( i=sim_N_r(theSim)-1 ; i>sim_N_r(theSim)-sim_Nghost_rmax(theSim)-1 ; --i ){
+      for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+          (*cell_single_init_ptr)(theCells,theSim,i,j,k);
         }
       }
     }
@@ -179,24 +179,24 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Grid *theGrid,struc
 
 }
 
-void cell_boundary_fixed_z( struct Cell *** theCells, struct Grid *theGrid,struct MPIsetup * theMPIsetup,
-    void (*cell_single_init_ptr)(struct Cell ***,struct Grid *,int,int,int)  ){
+void cell_boundary_fixed_z( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup,
+    void (*cell_single_init_ptr)(struct Cell ***,struct Sim *,int,int,int)  ){
   int i,j,k;
   if(mpisetup_check_zbot_bndry(theMPIsetup)){
-    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
-      for( k=0 ; k<grid_Nghost_zmin(theGrid) ; ++k ){
-        for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-          (*cell_single_init_ptr)(theCells,theGrid,i,j,k);
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      for( k=0 ; k<sim_Nghost_zmin(theSim) ; ++k ){
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+          (*cell_single_init_ptr)(theCells,theSim,i,j,k);
         }
       }
     }
   }
 
   if( mpisetup_check_ztop_bndry(theMPIsetup) ){
-    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
-      for( k=grid_N_z(theGrid)-1 ; k>grid_N_z(theGrid)-grid_Nghost_zmax(theGrid)-1 ; --k ){
-        for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
-          (*cell_single_init_ptr)(theCells,theGrid,i,j,k);
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      for( k=sim_N_z(theSim)-1 ; k>sim_N_z(theSim)-sim_Nghost_zmax(theSim)-1 ; --k ){
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+          (*cell_single_init_ptr)(theCells,theSim,i,j,k);
         }
       }
     }

@@ -44,7 +44,7 @@
 #include <stdlib.h>
 #include "Headers/MPIsetup.h"
 #include "Headers/Cell.h"
-#include "Headers/Grid.h"
+#include "Headers/Sim.h"
 #include "Headers/Face.h"
 #include "Headers/GravMass.h"
 #include "Headers/IO.h"
@@ -61,96 +61,96 @@ int main(int argc, char **argv) {
   mpisetup_cart_create(theMPIsetup);
   mpisetup_left_right(theMPIsetup);
 
-  //grid
-  struct Grid * theGrid = grid_create(theMPIsetup);
-  grid_read_par_file(theGrid,theMPIsetup,inputfilename);
-  grid_alloc_arr(theGrid,theMPIsetup); 
-  grid_set_rz(theGrid,theMPIsetup);
-  grid_set_N_p(theGrid);
-  grid_set_misc(theGrid,theMPIsetup);
+  //Grid
+  struct Sim * theSim = sim_create(theMPIsetup);
+  sim_read_par_file(theSim,theMPIsetup,inputfilename);
+  sim_alloc_arr(theSim,theMPIsetup); 
+  sim_set_rz(theSim,theMPIsetup);
+  sim_set_N_p(theSim);
+  sim_set_misc(theSim,theMPIsetup);
 
   // gravMass
-  struct GravMass *theGravMasses = gravMass_create(grid_NumGravMass(theGrid));
-  (*gravMass_init_ptr(theGrid))(theGravMasses);
-  gravMass_clean_pi(theGravMasses,theGrid);
+  struct GravMass *theGravMasses = gravMass_create(sim_NumGravMass(theSim));
+  (*gravMass_init_ptr(theSim))(theGravMasses);
+  gravMass_clean_pi(theGravMasses,theSim);
 
   // allocate memory for data 
-  struct Cell ***theCells = cell_create(theGrid,theMPIsetup);
+  struct Cell ***theCells = cell_create(theSim,theMPIsetup);
 
-  cell_clean_pi(theCells,theGrid);
-  cell_syncproc_r(theCells,theGrid,theMPIsetup);
-  if (grid_N_z_global(theGrid)>1){
-    cell_syncproc_z(theCells,theGrid,theMPIsetup);
+  cell_clean_pi(theCells,theSim);
+  cell_syncproc_r(theCells,theSim,theMPIsetup);
+  if (sim_N_z_global(theSim)>1){
+    cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
   // set initial data 
   int restart=0;
-  if (grid_Restart(theGrid)==1){
+  if (sim_Restart(theSim)==1){
     char checkpoint_filename[256];
     sprintf(checkpoint_filename,"input.h5");
-    struct IO *theIO = io_create(theGrid);
-    io_hdf5_in(theIO,theGrid,checkpoint_filename);
-    io_unflattened_prim(theIO,theCells,theGrid);
+    struct IO *theIO = io_create(theSim);
+    io_hdf5_in(theIO,theSim,checkpoint_filename);
+    io_unflattened_prim(theIO,theCells,theSim);
   }else{
-    (*cell_init_ptr(theGrid))(theCells,theGrid,theMPIsetup);
+    (*cell_init_ptr(theSim))(theCells,theSim,theMPIsetup);
   }
 
   //inter-processor syncs
-  cell_syncproc_r(theCells,theGrid,theMPIsetup);
-  if (grid_N_z_global(theGrid)>1){
-    cell_syncproc_z(theCells,theGrid,theMPIsetup);
+  cell_syncproc_r(theCells,theSim,theMPIsetup);
+  if (sim_N_z_global(theSim)>1){
+    cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
 
   //set conserved quantities
-  cell_calc_cons(theCells,theGrid);
+  cell_calc_cons(theCells,theSim);
 
-  if( grid_MOVE_CELLS(theGrid) == C_RIGID ) cell_set_wrigid( theCells ,theGrid);
+  if( sim_MOVE_CELLS(theSim) == C_RIGID ) cell_set_wrigid( theCells ,theSim);
 
-  struct TimeStep * theTimeStep = timestep_create(theGrid);
+  struct TimeStep * theTimeStep = timestep_create(theSim);
 
-  double dtcheck = grid_get_T_MAX(theGrid)/grid_NUM_CHECKPOINTS(theGrid);
+  double dtcheck = sim_get_T_MAX(theSim)/sim_NUM_CHECKPOINTS(theSim);
   double tcheck = dtcheck;
-  double dtdiag_measure = grid_get_T_MAX(theGrid)/grid_NUM_DIAG_MEASURE(theGrid);
+  double dtdiag_measure = sim_get_T_MAX(theSim)/sim_NUM_DIAG_MEASURE(theSim);
   double tdiag_measure = dtdiag_measure;
-  double dtdiag_dump = grid_get_T_MAX(theGrid)/grid_NUM_DIAG_DUMP(theGrid);
+  double dtdiag_dump = sim_get_T_MAX(theSim)/sim_NUM_DIAG_DUMP(theSim);
   double tdiag_dump = dtdiag_dump;
 
 
   int nfile=0;
   char filename[256];
 
-  struct Diagnostics * theDiagnostics = diagnostics_create(theGrid,theTimeStep);
-  while( timestep_get_t(theTimeStep) < grid_get_T_MAX(theGrid) ){
-    timestep_set_dt(theTimeStep,theCells,theGrid);
-    cell_copy(theCells,theGrid);
-    gravMass_copy(theGravMasses,theGrid);
+  struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep);
+  while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
+    timestep_set_dt(theTimeStep,theCells,theSim);
+    cell_copy(theCells,theSim);
+    gravMass_copy(theGravMasses,theSim);
     timestep_set_RK(theTimeStep,0.0);
-    timestep_substep(theTimeStep,theCells,theGrid,theGravMasses,theMPIsetup,1.0);
+    timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,1.0);
     gravMass_move(theGravMasses,1.0*timestep_dt(theTimeStep));
     timestep_set_RK(theTimeStep,0.5);
-    timestep_substep(theTimeStep,theCells,theGrid,theGravMasses,theMPIsetup,0.5);
+    timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,0.5);
     gravMass_move(theGravMasses,0.5*timestep_dt(theTimeStep));
-    if (grid_runtype(theGrid)==1){
-      timestep_update_Psi(theTimeStep,theCells,theGrid,theMPIsetup);
+    if (sim_runtype(theSim)==1){
+      timestep_update_Psi(theTimeStep,theCells,theSim,theMPIsetup);
     }
     timestep_update_t(theTimeStep); 
 
     if (timestep_get_t(theTimeStep)>tdiag_measure){
-      diagnostics_set(theDiagnostics,theCells,theGrid,theTimeStep);
+      diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep);
       tdiag_measure += dtdiag_measure;
     }
 
     if (timestep_get_t(theTimeStep)>tdiag_dump){
-      diagnostics_print(theDiagnostics,theTimeStep,theGrid,theMPIsetup);
-      diagnostics_destroy(theDiagnostics,theGrid);
-      struct Diagnostics * theDiagnostics = diagnostics_create(theGrid,theTimeStep);
+      diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
+      diagnostics_destroy(theDiagnostics,theSim);
+      struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep);
       tdiag_dump += dtdiag_dump;
     }
 
     if( timestep_get_t(theTimeStep)>tcheck){
       sprintf(filename,"checkpoint_%04d.h5",nfile);
-      struct IO *theIO = io_create(theGrid);
-      io_flattened_prim(theIO,theCells,theGrid);
-      io_hdf5_out(theIO,theGrid,filename);
+      struct IO *theIO = io_create(theSim);
+      io_flattened_prim(theIO,theCells,theSim);
+      io_hdf5_out(theIO,theSim,filename);
       io_destroy(theIO);
       tcheck += dtcheck;
       ++nfile;
@@ -158,14 +158,14 @@ int main(int argc, char **argv) {
   }
 
   //inter-processor syncs
-  cell_syncproc_r(theCells,theGrid,theMPIsetup);
-  if (grid_N_z_global(theGrid)>1){
-    cell_syncproc_z(theCells,theGrid,theMPIsetup);
+  cell_syncproc_r(theCells,theSim,theMPIsetup);
+  if (sim_N_z_global(theSim)>1){
+    cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
   // clean up
-  //  diagnostics_destroy(theDiagnostics,theGrid);
-  cell_destroy(theCells,theGrid);
-  grid_destroy(theGrid);
+  //  diagnostics_destroy(theDiagnostics,theSim);
+  cell_destroy(theCells,theSim);
+  sim_destroy(theSim);
   gravMass_destroy(theGravMasses);
 
   // exit MPI 

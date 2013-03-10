@@ -1,7 +1,7 @@
 #ifndef FACE_H
 #define FACE_H
 struct Face;
-struct Grid;
+struct Sim;
 struct Cell;
 struct TimeStep;
 
@@ -19,7 +19,7 @@ struct Face{
 #endif
 
 //create and destroy
-struct Face *face_create(struct Cell *** ,struct Grid *,struct TimeStep *, int);
+struct Face *face_create(struct Cell *** ,struct Sim *,struct TimeStep *, int);
 void face_destroy(struct Face *);
 //access face data
 struct Face *face_pointer( struct Face *,int);

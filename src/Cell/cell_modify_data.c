@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Cell.h"
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"

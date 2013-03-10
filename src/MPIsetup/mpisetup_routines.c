@@ -28,7 +28,7 @@ void mpisetup_setprocs(struct MPIsetup * theMPIsetup,char * filename){
   ierr = MPI_Comm_size(MPI_COMM_WORLD, &NumProcs);
   ierr = MPI_Comm_rank(MPI_COMM_WORLD, &MyProc);
   //This gives me the most efficient factorization of
-  //the number of processes being used into a j-by-k grid.
+  //the number of processes being used into a j-by-k Mesh.
   MPI_Dims_create(NumProcs,theMPIsetup->ndims_mpi,theMPIsetup->dim_NumProcs);
 printf("dim_NumProcs[0]: %d\n",theMPIsetup->dim_NumProcs[0]);
 printf("dim_NumProcs[1]: %d\n",theMPIsetup->dim_NumProcs[1]);
@@ -45,9 +45,9 @@ printf("dim_NumProcs[1]: %d\n",theMPIsetup->dim_NumProcs[1]);
 void mpisetup_cart_create(struct MPIsetup * theMPIsetup){
   //Creating the cart!  Woohoo.
   MPI_Cart_create(MPI_COMM_WORLD,
-      theMPIsetup->ndims_mpi,theMPIsetup->dim_NumProcs,theMPIsetup->wraparound,theMPIsetup->reorder,&grid_comm);
-  MPI_Comm_rank(grid_comm,&(theMPIsetup->MyProc));
-  MPI_Cart_coords(grid_comm,theMPIsetup->MyProc,theMPIsetup->ndims_mpi,theMPIsetup->dim_MyProc);
+      theMPIsetup->ndims_mpi,theMPIsetup->dim_NumProcs,theMPIsetup->wraparound,theMPIsetup->reorder,&sim_comm);
+  MPI_Comm_rank(sim_comm,&(theMPIsetup->MyProc));
+  MPI_Cart_coords(sim_comm,theMPIsetup->MyProc,theMPIsetup->ndims_mpi,theMPIsetup->dim_MyProc);
 }
 
 void mpisetup_left_right(struct MPIsetup * theMPIsetup){
@@ -59,9 +59,9 @@ void mpisetup_left_right(struct MPIsetup * theMPIsetup){
   }
   for( i=0 ; i<2 ; ++i ){
     next_Proc[i] += 1;
-    MPI_Cart_rank(grid_comm,next_Proc,&(theMPIsetup->right_Proc[i]));
+    MPI_Cart_rank(sim_comm,next_Proc,&(theMPIsetup->right_Proc[i]));
     next_Proc[i] -= 2;
-    MPI_Cart_rank(grid_comm,next_Proc,&(theMPIsetup->left_Proc[i]));
+    MPI_Cart_rank(sim_comm,next_Proc,&(theMPIsetup->left_Proc[i]));
     next_Proc[i] += 1;
   }
 }

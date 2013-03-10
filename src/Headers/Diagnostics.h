@@ -1,7 +1,7 @@
 #ifndef DIAGNOSTICS_H
 #define DIAGNOSTICS_H
 struct Diagnostics;
-struct Grid;
+struct Sim;
 struct Cell;
 struct TimeStep;
 struct MPIsetup;
@@ -16,10 +16,10 @@ struct Diagnostics{
 };
 #endif
 //create and destroy
-struct Diagnostics *diagnostics_create(struct Grid *, struct TimeStep *);
-void diagnostics_destroy(struct Diagnostics *,struct Grid *);
+struct Diagnostics *diagnostics_create(struct Sim *, struct TimeStep *);
+void diagnostics_destroy(struct Diagnostics *,struct Sim *);
 // set
-void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell ***,struct Grid *,struct TimeStep *);
+void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell ***,struct Sim *,struct TimeStep *);
 // print
-void diagnostics_print(struct Diagnostics * ,struct TimeStep * ,struct Grid * ,struct MPIsetup * );
+void diagnostics_print(struct Diagnostics * ,struct TimeStep * ,struct Sim * ,struct MPIsetup * );
 #endif

@@ -3,20 +3,20 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Cell.h"
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_plm_rz( struct Cell *** theCells ,struct Grid *theGrid, struct Face * theFaces , int Nf , int rz ){
-  int NUM_Q = grid_NUM_Q(theGrid);
-  double PLM = grid_PLM(theGrid);
+void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * theFaces , int Nf , int rz ){
+  int NUM_Q = sim_NUM_Q(theSim);
+  double PLM = sim_PLM(theSim);
 
   int i,j,k,q;
 
-  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
-    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
-      for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         for( q=0 ; q<NUM_Q ; ++q ){
           theCells[k][i][j].grad[q] = 0.0;
         }
@@ -49,14 +49,14 @@ void cell_plm_rz( struct Cell *** theCells ,struct Grid *theGrid, struct Face * 
       cR->grad[q] += S*dA; 
     }
   }
-  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
-    double zm = grid_z_faces(theGrid,k-1);
-    double zp = grid_z_faces(theGrid,k);
+  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    double zm = sim_z_faces(theSim,k-1);
+    double zp = sim_z_faces(theSim,k);
     double dz = zp-zm;
-    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
-      double rm = grid_r_faces(theGrid,i-1);
-      double rp = grid_r_faces(theGrid,i);
-      for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      double rm = sim_r_faces(theSim,i-1);
+      double rp = sim_r_faces(theSim,i);
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         double dp = theCells[k][i][j].dphi;
         double dAtot;
         if( rz==0 ) dAtot = dz*(rp+rm)*dp; else dAtot = 2.*.5*(rp*rp-rm*rm)*dp;
@@ -102,24 +102,24 @@ void cell_plm_rz( struct Cell *** theCells ,struct Grid *theGrid, struct Face * 
   }
 }
 
-void cell_plm_p( struct Cell *** theCells ,struct Grid * theGrid){
-  int NUM_Q = grid_NUM_Q(theGrid);
-  double PLM = grid_PLM(theGrid);
+void cell_plm_p( struct Cell *** theCells ,struct Sim * theSim){
+  int NUM_Q = sim_NUM_Q(theSim);
+  double PLM = sim_PLM(theSim);
 
   int Qmin = 0;
   int Qmax = NUM_Q;
 
   int i,j,k,q;
-  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
-    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
-      for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         struct Cell * cL;
         struct Cell * cR;
         if( j==0 ){
-          cL = &( theCells[k][i][grid_N_p(theGrid,i)-1] );
+          cL = &( theCells[k][i][sim_N_p(theSim,i)-1] );
           cR = &( theCells[k][i][j+1] );
-        }else if(j==grid_N_p(theGrid,i)-1){
+        }else if(j==sim_N_p(theSim,i)-1){
           cL = &( theCells[k][i][j-1] );
           cR = &( theCells[k][i][0] );
         }else{

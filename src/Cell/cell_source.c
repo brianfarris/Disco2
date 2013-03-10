@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Cell.h"
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
@@ -13,9 +13,9 @@ double fgrav( double M , double r , double eps, double n ){
   return( M*pow(r,n-1.)/pow( pow(r,n) + pow(eps,n) ,1.+1./n) );
 }
 
-void gravMassForce( struct GravMass * theGravMasses ,struct Grid * theGrid, int p , double r , double phi , double * fr , double * fp ){
-  double G_EPS=grid_G_EPS(theGrid);
-  double PHI_ORDER=grid_PHI_ORDER(theGrid);
+void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p , double r , double phi , double * fr , double * fp ){
+  double G_EPS=sim_G_EPS(theSim);
+  double PHI_ORDER=sim_PHI_ORDER(theSim);
 
   double rp = gravMass_r(theGravMasses,p);
   double pp = gravMass_phi(theGravMasses,p);
@@ -43,17 +43,17 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Grid * theGrid, int 
   *fp = sinap*f1;
 }
 
-void cell_add_src( struct Cell *** theCells ,struct Grid * theGrid, struct GravMass * theGravMasses , double dt ){
-  int GRAV2D=grid_GRAV2D(theGrid);
-  int POWELL=grid_POWELL(theGrid);
+void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses , double dt ){
+  int GRAV2D=sim_GRAV2D(theSim);
+  int POWELL=sim_POWELL(theSim);
   int i,j,k;
-  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
-    double zm = grid_z_faces(theGrid,k-1);
-    double zp = grid_z_faces(theGrid,k);
-    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
-      double rm = grid_r_faces(theGrid,i-1);
-      double rp = grid_r_faces(theGrid,i);
-      for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    double zm = sim_z_faces(theSim,k-1);
+    double zp = sim_z_faces(theSim,k);
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      double rm = sim_r_faces(theSim,i-1);
+      double rp = sim_r_faces(theSim,i);
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         double phi = c->tiph-.5*c->dphi;
         double dphi = c->dphi;
@@ -85,8 +85,8 @@ void cell_add_src( struct Cell *** theCells ,struct Grid * theGrid, struct GravM
         double Fr = 0.0;
         double Fp = 0.0;
         int p;
-        for( p=0 ; p<grid_NumGravMass(theGrid); ++p ){
-          gravMassForce( theGravMasses , theGrid , p , gravdist , phi , &fr , &fp );
+        for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
+          gravMassForce( theGravMasses , theSim , p , gravdist , phi , &fr , &fp );
           Fr += fr;
           Fp += fp;
         }
@@ -96,7 +96,7 @@ void cell_add_src( struct Cell *** theCells ,struct Grid * theGrid, struct GravM
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( Fr*(vr*sint+vz*cost) + Fp*vp );
 
-        if(grid_runtype(theGrid)==MHD){
+        if(sim_runtype(theSim)==MHD){
           double Br = c->prim[BRR];
           double Bp = c->prim[BPP];
           double Bz = c->prim[BZZ];
@@ -126,17 +126,17 @@ void cell_add_src( struct Cell *** theCells ,struct Grid * theGrid, struct GravM
   }
 }
 
-void cell_add_visc_src( struct Cell *** theCells ,struct Grid * theGrid, double dt ){
-  int INCLUDE_VISCOSITY=grid_INCLUDE_VISCOSITY(theGrid);
-  double EXPLICIT_VISCOSITY=grid_EXPLICIT_VISCOSITY(theGrid);
+void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, double dt ){
+  int INCLUDE_VISCOSITY=sim_INCLUDE_VISCOSITY(theSim);
+  double EXPLICIT_VISCOSITY=sim_EXPLICIT_VISCOSITY(theSim);
   int i,j,k;
-  for( k=0 ; k<grid_N_z(theGrid) ; ++k ){
-    double zm = grid_z_faces(theGrid,k-1);
-    double zp = grid_z_faces(theGrid,k);
-    for( i=0 ; i<grid_N_r(theGrid) ; ++i ){
-      double rm = grid_r_faces(theGrid,i-1);
-      double rp = grid_r_faces(theGrid,i);
-      for( j=0 ; j<grid_N_p(theGrid,i) ; ++j ){
+  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    double zm = sim_z_faces(theSim,k-1);
+    double zp = sim_z_faces(theSim,k);
+    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      double rm = sim_r_faces(theSim,i-1);
+      double rp = sim_r_faces(theSim,i);
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         double dphi = c->dphi;
         double rho = c->prim[RHO];
@@ -144,8 +144,8 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Grid * theGrid, double 
         double vr  = c->prim[URR];
         double dz = zp-zm;
         double dV = dphi*.5*(rp*rp-rm*rm)*dz;
-         if (grid_INCLUDE_VISCOSITY(theGrid)){
-          double nu = grid_EXPLICIT_VISCOSITY(theGrid);
+         if (sim_INCLUDE_VISCOSITY(theSim)){
+          double nu = sim_EXPLICIT_VISCOSITY(theSim);
           c->cons[SRR] += -dt*dV*nu*rho*vr/r/r;
         }
       }

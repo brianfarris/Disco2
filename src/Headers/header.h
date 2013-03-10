@@ -8,6 +8,6 @@ enum{BOUND_FIXED,BOUND_OUTFLOW,BOUND_PERIODIC};
 enum{FLOCK,SHEAR};
 enum{NONE,SINGLE,BINARY};
 #include "mpi.h"
-MPI_Comm grid_comm;
+MPI_Comm sim_comm;
 
 

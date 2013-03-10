@@ -3,20 +3,20 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Cell.h"
-#include "../Headers/Grid.h"
+#include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_single_init_shear(struct Cell ***theCells, struct Grid *theGrid,int i,int j,int k){
+void cell_single_init_shear(struct Cell ***theCells, struct Sim *theSim,int i,int j,int k){
   double rho = 1.0;
   double Pp  = 1.0;
   double v0  = 0.1;
   double t0  = 0.2;
 
-  double nu = grid_EXPLICIT_VISCOSITY(theGrid);
-  double rm = grid_r_faces(theGrid,i-1);
-  double rp = grid_r_faces(theGrid,i);
+  double nu = sim_EXPLICIT_VISCOSITY(theSim);
+  double rm = sim_r_faces(theSim,i-1);
+  double rp = sim_r_faces(theSim,i);
   double r = 0.5*(rm+rp);
   double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
   double x  = r*cos(t)-1.;
@@ -38,22 +38,22 @@ void cell_single_init_shear(struct Cell ***theCells, struct Grid *theGrid,int i,
   theCells[k][i][j].GradPsi[2] = 0.0;
 }
 
-void cell_init_shear(struct Cell ***theCells,struct Grid *theGrid,struct MPIsetup * theMPIsetup) {
+void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 
   double rho = 1.0;
   double Pp  = 1.0;
   double v0  = 0.1;
   double t0  = 0.2;
 
-  double nu = grid_EXPLICIT_VISCOSITY(theGrid);
+  double nu = sim_EXPLICIT_VISCOSITY(theSim);
   int i, j,k;
 
-  for (k = 0; k < grid_N_z(theGrid); k++) {
-    for (i = 0; i < grid_N_r(theGrid); i++) {
-      double rm = grid_r_faces(theGrid,i-1);
-      double rp = grid_r_faces(theGrid,i);
+  for (k = 0; k < sim_N_z(theSim); k++) {
+    for (i = 0; i < sim_N_r(theSim); i++) {
+      double rm = sim_r_faces(theSim,i-1);
+      double rp = sim_r_faces(theSim,i);
       double r = 0.5*(rm+rp);
-      for (j = 0; j < grid_N_p(theGrid,i); j++) {
+      for (j = 0; j < sim_N_p(theSim,i); j++) {
         double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
         double x  = r*cos(t)-1.;
 
