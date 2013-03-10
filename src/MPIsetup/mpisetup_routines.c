@@ -30,8 +30,6 @@ void mpisetup_setprocs(struct MPIsetup * theMPIsetup,char * filename){
   //This gives me the most efficient factorization of
   //the number of processes being used into a j-by-k Mesh.
   MPI_Dims_create(NumProcs,theMPIsetup->ndims_mpi,theMPIsetup->dim_NumProcs);
-printf("dim_NumProcs[0]: %d\n",theMPIsetup->dim_NumProcs[0]);
-printf("dim_NumProcs[1]: %d\n",theMPIsetup->dim_NumProcs[1]);
   //Just in case the dimensions don't make sense; I don't know how
   //the MPI_Dims_create funcition works, so you never know.
   if( (theMPIsetup->dim_NumProcs[0])*(theMPIsetup->dim_NumProcs[1]) != NumProcs ){

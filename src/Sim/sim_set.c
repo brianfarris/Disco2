@@ -54,7 +54,6 @@ void sim_set_misc(struct Sim *theSim,struct MPIsetup * theMPIsetup) {
   for (i=theSim->Nghost_rmin;i<theSim->N_r_noghost+theSim->Nghost_rmin;++i){
     Ncells += theSim->N_p[i]*theSim->N_z_noghost;
   }
-  printf("Ncells: %d\n",Ncells);
 
   int *Ncells_arr = malloc(sizeof(int) * mpisetup_NumProcs(theMPIsetup));
   MPI_Allgather(&Ncells, 1, MPI_INT, Ncells_arr, 1, MPI_INT, MPI_COMM_WORLD);

@@ -18,11 +18,7 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
     FILE * DiagScalarFile = fopen(DiagScalarFilename,"a");
     int i,n;
     for (i=0;i<sim_N_r_global(theSim);++i){
-      double rp = sim_r_faces(theSim,i-sim_N_r_0(theSim));
-      double rm = sim_r_faces(theSim,i-sim_N_r_0(theSim)-1);
-      double r = 0.5*(rp+rm);
-      fprintf(DiagVectorFile,"%e ",r);       
-      for (n=0;n<theDiagnostics->NUM_DIAG;++n){
+      for (n=0;n<theDiagnostics->NUM_DIAG+1;++n){
         fprintf(DiagVectorFile,"%e ",theDiagnostics->VectorDiag[i][n]/dt_dump);       
       }
       fprintf(DiagVectorFile,"\n");

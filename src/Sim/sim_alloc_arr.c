@@ -11,7 +11,6 @@ void sim_alloc_arr(struct Sim * theSim, struct MPIsetup * theMPIsetup) {
   int N_r_noghost = theSim->N_r_global/mpisetup_dim_NumProcs(theMPIsetup)[0];
   int N_z_noghost = theSim->N_z_global/mpisetup_dim_NumProcs(theMPIsetup)[1];
 
-  printf("mpisetup_dim_MyProc(theMPIsetup,0): %d\n",mpisetup_dim_MyProc(theMPIsetup,0));
   int Nghost_rmin;
   if (mpisetup_dim_MyProc(theMPIsetup,0)==0){
     Nghost_rmin  = 1;
