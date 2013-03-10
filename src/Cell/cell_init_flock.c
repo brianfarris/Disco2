@@ -44,8 +44,8 @@ void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
   srand(666 + mpisetup_MyProc(theMPIsetup));
   double rho0 = 1.0;
   int i, j,k;
-  for (k = 0; k < sim_N_z(theSim); k++) {
-    for (i = 0; i < sim_N_r(theSim); i++) {
+  for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
+    for (i = 0; i < sim_N(theSim,R_DIR); i++) {
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       double rp = sim_FacePos(theSim,i,R_DIR);
       double r = 0.5*(rm+rp);

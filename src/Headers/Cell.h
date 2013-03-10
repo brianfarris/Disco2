@@ -33,8 +33,8 @@ void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIs
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell *** , struct Sim *,int,int,int );
 ///retrieve data
 double cell_prim(struct Cell *, int);
-double *cell_grad(struct Cell *);
-double *cell_gradp(struct Cell *);
+double cell_grad(struct Cell *, int);
+double cell_gradp(struct Cell *, int);
 struct Cell *cell_single(struct Cell ***,int,int,int);
 double cell_tiph(struct Cell *);
 double cell_dphi(struct Cell *);

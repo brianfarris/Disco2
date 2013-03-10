@@ -14,8 +14,8 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
 
   int i,j,k,q;
 
-  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         for( q=0 ; q<NUM_Q ; ++q ){
           theCells[k][i][j].grad[q] = 0.0;
@@ -49,11 +49,11 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       cR->grad[q] += S*dA; 
     }
   }
-  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     double zp = sim_FacePos(theSim,k,Z_DIR);
     double dz = zp-zm;
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       double rp = sim_FacePos(theSim,i,R_DIR);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
@@ -110,8 +110,8 @@ void cell_plm_p( struct Cell *** theCells ,struct Sim * theSim){
   int Qmax = NUM_Q;
 
   int i,j,k,q;
-  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         struct Cell * cL;

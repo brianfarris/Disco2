@@ -42,11 +42,11 @@ void cell_calc_cons( struct Cell *** theCells,struct Sim *theSim ){
   double GAMMALAW = sim_GAMMALAW(theSim);
 
   int i,j,k;
-  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zp = sim_FacePos(theSim,k,Z_DIR);
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     double dz = zp-zm;
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       double rp = sim_FacePos(theSim,i,R_DIR);
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       double r = .5*(rp+rm);
@@ -112,11 +112,11 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
 
 void cell_calc_prim( struct Cell *** theCells ,struct Sim * theSim){
   int i,j,k;
-  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     double zp = sim_FacePos(theSim,k,Z_DIR);
     double dz = zp-zm;
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       double rp = sim_FacePos(theSim,i,R_DIR);
       double r = .5*(rp+rm);

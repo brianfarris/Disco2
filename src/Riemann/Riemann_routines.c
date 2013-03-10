@@ -274,9 +274,9 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim, double *
   for (q=0;q<NUM_Q;++q){
     AvgPrim[q] = .5*(theRiemann->primL[q]+theRiemann->primR[q]);
     if (fabs(n[1]-1.)<0.00001){ //is there a better way to check if n[1]==1?
-      Gprim[q] = .5*(cell_gradp(theRiemann->cL)[q]+cell_gradp(theRiemann->cR)[q]);    
+      Gprim[q] = .5*(cell_gradp(theRiemann->cL,q)+cell_gradp(theRiemann->cR,q));    
     } else{
-      Gprim[q] = .5*(cell_grad(theRiemann->cL)[q]+cell_grad(theRiemann->cR)[q]);
+      Gprim[q] = .5*(cell_grad(theRiemann->cL,q)+cell_grad(theRiemann->cR,q));
     }
     VFlux[q] = 0.0;
   }
@@ -324,8 +324,8 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
 
   int q;
   for (q=0;q<NUM_Q;++q){
-    theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_grad(theRiemann->cL)[q]*deltaL + cell_gradp(theRiemann->cL)[q]*dpL;
-    theRiemann->primR[q] = cell_prim(theRiemann->cR,q) + cell_grad(theRiemann->cR)[q]*deltaR + cell_gradp(theRiemann->cR)[q]*dpR;
+    theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_grad(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
+    theRiemann->primR[q] = cell_prim(theRiemann->cR,q) + cell_grad(theRiemann->cR,q)*deltaR + cell_gradp(theRiemann->cR,q)*dpR;
   }
 }
 
@@ -346,8 +346,8 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
   theRiemann->r = r; 
   int q;
   for (q=0;q<NUM_Q;++q){
-    theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_gradp(theRiemann->cL)[q]*dpL;
-    theRiemann->primR[q] = cell_prim(theRiemann->cR,q) + cell_gradp(theRiemann->cR)[q]*dpR;
+    theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_gradp(theRiemann->cL,q)*dpL;
+    theRiemann->primR[q] = cell_prim(theRiemann->cR,q) + cell_gradp(theRiemann->cR,q)*dpR;
   }
 
 }
@@ -400,7 +400,7 @@ void riemann_hllc(struct Riemann * theRiemann, struct Sim *theSim,double dt, int
   }
   riemann_addto_flux_general(theRiemann,w,sim_NUM_Q(theSim));
 
-  if (sim_INCLUDE_VISCOSITY(theSim)){
+  if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
     riemann_visc_flux(theRiemann,theSim,n );
   }
 

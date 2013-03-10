@@ -118,13 +118,13 @@ struct Face *face_create(struct Cell *** theCells ,struct Sim *theSim, struct Ti
     //Count them first.  build_jloop with argument zero says "just count", doesn't create any faces.
     int i,k; 
     int n=0;
-    for( i=0 ; i<sim_N_r(theSim)-1 ; ++i ){
+    for( i=0 ; i<sim_N(theSim,R_DIR)-1 ; ++i ){
       timestep_nri(theTimeStep)[i] = n;
-      for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+      for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
         build_jloop(&n,i,k,1,0,theCells,theFaces,theSim,0);
       }
     }
-    timestep_nri(theTimeStep)[sim_N_r(theSim)-1] = n; 
+    timestep_nri(theTimeStep)[sim_N(theSim,R_DIR)-1] = n; 
     timestep_set_Nfr(theTimeStep,theSim);
 
     //allocate memory for array of Faces
@@ -132,8 +132,8 @@ struct Face *face_create(struct Cell *** theCells ,struct Sim *theSim, struct Ti
 
     //now actually build the faces
     n=0;
-    for( i=0 ; i<sim_N_r(theSim)-1 ; ++i ){
-      for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR)-1 ; ++i ){
+      for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
         build_jloop(&n,i,k,1,0,theCells,theFaces,theSim,1);
       }
     }
@@ -141,17 +141,17 @@ struct Face *face_create(struct Cell *** theCells ,struct Sim *theSim, struct Ti
 
   if (direction==1){ // z-direction
 
-    if (sim_N_z_global(theSim)>1){
+    if (sim_N_global(theSim,Z_DIR)>1){
       //Count them first.  build_jloop with argument zero says "just count", doesn't create any faces.
       int i,k;
       int n=0;
-      for( k=0 ; k<sim_N_z(theSim)-1 ; ++k ){
+      for( k=0 ; k<sim_N(theSim,Z_DIR)-1 ; ++k ){
         timestep_nzk(theTimeStep)[k] = n;
-        for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+        for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
           build_jloop(&n,i,k,0,1,theCells,theFaces,theSim,0);
         }
       }
-      timestep_nzk(theTimeStep)[sim_N_z(theSim)-1] = n;
+      timestep_nzk(theTimeStep)[sim_N(theSim,Z_DIR)-1] = n;
       timestep_set_Nfz(theTimeStep,theSim);
 
       //allocate memory for array of Faces
@@ -159,8 +159,8 @@ struct Face *face_create(struct Cell *** theCells ,struct Sim *theSim, struct Ti
 
       //now actually build the faces
       n=0;
-      for( k=0 ; k<sim_N_z(theSim)-1 ; ++k ){
-        for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+      for( k=0 ; k<sim_N(theSim,Z_DIR)-1 ; ++k ){
+        for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
           build_jloop(&n,i,k,0,1,theCells,theFaces,theSim,1);
         }
       }

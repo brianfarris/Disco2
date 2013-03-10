@@ -5,50 +5,37 @@
 #include "../Headers/header.h"
 
 
-double sim_RMIN(struct Sim * theSim){
-  return(theSim->RMIN);
+double sim_MIN(struct Sim * theSim,int direction){
+  return(theSim->MIN[direction]);
 }
-double sim_RMAX(struct Sim * theSim){
-  return(theSim->RMAX);
+double sim_MAX(struct Sim * theSim,int direction){
+  return(theSim->MAX[direction]);
 }
-double sim_ZMIN(struct Sim * theSim){
-  return(theSim->ZMIN);
-}
-double sim_ZMAX(struct Sim * theSim){
-  return(theSim->ZMAX);
-}
-int sim_N_r_0(struct Sim * theSim){
-  return(theSim->N_r_0);
-}
-int sim_N_z_0(struct Sim * theSim){
-  return(theSim->N_z_0);
+int sim_N0(struct Sim * theSim, int direction){
+  return(theSim->N0[direction]);
 }
 int sim_N_p(struct Sim *theSim,int i){
   return(theSim->N_p[i]);
 }
-/*
-double sim_r_faces(struct Sim *theSim,int i){
-  return(theSim->r_faces[i+1]);
-}
-double sim_z_faces(struct Sim *theSim,int k){
-  return(theSim->z_faces[k+1]);
-}
-*/
+//double sim_r_faces(struct Sim *theSim,int i){
+//  return(theSim->r_faces[i+1]);
+//}
+//double sim_z_faces(struct Sim *theSim,int k){
+//  return(theSim->z_faces[k+1]);
+//}
 double sim_FacePos(struct Sim *theSim,int index,int direction){
   if (direction==R_DIR){
     return(theSim->r_faces[index+1]);
-  } else if(direction==Z_DIR){
+  } else if (direction==Z_DIR){
     return(theSim->z_faces[index+1]);
   } else{
     printf("ERROR\n");
     exit(0);
   }
 }
-int sim_N_r(struct Sim *theSim){
-  return(theSim->N_r_noghost+theSim->Nghost_rmin+theSim->Nghost_rmax);
-}
-int sim_N_z(struct Sim *theSim){
-  return(theSim->N_z_noghost+theSim->Nghost_zmin+theSim->Nghost_zmax);
+
+int sim_N(struct Sim *theSim, int direction){
+  return(theSim->N_noghost[direction]+theSim->Nghost_min[direction]+theSim->Nghost_max[direction]);
 }
 int sim_BoundTypeR(struct Sim *theSim){
   return(theSim->BoundTypeR);
@@ -68,26 +55,17 @@ int sim_Ncells_global(struct Sim *theSim){
 int sim_offset(struct Sim *theSim){
   return(theSim->offset);
 }
-int sim_Nghost_rmin(struct Sim *theSim){
-  return(theSim->Nghost_rmin);
+int sim_Nghost_min(struct Sim *theSim,int direction){
+  return(theSim->Nghost_min[direction]);
 }
-int sim_Nghost_rmax(struct Sim *theSim){
-  return(theSim->Nghost_rmax);
-}
-int sim_Nghost_zmin(struct Sim *theSim){
-  return(theSim->Nghost_zmin);
-}
-int sim_Nghost_zmax(struct Sim *theSim){
-  return(theSim->Nghost_zmax);
+int sim_Nghost_max(struct Sim *theSim,int direction){
+  return(theSim->Nghost_max[direction]);
 }
 int sim_ng(struct Sim *theSim){
   return(theSim->ng);
 }
-int sim_N_r_global(struct Sim *theSim){
-  return(theSim->N_r_global);
-}
-int sim_N_z_global(struct Sim *theSim){
-  return(theSim->N_z_global);
+int sim_N_global(struct Sim *theSim,int direction){
+  return(theSim->N_global[direction]);
 }
 int sim_NUM_Q(struct Sim *theSim){
   return(theSim->NUM_Q);
@@ -100,9 +78,6 @@ int sim_NumGravMass(struct Sim *theSim){
 }
 double sim_GAMMALAW(struct Sim *theSim){
   return(theSim->GAMMALAW);
-}
-int sim_INCLUDE_VISCOSITY(struct Sim *theSim) {
-  return(theSim->INCLUDE_VISCOSITY);
 }
 double sim_EXPLICIT_VISCOSITY(struct Sim *theSim){
   return(theSim->EXPLICIT_VISCOSITY);

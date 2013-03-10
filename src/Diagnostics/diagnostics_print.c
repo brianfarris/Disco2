@@ -17,7 +17,7 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
     FILE * DiagVectorFile = fopen(DiagVectorFilename,"w");
     FILE * DiagScalarFile = fopen(DiagScalarFilename,"a");
     int i,n;
-    for (i=0;i<sim_N_r_global(theSim);++i){
+    for (i=0;i<sim_N_global(theSim,R_DIR);++i){
       for (n=0;n<theDiagnostics->NUM_DIAG+1;++n){
         fprintf(DiagVectorFile,"%e ",theDiagnostics->VectorDiag[i][n]/dt_dump);       
       }

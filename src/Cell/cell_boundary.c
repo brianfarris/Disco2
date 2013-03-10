@@ -11,9 +11,9 @@
 
 
 void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces ,struct Sim * theSim,struct MPIsetup * theMPIsetup, int * nri ){
-  int Nf = nri[sim_N_r(theSim)-1];
+  int Nf = nri[sim_N(theSim,R_DIR)-1];
   int NUM_Q = sim_NUM_Q(theSim);
-  int n1 = nri[sim_N_r(theSim)-2];
+  int n1 = nri[sim_N(theSim,R_DIR)-2];
 
   int n,q;
   int i,j,k;
@@ -37,7 +37,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         }
       }
 
-      for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+      for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
         double zp = sim_FacePos(theSim,k,Z_DIR);
         double zm = sim_FacePos(theSim,k-1,Z_DIR);
         double dz = zp-zm;
@@ -59,25 +59,25 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
       }
     }
     for( n=n1 ; n<Nf ; ++n ){
-      //struct Face * f = face_pointer(theFaces,n);
+     // struct Face * f = face_pointer(theFaces,n);
       struct Cell * cL = face_L_pointer(theFaces,n);
       struct Cell * cR = face_R_pointer(theFaces,n);
       for( q=0 ; q<NUM_Q ; ++q ){
         cR->prim[q] += cL->prim[q]*face_dA(theFaces,n);
       }
     }
-    r = sim_FacePos(theSim,sim_N_r(theSim)-2,R_DIR);
+    r = sim_FacePos(theSim,sim_N(theSim,R_DIR)-2,R_DIR);
 
-    for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       double zp = sim_FacePos(theSim,k,Z_DIR);
       double zm = sim_FacePos(theSim,k-1,Z_DIR);
       double dz = zp-zm;
-      for( j=0 ; j<sim_N_p(theSim,sim_N_r(theSim)-1) ; ++j ){
-        double dA = dz*r*theCells[k][sim_N_r(theSim)-1][j].dphi;
+      for( j=0 ; j<sim_N_p(theSim,sim_N(theSim,R_DIR)-1) ; ++j ){
+        double dA = dz*r*theCells[k][sim_N(theSim,R_DIR)-1][j].dphi;
         for( q=0 ; q<NUM_Q ; ++q ){
-          theCells[k][sim_N_r(theSim)-1][j].prim[q] /= dA;
+          theCells[k][sim_N(theSim,R_DIR)-1][j].prim[q] /= dA;
         }
-        theCells[k][sim_N_r(theSim)-1][j].prim[URR] *= -1.;
+        theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] *= -1.;
       }
     }
 
@@ -89,9 +89,9 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
   int NUM_Q = sim_NUM_Q(theSim);
 
   int j,i;
-  int Nf = nzk[sim_N_z(theSim)-1];
+  int Nf = nzk[sim_N(theSim,Z_DIR)-1];
   int n0 = nzk[1];
-  int n1 = nzk[sim_N_z(theSim)-2];
+  int n1 = nzk[sim_N(theSim,Z_DIR)-2];
 
   int n,q;
 
@@ -110,7 +110,7 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       }
     }
 
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       double rp = sim_FacePos(theSim,i,R_DIR);
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
@@ -139,15 +139,15 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
     }
 
 
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       double rp = sim_FacePos(theSim,i,R_DIR);
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-        double dA = .5*(rp*rp-rm*rm)*theCells[sim_N_z(theSim)-1][i][j].dphi;
+        double dA = .5*(rp*rp-rm*rm)*theCells[sim_N(theSim,Z_DIR)-1][i][j].dphi;
         for( q=0 ; q<NUM_Q ; ++q ){
-          theCells[sim_N_z(theSim)-1][i][j].prim[q] /= dA;
+          theCells[sim_N(theSim,Z_DIR)-1][i][j].prim[q] /= dA;
         }
-        theCells[sim_N_z(theSim)-1][i][j].prim[UZZ] *= -1.0;
+        theCells[sim_N(theSim,Z_DIR)-1][i][j].prim[UZZ] *= -1.0;
       }
     }
   }
@@ -158,8 +158,8 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct 
     void (*cell_single_init_ptr)(struct Cell ***,struct Sim *,int,int,int) ){
   int i,j,k;
   if(mpisetup_check_rin_bndry(theMPIsetup)){
-    for( i=0 ; i<sim_Nghost_rmin(theSim) ; ++i ){
-      for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    for( i=0 ; i<sim_Nghost_min(theSim,R_DIR) ; ++i ){
+      for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           (*cell_single_init_ptr)(theCells,theSim,i,j,k);
         }
@@ -168,8 +168,8 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct 
   }
 
   if( mpisetup_check_rout_bndry(theMPIsetup) ){
-    for( i=sim_N_r(theSim)-1 ; i>sim_N_r(theSim)-sim_Nghost_rmax(theSim)-1 ; --i ){
-      for( k=0 ; k<sim_N_z(theSim) ; ++k ){
+    for( i=sim_N(theSim,R_DIR)-1 ; i>sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)-1 ; --i ){
+      for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           (*cell_single_init_ptr)(theCells,theSim,i,j,k);
         }
@@ -183,8 +183,8 @@ void cell_boundary_fixed_z( struct Cell *** theCells, struct Sim *theSim,struct 
     void (*cell_single_init_ptr)(struct Cell ***,struct Sim *,int,int,int)  ){
   int i,j,k;
   if(mpisetup_check_zbot_bndry(theMPIsetup)){
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
-      for( k=0 ; k<sim_Nghost_zmin(theSim) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+      for( k=0 ; k<sim_Nghost_min(theSim,Z_DIR) ; ++k ){
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           (*cell_single_init_ptr)(theCells,theSim,i,j,k);
         }
@@ -193,8 +193,8 @@ void cell_boundary_fixed_z( struct Cell *** theCells, struct Sim *theSim,struct 
   }
 
   if( mpisetup_check_ztop_bndry(theMPIsetup) ){
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
-      for( k=sim_N_z(theSim)-1 ; k>sim_N_z(theSim)-sim_Nghost_zmax(theSim)-1 ; --k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+      for( k=sim_N(theSim,Z_DIR)-1 ; k>sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR)-1 ; --k ){
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           (*cell_single_init_ptr)(theCells,theSim,i,j,k);
         }
