@@ -11,16 +11,16 @@ struct Diagnostics *diagnostics_create(struct Sim * theSim, struct TimeStep * th
 
   theDiagnostics->NUM_DIAG = 2;
 
-  theDiagnostics->VectorDiag = malloc(sizeof(double *) * sim_N_r_global(theSim));
-  theDiagnostics->VectorDiag[0] = malloc(sizeof(double) * sim_N_r_global(theSim) * (theDiagnostics->NUM_DIAG+1));
+  theDiagnostics->VectorDiag = malloc(sizeof(double *) * sim_N_global(theSim,R_DIR));
+  theDiagnostics->VectorDiag[0] = malloc(sizeof(double) * sim_N_global(theSim,R_DIR) * (theDiagnostics->NUM_DIAG+1));
   int i,n;
-  for (i=0;i<sim_N_r_global(theSim);++i){
+  for (i=0;i<sim_N_global(theSim,R_DIR);++i){
     theDiagnostics->VectorDiag[i] = theDiagnostics->VectorDiag[0]+i*(theDiagnostics->NUM_DIAG+1);
   }
 
   theDiagnostics->ScalarDiag = malloc(sizeof(double)*theDiagnostics->NUM_DIAG);
 
-  for (i=0;i<sim_N_r_global(theSim);++i){
+  for (i=0;i<sim_N_global(theSim,R_DIR);++i){
     for (n=0;n<(1+theDiagnostics->NUM_DIAG);++n){
        theDiagnostics->VectorDiag[i][n]=0.0;
     }
@@ -35,7 +35,7 @@ struct Diagnostics *diagnostics_create(struct Sim * theSim, struct TimeStep * th
 }
 
 void diagnostics_destroy(struct Diagnostics *theDiagnostics,struct Sim * theSim) {
-  int num_r_points_global = sim_N_r_global(theSim);
+  int num_r_points_global = sim_N_global(theSim,R_DIR);
   int i,n;
   free(theDiagnostics->ScalarDiag);
   free(theDiagnostics->VectorDiag[0]);

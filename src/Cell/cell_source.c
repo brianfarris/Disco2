@@ -47,12 +47,12 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
   int GRAV2D=sim_GRAV2D(theSim);
   int POWELL=sim_POWELL(theSim);
   int i,j,k;
-  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
-    double zm = sim_z_faces(theSim,k-1);
-    double zp = sim_z_faces(theSim,k);
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
-      double rm = sim_r_faces(theSim,i-1);
-      double rp = sim_r_faces(theSim,i);
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    double zm = sim_FacePos(theSim,k-1,Z_DIR);
+    double zp = sim_FacePos(theSim,k,Z_DIR);
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+      double rm = sim_FacePos(theSim,i-1,R_DIR);
+      double rp = sim_FacePos(theSim,i,R_DIR);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         double phi = c->tiph-.5*c->dphi;
@@ -127,15 +127,13 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 }
 
 void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, double dt ){
-  int INCLUDE_VISCOSITY=sim_INCLUDE_VISCOSITY(theSim);
-  double EXPLICIT_VISCOSITY=sim_EXPLICIT_VISCOSITY(theSim);
   int i,j,k;
-  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
-    double zm = sim_z_faces(theSim,k-1);
-    double zp = sim_z_faces(theSim,k);
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
-      double rm = sim_r_faces(theSim,i-1);
-      double rp = sim_r_faces(theSim,i);
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    double zm = sim_FacePos(theSim,k-1,Z_DIR);
+    double zp = sim_FacePos(theSim,k,Z_DIR);
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+      double rm = sim_FacePos(theSim,i-1,R_DIR);
+      double rp = sim_FacePos(theSim,i,R_DIR);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         double dphi = c->dphi;
@@ -144,7 +142,7 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, double dt
         double vr  = c->prim[URR];
         double dz = zp-zm;
         double dV = dphi*.5*(rp*rp-rm*rm)*dz;
-         if (sim_INCLUDE_VISCOSITY(theSim)){
+         if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
           double nu = sim_EXPLICIT_VISCOSITY(theSim);
           c->cons[SRR] += -dt*dV*nu*rho*vr/r/r;
         }

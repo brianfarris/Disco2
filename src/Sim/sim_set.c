@@ -10,13 +10,13 @@
 void sim_set_N_p(struct Sim * theSim){
   int i;
   if (theSim->NP_CONST>0){
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       theSim->N_p[i]=theSim->NP_CONST;
     }
   }else{
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
-      double r = sim_r_faces(theSim,i);
-      double dr = sim_r_faces(theSim,i)-sim_r_faces(theSim,i-1);
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+      double r = sim_FacePos(theSim,i,R_DIR);
+      double dr = sim_FacePos(theSim,i,R_DIR)-sim_FacePos(theSim,i-1,R_DIR);
       theSim->N_p[i] = (int)( 2.*M_PI*( 1. + (r/dr-1.)/theSim->aspect ) ) ;
     }
   }
@@ -25,22 +25,23 @@ void sim_set_N_p(struct Sim * theSim){
 
 void sim_set_rz(struct Sim * theSim,struct MPIsetup * theMPIsetup){
 
-  int N_r_0 = theSim->N_r_noghost*mpisetup_dim_MyProc(theMPIsetup,0);
-  int N_z_0 = theSim->N_z_noghost*mpisetup_dim_MyProc(theMPIsetup,1);
+  int N0[2];
+  N0[R_DIR] = theSim->N_noghost[R_DIR]*mpisetup_dim_MyProc(theMPIsetup,0);
+  N0[Z_DIR] = theSim->N_noghost[Z_DIR]*mpisetup_dim_MyProc(theMPIsetup,1);
 
-  theSim->N_r_0 = N_r_0;
-  theSim->N_z_0 = N_z_0;
+  theSim->N0[R_DIR] = N0[R_DIR];
+  theSim->N0[Z_DIR] = N0[Z_DIR];
 
   int i,k;
-  for(i = 0; i < sim_N_r(theSim)+1; i++){
-    int ig = i-theSim->Nghost_rmin+N_r_0;
-    double delta = (theSim->RMAX-theSim->RMIN)/(double)theSim->N_r_global;
-    theSim->r_faces[i] = theSim->RMIN+(double)ig*delta;
+  for(i = 0; i < sim_N(theSim,R_DIR)+1; i++){
+    int ig = i-theSim->Nghost_min[R_DIR]+N0[R_DIR];
+    double delta = (theSim->MAX[R_DIR]-theSim->MIN[R_DIR])/(double)theSim->N_global[R_DIR];
+    theSim->r_faces[i] = theSim->MIN[R_DIR]+(double)ig*delta;
   }
-  for(k = 0; k < sim_N_z(theSim)+1; k++){
-    int kg = k-theSim->Nghost_zmin+N_z_0;
-    double delta = (theSim->ZMAX-theSim->ZMIN)/(double)theSim->N_z_global;
-    theSim->z_faces[k] = theSim->ZMIN+(double)kg*delta;
+  for(k = 0; k < sim_N(theSim,Z_DIR)+1; k++){
+    int kg = k-theSim->Nghost_min[Z_DIR]+N0[Z_DIR];
+    double delta = (theSim->MAX[Z_DIR]-theSim->MIN[Z_DIR])/(double)theSim->N_global[Z_DIR];
+    theSim->z_faces[k] = theSim->MIN[Z_DIR]+(double)kg*delta;
   } 
 }
 
@@ -51,8 +52,8 @@ void sim_set_misc(struct Sim *theSim,struct MPIsetup * theMPIsetup) {
   int Ncells=0;
   int Ncells_global;
 
-  for (i=theSim->Nghost_rmin;i<theSim->N_r_noghost+theSim->Nghost_rmin;++i){
-    Ncells += theSim->N_p[i]*theSim->N_z_noghost;
+  for (i=theSim->Nghost_min[R_DIR];i<theSim->N_noghost[R_DIR]+theSim->Nghost_min[R_DIR];++i){
+    Ncells += theSim->N_p[i]*theSim->N_noghost[Z_DIR];
   }
 
   int *Ncells_arr = malloc(sizeof(int) * mpisetup_NumProcs(theMPIsetup));

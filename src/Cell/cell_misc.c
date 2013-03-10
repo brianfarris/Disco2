@@ -13,8 +13,8 @@ void cell_clean_pi(struct Cell *** theCells,struct Sim *theSim){
   int NUM_Q = sim_NUM_Q(theSim);
 
   int i,j,k;
-  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         double phi = theCells[k][i][j].tiph;
         while( phi > 2.*M_PI ) phi -= 2.*M_PI;
@@ -28,8 +28,8 @@ void cell_clean_pi(struct Cell *** theCells,struct Sim *theSim){
 void cell_copy(struct Cell ***theCells,struct Sim * theSim){
   int NUM_Q = sim_NUM_Q(theSim);
   int i,j,k,q;
-  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         for (q=0;q<NUM_Q;++q){
           theCells[k][i][j].RKcons[q] = theCells[k][i][j].cons[q];
@@ -44,8 +44,8 @@ void cell_adjust_RK_cons( struct Cell *** theCells , struct Sim * theSim, double
   int NUM_Q = sim_NUM_Q(theSim);
 
   int i,j,k,q;
-  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         for( q=0 ; q<NUM_Q ; ++q ){
@@ -59,10 +59,10 @@ void cell_adjust_RK_cons( struct Cell *** theCells , struct Sim * theSim, double
 void cell_update_phi( struct Cell *** theCells , struct Sim * theSim, double RK , double dt ){
 
   int i,j,k;
-  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
-      double rm = sim_r_faces(theSim,i-1);
-      double rp = sim_r_faces(theSim,i);
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+      double rm = sim_FacePos(theSim,i-1,R_DIR);
+      double rp = sim_FacePos(theSim,i,R_DIR);
       double r = .5*(rm+rp);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
@@ -79,8 +79,8 @@ void cell_update_phi( struct Cell *** theCells , struct Sim * theSim, double RK 
 void cell_update_dphi( struct Cell *** theCells,struct Sim * theSim ){
 
   int i,j,k;
-  for( k=0 ; k<sim_N_z(theSim) ; ++k ){
-    for( i=0 ; i<sim_N_r(theSim) ; ++i ){
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         int jm = j-1;
         if( jm==-1 ) jm = sim_N_p(theSim,i)-1;
