@@ -24,20 +24,20 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
   double deltaL,deltaR,deltaPerp;
   double r;
   if (rDir){
-    deltaL = .5*(sim_r_faces(theSim,i)-sim_r_faces(theSim,i-1));
-    deltaR = .5*(sim_r_faces(theSim,i+1)-sim_r_faces(theSim,i));
-    r = sim_r_faces(theSim,i);
+    deltaL = .5*(sim_FacePos(theSim,i,R_DIR)-sim_FacePos(theSim,i-1,R_DIR));
+    deltaR = .5*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i,R_DIR));
+    r = sim_FacePos(theSim,i,R_DIR);
 
-    double zp = sim_z_faces(theSim,k);
-    double zm = sim_z_faces(theSim,k-1);
+    double zp = sim_FacePos(theSim,k,Z_DIR);
+    double zm = sim_FacePos(theSim,k-1,Z_DIR);
     deltaPerp = zp-zm;
   }
   if (zDir){
-    deltaL = .5*(sim_z_faces(theSim,k)-sim_z_faces(theSim,k-1));
-    deltaR = .5*(sim_z_faces(theSim,k+1)-sim_z_faces(theSim,k));
+    deltaL = .5*(sim_FacePos(theSim,k,Z_DIR)-sim_FacePos(theSim,k-1,Z_DIR));
+    deltaR = .5*(sim_FacePos(theSim,k+1,Z_DIR)-sim_FacePos(theSim,k,Z_DIR));
 
-    double rp=sim_r_faces(theSim,i);
-    double rm = sim_r_faces(theSim,i-1);
+    double rp=sim_FacePos(theSim,i,R_DIR);
+    double rm = sim_FacePos(theSim,i-1,R_DIR);
     deltaPerp = rp-rm;
     r = .5*(rp+rm);
   }

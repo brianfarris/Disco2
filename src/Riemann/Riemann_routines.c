@@ -305,22 +305,22 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim, double *
 
 void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct Sim * theSim,int n){
   int NUM_Q = sim_NUM_Q(theSim);
-  double deltaL = face_deltaL(face_pointer(theFaces,n));
-  double deltaR = face_deltaR(face_pointer(theFaces,n));
+  double deltaL = face_deltaL(theFaces,n);
+  double deltaR = face_deltaR(theFaces,n);
   theRiemann->cL = face_L_pointer(theFaces,n);
   theRiemann->cR = face_R_pointer(theFaces,n);
   double pL = cell_tiph(theRiemann->cL) - .5*cell_dphi(theRiemann->cL);
   double pR = cell_tiph(theRiemann->cR) - .5*cell_dphi(theRiemann->cR);   
-  double dpL =  face_cm(face_pointer(theFaces,n)) - pL;
-  double dpR = -face_cm(face_pointer(theFaces,n)) + pR;
+  double dpL =  face_cm(theFaces,n) - pL;
+  double dpR = -face_cm(theFaces,n) + pR;
   while( dpL >  M_PI ) dpL -= 2.*M_PI;
   while( dpL < -M_PI ) dpL += 2.*M_PI;
   while( dpR >  M_PI ) dpR -= 2.*M_PI;
   while( dpR < -M_PI ) dpR += 2.*M_PI;
   dpL = dpL;
   dpR = dpR;
-  theRiemann->r = face_r(face_pointer(theFaces,n));
-  theRiemann->dA = face_dA(face_pointer(theFaces,n));
+  theRiemann->r = face_r(theFaces,n);
+  theRiemann->dA = face_dA(theFaces,n);
 
   int q;
   for (q=0;q<NUM_Q;++q){
@@ -335,11 +335,11 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
   theRiemann->cR = cell_single(theCells,i,j_hi ,k);
   double dpL = cell_dphi(theRiemann->cL);
   double dpR = cell_dphi(theRiemann->cR);
-  double zm = sim_z_faces(theSim,k-1);
-  double zp = sim_z_faces(theSim,k);
+  double zm = sim_FacePos(theSim,k-1,Z_DIR);
+  double zp = sim_FacePos(theSim,k,Z_DIR);
   double dz = zp-zm;
-  double rm = sim_r_faces(theSim,i-1);
-  double rp = sim_r_faces(theSim,i);
+  double rm = sim_FacePos(theSim,i-1,R_DIR);
+  double rp = sim_FacePos(theSim,i,R_DIR);
   double dr = rp-rm;
   double r = .5*(rp+rm);
   theRiemann->dA = dr*dz;

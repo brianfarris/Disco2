@@ -26,11 +26,23 @@ int sim_N_z_0(struct Sim * theSim){
 int sim_N_p(struct Sim *theSim,int i){
   return(theSim->N_p[i]);
 }
+/*
 double sim_r_faces(struct Sim *theSim,int i){
   return(theSim->r_faces[i+1]);
 }
 double sim_z_faces(struct Sim *theSim,int k){
   return(theSim->z_faces[k+1]);
+}
+*/
+double sim_FacePos(struct Sim *theSim,int index,int direction){
+  if (direction==R_DIR){
+    return(theSim->r_faces[index+1]);
+  } else if(direction==Z_DIR){
+    return(theSim->z_faces[index+1]);
+  } else{
+    printf("ERROR\n");
+    exit(0);
+  }
 }
 int sim_N_r(struct Sim *theSim){
   return(theSim->N_r_noghost+theSim->Nghost_rmin+theSim->Nghost_rmax);

@@ -38,12 +38,12 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
   }
 
   for (k=kmin;k<kmax;++k){
-    double zp = sim_z_faces(theSim,k);
-    double zm = sim_z_faces(theSim,k-1);
+    double zp = sim_FacePos(theSim,k,Z_DIR);
+    double zm = sim_FacePos(theSim,k-1,Z_DIR);
     double dz = zp-zm;
     for (i=imin;i<imax;++i){
-      double rp = sim_r_faces(theSim,i);
-      double rm = sim_r_faces(theSim,i-1);
+      double rp = sim_FacePos(theSim,i,R_DIR);
+      double rm = sim_FacePos(theSim,i-1,R_DIR);
       double r = 0.5*(rm+rp);
       for (j=0;j<sim_N_p(theSim,i);++j){
         // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
@@ -56,8 +56,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
   }
 
   for (i=imin;i<imax;++i){
-    double rp = sim_r_faces(theSim,i);
-    double rm = sim_r_faces(theSim,i-1);
+    double rp = sim_FacePos(theSim,i,R_DIR);
+    double rm = sim_FacePos(theSim,i-1,R_DIR);
     for (n=0;n<NUM_SCAL;++n){
       // mult by delta r^2 because we are doing an r integration
       ScalarDiag_temp[n] += VectorDiag_temp[(sim_N_r_0(theSim)+i-imin)*NUM_VEC+n+1] * (rp*rp-rm*rm); 

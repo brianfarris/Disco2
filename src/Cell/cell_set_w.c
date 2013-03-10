@@ -14,8 +14,8 @@ void cell_set_wcell(struct Cell ***theCells,struct Sim *theSim){
   int i,j,k;
   for( k=0 ; k<sim_N_z(theSim) ; ++k ){
     for( i=0 ; i<sim_N_r(theSim) ; ++i ){
-      double rp = sim_r_faces(theSim,i);
-      double rm = sim_r_faces(theSim,i-1);
+      double rp = sim_FacePos(theSim,i,R_DIR);
+      double rm = sim_FacePos(theSim,i-1,R_DIR);
       double r = 0.5*(rm+rp);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         int jp = j+1;
@@ -32,8 +32,8 @@ void cell_set_wrigid(struct Cell ***theCells,struct Sim *theSim){
   for( k=0 ; k<sim_N_z(theSim) ; ++k ){
     for( i=0 ; i<sim_N_r(theSim) ; ++i ){
       double w=0.0;
-      double rp = sim_r_faces(theSim,i);
-      double rm = sim_r_faces(theSim,i-1);
+      double rp = sim_FacePos(theSim,i,R_DIR);
+      double rm = sim_FacePos(theSim,i-1,R_DIR);
       double r = 0.5*(rm+rp);
       double Mring = 0.0;
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){

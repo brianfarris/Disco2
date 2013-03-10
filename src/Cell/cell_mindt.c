@@ -39,12 +39,12 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
   double dt_m = 1.e100;//HUGE_VAL;
   int i,j,k;
   for( k=0 ; k<sim_N_z(theSim) ; ++k ){
-    double zm = sim_z_faces(theSim,k-1);
-    double zp = sim_z_faces(theSim,k);
+    double zm = sim_FacePos(theSim,k-1,Z_DIR);
+    double zp = sim_FacePos(theSim,k,Z_DIR);
     double dz = zp-zm;
     for( i=0 ; i<sim_N_r(theSim) ; ++i ){
-      double rm = sim_r_faces(theSim,i-1);
-      double rp = sim_r_faces(theSim,i);
+      double rm = sim_FacePos(theSim,i-1,R_DIR);
+      double rp = sim_FacePos(theSim,i,R_DIR);
       double dr = rp-rm;
       double r = .5*(rp+rm);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){

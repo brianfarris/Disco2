@@ -22,24 +22,24 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
   if( mpisetup_check_rin_bndry(theMPIsetup) ){
 
     for( i=0 ; i>=0 ; --i ){
-      r=sim_r_faces(theSim,i);
+      r=sim_FacePos(theSim,i,R_DIR);
       for( n=nri[i] ; n<nri[i+1] ; ++n ){
         for( q=0 ; q<NUM_Q ; ++q ){
           face_L_pointer(theFaces,n)->prim[q] = 0.0;
         }
       } 
       for( n=nri[i] ; n<nri[i+1] ; ++n ){
-        struct Face * f = face_pointer(theFaces,n);//&(theFaces[n]);
+        //struct Face * f = face_pointer(theFaces,n);//&(theFaces[n]);
         struct Cell * cL = face_L_pointer(theFaces,n);
         struct Cell * cR = face_R_pointer(theFaces,n);
         for( q=0 ; q<NUM_Q ; ++q ){
-          cL->prim[q] += cR->prim[q]*face_dA(f);
+          cL->prim[q] += cR->prim[q]*face_dA(theFaces,n);
         }
       }
 
       for( k=0 ; k<sim_N_z(theSim) ; ++k ){
-        double zp = sim_z_faces(theSim,k);
-        double zm = sim_z_faces(theSim,k-1);
+        double zp = sim_FacePos(theSim,k,Z_DIR);
+        double zm = sim_FacePos(theSim,k-1,Z_DIR);
         double dz = zp-zm;
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           double dA = dz*r*theCells[k][i][j].dphi;
@@ -59,18 +59,18 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
       }
     }
     for( n=n1 ; n<Nf ; ++n ){
-      struct Face * f = face_pointer(theFaces,n);
+      //struct Face * f = face_pointer(theFaces,n);
       struct Cell * cL = face_L_pointer(theFaces,n);
       struct Cell * cR = face_R_pointer(theFaces,n);
       for( q=0 ; q<NUM_Q ; ++q ){
-        cR->prim[q] += cL->prim[q]*face_dA(f);
+        cR->prim[q] += cL->prim[q]*face_dA(theFaces,n);
       }
     }
-    r = sim_r_faces(theSim,sim_N_r(theSim)-2);
+    r = sim_FacePos(theSim,sim_N_r(theSim)-2,R_DIR);
 
     for( k=0 ; k<sim_N_z(theSim) ; ++k ){
-      double zp = sim_z_faces(theSim,k);
-      double zm = sim_z_faces(theSim,k-1);
+      double zp = sim_FacePos(theSim,k,Z_DIR);
+      double zm = sim_FacePos(theSim,k-1,Z_DIR);
       double dz = zp-zm;
       for( j=0 ; j<sim_N_p(theSim,sim_N_r(theSim)-1) ; ++j ){
         double dA = dz*r*theCells[k][sim_N_r(theSim)-1][j].dphi;
@@ -102,17 +102,17 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       }
     }
     for( n=0 ; n<n0 ; ++n ){
-      struct Face * f = face_pointer(theFaces,n);
+      //struct Face * f = face_pointer(theFaces,n);
       struct Cell * cL = face_L_pointer(theFaces,n);
       struct Cell * cR = face_R_pointer(theFaces,n);
       for( q=0 ; q<NUM_Q ; ++q ){
-        cL->prim[q] += cR->prim[q]*face_dA(f);
+        cL->prim[q] += cR->prim[q]*face_dA(theFaces,n);
       }
     }
 
     for( i=0 ; i<sim_N_r(theSim) ; ++i ){
-      double rp = sim_r_faces(theSim,i);
-      double rm = sim_r_faces(theSim,i-1);
+      double rp = sim_FacePos(theSim,i,R_DIR);
+      double rm = sim_FacePos(theSim,i-1,R_DIR);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         double dA = .5*(rp*rp-rm*rm)*theCells[0][i][j].dphi;
         for( q=0 ; q<NUM_Q ; ++q ){
@@ -130,18 +130,18 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       }
     }
     for( n=n1 ; n<Nf ; ++n ){
-      struct Face * f = face_pointer(theFaces,n);
+      //struct Face * f = face_pointer(theFaces,n);
       struct Cell * cL = face_L_pointer(theFaces,n);
       struct Cell * cR = face_R_pointer(theFaces,n);
       for( q=0 ; q<NUM_Q ; ++q ){
-        cR->prim[q] += cL->prim[q]*face_dA(f);
+        cR->prim[q] += cL->prim[q]*face_dA(theFaces,n);
       }
     }
 
 
     for( i=0 ; i<sim_N_r(theSim) ; ++i ){
-      double rp = sim_r_faces(theSim,i);
-      double rm = sim_r_faces(theSim,i-1);
+      double rp = sim_FacePos(theSim,i,R_DIR);
+      double rm = sim_FacePos(theSim,i-1,R_DIR);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         double dA = .5*(rp*rp-rm*rm)*theCells[sim_N_z(theSim)-1][i][j].dphi;
         for( q=0 ; q<NUM_Q ; ++q ){

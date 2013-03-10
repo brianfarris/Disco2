@@ -19,8 +19,8 @@ void io_flattened_prim(struct IO *io_pointer,struct Cell ***theCells,struct Sim 
     for (i=sim_Nghost_rmin(theSim); i<(sim_N_r(theSim)-sim_Nghost_rmax(theSim));i++){
       for (j=0; j<sim_N_p(theSim,i);j++){
            io_pointer->primitives[index][0] = cell_tiph(cell_single(theCells,i,j,k));
-          io_pointer->primitives[index][1] = 0.5*(sim_r_faces(theSim,i-1)+sim_r_faces(theSim,i));
-          io_pointer->primitives[index][2] = 0.5*(sim_z_faces(theSim,k-1)+sim_z_faces(theSim,k));
+          io_pointer->primitives[index][1] = 0.5*(sim_FacePos(theSim,i-1,R_DIR)+sim_FacePos(theSim,i,R_DIR));
+          io_pointer->primitives[index][2] = 0.5*(sim_FacePos(theSim,k-1,Z_DIR)+sim_FacePos(theSim,k,Z_DIR));
         for (q=0;q<NUM_Q;q++){
           io_pointer->primitives[index][q+3] = cell_prim(cell_single(theCells,i,j,k),q); 
         }
