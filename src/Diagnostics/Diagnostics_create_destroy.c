@@ -8,7 +8,9 @@
 
 struct Diagnostics *diagnostics_create(struct Sim * theSim, struct TimeStep * theTimeStep) {
   struct Diagnostics * theDiagnostics = (struct Diagnostics *) malloc(sizeof(struct Diagnostics));
-  
+
+  theDiagnostics->NUM_DIAG = 2;
+
   theDiagnostics->VectorDiag = malloc(sizeof(double *) * sim_N_r_global(theSim));
   theDiagnostics->VectorDiag[0] = malloc(sizeof(double) * sim_N_r_global(theSim) * theDiagnostics->NUM_DIAG);
   int i,n;

@@ -1,3 +1,4 @@
+fix r in vector output
 check that flock still works
 finish diagnostics
 make it so that we can restart from checkpoint without a par file
