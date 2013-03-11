@@ -30,13 +30,28 @@ struct Diagnostics *diagnostics_create(struct Sim * theSim, struct TimeStep * th
     }
 
   theDiagnostics->toutprev = timestep_get_t(theTimeStep); 
-  theDiagnostics->toutprev_dump = timestep_get_t(theTimeStep); 
+  theDiagnostics->toutprev_dump = timestep_get_t(theTimeStep);
+
+ // for determining when to measure diagnostics
+  theDiagnostics->dtdiag_measure = sim_get_T_MAX(theSim)/sim_NUM_DIAG_MEASURE(theSim);
+  theDiagnostics->tdiag_measure = theDiagnostics->dtdiag_measure;
+  // for determining when to dump diagnostics
+  theDiagnostics->dtdiag_dump = sim_get_T_MAX(theSim)/sim_NUM_DIAG_DUMP(theSim);
+  theDiagnostics->tdiag_dump = theDiagnostics->dtdiag_dump;
+
+  while( theDiagnostics->tdiag_measure< timestep_get_t(theTimeStep)){
+    theDiagnostics->tdiag_measure+=theDiagnostics->dtdiag_measure;
+  }
+  while( theDiagnostics->tdiag_dump< timestep_get_t(theTimeStep)){
+    theDiagnostics->tdiag_dump+=theDiagnostics->dtdiag_dump;
+  }
+
+
+
   return theDiagnostics;
 }
 
 void diagnostics_destroy(struct Diagnostics *theDiagnostics,struct Sim * theSim) {
-  int num_r_points_global = sim_N_global(theSim,R_DIR);
-  int i,n;
   free(theDiagnostics->ScalarDiag);
   free(theDiagnostics->VectorDiag[0]);
   free(theDiagnostics->VectorDiag);

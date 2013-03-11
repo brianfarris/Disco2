@@ -11,7 +11,7 @@
 #include "../Headers/IO.h"
 #include "../Headers/header.h"
 
-void io_hdf5_out(struct IO *io_pointer,struct Sim * theSim,struct TimeStep * theTimeStep, char * output_filename){
+void io_hdf5_out(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeStep){
   int NUM_Q = sim_NUM_Q(theSim);
   int Ncells = sim_Ncells(theSim);
   int i,q;
@@ -35,7 +35,7 @@ void io_hdf5_out(struct IO *io_pointer,struct Sim * theSim,struct TimeStep * the
   H5Pset_fapl_mpio(plist_id, sim_comm, info);
 
   // Create a new file collectively and release property list identifier.
-  file_id = H5Fcreate(output_filename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
+  file_id = H5Fcreate(theIO->filename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
   H5Pclose(plist_id);
 
   // **********************
@@ -112,7 +112,7 @@ void io_hdf5_out(struct IO *io_pointer,struct Sim * theSim,struct TimeStep * the
   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
   //status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, prim_data);
-  status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, &(io_pointer->primitives[0][0]));
+  status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, &(theIO->buffer[0][0]));
 
   // Close/release resources.
   H5Dclose(dset_id);
@@ -120,9 +120,14 @@ void io_hdf5_out(struct IO *io_pointer,struct Sim * theSim,struct TimeStep * the
   H5Sclose(memspace);
   H5Pclose(plist_id);
   H5Fclose(file_id);
+
+  theIO->tcheck += theIO->dtcheck;
+  ++(theIO->nfile);
+  sprintf(theIO->filename,"checkpoint_%04d.h5",io_nfile(theIO));
+
 }    
 
-void io_hdf5_in(struct IO *io_pointer,struct Sim * theSim,struct TimeStep * theTimeStep, char * input_filename){
+void io_hdf5_in(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeStep){
   int NUM_Q = sim_NUM_Q(theSim);
   int Ncells = sim_Ncells(theSim);
   hid_t       file;                        /* handles */
@@ -141,12 +146,12 @@ void io_hdf5_in(struct IO *io_pointer,struct Sim * theSim,struct TimeStep * theT
   //int         i, j,k;
 
   // Open the file and the dataset.
-  file = H5Fopen(input_filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  
+  file = H5Fopen("input.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+
   // **********************
   // First read in the time
   // **********************
-  
+
   dataset = H5Dopen1(file,"T");
   dims1[0] = 1;
   // Get dataset rank and dimension.
@@ -171,7 +176,7 @@ void io_hdf5_in(struct IO *io_pointer,struct Sim * theSim,struct TimeStep * theT
   // **********************
   // Then we read in the actual data
   // **********************
-  
+
   dataset = H5Dopen1(file, DATASETNAME);
 
   // Get dataset rank and dimension.
@@ -198,7 +203,7 @@ void io_hdf5_in(struct IO *io_pointer,struct Sim * theSim,struct TimeStep * theT
   status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, stride, count, block);
 
   // Read chunk 
-  status = H5Dread(dataset, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT,&(io_pointer->primitives[0][0]));
+  status = H5Dread(dataset, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT,&(theIO->buffer[0][0]));
 
   // Close/release resources.
   H5Dclose(dataset);

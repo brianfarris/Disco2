@@ -57,8 +57,9 @@ void cell_clear_w(struct Cell ***,struct Sim * );
 void cell_clear_divB( struct Cell ***,struct Sim * );
 void cell_clear_GradPsi( struct Cell ***,struct Sim * );
 //set w
-void cell_set_wcell(struct Cell ***,struct Sim *);
-void cell_set_wrigid(struct Cell ***,struct Sim *);
+//void cell_set_wcell(struct Cell ***,struct Sim *);
+//void cell_set_wrigid(struct Cell ***,struct Sim *);
+void cell_set(struct Cell ***,struct Sim *);
 //processor syncs
 void cell_syncproc_r( struct Cell *** , struct Sim *,struct MPIsetup *);
 void cell_syncproc_z( struct Cell *** , struct Sim *,struct MPIsetup *);

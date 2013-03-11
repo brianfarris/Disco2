@@ -44,8 +44,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_clean_pi(theCells,theSim);
   gravMass_clean_pi(theGravMasses,theSim);
   cell_clear_w(theCells,theSim);
-  if( sim_MOVE_CELLS(theSim) == C_WCELL ) cell_set_wcell( theCells ,theSim);
-  if( sim_MOVE_CELLS(theSim) == C_RIGID ) cell_set_wrigid( theCells ,theSim);
+  cell_set( theCells ,theSim);
 
   cell_adjust_RK_cons( theCells, theSim, theTimeStep->RK);
   cell_clear_divB(theCells,theSim);
@@ -123,9 +122,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
-  if (sim_N_global(theSim,Z_DIR)>1){
-    cell_syncproc_z(theCells,theSim,theMPIsetup);
-  }
+  cell_syncproc_z(theCells,theSim,theMPIsetup);
 
   cell_calc_cons( theCells,theSim );
 

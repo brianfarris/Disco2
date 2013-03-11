@@ -125,33 +125,35 @@ void cell_syncproc_r( struct Cell *** theCells , struct Sim *theSim,struct MPIse
 }
 
 void cell_syncproc_z( struct Cell *** theCells , struct Sim *theSim,struct MPIsetup * theMPIsetup){
-  int NUM_Q = sim_NUM_Q(theSim);
+  if (sim_N_global(theSim,Z_DIR)>1){
+    int NUM_Q = sim_NUM_Q(theSim);
 
-  int i,j,k,q;
+    int i,j,k,q;
 
-  int buffersize_z_hi_send = get_buffersize(0,sim_N(theSim,R_DIR), sim_N(theSim,Z_DIR)-2*sim_Nghost_max(theSim,Z_DIR),sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR),theSim);
-  int buffersize_z_hi_recv = get_buffersize(0,sim_N(theSim,R_DIR),sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR),sim_N(theSim,Z_DIR),theSim);
-  double * buffer_z_hi_send = malloc(sizeof(double)*buffersize_z_hi_send);
-  double * buffer_z_hi_recv = malloc(sizeof(double)*buffersize_z_hi_recv);
-  set_buffer(0,sim_N(theSim,R_DIR), sim_N(theSim,Z_DIR)-2*sim_Nghost_max(theSim,Z_DIR),sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR),theSim,theCells,buffer_z_hi_send);
+    int buffersize_z_hi_send = get_buffersize(0,sim_N(theSim,R_DIR), sim_N(theSim,Z_DIR)-2*sim_Nghost_max(theSim,Z_DIR),sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR),theSim);
+    int buffersize_z_hi_recv = get_buffersize(0,sim_N(theSim,R_DIR),sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR),sim_N(theSim,Z_DIR),theSim);
+    double * buffer_z_hi_send = malloc(sizeof(double)*buffersize_z_hi_send);
+    double * buffer_z_hi_recv = malloc(sizeof(double)*buffersize_z_hi_recv);
+    set_buffer(0,sim_N(theSim,R_DIR), sim_N(theSim,Z_DIR)-2*sim_Nghost_max(theSim,Z_DIR),sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR),theSim,theCells,buffer_z_hi_send);
 
-  int buffersize_z_low_send = get_buffersize(0,sim_N(theSim,R_DIR),sim_Nghost_min(theSim,Z_DIR), 2*sim_Nghost_min(theSim,Z_DIR),theSim);
-  int buffersize_z_low_recv = get_buffersize(0,sim_N(theSim,R_DIR),0,sim_Nghost_min(theSim,Z_DIR),theSim);
-  double * buffer_z_low_send = malloc(sizeof(double)*buffersize_z_low_send);
-  double * buffer_z_low_recv = malloc(sizeof(double)*buffersize_z_low_recv);
-  set_buffer(0,sim_N(theSim,R_DIR), sim_Nghost_min(theSim,Z_DIR), 2*sim_Nghost_min(theSim,Z_DIR),theSim,theCells,buffer_z_low_send);
+    int buffersize_z_low_send = get_buffersize(0,sim_N(theSim,R_DIR),sim_Nghost_min(theSim,Z_DIR), 2*sim_Nghost_min(theSim,Z_DIR),theSim);
+    int buffersize_z_low_recv = get_buffersize(0,sim_N(theSim,R_DIR),0,sim_Nghost_min(theSim,Z_DIR),theSim);
+    double * buffer_z_low_send = malloc(sizeof(double)*buffersize_z_low_send);
+    double * buffer_z_low_recv = malloc(sizeof(double)*buffersize_z_low_recv);
+    set_buffer(0,sim_N(theSim,R_DIR), sim_Nghost_min(theSim,Z_DIR), 2*sim_Nghost_min(theSim,Z_DIR),theSim,theCells,buffer_z_low_send);
 
-  MPI_Status status;
-  MPI_Sendrecv(buffer_z_low_send,buffersize_z_low_send,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[1],14,buffer_z_hi_recv,buffersize_z_hi_recv,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[1],14,sim_comm,&status);
-  MPI_Sendrecv(buffer_z_hi_send,buffersize_z_hi_send,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[1],15,buffer_z_low_recv,buffersize_z_low_recv,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[1],15,sim_comm,&status);
+    MPI_Status status;
+    MPI_Sendrecv(buffer_z_low_send,buffersize_z_low_send,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[1],14,buffer_z_hi_recv,buffersize_z_hi_recv,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[1],14,sim_comm,&status);
+    MPI_Sendrecv(buffer_z_hi_send,buffersize_z_hi_send,MPI_DOUBLE,mpisetup_right_Proc(theMPIsetup)[1],15,buffer_z_low_recv,buffersize_z_low_recv,MPI_DOUBLE,mpisetup_left_Proc(theMPIsetup)[1],15,sim_comm,&status);
 
-  set_cells(0,sim_N(theSim,R_DIR),sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR),sim_N(theSim,Z_DIR),theSim,theCells,buffer_z_hi_recv);
-  set_cells(0,sim_N(theSim,R_DIR),0,sim_Nghost_min(theSim,Z_DIR),theSim,theCells,buffer_z_low_recv);
+    set_cells(0,sim_N(theSim,R_DIR),sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR),sim_N(theSim,Z_DIR),theSim,theCells,buffer_z_hi_recv);
+    set_cells(0,sim_N(theSim,R_DIR),0,sim_Nghost_min(theSim,Z_DIR),theSim,theCells,buffer_z_low_recv);
 
-  free(buffer_z_low_send);
-  free(buffer_z_low_recv);    
-  free(buffer_z_hi_send);
-  free(buffer_z_hi_recv);
+    free(buffer_z_low_send);
+    free(buffer_z_low_recv);    
+    free(buffer_z_hi_send);
+    free(buffer_z_hi_recv);
+  }
 }
 
 

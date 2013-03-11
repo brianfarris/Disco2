@@ -14,19 +14,11 @@ struct IO *io_create(struct Sim *theSim) {
   struct IO *theIO = (struct IO *) malloc(sizeof(struct IO));
   int NUM_Q = sim_NUM_Q(theSim);
 
-  int Ncells = sim_Ncells(theSim)*(NUM_Q+3);
-
-  theIO->primitives = malloc(sizeof(double *)*sim_Ncells(theSim));
-  theIO->primitives[0] = malloc(sizeof(double )*sim_Ncells(theSim)*(NUM_Q+3));
-  int i;
-  for (i=0;i<sim_Ncells(theSim);++i){
-    theIO->primitives[i]= theIO->primitives[0]+i*(NUM_Q+3);
-  }
   return(theIO);
 }
 
 void io_destroy(struct IO *theIO){
-  free(theIO->primitives[0]);
-  free(theIO->primitives);
+  free(theIO->buffer[0]);
+  free(theIO->buffer);
   free(theIO);
 }

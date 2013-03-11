@@ -3,7 +3,7 @@
 
 InitialDataType         2               // 0 Flock, 1 Shear, 2 vortex
 GravMassType            0               // 0 none, 1 single, 2 binary
-Restart			0		//If this=1 restart using input.h5
+Restart			1		//If this=1 restart using input.h5
 
 //Computational Grid
 NumR			16			//Radial Zones

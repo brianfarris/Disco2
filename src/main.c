@@ -55,13 +55,14 @@
 
 int main(int argc, char **argv) {
   char* inputfilename = argv[1];
+  
   // start MPI 
   struct MPIsetup * theMPIsetup = mpisetup_create(argc,argv);
   mpisetup_setprocs(theMPIsetup,inputfilename);
   mpisetup_cart_create(theMPIsetup);
   mpisetup_left_right(theMPIsetup);
 
-  //Grid
+  // Set up everything that will not change throughout the simulation
   struct Sim * theSim = sim_create(theMPIsetup);
   sim_read_par_file(theSim,theMPIsetup,inputfilename);
   sim_alloc_arr(theSim,theMPIsetup); 
@@ -69,7 +70,7 @@ int main(int argc, char **argv) {
   sim_set_N_p(theSim);
   sim_set_misc(theSim,theMPIsetup);
 
-  // gravMass
+  // set up gravitating masses. 
   struct GravMass *theGravMasses = gravMass_create(sim_NumGravMass(theSim));
   (*gravMass_init_ptr(theSim))(theGravMasses);
   gravMass_clean_pi(theGravMasses,theSim);
@@ -77,63 +78,47 @@ int main(int argc, char **argv) {
   // allocate memory for data 
   struct Cell ***theCells = cell_create(theSim,theMPIsetup);
 
+  // make sure that phi is between 0 and 2 pi. I'm not sure why this matters.
   cell_clean_pi(theCells,theSim);
+
+  // inter-processor syncs. cell_create currently sets up tiph_0 randomly, 
+  // so we need to make sure ghost-zones are set appropriately
   cell_syncproc_r(theCells,theSim,theMPIsetup);
-  if (sim_N_global(theSim,Z_DIR)>1){
-    cell_syncproc_z(theCells,theSim,theMPIsetup);
-  }
-  
+  cell_syncproc_z(theCells,theSim,theMPIsetup);
+
+  // create TimeStep struct
   struct TimeStep * theTimeStep = timestep_create(theSim);
 
+  // create IO struct
+  struct IO *theIO = io_create(theSim);
+
   // set initial data 
-  if (sim_Restart(theSim)==1){
-    char checkpoint_filename[256];
-    sprintf(checkpoint_filename,"input.h5");
-    struct IO *theIO = io_create(theSim);
-    io_hdf5_in(theIO,theSim,theTimeStep,checkpoint_filename);
-    io_readbuf(theIO,theCells,theSim);
+  if (sim_Restart(theSim)==1){ // getting initial data from checkpoint file
+    io_allocbuf(theIO,theSim); // allocate memory for a buffer to store checkpoint data
+    io_hdf5_in(theIO,theSim,theTimeStep); // read from hdf5 file into buffer
+    io_readbuf(theIO,theCells,theSim); // read from buffer into theCells
+    io_deallocbuf(theIO); // get rid of buffer
   }else{
-    (*cell_init_ptr(theSim))(theCells,theSim,theMPIsetup);
+    (*cell_init_ptr(theSim))(theCells,theSim,theMPIsetup); // setup initial data using routine specified in .par file
   }
 
-  //inter-processor syncs
+  // set tcheck, dtcheck, and nfile. Needs to be done after ID because it depends on current time.
+  io_setup(theIO,theSim,theTimeStep);
+
+  // inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
-  if (sim_N_global(theSim,Z_DIR)>1){
-    cell_syncproc_z(theCells,theSim,theMPIsetup);
-  }
+  cell_syncproc_z(theCells,theSim,theMPIsetup);
 
-
-  //set conserved quantities
+  // set conserved quantities
   cell_calc_cons(theCells,theSim);
 
-  double dtcheck = sim_get_T_MAX(theSim)/sim_NUM_CHECKPOINTS(theSim);
-  double tcheck = dtcheck;
-  double dtdiag_measure = sim_get_T_MAX(theSim)/sim_NUM_DIAG_MEASURE(theSim);
-  double tdiag_measure = dtdiag_measure;
-  double dtdiag_dump = sim_get_T_MAX(theSim)/sim_NUM_DIAG_DUMP(theSim);
-  double tdiag_dump = dtdiag_dump;
-
-  int nfile=0;
-  char filename[256];
-
-  while( tcheck < timestep_get_t(theTimeStep)){
-    tcheck+=dtcheck;
-    ++nfile;
-  }
-
-  while( tdiag_measure< timestep_get_t(theTimeStep)){
-    tdiag_measure+=dtdiag_measure;
-  }
-  while( tdiag_dump< timestep_get_t(theTimeStep)){
-    tdiag_dump+=dtdiag_dump;
-  }
-
-
+  // set up diagnostics struct
   struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep);
+
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
+    /*
     cell_clear_w(theCells,theSim);
-    if( sim_MOVE_CELLS(theSim) == C_WCELL ) cell_set_wcell( theCells ,theSim);
-    if( sim_MOVE_CELLS(theSim) == C_RIGID ) cell_set_wrigid( theCells ,theSim);
+    cell_set( theCells ,theSim);
     timestep_set_dt(theTimeStep,theCells,theSim);
     cell_copy(theCells,theSim);
     gravMass_copy(theGravMasses,theSim);
@@ -143,44 +128,34 @@ int main(int argc, char **argv) {
     timestep_set_RK(theTimeStep,0.5);
     timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,0.5);
     gravMass_move(theGravMasses,0.5*timestep_dt(theTimeStep));
-    if (sim_runtype(theSim)==1){
-      timestep_update_Psi(theTimeStep,theCells,theSim,theMPIsetup);
-    }
+    if (sim_runtype(theSim)==1) timestep_update_Psi(theTimeStep,theCells,theSim,theMPIsetup);
     timestep_update_t(theTimeStep); 
+    */
+    timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
 
-    if (timestep_get_t(theTimeStep)>tdiag_measure){
-      diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep);
-      tdiag_measure += dtdiag_measure;
-    }
-
-    if (timestep_get_t(theTimeStep)>tdiag_dump){
-      diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
-      diagnostics_destroy(theDiagnostics,theSim);
-      struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep);
-      tdiag_dump += dtdiag_dump;
-    }
-
-    if( timestep_get_t(theTimeStep)>tcheck){
-      sprintf(filename,"checkpoint_%04d.h5",nfile);
-      struct IO *theIO = io_create(theSim);
-      io_setbuf(theIO,theCells,theSim);
-      io_hdf5_out(theIO,theSim,theTimeStep,filename);
-      io_destroy(theIO);
-      tcheck += dtcheck;
-      ++nfile;
+    // calculate diagnostics
+    diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep);
+    //write diagnostics to file
+    diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
+    
+    if( timestep_get_t(theTimeStep)>io_tcheck(theIO)){ // time to write checkpoint file
+      io_allocbuf(theIO,theSim); // allocate memory for a buffer to store simulation data
+      io_setbuf(theIO,theCells,theSim); // fill the buffer
+      io_hdf5_out(theIO,theSim,theTimeStep); // write contents to file
+      io_deallocbuf(theIO); // get rid of buffer
     }
   }
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
-  if (sim_N_global(theSim,Z_DIR)>1){
-    cell_syncproc_z(theCells,theSim,theMPIsetup);
-  }
+  cell_syncproc_z(theCells,theSim,theMPIsetup);
+ 
   // clean up
-  //  diagnostics_destroy(theDiagnostics,theSim);
+  diagnostics_destroy(theDiagnostics,theSim);
   cell_destroy(theCells,theSim);
   sim_destroy(theSim);
   gravMass_destroy(theGravMasses);
+  io_destroy(theIO);
 
   // exit MPI 
   mpisetup_destroy(theMPIsetup);
