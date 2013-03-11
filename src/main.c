@@ -116,28 +116,15 @@ int main(int argc, char **argv) {
   struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep);
 
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
-    /*
-    cell_clear_w(theCells,theSim);
-    cell_set( theCells ,theSim);
-    timestep_set_dt(theTimeStep,theCells,theSim);
-    cell_copy(theCells,theSim);
-    gravMass_copy(theGravMasses,theSim);
-    timestep_set_RK(theTimeStep,0.0);
-    timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,1.0);
-    gravMass_move(theGravMasses,1.0*timestep_dt(theTimeStep));
-    timestep_set_RK(theTimeStep,0.5);
-    timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,0.5);
-    gravMass_move(theGravMasses,0.5*timestep_dt(theTimeStep));
-    if (sim_runtype(theSim)==1) timestep_update_Psi(theTimeStep,theCells,theSim,theMPIsetup);
-    timestep_update_t(theTimeStep); 
-    */
+    // here the actual timestep is taken
     timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
 
     // calculate diagnostics
     diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep);
     //write diagnostics to file
     diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
-    
+
+    // checkpointing
     if( timestep_get_t(theTimeStep)>io_tcheck(theIO)){ // time to write checkpoint file
       io_allocbuf(theIO,theSim); // allocate memory for a buffer to store simulation data
       io_setbuf(theIO,theCells,theSim); // fill the buffer
@@ -149,15 +136,14 @@ int main(int argc, char **argv) {
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);
- 
+
   // clean up
   diagnostics_destroy(theDiagnostics,theSim);
   cell_destroy(theCells,theSim);
   sim_destroy(theSim);
   gravMass_destroy(theGravMasses);
   io_destroy(theIO);
-
-  // exit MPI 
+  timestep_destroy(theTimeStep);
   mpisetup_destroy(theMPIsetup);
   return(0);
 }
