@@ -113,9 +113,21 @@ int main(int argc, char **argv) {
   double dtdiag_dump = sim_get_T_MAX(theSim)/sim_NUM_DIAG_DUMP(theSim);
   double tdiag_dump = dtdiag_dump;
 
-
   int nfile=0;
   char filename[256];
+
+  while( tcheck < timestep_get_t(theTimeStep)){
+    tcheck+=dtcheck;
+    ++nfile;
+  }
+
+  while( tdiag_measure< timestep_get_t(theTimeStep)){
+    tdiag_measure+=dtdiag_measure;
+  }
+  while( tdiag_dump< timestep_get_t(theTimeStep)){
+    tdiag_dump+=dtdiag_dump;
+  }
+
 
   struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep);
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
