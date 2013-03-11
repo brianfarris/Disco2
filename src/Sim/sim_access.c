@@ -70,6 +70,9 @@ int sim_N_global(struct Sim *theSim,int direction){
 int sim_NUM_Q(struct Sim *theSim){
   return(theSim->NUM_Q);
 }
+int sim_NUM_C(struct Sim *theSim){
+  return(theSim->NUM_C);
+}
 int sim_MOVE_CELLS(struct Sim *theSim){
   return(theSim->MOVE_CELLS);
 }

@@ -93,3 +93,6 @@ void cell_update_dphi( struct Cell *** theCells,struct Sim * theSim ){
   }
 }
 
+void cell_print(struct Cell *** theCells,int n){
+  printf("%d theCells[2][5][4]: %e\n",n,theCells[2][5][4].wiph);
+}

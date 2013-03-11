@@ -43,7 +43,7 @@ void cell_set_wrigid(struct Cell ***theCells,struct Sim *theSim){
         w += vp*m;
       }
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-        theCells[k][i][j].wiph = w/Mring;       
+        theCells[k][i][j].wiph = w/Mring;   
       }
     }
   }

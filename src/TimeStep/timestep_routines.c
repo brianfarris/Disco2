@@ -46,6 +46,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_clear_w(theCells,theSim);
   if( sim_MOVE_CELLS(theSim) == C_WCELL ) cell_set_wcell( theCells ,theSim);
   if( sim_MOVE_CELLS(theSim) == C_RIGID ) cell_set_wrigid( theCells ,theSim);
+
   cell_adjust_RK_cons( theCells, theSim, theTimeStep->RK);
   cell_clear_divB(theCells,theSim);
   cell_clear_GradPsi(theCells,theSim);
@@ -106,7 +107,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
     cell_boundary_fixed_r(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
   }
   if (sim_N_global(theSim,Z_DIR)>1){
-    if (sim_BoundTypeZ(theSim)==BOUND_OUTFLOWx){
+    if (sim_BoundTypeZ(theSim)==BOUND_OUTFLOW){
       cell_boundary_outflow_z( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep->nzk );
     }else if (sim_BoundTypeZ(theSim)==BOUND_FIXED){
       cell_boundary_fixed_z(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    

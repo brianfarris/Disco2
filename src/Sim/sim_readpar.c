@@ -66,7 +66,8 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Z_Max"             , VAR_DOUB , &(theSim->MAX[Z_DIR])  );
       err += readvar( pfile , "NP_CONST"             , VAR_INT , &(theSim->NP_CONST)  );
       err += readvar( pfile , "aspect"             , VAR_DOUB , &(theSim->aspect)  );
-      err += readvar( pfile , "NUM_Q"              , VAR_INT  , &(theSim->NUM_Q) );
+      err += readvar( pfile , "NUM_C"              , VAR_INT  , &(theSim->NUM_C) );
+      err += readvar( pfile , "NUM_N"              , VAR_INT  , &(theSim->NUM_N) );
       err += readvar( pfile , "Time_Max"       , VAR_DOUB , &(theSim->T_MAX)  );
       err += readvar( pfile , "Num_Checkpoints"   , VAR_INT  , &(theSim->NUM_CHECKPOINTS)  );
       err += readvar( pfile , "Num_Diag_Dump"   , VAR_INT  , &(theSim->NUM_DIAG_DUMP)  );
@@ -102,7 +103,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }
-
+  
   int errtot;
   MPI_Allreduce( &err , &errtot , 1 , MPI_INT , MPI_SUM , MPI_COMM_WORLD );
 

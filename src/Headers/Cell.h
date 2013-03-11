@@ -29,6 +29,8 @@ void cell_init_flock(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_flock(struct Cell ***, struct Sim *,int ,int ,int );
 void cell_init_shear(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_shear(struct Cell ***, struct Sim *,int ,int ,int );
+void cell_init_vortex(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_vortex(struct Cell ***, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell *** , struct Sim *,int,int,int );
 ///retrieve data
@@ -70,7 +72,7 @@ void cell_boundary_fixed_r( struct Cell ***, struct Sim *,struct MPIsetup *,void
 void cell_boundary_fixed_z( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell ***,struct Sim *,int,int,int));
 //primitive-conservative conversion routines
 void cell_calc_prim( struct Cell ***,struct Sim *);
-void cell_prim2cons( double * , double * , double , double ,double,int );
+void cell_prim2cons( double * , double * , double , double ,struct Sim *,int );
 void cell_calc_cons(struct Cell ***,struct Sim *); 
 void cell_cons2prim( double * , double * , double , double ,struct Sim *,int );
 //miscellaneous
@@ -79,4 +81,5 @@ void cell_copy(struct Cell ***,struct Sim * );
 void cell_adjust_RK_cons( struct Cell *** , struct Sim * , double );
 void cell_set_prim(struct Cell ***,int,int,int,int,double);//this will morph into a checkpoint restart routine
 void cell_set_tiph(struct Cell ***,int,int,int,double);//this will morph into a checkpoint restart routine
+void cell_print(struct Cell ***,int);
 #endif

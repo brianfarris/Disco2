@@ -8,7 +8,8 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_prim2cons( double * prim , double * cons , double r , double dV ,double GAMMALAW, int runtype){
+void cell_prim2cons( double * prim , double * cons , double r , double dV ,struct Sim * theSim, int runtype){
+  double GAMMALAW = sim_GAMMALAW(theSim);
 
   double rho = prim[RHO];
   double Pp  = prim[PPP];
@@ -36,6 +37,12 @@ void cell_prim2cons( double * prim , double * cons , double r , double dV ,doubl
     cons[BZZ] = Bz*dV;
     cons[PSI] = prim[PSI]*dV;
   }
+
+  int q;
+  for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q ){
+    cons[q] = prim[q]*cons[DDD];
+  }
+
 }
 
 void cell_calc_cons( struct Cell *** theCells,struct Sim *theSim ){
@@ -53,7 +60,7 @@ void cell_calc_cons( struct Cell *** theCells,struct Sim *theSim ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         double dV = .5*(rp*rp - rm*rm)*c->dphi*dz;
-        cell_prim2cons( c->prim , c->cons , r , dV,GAMMALAW ,sim_runtype(theSim));
+        cell_prim2cons( c->prim , c->cons , r , dV,theSim ,sim_runtype(theSim));
       }    
     }    
   }
@@ -108,6 +115,12 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
   prim[URR] = vr;
   prim[UPP] = vp/r;
   prim[UZZ] = vz;
+
+  int q;
+  for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q ){
+    prim[q] = cons[q]/cons[DDD];
+  }
+
 }
 
 void cell_calc_prim( struct Cell *** theCells ,struct Sim * theSim){

@@ -75,6 +75,8 @@ void sim_set_misc(struct Sim *theSim,struct MPIsetup * theMPIsetup) {
   // For now, we will always say that there are two masses, and we will set masses to 0 when we need to
   theSim->NumGravMass = 2;
 
+  theSim->NUM_Q = theSim->NUM_C + theSim->NUM_N;
+  
 }
 
 

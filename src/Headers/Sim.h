@@ -32,6 +32,8 @@ struct Sim {
   int NUM_DIAG_MEASURE;
   double MIN[2];
   double MAX[2];
+  int NUM_C;
+  int NUM_N;
   int NUM_Q;
   int MOVE_CELLS;   
   int NumGravMass;
@@ -94,6 +96,7 @@ double sim_RHO_FLOOR(struct Sim *);
 double sim_CS_FLOOR(struct Sim *);
 double sim_CS_CAP(struct Sim *);
 double sim_VEL_CAP(struct Sim *);
+int sim_NUM_C(struct Sim *);
 int sim_NUM_Q(struct Sim *);
 double sim_get_T_MAX(struct Sim * );
 int sim_NUM_CHECKPOINTS(struct Sim * );
