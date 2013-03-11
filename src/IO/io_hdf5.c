@@ -1,23 +1,24 @@
 #define IO_PRIVATE_DEFS
-#define H5FILE_NAME     "testout.h5"
-#define DATASETNAME 	"DoubleArray" 
+#define DATASETNAME 	"Data" 
 #define RANK   2
 
 #include <string.h>
 #include <stdlib.h>
 #include "../Headers/Sim.h"
 #include "../Headers/Cell.h"
+#include "../Headers/TimeStep.h"
 #include "hdf5.h"
 #include "../Headers/IO.h"
 #include "../Headers/header.h"
 
-void io_hdf5_out(struct IO *io_pointer,struct Sim * theSim, char * output_filename){
+void io_hdf5_out(struct IO *io_pointer,struct Sim * theSim,struct TimeStep * theTimeStep, char * output_filename){
   int NUM_Q = sim_NUM_Q(theSim);
   int Ncells = sim_Ncells(theSim);
   int i,q;
   // HDF5 APIs definitions
   hid_t       file_id, dset_id;         /* file and dataset identifiers */
   hid_t       filespace, memspace;      /* file and memory dataspace identifiers */
+  hsize_t     dimsf1[1];                 /* dataset containing one element */
   hsize_t     dimsf[2];                 /* dataset dimensions */
   hsize_t     chunk_dims[2];            /* chunk dimensions */
   hsize_t	count[2];	          /* hyperslab selection parameters */
@@ -37,6 +38,45 @@ void io_hdf5_out(struct IO *io_pointer,struct Sim * theSim, char * output_filena
   file_id = H5Fcreate(output_filename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
   H5Pclose(plist_id);
 
+  // **********************
+  // First we save the time
+  // **********************
+
+  // we will only be saving one element
+  dimsf1[0] = 1;
+
+  // Create the dataspace for the dataset.
+  filespace = H5Screate_simple(1, dimsf1, NULL); 
+  memspace  = H5Screate_simple(1, dimsf1, NULL); 
+
+  plist_id = H5Pcreate(H5P_DATASET_CREATE);
+
+  dset_id = H5Dcreate1(file_id, "T", H5T_NATIVE_DOUBLE, filespace,plist_id);
+  H5Pclose(plist_id);
+  H5Sclose(filespace);
+
+  // Select hyperslab in the file.
+  filespace = H5Dget_space(dset_id);
+
+  // Create property list for collective dataset write.
+  plist_id = H5Pcreate(H5P_DATASET_XFER);
+  H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+
+  //status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, prim_data);
+  double time = timestep_get_t(theTimeStep);
+  status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, &(time));
+
+  // Close/release resources.
+  H5Sclose(filespace);
+  H5Sclose(memspace);
+  H5Pclose(plist_id);
+  H5Dclose(dset_id);
+
+
+  // ***************************
+  // Now we save the actual data
+  // ***************************
+
   // Create the dataspace for the dataset.
   dimsf[0] = sim_Ncells_global(theSim);
   dimsf[1] = NUM_Q+3;
@@ -49,7 +89,6 @@ void io_hdf5_out(struct IO *io_pointer,struct Sim * theSim, char * output_filena
   plist_id = H5Pcreate(H5P_DATASET_CREATE);
 
   //H5Pset_chunk(plist_id, RANK, chunk_dims);
-  //dset_id = H5Dcreate(file_id, DATASETNAME, H5T_NATIVE_DOUBLE, filespace, H5P_DEFAULT, plist_id, H5P_DEFAULT);
   dset_id = H5Dcreate1(file_id, DATASETNAME, H5T_NATIVE_DOUBLE, filespace,plist_id);
   H5Pclose(plist_id);
   H5Sclose(filespace);
@@ -83,14 +122,14 @@ void io_hdf5_out(struct IO *io_pointer,struct Sim * theSim, char * output_filena
   H5Fclose(file_id);
 }    
 
-void io_hdf5_in(struct IO *io_pointer,struct Sim * theSim, char * input_filename){
+void io_hdf5_in(struct IO *io_pointer,struct Sim * theSim,struct TimeStep * theTimeStep, char * input_filename){
   int NUM_Q = sim_NUM_Q(theSim);
   int Ncells = sim_Ncells(theSim);
-   // double **chunk_out = io_pointer->primitives;
   hid_t       file;                        /* handles */
   hid_t       dataset;  
   hid_t       filespace;                   
   hid_t       memspace;                  
+  hsize_t     dims1[1];                     /* dataset and chunk dimensions*/ 
   hsize_t     dims[2];                     /* dataset and chunk dimensions*/ 
   hsize_t     chunk_dims[2];
   hsize_t     count[2];
@@ -103,7 +142,37 @@ void io_hdf5_in(struct IO *io_pointer,struct Sim * theSim, char * input_filename
 
   // Open the file and the dataset.
   file = H5Fopen(input_filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  dataset = H5Dopen1(file, "DoubleArray");
+  
+  // **********************
+  // First read in the time
+  // **********************
+  
+  dataset = H5Dopen1(file,"T");
+  dims1[0] = 1;
+  // Get dataset rank and dimension.
+  filespace = H5Dget_space(dataset);    /* Get filespace handle first. */
+  rank      = H5Sget_simple_extent_ndims(filespace);
+  //status_n  = H5Sget_simple_extent_dims(filespace, dims1, NULL);
+  //status_n  = H5Sget_simple_extent_dims(memspace, dims1, NULL);
+
+  // Define the memory space to read a chunk.
+  memspace = H5Screate_simple(rank,dims1,NULL);
+
+  double time = 0.0;
+  status = H5Dread(dataset, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT,&time);
+
+  timestep_set_t(theTimeStep,time);
+
+  // Close/release resources.
+  H5Dclose(dataset);
+  H5Sclose(filespace);
+  H5Sclose(memspace);
+
+  // **********************
+  // Then we read in the actual data
+  // **********************
+  
+  dataset = H5Dopen1(file, DATASETNAME);
 
   // Get dataset rank and dimension.
   filespace = H5Dget_space(dataset);    /* Get filespace handle first. */
@@ -129,7 +198,6 @@ void io_hdf5_in(struct IO *io_pointer,struct Sim * theSim, char * input_filename
   status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, stride, count, block);
 
   // Read chunk 
-  // status = H5Dread(dataset, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT, prim_data);
   status = H5Dread(dataset, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT,&(io_pointer->primitives[0][0]));
 
   // Close/release resources.

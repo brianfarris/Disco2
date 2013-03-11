@@ -82,34 +82,32 @@ int main(int argc, char **argv) {
   if (sim_N_global(theSim,Z_DIR)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
+  
+  struct TimeStep * theTimeStep = timestep_create(theSim);
+
   // set initial data 
-  int restart=0;
   if (sim_Restart(theSim)==1){
     char checkpoint_filename[256];
     sprintf(checkpoint_filename,"input.h5");
     struct IO *theIO = io_create(theSim);
-    io_hdf5_in(theIO,theSim,checkpoint_filename);
+    io_hdf5_in(theIO,theSim,theTimeStep,checkpoint_filename);
     io_readbuf(theIO,theCells,theSim);
   }else{
     (*cell_init_ptr(theSim))(theCells,theSim,theMPIsetup);
   }
 
-  cell_boundary_fixed_r(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   if (sim_N_global(theSim,Z_DIR)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
 
-  cell_boundary_fixed_r(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
-  
 
   //set conserved quantities
   cell_calc_cons(theCells,theSim);
 
   if( sim_MOVE_CELLS(theSim) == C_RIGID ) cell_set_wrigid( theCells ,theSim);
 
-  struct TimeStep * theTimeStep = timestep_create(theSim);
 
   double dtcheck = sim_get_T_MAX(theSim)/sim_NUM_CHECKPOINTS(theSim);
   double tcheck = dtcheck;
@@ -124,6 +122,7 @@ int main(int argc, char **argv) {
 
   struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep);
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
+  if( sim_MOVE_CELLS(theSim) == C_RIGID ) cell_set_wrigid( theCells ,theSim);
     timestep_set_dt(theTimeStep,theCells,theSim);
     cell_copy(theCells,theSim);
     gravMass_copy(theGravMasses,theSim);
@@ -154,7 +153,7 @@ int main(int argc, char **argv) {
       sprintf(filename,"checkpoint_%04d.h5",nfile);
       struct IO *theIO = io_create(theSim);
       io_setbuf(theIO,theCells,theSim);
-      io_hdf5_out(theIO,theSim,filename);
+      io_hdf5_out(theIO,theSim,theTimeStep,filename);
       io_destroy(theIO);
       tcheck += dtcheck;
       ++nfile;

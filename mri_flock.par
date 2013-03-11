@@ -19,7 +19,7 @@ aspect                  1.0
 
 NUM_Q                   9
 Time_Max                100.0
-Num_Checkpoints		25
+Num_Checkpoints	        50	
 Num_Diag_Dump           50
 Num_Diag_Measure        100
 

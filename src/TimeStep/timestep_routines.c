@@ -26,6 +26,9 @@ void timestep_update_t(struct TimeStep * theTimeStep){
 void timestep_set_RK(struct TimeStep * theTimeStep,double RK){
   theTimeStep->RK = RK;
 }
+void timestep_set_t(struct TimeStep * theTimeStep,double t){
+  theTimeStep->t = t;
+}
 double timestep_get_t(struct TimeStep * theTimeStep){
   return(theTimeStep->t);
 }
