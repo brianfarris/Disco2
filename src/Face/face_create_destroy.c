@@ -119,16 +119,16 @@ struct Face *face_create(struct Cell *** theCells ,struct Sim *theSim, struct Ti
     int i,k; 
     int n=0;
     for( i=0 ; i<sim_N(theSim,R_DIR)-1 ; ++i ){
-      timestep_nri(theTimeStep)[i] = n;
+      timestep_set_nri(theTimeStep,i,n);
       for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
         build_jloop(&n,i,k,1,0,theCells,theFaces,theSim,0);
       }
     }
-    timestep_nri(theTimeStep)[sim_N(theSim,R_DIR)-1] = n; 
-    timestep_set_Nfr(theTimeStep,theSim);
+    timestep_set_nri(theTimeStep,sim_N(theSim,R_DIR)-1,n);
+    //timestep_set_Nfr(theTimeStep,theSim);
 
     //allocate memory for array of Faces
-    theFaces = (struct Face *) malloc( timestep_Nfr(theTimeStep)*sizeof(struct Face) );
+    theFaces = (struct Face *) malloc( timestep_nri(theTimeStep,sim_N(theSim,R_DIR)-1)/*timestep_Nfr(theTimeStep)*/ *sizeof(struct Face) );
 
     //now actually build the faces
     n=0;
@@ -146,16 +146,16 @@ struct Face *face_create(struct Cell *** theCells ,struct Sim *theSim, struct Ti
       int i,k;
       int n=0;
       for( k=0 ; k<sim_N(theSim,Z_DIR)-1 ; ++k ){
-        timestep_nzk(theTimeStep)[k] = n;
+        timestep_set_nzk(theTimeStep,k,n);
         for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
           build_jloop(&n,i,k,0,1,theCells,theFaces,theSim,0);
         }
       }
-      timestep_nzk(theTimeStep)[sim_N(theSim,Z_DIR)-1] = n;
-      timestep_set_Nfz(theTimeStep,theSim);
+      timestep_set_nzk(theTimeStep,sim_N(theSim,Z_DIR)-1,n);
+      //timestep_set_Nfz(theTimeStep,theSim);
 
       //allocate memory for array of Faces
-      theFaces = (struct Face *) malloc( timestep_Nfz(theTimeStep)*sizeof(struct Face) );
+      theFaces = (struct Face *) malloc(timestep_nzk(theTimeStep,sim_N(theSim,Z_DIR)-1) /*timestep_Nfz(theTimeStep)*/ *sizeof(struct Face) );
 
       //now actually build the faces
       n=0;

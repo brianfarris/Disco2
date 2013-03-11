@@ -5,11 +5,11 @@
 #include "../Headers/header.h"
 
 double diagnostics_tdiag_measure(struct Diagnostics * theDiagnostics) {
-  return(theDiagnostics->dtdiag_measure);
+  return(theDiagnostics->tdiag_measure);
 }
 
 double diagnostics_tdiag_dump(struct Diagnostics * theDiagnostics) {
-  return(theDiagnostics->dtdiag_dump);
+  return(theDiagnostics->tdiag_dump);
 }
 
 

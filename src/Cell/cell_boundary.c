@@ -7,13 +7,14 @@
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/MPIsetup.h"
+#include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
 
-void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces ,struct Sim * theSim,struct MPIsetup * theMPIsetup, int * nri ){
-  int Nf = nri[sim_N(theSim,R_DIR)-1];
+void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces ,struct Sim * theSim,struct MPIsetup * theMPIsetup, struct TimeStep * theTimeStep ){
+  int Nf = timestep_nri(theTimeStep,sim_N(theSim,R_DIR)-1);
   int NUM_Q = sim_NUM_Q(theSim);
-  int n1 = nri[sim_N(theSim,R_DIR)-2];
+  int n1 = timestep_nri(theTimeStep,sim_N(theSim,R_DIR)-2);
 
   int n,q;
   int i,j,k;
@@ -23,13 +24,12 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
 
     for( i=0 ; i>=0 ; --i ){
       r=sim_FacePos(theSim,i,R_DIR);
-      for( n=nri[i] ; n<nri[i+1] ; ++n ){
+      for( n=timestep_nri(theTimeStep,i) ; n<timestep_nri(theTimeStep,i+1) ; ++n ){
         for( q=0 ; q<NUM_Q ; ++q ){
           face_L_pointer(theFaces,n)->prim[q] = 0.0;
         }
       } 
-      for( n=nri[i] ; n<nri[i+1] ; ++n ){
-        //struct Face * f = face_pointer(theFaces,n);//&(theFaces[n]);
+      for( n=timestep_nri(theTimeStep,i) ; n<timestep_nri(theTimeStep,i+1) ; ++n ){
         struct Cell * cL = face_L_pointer(theFaces,n);
         struct Cell * cR = face_R_pointer(theFaces,n);
         for( q=0 ; q<NUM_Q ; ++q ){
@@ -59,7 +59,6 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
       }
     }
     for( n=n1 ; n<Nf ; ++n ){
-     // struct Face * f = face_pointer(theFaces,n);
       struct Cell * cL = face_L_pointer(theFaces,n);
       struct Cell * cR = face_R_pointer(theFaces,n);
       for( q=0 ; q<NUM_Q ; ++q ){
@@ -85,13 +84,13 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
 
 }
 
-void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces, struct Sim * theSim,struct MPIsetup * theMPIsetup,int * nzk ){
+void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces, struct Sim * theSim,struct MPIsetup * theMPIsetup,struct TimeStep * theTimeStep ){
   int NUM_Q = sim_NUM_Q(theSim);
 
   int j,i;
-  int Nf = nzk[sim_N(theSim,Z_DIR)-1];
-  int n0 = nzk[1];
-  int n1 = nzk[sim_N(theSim,Z_DIR)-2];
+  int Nf = timestep_nzk(theTimeStep,sim_N(theSim,Z_DIR)-1);
+  int n0 = timestep_nzk(theTimeStep,1);
+  int n1 = timestep_nzk(theTimeStep,sim_N(theSim,Z_DIR)-2);
 
   int n,q;
 
@@ -102,7 +101,6 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       }
     }
     for( n=0 ; n<n0 ; ++n ){
-      //struct Face * f = face_pointer(theFaces,n);
       struct Cell * cL = face_L_pointer(theFaces,n);
       struct Cell * cR = face_R_pointer(theFaces,n);
       for( q=0 ; q<NUM_Q ; ++q ){
@@ -130,7 +128,6 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       }
     }
     for( n=n1 ; n<Nf ; ++n ){
-      //struct Face * f = face_pointer(theFaces,n);
       struct Cell * cL = face_L_pointer(theFaces,n);
       struct Cell * cR = face_R_pointer(theFaces,n);
       for( q=0 ; q<NUM_Q ; ++q ){

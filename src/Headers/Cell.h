@@ -5,6 +5,7 @@ struct Sim;
 struct Face;
 struct GravMass;
 struct MPIsetup;
+struct TimeStep;
 
 #ifdef CELL_PRIVATE_DEFS
 struct Cell{
@@ -67,8 +68,8 @@ void cell_syncproc_z( struct Cell *** , struct Sim *,struct MPIsetup *);
 void cell_plm_rz( struct Cell *** ,struct Sim *, struct Face * , int , int );
 void cell_plm_p( struct Cell *** ,struct Sim * );
 //boundary conditions
-void cell_boundary_outflow_r( struct Cell *** , struct Face * ,struct Sim * ,struct MPIsetup *, int * );
-void cell_boundary_outflow_z( struct Cell *** , struct Face * , struct Sim * ,struct MPIsetup *,int * );
+void cell_boundary_outflow_r( struct Cell *** , struct Face * ,struct Sim * ,struct MPIsetup *, struct TimeStep * );
+void cell_boundary_outflow_z( struct Cell *** , struct Face * , struct Sim * ,struct MPIsetup *,struct TimeStep * );
 void cell_boundary_fixed_r( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell ***,struct Sim *,int,int,int));
 void cell_boundary_fixed_z( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell ***,struct Sim *,int,int,int));
 //primitive-conservative conversion routines

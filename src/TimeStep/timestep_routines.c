@@ -13,29 +13,6 @@
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
-void timestep_set_dt(struct TimeStep * theTimeStep, struct Cell *** theCells, struct Sim * theSim){
-  theTimeStep->dt = cell_mindt(theCells,theSim);
-  if( theTimeStep->t+theTimeStep->dt > sim_get_T_MAX(theSim) ) {
-    theTimeStep->dt = sim_get_T_MAX(theSim)-theTimeStep->t;
-  }
-  printf("t: %e, dt: %e\n",theTimeStep->t,theTimeStep->dt);
-}
-void timestep_update_t(struct TimeStep * theTimeStep){
-  theTimeStep->t += theTimeStep->dt;
-}
-void timestep_set_RK(struct TimeStep * theTimeStep,double RK){
-  theTimeStep->RK = RK;
-}
-void timestep_set_t(struct TimeStep * theTimeStep,double t){
-  theTimeStep->t = t;
-}
-double timestep_get_t(struct TimeStep * theTimeStep){
-  return(theTimeStep->t);
-}
-double timestep_dt(struct TimeStep * theTimeStep){
-  return(theTimeStep->dt);
-}
-
 void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,struct Sim * theSim,struct GravMass * theGravMasses,struct MPIsetup * theMPIsetup,double timestep_fac){
 
   double dt = timestep_fac*theTimeStep->dt;
@@ -67,9 +44,9 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
     }
   }
   //R Flux
-  cell_plm_rz( theCells ,theSim, theFaces_r , timestep_Nfr(theTimeStep) , 0 );
+  cell_plm_rz( theCells ,theSim, theFaces_r , timestep_nri(theTimeStep,sim_N(theSim,R_DIR)-1)/*timestep_Nfr(theTimeStep)*/, 0 );
   int n;
-  for( n=0 ; n<timestep_Nfr(theTimeStep) ; ++n ){
+  for( n=0 ; n<timestep_nri(theTimeStep,sim_N(theSim,R_DIR)-1)/*timestep_Nfr(theTimeStep)*/ ; ++n ){
     struct Riemann * theRiemann = riemann_create(theSim);
     riemann_setup_rz(theRiemann,theFaces_r,theSim,n);
     riemann_hllc(theRiemann,theSim,dt,0);
@@ -78,8 +55,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
 
   //Z Flux
   if( sim_N_global(theSim,Z_DIR) != 1 ){
-    cell_plm_rz( theCells ,theSim, theFaces_z , timestep_Nfz(theTimeStep) , 1 );
-    for( n=0 ; n<timestep_Nfz(theTimeStep) ; ++n ){
+    cell_plm_rz( theCells ,theSim, theFaces_z ,timestep_nzk(theTimeStep,sim_N(theSim,Z_DIR)-1) /*timestep_Nfz(theTimeStep)*/ , 1 );
+    for( n=0 ; n<timestep_nzk(theTimeStep,sim_N(theSim,Z_DIR)-1)/*timestep_Nfz(theTimeStep)*/ ; ++n ){
       struct Riemann * theRiemann = riemann_create(theSim);
       riemann_setup_rz(theRiemann,theFaces_z,theSim,n);
       riemann_hllc(theRiemann,theSim,dt,2); 
@@ -101,13 +78,13 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
 
   //Boundary Data
   if (sim_BoundTypeR(theSim)==BOUND_OUTFLOW){
-    cell_boundary_outflow_r( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep->nri );
+    cell_boundary_outflow_r( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
   }else if (sim_BoundTypeR(theSim)==BOUND_FIXED){
     cell_boundary_fixed_r(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
   }
   if (sim_N_global(theSim,Z_DIR)>1){
     if (sim_BoundTypeZ(theSim)==BOUND_OUTFLOW){
-      cell_boundary_outflow_z( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep->nzk );
+      cell_boundary_outflow_z( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
     }else if (sim_BoundTypeZ(theSim)==BOUND_FIXED){
       cell_boundary_fixed_z(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
     } else if (sim_BoundTypeZ(theSim)==BOUND_PERIODIC){
@@ -151,27 +128,6 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
   if (sim_N_global(theSim,Z_DIR)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
-}
-
-int * timestep_nri(struct TimeStep * theTimeStep){
-  return(theTimeStep->nri);
-}
-int * timestep_nzk(struct TimeStep * theTimeStep){
-  return(theTimeStep->nzk);
-}
-
-void timestep_set_Nfr(struct TimeStep * theTimeStep,struct Sim * theSim){
-  theTimeStep->Nfr = theTimeStep->nri[sim_N(theSim,R_DIR)-1];
-}
-void timestep_set_Nfz(struct TimeStep * theTimeStep,struct Sim * theSim){
-  theTimeStep->Nfz = theTimeStep->nzk[sim_N(theSim,Z_DIR)-1];
-}
-
-int timestep_Nfr(struct TimeStep * theTimeStep){
-  return(theTimeStep->Nfr);
-}
-int timestep_Nfz(struct TimeStep * theTimeStep){
-  return(theTimeStep->Nfz);
 }
 
 

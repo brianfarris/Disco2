@@ -48,6 +48,5 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
     }
 
     theDiagnostics->tdiag_dump += theDiagnostics->dtdiag_dump;
-
   }
 }

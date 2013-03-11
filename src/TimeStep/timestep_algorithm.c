@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../Headers/Sim.h"
+#include "../Headers/MPIsetup.h"
+#include "../Headers/GravMass.h"
+#include "../Headers/Cell.h"
 #include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
@@ -18,8 +21,8 @@ void timestep_rk2(struct TimeStep * theTimeStep, struct Sim * theSim,
   gravMass_move(theGravMasses,1.0*timestep_dt(theTimeStep));
   timestep_set_RK(theTimeStep,0.5);
   timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,0.5);
-  gravMass_move(theGravMasses,0.5*timestep_dt(theTimeStep));
   if (sim_runtype(theSim)==1) timestep_update_Psi(theTimeStep,theCells,theSim,theMPIsetup);
+  gravMass_move(theGravMasses,0.5*timestep_dt(theTimeStep));
   timestep_update_t(theTimeStep); 
 
 }

@@ -34,6 +34,5 @@ void riemann_visc_flux(struct Riemann * ,struct Sim * , double * );
 void riemann_set_flux(struct Riemann * ,struct Sim *, double , double * ,double ,double );
 void riemann_setup_rz(struct Riemann *,struct Face * , struct Sim *,int );
 void riemann_setup_p(struct Riemann * ,struct Cell *** ,struct Sim * ,int ,int ,int ,int );
-//void riemann_hllc(struct Riemann *, struct Cell * , struct Cell * ,struct Sim *, double , double , double ,double,double,double,double,int);
 void riemann_hllc(struct Riemann *, struct Sim *,double,int);
 #endif

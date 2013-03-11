@@ -46,8 +46,6 @@ struct Diagnostics *diagnostics_create(struct Sim * theSim, struct TimeStep * th
     theDiagnostics->tdiag_dump+=theDiagnostics->dtdiag_dump;
   }
 
-
-
   return theDiagnostics;
 }
 
