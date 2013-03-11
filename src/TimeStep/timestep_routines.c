@@ -100,20 +100,20 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   cell_calc_prim( theCells ,theSim);
 
   //Boundary Data
-  //if( N_z_global > 1 ) cell_boundary_z( theCells , theFaces_z ,theSim, nzk );
   if (sim_BoundTypeR(theSim)==BOUND_OUTFLOW){
     cell_boundary_outflow_r( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep->nri );
   }else if (sim_BoundTypeR(theSim)==BOUND_FIXED){
     cell_boundary_fixed_r(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
   }
-  if (sim_BoundTypeZ(theSim)==BOUND_OUTFLOW){
-    cell_boundary_outflow_z( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep->nzk );
-  }else if (sim_BoundTypeZ(theSim)==BOUND_FIXED){
-    cell_boundary_fixed_z(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
-  } else if (sim_BoundTypeZ(theSim)==BOUND_PERIODIC){
-    //do nothing, this is already handled by the syncing routine
-  }
-   
+  if (sim_N_global(theSim,Z_DIR)>1){
+    if (sim_BoundTypeZ(theSim)==BOUND_OUTFLOWx){
+      cell_boundary_outflow_z( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep->nzk );
+    }else if (sim_BoundTypeZ(theSim)==BOUND_FIXED){
+      cell_boundary_fixed_z(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+    } else if (sim_BoundTypeZ(theSim)==BOUND_PERIODIC){
+      //do nothing, this is already handled by the syncing routine
+    }
+  } 
 
   face_destroy(theFaces_r);
   if (sim_N_global(theSim,Z_DIR)>1){
@@ -125,7 +125,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,st
   if (sim_N_global(theSim,Z_DIR)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
-  
+
   cell_calc_cons( theCells,theSim );
 
 }

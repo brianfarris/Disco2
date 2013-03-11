@@ -106,9 +106,6 @@ int main(int argc, char **argv) {
   //set conserved quantities
   cell_calc_cons(theCells,theSim);
 
-  if( sim_MOVE_CELLS(theSim) == C_RIGID ) cell_set_wrigid( theCells ,theSim);
-
-
   double dtcheck = sim_get_T_MAX(theSim)/sim_NUM_CHECKPOINTS(theSim);
   double tcheck = dtcheck;
   double dtdiag_measure = sim_get_T_MAX(theSim)/sim_NUM_DIAG_MEASURE(theSim);
@@ -122,7 +119,9 @@ int main(int argc, char **argv) {
 
   struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep);
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
-  if( sim_MOVE_CELLS(theSim) == C_RIGID ) cell_set_wrigid( theCells ,theSim);
+    cell_clear_w(theCells,theSim);
+    if( sim_MOVE_CELLS(theSim) == C_WCELL ) cell_set_wcell( theCells ,theSim);
+    if( sim_MOVE_CELLS(theSim) == C_RIGID ) cell_set_wrigid( theCells ,theSim);
     timestep_set_dt(theTimeStep,theCells,theSim);
     cell_copy(theCells,theSim);
     gravMass_copy(theGravMasses,theSim);
