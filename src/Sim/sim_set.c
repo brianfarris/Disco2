@@ -32,16 +32,25 @@ void sim_set_rz(struct Sim * theSim,struct MPIsetup * theMPIsetup){
   theSim->N0[R_DIR] = N0[R_DIR];
   theSim->N0[Z_DIR] = N0[Z_DIR];
 
+  double RMIN;
+  if (theSim->MIN[R_DIR]>0.0){
+    RMIN=theSim->MIN[R_DIR];
+  }else{
+    RMIN=0.0;
+  }
+  double ZMIN = theSim->MIN[Z_DIR];
+  double RMAX=theSim->MAX[R_DIR];
+  double ZMAX=theSim->MAX[Z_DIR];
   int i,k;
   for(i = 0; i < sim_N(theSim,R_DIR)+1; i++){
     int ig = i-theSim->Nghost_min[R_DIR]+N0[R_DIR];
-    double delta = (theSim->MAX[R_DIR]-theSim->MIN[R_DIR])/(double)theSim->N_global[R_DIR];
-    theSim->r_faces[i] = theSim->MIN[R_DIR]+(double)ig*delta;
+    double delta = (RMAX-RMIN)/(double)theSim->N_global[R_DIR];
+    theSim->r_faces[i] = RMIN+(double)ig*delta;
   }
   for(k = 0; k < sim_N(theSim,Z_DIR)+1; k++){
     int kg = k-theSim->Nghost_min[Z_DIR]+N0[Z_DIR];
-    double delta = (theSim->MAX[Z_DIR]-theSim->MIN[Z_DIR])/(double)theSim->N_global[Z_DIR];
-    theSim->z_faces[k] = theSim->MIN[Z_DIR]+(double)kg*delta;
+    double delta = (ZMAX-ZMIN)/(double)theSim->N_global[Z_DIR];
+    theSim->z_faces[k] = ZMIN+(double)kg*delta;
   } 
 }
 
@@ -76,7 +85,7 @@ void sim_set_misc(struct Sim *theSim,struct MPIsetup * theMPIsetup) {
   theSim->NumGravMass = 2;
 
   theSim->NUM_Q = theSim->NUM_C + theSim->NUM_N;
-  
+
 }
 
 

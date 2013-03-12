@@ -67,7 +67,12 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 
     MPI_Allreduce( ScalarDiag_temp,ScalarDiag_reduce , NUM_SCAL, MPI_DOUBLE, MPI_SUM, sim_comm);
     MPI_Allreduce( VectorDiag_temp,VectorDiag_reduce , num_r_points_global*NUM_VEC, MPI_DOUBLE, MPI_SUM, sim_comm);
-    double RMIN = sim_MIN(theSim,R_DIR);
+    double RMIN;
+    if (sim_MIN(theSim,R_DIR)>0.0){
+      RMIN = sim_MIN(theSim,R_DIR);
+    } else{
+      RMIN = 0.0;
+    }
     double RMAX = sim_MAX(theSim,R_DIR);
     double ZMIN = sim_MIN(theSim,Z_DIR);
     double ZMAX = sim_MAX(theSim,Z_DIR);
