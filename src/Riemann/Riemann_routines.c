@@ -8,7 +8,8 @@
 #include "../Headers/Face.h"
 #include "../Headers/header.h"
 
-//try to come up with a better name for this routine
+// this routine is only called by riemann_set_vel.
+// It is used to find various L/R quantities. 
 void LR_speed(double *prim,double *n,double r,double GAMMALAW,double * p_vn,double * p_cf2,double *Fm,double * p_mn){
   double P   = prim[PPP];
   double rho = prim[RHO];
@@ -31,6 +32,8 @@ void LR_speed(double *prim,double *n,double r,double GAMMALAW,double * p_vn,doub
   *p_mn = mn;
 }
 
+// this routine is only called by riemann_set_vel.
+// It is used to find various L/R quantities. 
 void LR_speed_mhd(double *prim,double *n,double r,double ch, double * p_cf2,double *F,double *Fm,double * p_Bn,double * p_B2){
   double rho  =   prim[RHO];
   double vr  =   prim[URR];
@@ -61,6 +64,7 @@ void LR_speed_mhd(double *prim,double *n,double r,double ch, double * p_cf2,doub
   *p_B2 = B2;
 }
 
+// Find velocities needed for the Riemann problem
 void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim, double *n,double r,double *Bpack,double GAMMALAW,double DIVB_CH){
   double L_Mins, L_Plus, L_Star;
 
@@ -119,6 +123,7 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim, double *n,
 
 }
 
+// Which state of the riemann problem are we in?
 void riemann_set_state(struct Riemann * theRiemann,int w ){
   if (w < theRiemann->Sl){
     theRiemann->state=LEFT;
@@ -260,7 +265,7 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim, double r
 
 }
 
-void riemann_addto_flux_general(struct Riemann * theRiemann,double w,int NUM_Q){
+void riemann_addto_flux(struct Riemann * theRiemann,double w,int NUM_Q){
   int q;
   for (q=0;q<NUM_Q;++q){
     if ((theRiemann->state==LEFT)||(theRiemann->state==RIGHT)){
@@ -410,7 +415,7 @@ void riemann_hllc(struct Riemann * theRiemann, struct Sim *theSim,double dt, int
     cell_prim2cons( theRiemann->primR , theRiemann->Uk , theRiemann->r , 1.0 ,theSim,sim_runtype(theSim));
     riemann_set_Ustar(theRiemann,theSim,n,theRiemann->r,Bpack,GAMMALAW);
   }
-  riemann_addto_flux_general(theRiemann,w,sim_NUM_Q(theSim));
+  riemann_addto_flux(theRiemann,w,sim_NUM_Q(theSim));
 
   if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
     riemann_visc_flux(theRiemann,theSim,n );

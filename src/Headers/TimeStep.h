@@ -33,13 +33,8 @@ void timestep_update_Psi( struct TimeStep * , struct Cell *** , struct Sim *,str
 //access data 
 double timestep_get_t(struct TimeStep *);
 double timestep_dt(struct TimeStep * );
-int timestep_nri(struct TimeStep *,int);
-int timestep_nzk(struct TimeStep *,int);
-//int timestep_Nfr(struct TimeStep *);
-//int timestep_Nfz(struct TimeStep *);
+int timestep_n(struct TimeStep *,int,int);
 //set data
-//void timestep_set_Nfr(struct TimeStep *,struct Sim *);
-//void timestep_set_Nfz(struct TimeStep *,struct Sim *);
 void timestep_set_nri(struct TimeStep * ,int ,int );
 void timestep_set_nzk(struct TimeStep * ,int ,int );
 #endif

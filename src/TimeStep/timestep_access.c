@@ -19,11 +19,23 @@ double timestep_get_t(struct TimeStep * theTimeStep){
 double timestep_dt(struct TimeStep * theTimeStep){
   return(theTimeStep->dt);
 }
+/*
 int timestep_nri(struct TimeStep * theTimeStep, int i){
   return(theTimeStep->nri[i]);
 }
 int timestep_nzk(struct TimeStep * theTimeStep, int k){
   return(theTimeStep->nzk[k]);
+}
+*/
+int timestep_n(struct TimeStep * theTimeStep, int index, int direction){
+  if (direction==R_DIR){
+    return(theTimeStep->nri[index]);
+  } else if (direction==Z_DIR){
+    return(theTimeStep->nzk[index]);
+  } else {
+    printf("ERROR\n");
+    exit(0);
+  }
 }
 int timestep_Nfr(struct TimeStep * theTimeStep){
   return(theTimeStep->Nfr);

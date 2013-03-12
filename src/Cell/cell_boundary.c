@@ -12,9 +12,9 @@
 
 
 void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces ,struct Sim * theSim,struct MPIsetup * theMPIsetup, struct TimeStep * theTimeStep ){
-  int Nf = timestep_nri(theTimeStep,sim_N(theSim,R_DIR)-1);
+  int Nf = timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR);
   int NUM_Q = sim_NUM_Q(theSim);
-  int n1 = timestep_nri(theTimeStep,sim_N(theSim,R_DIR)-2);
+  int n1 = timestep_n(theTimeStep,sim_N(theSim,R_DIR)-2,R_DIR);
 
   int n,q;
   int i,j,k;
@@ -24,12 +24,12 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
 
     for( i=0 ; i>=0 ; --i ){
       r=sim_FacePos(theSim,i,R_DIR);
-      for( n=timestep_nri(theTimeStep,i) ; n<timestep_nri(theTimeStep,i+1) ; ++n ){
+      for( n=timestep_n(theTimeStep,i,R_DIR) ; n<timestep_n(theTimeStep,i+1,R_DIR) ; ++n ){
         for( q=0 ; q<NUM_Q ; ++q ){
           face_L_pointer(theFaces,n)->prim[q] = 0.0;
         }
       } 
-      for( n=timestep_nri(theTimeStep,i) ; n<timestep_nri(theTimeStep,i+1) ; ++n ){
+      for( n=timestep_n(theTimeStep,i,R_DIR) ; n<timestep_n(theTimeStep,i+1,R_DIR) ; ++n ){
         struct Cell * cL = face_L_pointer(theFaces,n);
         struct Cell * cR = face_R_pointer(theFaces,n);
         for( q=0 ; q<NUM_Q ; ++q ){
@@ -88,9 +88,9 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
   int NUM_Q = sim_NUM_Q(theSim);
 
   int j,i;
-  int Nf = timestep_nzk(theTimeStep,sim_N(theSim,Z_DIR)-1);
-  int n0 = timestep_nzk(theTimeStep,1);
-  int n1 = timestep_nzk(theTimeStep,sim_N(theSim,Z_DIR)-2);
+  int Nf = timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-1,Z_DIR);
+  int n0 = timestep_n(theTimeStep,1,Z_DIR);
+  int n1 = timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-2,Z_DIR);
 
   int n,q;
 

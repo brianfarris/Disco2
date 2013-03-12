@@ -6,14 +6,16 @@
 #include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
+#include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
-void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * theFaces , int Nf , int rz ){
+void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * theFaces , struct TimeStep * theTimeStep , int direction ){
   int NUM_Q = sim_NUM_Q(theSim);
   double PLM = sim_PLM(theSim);
 
+  int Nf = timestep_n(theTimeStep,sim_N(theSim,direction)-1,direction); // number of faces
+  
   int i,j,k,q;
-
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
@@ -26,7 +28,6 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
 
   int n;
   for( n=0 ; n<Nf ; ++n ){
-    //struct Face * f  = face_pointer(theFaces,n);
     struct Cell * cL = face_L_pointer(theFaces,n);
     struct Cell * cR = face_R_pointer(theFaces,n);
     double deltaL = face_deltaL(theFaces,n);
@@ -59,7 +60,7 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         double dp = theCells[k][i][j].dphi;
         double dAtot;
-        if( rz==0 ) dAtot = dz*(rp+rm)*dp; else dAtot = 2.*.5*(rp*rp-rm*rm)*dp;
+        if( direction==R_DIR ) dAtot = dz*(rp+rm)*dp; else dAtot = 2.*.5*(rp*rp-rm*rm)*dp;
         for( q=0 ; q<NUM_Q ; ++q ){
           theCells[k][i][j].grad[q] /= dAtot;
         }
@@ -68,7 +69,6 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
   }
 
   for( n=0 ; n<Nf ; ++n ){
-    //struct Face * f  = face_pointer(theFaces,n);
     struct Cell * cL = face_L_pointer(theFaces,n);
     struct Cell * cR = face_R_pointer(theFaces,n);
     double deltaL = face_deltaL(theFaces,n);

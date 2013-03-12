@@ -29,14 +29,6 @@ void timestep_set_RK(struct TimeStep * theTimeStep,double RK){
 void timestep_set_t(struct TimeStep * theTimeStep,double t){
   theTimeStep->t = t;
 }
-/*
-void timestep_set_Nfr(struct TimeStep * theTimeStep,struct Sim * theSim){
-  theTimeStep->Nfr = theTimeStep->nri[sim_N(theSim,R_DIR)-1];
-}
-void timestep_set_Nfz(struct TimeStep * theTimeStep,struct Sim * theSim){
-  theTimeStep->Nfz = theTimeStep->nzk[sim_N(theSim,Z_DIR)-1];
-}
-*/
 void timestep_set_nri(struct TimeStep * theTimeStep,int i,int n){
   theTimeStep->nri[i] = n;
 }

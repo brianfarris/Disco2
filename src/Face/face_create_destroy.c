@@ -128,7 +128,7 @@ struct Face *face_create(struct Cell *** theCells ,struct Sim *theSim, struct Ti
     //timestep_set_Nfr(theTimeStep,theSim);
 
     //allocate memory for array of Faces
-    theFaces = (struct Face *) malloc( timestep_nri(theTimeStep,sim_N(theSim,R_DIR)-1)/*timestep_Nfr(theTimeStep)*/ *sizeof(struct Face) );
+    theFaces = (struct Face *) malloc( timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR)*sizeof(struct Face) );
 
     //now actually build the faces
     n=0;
@@ -155,7 +155,7 @@ struct Face *face_create(struct Cell *** theCells ,struct Sim *theSim, struct Ti
       //timestep_set_Nfz(theTimeStep,theSim);
 
       //allocate memory for array of Faces
-      theFaces = (struct Face *) malloc(timestep_nzk(theTimeStep,sim_N(theSim,Z_DIR)-1) /*timestep_Nfz(theTimeStep)*/ *sizeof(struct Face) );
+      theFaces = (struct Face *) malloc(timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-1,Z_DIR)*sizeof(struct Face) );
 
       //now actually build the faces
       n=0;

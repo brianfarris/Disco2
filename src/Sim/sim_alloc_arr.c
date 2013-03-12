@@ -9,8 +9,8 @@
 void sim_alloc_arr(struct Sim * theSim, struct MPIsetup * theMPIsetup) {
 
   int N_noghost[2];
-  N_noghost[R_DIR] = theSim->N_global[R_DIR]/mpisetup_dim_NumProcs(theMPIsetup)[0];
-  N_noghost[Z_DIR] = theSim->N_global[Z_DIR]/mpisetup_dim_NumProcs(theMPIsetup)[1];
+  N_noghost[R_DIR] = theSim->N_global[R_DIR]/mpisetup_dim_NumProcs(theMPIsetup,R_DIR);
+  N_noghost[Z_DIR] = theSim->N_global[Z_DIR]/mpisetup_dim_NumProcs(theMPIsetup,Z_DIR);
 
   int Nghost_min[2];
   int Nghost_max[2];
