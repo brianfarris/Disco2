@@ -154,14 +154,14 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
 }
 
 void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup, 
-    void (*cell_single_init_ptr)(struct Cell ***,struct Sim *,int,int,int) ){
+    void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int) ){
   int i,j,k;
   if (sim_MIN(theSim,R_DIR)>0.0){ // if the global inner radius is set negative, we don't apply an inner BC
     if(mpisetup_check_rin_bndry(theMPIsetup)){
       for( i=0 ; i<sim_Nghost_min(theSim,R_DIR) ; ++i ){
         for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
           for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-            (*cell_single_init_ptr)(theCells,theSim,i,j,k);
+            (*single_init_ptr)(&(theCells[k][i][j]),theSim,i,j,k);
           }
         }
       }
@@ -171,7 +171,7 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct 
     for( i=sim_N(theSim,R_DIR)-1 ; i>sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)-1 ; --i ){
       for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-          (*cell_single_init_ptr)(theCells,theSim,i,j,k);
+          (*single_init_ptr)(&(theCells[k][i][j]),theSim,i,j,k);
         }
       }
     }
@@ -180,13 +180,13 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct 
 }
 
 void cell_boundary_fixed_z( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup,
-    void (*cell_single_init_ptr)(struct Cell ***,struct Sim *,int,int,int)  ){
+    void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int)  ){
   int i,j,k;
   if(mpisetup_check_zbot_bndry(theMPIsetup)){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( k=0 ; k<sim_Nghost_min(theSim,Z_DIR) ; ++k ){
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-          (*cell_single_init_ptr)(theCells,theSim,i,j,k);
+          (*single_init_ptr)(&(theCells[k][i][j]),theSim,i,j,k);
         }
       }
     }
@@ -196,7 +196,7 @@ void cell_boundary_fixed_z( struct Cell *** theCells, struct Sim *theSim,struct 
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( k=sim_N(theSim,Z_DIR)-1 ; k>sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR)-1 ; --k ){
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-          (*cell_single_init_ptr)(theCells,theSim,i,j,k);
+          (*single_init_ptr)(&(theCells[k][i][j]),theSim,i,j,k);
         }
       }
     }

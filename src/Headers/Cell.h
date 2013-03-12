@@ -25,15 +25,17 @@ struct Cell{
 //create and destroy
 struct Cell ***cell_create(struct Sim *,struct MPIsetup *);
 void cell_destroy(struct Cell ***,struct Sim *);
+struct Cell * cell_single_create(struct Sim * );
+void cell_single_destroy(struct Cell * );
 //initial data
 void cell_init_flock(struct Cell ***,struct Sim *, struct MPIsetup *);
-void cell_single_init_flock(struct Cell ***, struct Sim *,int ,int ,int );
+void cell_single_init_flock(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_shear(struct Cell ***,struct Sim *, struct MPIsetup *);
-void cell_single_init_shear(struct Cell ***, struct Sim *,int ,int ,int );
+void cell_single_init_shear(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_vortex(struct Cell ***,struct Sim *, struct MPIsetup *);
-void cell_single_init_vortex(struct Cell ***, struct Sim *,int ,int ,int );
+void cell_single_init_vortex(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
-void (*cell_single_init_ptr(struct Sim * ))(struct Cell *** , struct Sim *,int,int,int );
+void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
 double cell_prim(struct Cell *, int);
 double cell_grad(struct Cell *, int);
@@ -70,8 +72,9 @@ void cell_plm_p( struct Cell *** ,struct Sim * );
 //boundary conditions
 void cell_boundary_outflow_r( struct Cell *** , struct Face * ,struct Sim * ,struct MPIsetup *, struct TimeStep * );
 void cell_boundary_outflow_z( struct Cell *** , struct Face * , struct Sim * ,struct MPIsetup *,struct TimeStep * );
-void cell_boundary_fixed_r( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell ***,struct Sim *,int,int,int));
-void cell_boundary_fixed_z( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell ***,struct Sim *,int,int,int));
+void cell_boundary_fixed_r( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell *,struct Sim *,int,int,int));
+void cell_boundary_fixed_z( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell *,struct Sim *,int,int,int));
+void cell_bc_damp( struct Cell *** , struct Sim * , double ,void (*)(struct Cell *,struct Sim *,int,int,int));
 //primitive-conservative conversion routines
 void cell_calc_prim( struct Cell ***,struct Sim *);
 void cell_prim2cons( double * , double * , double , double ,struct Sim *);

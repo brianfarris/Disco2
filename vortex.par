@@ -51,3 +51,8 @@ Cs_Cap			100.0
 Vel_Cap			100.0
 
 runtype                 0
+
+//DAMPING
+DAMP_TIME               -1.0        // Set negative to turn off
+RDAMP_INNER             0.0
+RDAMP_OUTER             0.0

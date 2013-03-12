@@ -1,1 +1,4 @@
 Note that the documentations will not be automatically updated by git. You should use doxygen to regenerate up-to-date documentation.
+Viscosity is turned off when you set it to a negative number
+eliminate inner BC by setting R_Min to a negative number
+let N_p vary by setting NP_CONST to negative number

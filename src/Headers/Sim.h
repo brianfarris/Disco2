@@ -53,8 +53,11 @@ struct Sim {
   double CS_CAP;
   double VEL_CAP;
   int runtype;
-  void (*single_init_ptr)(struct Cell ***,struct Sim *,int,int,int);
-  void (*init_ptr)(struct Cell ***,struct Sim *);
+  double DAMP_TIME;
+  double RDAMP_INNER;
+  double RDAMP_OUTER;
+//  void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int);
+//  void (*init_ptr)(struct Cell ***,struct Sim *);
 };
 #endif
 
@@ -106,8 +109,11 @@ int sim_NUM_DIAG_DUMP(struct Sim * );
 int sim_NUM_DIAG_MEASURE(struct Sim * );
 int sim_runtype(struct Sim * );
 int sim_InitialDataType(struct Sim * );
-int sim_GravMassType(struct Sim * );
+double sim_DAMP_TIME(struct Sim *);
+double sim_RDAMP_INNER(struct Sim *);
+double sim_RDAMP_OUTER(struct Sim *);
 
+int sim_GravMassType(struct Sim * );
 //set Grid data
 int sim_read_par_file(struct Sim * ,struct MPIsetup *, char * );
 void sim_set_N_p(struct Sim *);

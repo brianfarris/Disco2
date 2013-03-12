@@ -8,7 +8,7 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_single_init_vortex(struct Cell ***theCells, struct Sim *theSim,int i,int j,int k){
+void cell_single_init_vortex(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
   double rho  = 1.0;
   double P0   = 1.0;
   double R    = 1.0;
@@ -19,7 +19,7 @@ void cell_single_init_vortex(struct Cell ***theCells, struct Sim *theSim,int i,i
   double rp = sim_FacePos(theSim,i,R_DIR);
   double r = 0.5*(rm+rp);
   double Pp,vp,Qq;
-  double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
+  double t = theCell->tiph-.5*theCell->dphi;
   if( r >= R ){
     Pp = P0;
     vp = 0.0;
@@ -27,16 +27,16 @@ void cell_single_init_vortex(struct Cell ***theCells, struct Sim *theSim,int i,i
     Pp = P0*( 1. - A*exp( g*( r/R - R/(R-r) + 1. ) ) );
     vp = sqrt( A*g*P0/rho*(2.*R-r)/R*r*r/pow(R-r,2.)*exp( g*( r/R - R/(R-r) + 1. ) ) );
     if( cos(t) < 0.0 ) Qq = 0.0; else Qq = 1.0;
-    theCells[k][i][j].prim[RHO] = rho;
-    theCells[k][i][j].prim[PPP] = Pp;
-    theCells[k][i][j].prim[URR] = 0.0;
-    theCells[k][i][j].prim[UPP] = vp/r;
-    theCells[k][i][j].prim[UZZ] = 0.0;
-    theCells[k][i][j].divB = 0.0;
-    theCells[k][i][j].GradPsi[0] = 0.0;
-    theCells[k][i][j].GradPsi[1] = 0.0;
-    theCells[k][i][j].GradPsi[2] = 0.0;
-    if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCells[k][i][j].prim[sim_NUM_C(theSim)] = Qq;
+    theCell->prim[RHO] = rho;
+    theCell->prim[PPP] = Pp;
+    theCell->prim[URR] = 0.0;
+    theCell->prim[UPP] = vp/r;
+    theCell->prim[UZZ] = 0.0;
+    theCell->divB = 0.0;
+    theCell->GradPsi[0] = 0.0;
+    theCell->GradPsi[1] = 0.0;
+    theCell->GradPsi[2] = 0.0;
+    if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = Qq;
   }
 }
 

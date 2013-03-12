@@ -9,6 +9,17 @@
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
+struct Cell * cell_single_create(struct Sim * theSim){
+  struct Cell *theCell = malloc(sizeof(struct Cell));
+  theCell->prim = malloc(sim_NUM_Q(theSim)*sizeof(double));
+  return(theCell);
+}
+
+void cell_single_destroy(struct Cell * theCell){
+  free(theCell->prim);
+  free(theCell);
+}
+
 struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
   int NUM_Q = sim_NUM_Q(theSim);
   //count up the total number of cells

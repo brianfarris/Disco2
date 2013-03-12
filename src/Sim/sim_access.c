@@ -145,3 +145,13 @@ int sim_InitialDataType(struct Sim * theSim){
 int sim_GravMassType(struct Sim * theSim){
   return(theSim->GravMassType);
 }
+double sim_DAMP_TIME(struct Sim * theSim){
+  return(theSim->DAMP_TIME);
+}
+double sim_RDAMP_INNER(struct Sim * theSim){
+  return(theSim->RDAMP_INNER);
+}
+double sim_RDAMP_OUTER(struct Sim * theSim){
+  return(theSim->RDAMP_OUTER);
+}
+

@@ -105,6 +105,9 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   if (sim_N_global(theSim,Z_DIR)>1){
     face_destroy(theFaces_z);
   }
+ 
+  // if DAMP_TIME is set to a positive number, apply damping near boundary
+  if (sim_DAMP_TIME(theSim)>0.0) cell_bc_damp( theCells , theSim, dt,(*cell_single_init_ptr(theSim)) );
 
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);

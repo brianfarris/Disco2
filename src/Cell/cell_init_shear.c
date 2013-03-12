@@ -8,7 +8,7 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_single_init_shear(struct Cell ***theCells, struct Sim *theSim,int i,int j,int k){
+void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
   double rho = 1.0;
   double Pp  = 1.0;
   double v0  = 0.1;
@@ -18,7 +18,7 @@ void cell_single_init_shear(struct Cell ***theCells, struct Sim *theSim,int i,in
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
   double r = 0.5*(rm+rp);
-  double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
+  double t = theCell->tiph-.5*theCell->dphi;
   double x  = r*cos(t)-1.;
 
   double vy = v0*exp(-x*x/(2.*nu*t0))/sqrt(2.*M_PI*nu*t0);
@@ -26,16 +26,16 @@ void cell_single_init_shear(struct Cell ***theCells, struct Sim *theSim,int i,in
   double vr    = vy*sin(t);
   double omega = vy*cos(t)/r;
 
-  theCells[k][i][j].prim[RHO] = rho;
-  theCells[k][i][j].prim[PPP] = Pp;
-  theCells[k][i][j].prim[URR] = vr;
-  theCells[k][i][j].prim[UPP] = omega;
-  theCells[k][i][j].prim[UZZ] = 0.0;
-  theCells[k][i][j].wiph = 0.0;
-  theCells[k][i][j].divB = 0.0;
-  theCells[k][i][j].GradPsi[0] = 0.0;
-  theCells[k][i][j].GradPsi[1] = 0.0;
-  theCells[k][i][j].GradPsi[2] = 0.0;
+  theCell->prim[RHO] = rho;
+  theCell->prim[PPP] = Pp;
+  theCell->prim[URR] = vr;
+  theCell->prim[UPP] = omega;
+  theCell->prim[UZZ] = 0.0;
+  theCell->wiph = 0.0;
+  theCell->divB = 0.0;
+  theCell->GradPsi[0] = 0.0;
+  theCell->GradPsi[1] = 0.0;
+  theCell->GradPsi[2] = 0.0;
 }
 
 void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {

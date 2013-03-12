@@ -9,7 +9,7 @@
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
-void cell_single_init_flock(struct Cell ***theCells, struct Sim *theSim,int i,int j,int k){
+void cell_single_init_flock(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
   double DISK_MACH = 10.;
   double GAMMALAW = sim_GAMMALAW(theSim);
   double rm =  sim_FacePos(theSim,i-1,R_DIR);
@@ -20,20 +20,20 @@ void cell_single_init_flock(struct Cell ***theCells, struct Sim *theSim,int i,in
   double rho = 1.0;
   double Pp = cs*cs*rho/GAMMALAW;
 
-  theCells[k][i][j].prim[RHO] = 1.0;
-  theCells[k][i][j].prim[PPP] = Pp;
-  theCells[k][i][j].prim[URR] = 0.0;
-  theCells[k][i][j].prim[UPP] = omega;
-  theCells[k][i][j].prim[UZZ] = 0.0;
-  theCells[k][i][j].prim[BRR] = 0.0;
-  theCells[k][i][j].prim[BPP] = 0.0;
-  theCells[k][i][j].prim[BZZ] = 0.0;
-  theCells[k][i][j].prim[PSI] = 0.0;
-  theCells[k][i][j].wiph = omega*r;
-  theCells[k][i][j].divB = 0.0;
-  theCells[k][i][j].GradPsi[0] = 0.0;
-  theCells[k][i][j].GradPsi[1] = 0.0;
-  theCells[k][i][j].GradPsi[2] = 0.0;
+  theCell->prim[RHO] = 1.0;
+  theCell->prim[PPP] = Pp;
+  theCell->prim[URR] = 0.0;
+  theCell->prim[UPP] = omega;
+  theCell->prim[UZZ] = 0.0;
+  theCell->prim[BRR] = 0.0;
+  theCell->prim[BPP] = 0.0;
+  theCell->prim[BZZ] = 0.0;
+  theCell->prim[PSI] = 0.0;
+  theCell->wiph = omega*r;
+  theCell->divB = 0.0;
+  theCell->GradPsi[0] = 0.0;
+  theCell->GradPsi[1] = 0.0;
+  theCell->GradPsi[2] = 0.0;
 }
 
 void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {

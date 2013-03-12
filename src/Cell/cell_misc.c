@@ -93,6 +93,46 @@ void cell_update_dphi( struct Cell *** theCells,struct Sim * theSim ){
   }
 }
 
+void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int) ){
+  int NUM_Q = sim_NUM_Q(theSim);
+
+  double RMIN;
+  if (sim_MIN(theSim,R_DIR)>0.0){
+    RMIN = sim_MIN(theSim,R_DIR);
+  } else{
+    RMIN = 0.0;
+  }
+  double RMAX = sim_MAX(theSim,R_DIR);
+  double ZMIN = sim_MIN(theSim,Z_DIR);
+  double ZMAX = sim_MAX(theSim,Z_DIR);
+
+  struct Cell * initialCell = cell_single_create(theSim);
+  double R0 = 1./sim_DAMP_TIME(theSim)/2./M_PI;
+
+  int i,j,k,q;
+  for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+    double rp = sim_FacePos(theSim,i,R_DIR);
+    double rm = sim_FacePos(theSim,i-1,R_DIR);
+    double r = .5*(rp+rm);
+
+    if( r < sim_RDAMP_INNER(theSim) || r > sim_RDAMP_OUTER(theSim) ){
+      double rate = R0*(r-sim_RDAMP_INNER(theSim))/(RMIN-sim_RDAMP_INNER(theSim));
+      if( r > sim_RDAMP_OUTER(theSim) ) rate = R0*(r-sim_RDAMP_OUTER(theSim))/(RMAX-sim_RDAMP_OUTER(theSim));
+
+      (*single_init_ptr)(initialCell,theSim,i,j,k);
+      for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+          for( q=0 ; q<NUM_Q ; ++q ){
+            double dprim = initialCell->prim[q] - theCells[k][i][j].prim[q];
+            theCells[k][i][j].prim[q] += (1.-exp(-rate*dt))*dprim;
+          }
+        }
+      }
+    }
+  }
+}
+
+
 void cell_print(struct Cell *** theCells,int n){
   printf("%d theCells[2][5][4]: %e\n",n,theCells[2][5][4].wiph);
 }

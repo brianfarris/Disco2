@@ -16,7 +16,7 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
   }
 }
 
-void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,int,int,int ){
+void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,int,int,int ){
   if (sim_InitialDataType(theSim)==FLOCK){
     return(&cell_single_init_flock);
   } else if (sim_InitialDataType(theSim)==SHEAR){
