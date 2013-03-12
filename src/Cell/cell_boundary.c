@@ -22,31 +22,33 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
 
   if( mpisetup_check_rin_bndry(theMPIsetup) ){
 
-    for( i=0 ; i>=0 ; --i ){
-      r=sim_FacePos(theSim,i,R_DIR);
-      for( n=timestep_n(theTimeStep,i,R_DIR) ; n<timestep_n(theTimeStep,i+1,R_DIR) ; ++n ){
-        for( q=0 ; q<NUM_Q ; ++q ){
-          face_L_pointer(theFaces,n)->prim[q] = 0.0;
-        }
-      } 
-      for( n=timestep_n(theTimeStep,i,R_DIR) ; n<timestep_n(theTimeStep,i+1,R_DIR) ; ++n ){
-        struct Cell * cL = face_L_pointer(theFaces,n);
-        struct Cell * cR = face_R_pointer(theFaces,n);
-        for( q=0 ; q<NUM_Q ; ++q ){
-          cL->prim[q] += cR->prim[q]*face_dA(theFaces,n);
-        }
-      }
-
-      for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-        double zp = sim_FacePos(theSim,k,Z_DIR);
-        double zm = sim_FacePos(theSim,k-1,Z_DIR);
-        double dz = zp-zm;
-        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-          double dA = dz*r*theCells[k][i][j].dphi;
+    if (sim_MIN(theSim,R_DIR)>0.0){ // if the global inner radius is set negative, we don't apply an inner BC
+      for( i=0 ; i>=0 ; --i ){
+        r=sim_FacePos(theSim,i,R_DIR);
+        for( n=timestep_n(theTimeStep,i,R_DIR) ; n<timestep_n(theTimeStep,i+1,R_DIR) ; ++n ){
           for( q=0 ; q<NUM_Q ; ++q ){
-            theCells[k][i][j].prim[q] /= dA;
+            face_L_pointer(theFaces,n)->prim[q] = 0.0;
           }
-          if( theCells[k][i][j].prim[URR] > 0.0 ) theCells[k][i][j].prim[URR] = 0.0;
+        } 
+        for( n=timestep_n(theTimeStep,i,R_DIR) ; n<timestep_n(theTimeStep,i+1,R_DIR) ; ++n ){
+          struct Cell * cL = face_L_pointer(theFaces,n);
+          struct Cell * cR = face_R_pointer(theFaces,n);
+          for( q=0 ; q<NUM_Q ; ++q ){
+            cL->prim[q] += cR->prim[q]*face_dA(theFaces,n);
+          }
+        }
+
+        for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+          double zp = sim_FacePos(theSim,k,Z_DIR);
+          double zm = sim_FacePos(theSim,k-1,Z_DIR);
+          double dz = zp-zm;
+          for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+            double dA = dz*r*theCells[k][i][j].dphi;
+            for( q=0 ; q<NUM_Q ; ++q ){
+              theCells[k][i][j].prim[q] /= dA;
+            }
+            if( theCells[k][i][j].prim[URR] > 0.0 ) theCells[k][i][j].prim[URR] = 0.0;
+          }
         }
       }
     }
@@ -154,16 +156,17 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
 void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup, 
     void (*cell_single_init_ptr)(struct Cell ***,struct Sim *,int,int,int) ){
   int i,j,k;
-  if(mpisetup_check_rin_bndry(theMPIsetup)){
-    for( i=0 ; i<sim_Nghost_min(theSim,R_DIR) ; ++i ){
-      for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-          (*cell_single_init_ptr)(theCells,theSim,i,j,k);
+  if (sim_MIN(theSim,R_DIR)>0.0){ // if the global inner radius is set negative, we don't apply an inner BC
+    if(mpisetup_check_rin_bndry(theMPIsetup)){
+      for( i=0 ; i<sim_Nghost_min(theSim,R_DIR) ; ++i ){
+        for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+          for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+            (*cell_single_init_ptr)(theCells,theSim,i,j,k);
+          }
         }
       }
     }
   }
-
   if( mpisetup_check_rout_bndry(theMPIsetup) ){
     for( i=sim_N(theSim,R_DIR)-1 ; i>sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)-1 ; --i ){
       for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){

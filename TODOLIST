@@ -1,12 +1,9 @@
 add planet info to checkpoint file
-add hll option
+add no inner BC option
 make it so that we can restart from checkpoint without a par file
-put back passive scalar
 put back damping at inner boundary
-have hll option
 check that checkpoint restart agrees to machine precision
 make it so that we can run on any number of procs
-add error checking wherever possible
 see if it is possible to not use buffers in syncing and IO
 openMP support
 doxygen
