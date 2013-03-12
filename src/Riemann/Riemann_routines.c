@@ -399,7 +399,7 @@ void riemann_hllc(struct Riemann * theRiemann, struct Sim *theSim,double dt ){
     Psi_face = 0.5*(theRiemann->primL[PSI]+theRiemann->primR[PSI]);
   }
   double w;
-  if (theRiemann->n[RDIRECTION]){
+  if (theRiemann->n[PDIRECTION]){
     if( sim_MOVE_CELLS(theSim) == C_WRIEMANN ) cell_add_wiph(theRiemann->cL,theRiemann->Ss);
     w = cell_wiph(theRiemann->cL);
   } else{
