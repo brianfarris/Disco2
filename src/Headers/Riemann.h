@@ -20,6 +20,7 @@ struct Riemann {
   double Sr;
   double Ss;
   int state;
+  int n[3];
 };
 #endif
 
@@ -27,7 +28,7 @@ struct Riemann {
 struct Riemann *riemann_create(struct Sim * );
 void riemann_destroy(struct Riemann *); 
 //other routines
-void riemann_setup_rz(struct Riemann *,struct Face * , struct Sim *,int );
-void riemann_setup_p(struct Riemann * ,struct Cell *** ,struct Sim * ,int ,int ,int ,int );
-void riemann_hllc(struct Riemann *, struct Sim *,double,int);
+void riemann_setup_rz(struct Riemann *,struct Face * , struct Sim *,int,int );
+void riemann_setup_p(struct Riemann * ,struct Cell *** ,struct Sim * ,int ,int ,int,int );
+void riemann_hllc(struct Riemann *, struct Sim *,double);
 #endif

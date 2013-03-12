@@ -43,17 +43,12 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   int i,j,k;
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
-      for( j=0 ; j<sim_N_p(theSim,i)-1 ; ++j ){
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem 
-        riemann_setup_p(theRiemann,theCells,theSim,i,j,j+1,k); // set various quantities in theRiemann
-        riemann_hllc( theRiemann,theSim,dt,1); // solve Riemann problem
+        riemann_setup_p(theRiemann,theCells,theSim,i,j,k,PDIRECTION); // set various quantities in theRiemann
+        riemann_hllc( theRiemann,theSim,dt); // solve Riemann problem
         riemann_destroy(theRiemann); // clean up
       }
-      //same as above, but when cells wrap around to beginning of array
-      struct Riemann * theRiemann = riemann_create(theSim);
-      riemann_setup_p(theRiemann,theCells,theSim,i,sim_N_p(theSim,i)-1,0,k);
-      riemann_hllc(theRiemann, theSim,dt,1 );
-      riemann_destroy(theRiemann);
     }
   }
   //R Flux
@@ -61,8 +56,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   int n;
   for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR) ; ++n ){
     struct Riemann * theRiemann = riemann_create(theSim); //struct to contain everything we need to solve Riemann problem
-    riemann_setup_rz(theRiemann,theFaces_r,theSim,n);  //set various quantities in theRiemann
-    riemann_hllc(theRiemann,theSim,dt,0); // solve Riemann problem
+    riemann_setup_rz(theRiemann,theFaces_r,theSim,n,RDIRECTION);  //set various quantities in theRiemann
+    riemann_hllc(theRiemann,theSim,dt); // solve Riemann problem
     riemann_destroy(theRiemann); // clean up
   }
 
@@ -71,8 +66,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     cell_plm_rz(theCells,theSim,theFaces_z,theTimeStep,Z_DIR );//piecewise-linear reconstruction
     for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-1,Z_DIR); ++n ){
       struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem
-      riemann_setup_rz(theRiemann,theFaces_z,theSim,n); // set various quantities in theRiemann
-      riemann_hllc(theRiemann,theSim,dt,2); // solve Riemann problem 
+      riemann_setup_rz(theRiemann,theFaces_z,theSim,n,ZDIRECTION); // set various quantities in theRiemann
+      riemann_hllc(theRiemann,theSim,dt); // solve Riemann problem 
       riemann_destroy(theRiemann); // clean up
     }
   }

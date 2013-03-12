@@ -7,7 +7,9 @@ enum{VAR_INT,VAR_DOUB,VAR_STR};
 enum{BOUND_FIXED,BOUND_OUTFLOW,BOUND_PERIODIC};
 enum{FLOCK,SHEAR,VORTEX};
 enum{NONE,SINGLE,BINARY};
+//unify the 2 below
 enum{R_DIR,Z_DIR};
+enum{RDIRECTION,PDIRECTION,ZDIRECTION};
 #include "mpi.h"
 MPI_Comm sim_comm;
 

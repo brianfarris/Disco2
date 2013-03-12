@@ -21,6 +21,10 @@ struct Riemann *riemann_create(struct Sim *theSim){
     theRiemann->Ustar[q]=0.;
     theRiemann->F[q]=0.;
   }
+  int iter;
+  for (iter=0;iter<3;++iter){
+    theRiemann->n[iter]=0; //initialize
+  }
   return(theRiemann);
 }
 
