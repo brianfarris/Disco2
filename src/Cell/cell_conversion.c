@@ -8,8 +8,9 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_prim2cons( double * prim , double * cons , double r , double dV ,struct Sim * theSim, int runtype){
+void cell_prim2cons( double * prim , double * cons , double r , double dV ,struct Sim * theSim){
   double GAMMALAW = sim_GAMMALAW(theSim);
+  int runtype = sim_runtype(theSim);
 
   double rho = prim[RHO];
   double Pp  = prim[PPP];
@@ -60,13 +61,14 @@ void cell_calc_cons( struct Cell *** theCells,struct Sim *theSim ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         double dV = .5*(rp*rp - rm*rm)*c->dphi*dz;
-        cell_prim2cons( c->prim , c->cons , r , dV,theSim ,sim_runtype(theSim));
+        cell_prim2cons( c->prim , c->cons , r , dV,theSim);
       }    
     }    
   }
 }
 
-void cell_cons2prim( double * cons , double * prim , double r , double dV ,struct Sim * theSim,int runtype){
+void cell_cons2prim( double * cons , double * prim , double r , double dV ,struct Sim * theSim){
+  int runtype = sim_runtype(theSim);
   double CS_FLOOR = sim_CS_FLOOR(theSim);
   double CS_CAP = sim_CS_CAP(theSim);
   double RHO_FLOOR = sim_RHO_FLOOR(theSim);
@@ -136,7 +138,7 @@ void cell_calc_prim( struct Cell *** theCells ,struct Sim * theSim){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = cell_single(theCells,i,j,k);
         double dV = .5*(rp*rp-rm*rm)*c->dphi*dz;
-        cell_cons2prim( c->cons , c->prim , r , dV ,theSim,sim_runtype(theSim));
+        cell_cons2prim( c->cons , c->prim , r , dV ,theSim);
       }
     }
   }

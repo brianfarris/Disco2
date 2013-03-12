@@ -384,16 +384,6 @@ void riemann_hllc(struct Riemann * theRiemann, struct Sim *theSim,double dt ){
   double GAMMALAW = sim_GAMMALAW(theSim);
   double DIVB_CH = sim_DIVB_CH(theSim);
 
-  /*
-  //initialize
-  double n[3];int i;
-  for (i=0;i<3;++i){
-    n[i]=0;
-  }
-  //set
-  n[direction]=1.0;
-  */
-
   double Bpack[6];
   riemann_set_vel(theRiemann,theSim,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
 
@@ -419,11 +409,11 @@ void riemann_hllc(struct Riemann * theRiemann, struct Sim *theSim,double dt ){
 
   riemann_set_flux( theRiemann , theSim, theRiemann->r , GAMMALAW,DIVB_CH );
   if (theRiemann->state==LEFTSTAR){
-    cell_prim2cons( theRiemann->primL , theRiemann->Uk , theRiemann->r , 1.0 ,theSim,sim_runtype(theSim));
+    cell_prim2cons( theRiemann->primL , theRiemann->Uk , theRiemann->r , 1.0 ,theSim);
     riemann_set_Ustar(theRiemann,theSim,theRiemann->r,Bpack,GAMMALAW);
 
   } else if(theRiemann->state==RIGHTSTAR){
-    cell_prim2cons( theRiemann->primR , theRiemann->Uk , theRiemann->r , 1.0 ,theSim,sim_runtype(theSim));
+    cell_prim2cons( theRiemann->primR , theRiemann->Uk , theRiemann->r , 1.0 ,theSim);
     riemann_set_Ustar(theRiemann,theSim,theRiemann->r,Bpack,GAMMALAW);
   }
   riemann_addto_flux(theRiemann,w,sim_NUM_Q(theSim));
