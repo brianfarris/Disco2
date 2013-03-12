@@ -37,6 +37,7 @@ struct Sim {
   int NUM_Q;
   int MOVE_CELLS;   
   int NumGravMass;
+  int Riemann;
   double GAMMALAW;
   double EXPLICIT_VISCOSITY;
   double DIVB_CH;
@@ -82,6 +83,7 @@ int sim_Nghost_min(struct Sim *,int);
 int sim_Nghost_max(struct Sim *,int);
 int sim_MOVE_CELLS(struct Sim *);
 int sim_NumGravMass(struct Sim *);
+int sim_Riemann(struct Sim *);
 double sim_GAMMALAW(struct Sim *);
 double sim_EXPLICIT_VISCOSITY(struct Sim *);
 double sim_DIVB_CH(struct Sim *);

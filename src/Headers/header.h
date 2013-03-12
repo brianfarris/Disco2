@@ -10,6 +10,7 @@ enum{NONE,SINGLE,BINARY};
 //unify the 2 below
 enum{R_DIR,Z_DIR};
 enum{RDIRECTION,PDIRECTION,ZDIRECTION};
+enum{HLLC,HLL};
 #include "mpi.h"
 MPI_Comm sim_comm;
 

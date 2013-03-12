@@ -74,6 +74,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Num_Diag_Measure"   , VAR_INT  , &(theSim->NUM_DIAG_MEASURE)  );
       err += readvar( pfile , "Move_Cells"        , VAR_INT  , &(theSim->MOVE_CELLS)  );
       //     err += readvar( pfile , "NumGravMass"        , VAR_INT  , &(theSim->NumGravMass)  );
+      err += readvar( pfile , "RiemannSolver"   , VAR_INT , &(theSim->Riemann)  );
       err += readvar( pfile , "Adiabatic_Index"   , VAR_DOUB , &(theSim->GAMMALAW)  );
       err += readvar( pfile , "Explicit_Viscosity" , VAR_DOUB  , &(theSim->EXPLICIT_VISCOSITY)  );
       err += readvar( pfile , "DivB_Ch"           , VAR_DOUB , &(theSim->DIVB_CH)  );

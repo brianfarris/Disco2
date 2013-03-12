@@ -13,8 +13,12 @@ struct Riemann {
   double dA;
   double *primL;
   double *primR;
-  double *Uk;
+  double *UL;
+  double *UR;
   double *Ustar;
+  double *FL;
+  double *FR;
+  double *Fstar;
   double *F;
   double Sl;
   double Sr;
@@ -30,5 +34,5 @@ void riemann_destroy(struct Riemann *);
 //other routines
 void riemann_setup_rz(struct Riemann *,struct Face * , struct Sim *,int,int );
 void riemann_setup_p(struct Riemann * ,struct Cell *** ,struct Sim * ,int ,int ,int,int );
-void riemann_hllc(struct Riemann *, struct Sim *,double);
+void riemann_AddFlux(struct Riemann *, struct Sim *,double);
 #endif

@@ -79,6 +79,9 @@ int sim_MOVE_CELLS(struct Sim *theSim){
 int sim_NumGravMass(struct Sim *theSim){
   return(theSim->NumGravMass);
 }
+int sim_Riemann(struct Sim *theSim){
+  return(theSim->Riemann);
+}
 double sim_GAMMALAW(struct Sim *theSim){
   return(theSim->GAMMALAW);
 }
