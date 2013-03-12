@@ -1,4 +1,5 @@
 add planet info to checkpoint file
+add hll option
 make it so that we can restart from checkpoint without a par file
 put back passive scalar
 put back damping at inner boundary
