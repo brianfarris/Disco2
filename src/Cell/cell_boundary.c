@@ -22,7 +22,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
 
   if( mpisetup_check_rin_bndry(theMPIsetup) ){
 
-    if (sim_NoInnerBC(theSim)){ // if the global inner radius is set negative, we don't apply an inner BC
+    if (sim_NoInnerBC(theSim)!=1){ // if the global inner radius is set negative, we don't apply an inner BC
       for( i=0 ; i>=0 ; --i ){
         r=sim_FacePos(theSim,i,R_DIR);
         for( n=timestep_n(theTimeStep,i,R_DIR) ; n<timestep_n(theTimeStep,i+1,R_DIR) ; ++n ){
@@ -156,7 +156,7 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
 void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup, 
     void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int) ){
   int i,j,k;
-  if (sim_NoInnerBC(theSim)){ // if the global inner radius is set negative, we don't apply an inner BC
+  if (sim_NoInnerBC(theSim)!=1){ // if the global inner radius is set negative, we don't apply an inner BC
     if(mpisetup_check_rin_bndry(theMPIsetup)){
       for( i=0 ; i<sim_Nghost_min(theSim,R_DIR) ; ++i ){
         for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
