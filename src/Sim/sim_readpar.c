@@ -93,6 +93,11 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "DAMP_TIME"           , VAR_DOUB , &(theSim->DAMP_TIME)  );
       err += readvar( pfile , "RDAMP_INNER"           , VAR_DOUB , &(theSim->RDAMP_INNER)  );
       err += readvar( pfile , "RDAMP_OUTER"           , VAR_DOUB , &(theSim->RDAMP_OUTER)  );
+      err += readvar( pfile , "RLogScale"           , VAR_DOUB , &(theSim->RLogScale)  );
+      err += readvar( pfile , "ZLogScale"           , VAR_DOUB , &(theSim->ZLogScale)  );
+      err += readvar( pfile , "HiResSigma"           , VAR_DOUB , &(theSim->HiResSigma)  );
+      err += readvar( pfile , "HiResR0"           , VAR_DOUB , &(theSim->HiResR0)  );
+      err += readvar( pfile , "HiResFac"           , VAR_DOUB , &(theSim->HiResFac)  );
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }

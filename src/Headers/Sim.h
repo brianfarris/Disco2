@@ -57,6 +57,11 @@ struct Sim {
   double DAMP_TIME;
   double RDAMP_INNER;
   double RDAMP_OUTER;
+  double RLogScale;
+  double ZLogScale;
+  double HiResSigma;
+  double HiResR0;
+  double HiResFac;
 };
 #endif
 

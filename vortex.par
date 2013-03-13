@@ -56,3 +56,9 @@ runtype                 0
 DAMP_TIME               -1.0        // Set negative to turn off
 RDAMP_INNER             0.0
 RDAMP_OUTER             0.0
+
+RLogScale               1000.0
+ZLogScale               1000.0
+HiResSigma              1000.0
+HiResR0                 1000.0
+HiResFac                0.0
