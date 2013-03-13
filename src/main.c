@@ -70,10 +70,8 @@ int main(int argc, char **argv) {
   sim_set_N_p(theSim);
   sim_set_misc(theSim,theMPIsetup);
   
-  // set up gravitating masses. 
+  //allocate memory for gravitating masses
   struct GravMass *theGravMasses = gravMass_create(sim_NumGravMass(theSim));
-  (*gravMass_init_ptr(theSim))(theGravMasses);
-  gravMass_clean_pi(theGravMasses,theSim);
 
   // allocate memory for data 
   struct Cell ***theCells = cell_create(theSim,theMPIsetup);
@@ -96,11 +94,13 @@ int main(int argc, char **argv) {
   if (sim_Restart(theSim)==1){ // getting initial data from checkpoint file
     io_allocbuf(theIO,theSim); // allocate memory for a buffer to store checkpoint data
     io_hdf5_in(theIO,theSim,theTimeStep); // read from hdf5 file into buffer
-    io_readbuf(theIO,theCells,theSim,theGravMasses); // read from buffer into theCells
+    io_readbuf(theIO,theCells,theSim,theGravMasses); // read from buffer into theCells and theGravMasses
     io_deallocbuf(theIO); // get rid of buffer
   }else{
+    (*gravMass_init_ptr(theSim))(theGravMasses); // set up gravitating masses. 
     (*cell_init_ptr(theSim))(theCells,theSim,theMPIsetup); // setup initial data using routine specified in .par file
   }
+  gravMass_clean_pi(theGravMasses,theSim); // make sure GravMasses have phi between 0 and 2 pi.
 
   // set tcheck, dtcheck, and nfile. Needs to be done after ID because it depends on current time.
   io_setup(theIO,theSim,theTimeStep);

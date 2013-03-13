@@ -19,6 +19,7 @@ struct TimeStep {
 #endif
 // timestepping algorithms
 void timestep_rk2(struct TimeStep * , struct Sim * , struct Cell *** , struct GravMass * , struct MPIsetup * );
+void timestep_forward_euler(struct TimeStep * , struct Sim * , struct Cell *** , struct GravMass * , struct MPIsetup * );
 //create and destroy
 struct TimeStep *timestep_create(struct Sim * );
 void timestep_destroy(struct TimeStep *); 
