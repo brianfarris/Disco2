@@ -18,8 +18,8 @@ void io_hdf5_out(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeS
   // HDF5 APIs definitions
   hid_t       file_id, dset_id;         /* file and dataset identifiers */
   hid_t       filespace, memspace;      /* file and memory dataspace identifiers */
-  hsize_t     dimsf1[1];                 /* dataset containing one element */
-  hsize_t     dimsf[2];                 /* dataset dimensions */
+  hsize_t     dimsf1[1];                 /* 1d dataset dimensions */
+  hsize_t     dimsf2[2];                 /* 2d dataset dimensions */
   hsize_t     chunk_dims[2];            /* chunk dimensions */
   hsize_t	count[2];	          /* hyperslab selection parameters */
   hsize_t	stride[2];
@@ -72,17 +72,48 @@ void io_hdf5_out(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeS
   H5Pclose(plist_id);
   H5Dclose(dset_id);
 
+  // *****************************************
+  // Then we save the info of the GravMasses
+  // *****************************************
+
+  dimsf2[0] = 2;
+  dimsf2[1] = 4;
+  // Create the dataspace for the dataset.
+  filespace = H5Screate_simple(2, dimsf2, NULL); 
+  memspace  = H5Screate_simple(2, dimsf2, NULL); 
+
+  plist_id = H5Pcreate(H5P_DATASET_CREATE);
+
+  dset_id = H5Dcreate1(file_id, "GravMass", H5T_NATIVE_DOUBLE, filespace,plist_id);
+  H5Pclose(plist_id);
+  H5Sclose(filespace);
+
+  // Select hyperslab in the file.
+  filespace = H5Dget_space(dset_id);
+
+  // Create property list for collective dataset write.
+  plist_id = H5Pcreate(H5P_DATASET_XFER);
+  H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+
+  //status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, prim_data);
+  status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, plist_id, theIO->GravMassBuffer);
+
+  // Close/release resources.
+  H5Sclose(filespace);
+  H5Sclose(memspace);
+  H5Pclose(plist_id);
+  H5Dclose(dset_id);
 
   // ***************************
   // Now we save the actual data
   // ***************************
 
   // Create the dataspace for the dataset.
-  dimsf[0] = sim_Ncells_global(theSim);
-  dimsf[1] = NUM_Q+3;
+  dimsf2[0] = sim_Ncells_global(theSim);
+  dimsf2[1] = NUM_Q+3;
   chunk_dims[0] = sim_Ncells(theSim);
   chunk_dims[1] = NUM_Q+3;
-  filespace = H5Screate_simple(RANK, dimsf, NULL); 
+  filespace = H5Screate_simple(RANK, dimsf2, NULL); 
   memspace  = H5Screate_simple(RANK, chunk_dims, NULL); 
 
   // Create chunked dataset.
@@ -134,8 +165,8 @@ void io_hdf5_in(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeSt
   hid_t       dataset;  
   hid_t       filespace;                   
   hid_t       memspace;                  
-  hsize_t     dims1[1];                     /* dataset and chunk dimensions*/ 
-  hsize_t     dims[2];                     /* dataset and chunk dimensions*/ 
+  hsize_t     dims1[1];                     // 1d dataset dimensions 
+  hsize_t     dims2[2];                     // 2d dataset dimensions 
   hsize_t     chunk_dims[2];
   hsize_t     count[2];
   hsize_t     offset[2];
@@ -157,8 +188,6 @@ void io_hdf5_in(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeSt
   // Get dataset rank and dimension.
   filespace = H5Dget_space(dataset);    /* Get filespace handle first. */
   rank      = H5Sget_simple_extent_ndims(filespace);
-  //status_n  = H5Sget_simple_extent_dims(filespace, dims1, NULL);
-  //status_n  = H5Sget_simple_extent_dims(memspace, dims1, NULL);
 
   // Define the memory space to read a chunk.
   memspace = H5Screate_simple(rank,dims1,NULL);
@@ -173,6 +202,30 @@ void io_hdf5_in(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeSt
   H5Sclose(filespace);
   H5Sclose(memspace);
 
+  // ********************************************
+  // Then we read in the info of the 1st GravMass
+  // ********************************************
+  
+  dataset = H5Dopen1(file,"GravMass");
+  dims2[0] = 2;
+  dims2[1] = 4;
+
+  // Get dataset rank and dimension.
+  filespace = H5Dget_space(dataset);    /* Get filespace handle first. */
+  rank      = H5Sget_simple_extent_ndims(filespace);
+
+  // Define the memory space to read a chunk.
+  memspace = H5Screate_simple(rank,dims2,NULL);
+
+  status = H5Dread(dataset, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT,theIO->GravMassBuffer);
+
+  // Close/release resources.
+  H5Dclose(dataset);
+  H5Sclose(filespace);
+  H5Sclose(memspace);
+
+
+
   // **********************
   // Then we read in the actual data
   // **********************
@@ -182,7 +235,7 @@ void io_hdf5_in(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeSt
   // Get dataset rank and dimension.
   filespace = H5Dget_space(dataset);    /* Get filespace handle first. */
   rank      = H5Sget_simple_extent_ndims(filespace);
-  status_n  = H5Sget_simple_extent_dims(filespace, dims, NULL);
+  status_n  = H5Sget_simple_extent_dims(filespace, dims2, NULL);
 
   chunk_dims[0] = sim_Ncells(theSim);
   chunk_dims[1] = NUM_Q+3;

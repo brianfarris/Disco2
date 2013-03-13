@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
   if (sim_Restart(theSim)==1){ // getting initial data from checkpoint file
     io_allocbuf(theIO,theSim); // allocate memory for a buffer to store checkpoint data
     io_hdf5_in(theIO,theSim,theTimeStep); // read from hdf5 file into buffer
-    io_readbuf(theIO,theCells,theSim); // read from buffer into theCells
+    io_readbuf(theIO,theCells,theSim,theGravMasses); // read from buffer into theCells
     io_deallocbuf(theIO); // get rid of buffer
   }else{
     (*cell_init_ptr(theSim))(theCells,theSim,theMPIsetup); // setup initial data using routine specified in .par file
@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
     // checkpointing
     if( timestep_get_t(theTimeStep)>io_tcheck(theIO)){ // time to write checkpoint file
       io_allocbuf(theIO,theSim); // allocate memory for a buffer to store simulation data
-      io_setbuf(theIO,theCells,theSim); // fill the buffer
+      io_setbuf(theIO,theCells,theSim,theGravMasses); // fill the buffer
       io_hdf5_out(theIO,theSim,theTimeStep); // write contents to file
       io_deallocbuf(theIO); // get rid of buffer
     }

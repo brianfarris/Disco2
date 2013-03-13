@@ -13,3 +13,6 @@ double gravMass_phi(struct GravMass * theGravMasses,int p){
 double gravMass_M(struct GravMass * theGravMasses,int p){
   return(theGravMasses[p].M);
 }
+double gravMass_omega(struct GravMass * theGravMasses,int p){
+  return(theGravMasses[p].omega);
+}

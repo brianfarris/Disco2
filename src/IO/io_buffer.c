@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "../Headers/Sim.h"
 #include "../Headers/Cell.h"
+#include "../Headers/GravMass.h"
 #include "hdf5.h"
 #include "../Headers/IO.h"
 #include "../Headers/header.h"
@@ -22,7 +23,7 @@ void io_deallocbuf(struct IO *theIO){
   free(theIO->buffer);
 }
 
-void io_setbuf(struct IO *theIO,struct Cell ***theCells,struct Sim *theSim){
+void io_setbuf(struct IO *theIO,struct Cell ***theCells,struct Sim *theSim,struct GravMass * theGravMasses){
   int NUM_Q = sim_NUM_Q(theSim);
   int i,j,k,q;
   int index=0;
@@ -39,9 +40,21 @@ void io_setbuf(struct IO *theIO,struct Cell ***theCells,struct Sim *theSim){
       }
     }
   }
+
+  //first GravMass
+  theIO->GravMassBuffer[0][0] = gravMass_r(theGravMasses,0);
+  theIO->GravMassBuffer[0][1] = gravMass_phi(theGravMasses,0);
+  theIO->GravMassBuffer[0][2] = gravMass_M(theGravMasses,0);
+  theIO->GravMassBuffer[0][3] = gravMass_omega(theGravMasses,0);
+  //second GravMass
+  theIO->GravMassBuffer[1][0] = gravMass_r(theGravMasses,1);
+  theIO->GravMassBuffer[1][1] = gravMass_phi(theGravMasses,1);
+  theIO->GravMassBuffer[1][2] = gravMass_M(theGravMasses,1);
+  theIO->GravMassBuffer[1][3] = gravMass_omega(theGravMasses,1);
+
 }
 
-void io_readbuf(struct IO *theIO,struct Cell ***theCells,struct Sim *theSim){
+void io_readbuf(struct IO *theIO,struct Cell ***theCells,struct Sim *theSim,struct GravMass * theGravMasses){
   int NUM_Q = sim_NUM_Q(theSim);
   int i,j,k,q;
   int index=0;
@@ -56,4 +69,11 @@ void io_readbuf(struct IO *theIO,struct Cell ***theCells,struct Sim *theSim){
       }
     }
   }
+  //first GravMass
+  int p = 0;
+  gravMass_set_chkpt(theGravMasses,p,theIO->GravMassBuffer[p][0],theIO->GravMassBuffer[p][1],theIO->GravMassBuffer[p][2],theIO->GravMassBuffer[p][3]);
+  //second GravMass
+  p=1;
+  gravMass_set_chkpt(theGravMasses,p,theIO->GravMassBuffer[p][0],theIO->GravMassBuffer[p][1],theIO->GravMassBuffer[p][2],theIO->GravMassBuffer[p][3]);
+
 }

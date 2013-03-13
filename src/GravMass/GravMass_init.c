@@ -63,3 +63,9 @@ void gravMass_init_binary(struct GravMass * theGravMasses){
   theGravMasses[1].omega = sqrt(om2);
 }
 
+void gravMass_set_chkpt(struct GravMass * theGravMasses,int p,double r,double phi,double M, double omega){
+  theGravMasses[p].r = r; 
+  theGravMasses[p].phi = phi;
+  theGravMasses[p].M = M;
+  theGravMasses[p].omega = omega;
+ }
