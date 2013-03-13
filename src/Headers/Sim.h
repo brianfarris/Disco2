@@ -56,8 +56,6 @@ struct Sim {
   double DAMP_TIME;
   double RDAMP_INNER;
   double RDAMP_OUTER;
-//  void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int);
-//  void (*init_ptr)(struct Cell ***,struct Sim *);
 };
 #endif
 
@@ -70,8 +68,6 @@ double sim_MIN(struct Sim * ,int);
 double sim_MAX(struct Sim * ,int);
 int sim_N0(struct Sim * ,int );
 int sim_N_p(struct Sim *,int);
-//double sim_r_faces(struct Sim *,int);
-//double sim_z_faces(struct Sim *,int);
 double sim_FacePos(struct Sim *,int,int);
 int sim_N(struct Sim *,int );
 int sim_Restart(struct Sim *);

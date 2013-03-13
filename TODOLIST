@@ -1,8 +1,19 @@
+****************
+desired features
+****************
+Put real diagnostics in
+Logarithmic coords
 add planet info to checkpoint file
 make it so that we can restart from checkpoint without a par file
-put back damping at inner boundary
-check that checkpoint restart agrees to machine precision
 make it so that we can run on any number of procs
-see if it is possible to not use buffers in syncing and IO
+see if it is possible to avoid using buffers in syncing and IO
 openMP support
 create awesome documentation using doxygen
+
+***************
+quality control
+***************
+test boundary damping
+check that checkpoint restart agrees to machine precision
+test for 2nd order convergence
+add other code tests

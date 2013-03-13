@@ -73,7 +73,6 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Num_Diag_Dump"   , VAR_INT  , &(theSim->NUM_DIAG_DUMP)  );
       err += readvar( pfile , "Num_Diag_Measure"   , VAR_INT  , &(theSim->NUM_DIAG_MEASURE)  );
       err += readvar( pfile , "Move_Cells"        , VAR_INT  , &(theSim->MOVE_CELLS)  );
-      //     err += readvar( pfile , "NumGravMass"        , VAR_INT  , &(theSim->NumGravMass)  );
       err += readvar( pfile , "RiemannSolver"   , VAR_INT , &(theSim->Riemann)  );
       err += readvar( pfile , "Adiabatic_Index"   , VAR_DOUB , &(theSim->GAMMALAW)  );
       err += readvar( pfile , "Explicit_Viscosity" , VAR_DOUB  , &(theSim->EXPLICIT_VISCOSITY)  );
@@ -93,18 +92,6 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "DAMP_TIME"           , VAR_DOUB , &(theSim->DAMP_TIME)  );
       err += readvar( pfile , "RDAMP_INNER"           , VAR_DOUB , &(theSim->RDAMP_INNER)  );
       err += readvar( pfile , "RDAMP_OUTER"           , VAR_DOUB , &(theSim->RDAMP_OUTER)  );
-
-      //err += readvar( pfile , "BC_Damp"           , VAR_INT  , &(theSim->BC_DAMP));
-      //err += readvar( pfile , "Num_Reports"       , VAR_INT  , &(theSim->NUM_REPORTS)  );
-      //err += readvar( pfile , "Num_Outputs"       , VAR_INT  , &(theSim->NUM_OUTPUTS)  );
-      //err += readvar( pfile , "Restart"           , VAR_INT  , &(theSim->RESTART)  );
-      //err += readvar( pfile , "Mp_Thresh"         , VAR_DOUB , &(theSim->PLANET_MASS)  );
-      //err += readvar( pfile , "Disk_Mach"         , VAR_DOUB , &(theSim->DISK_MACH)  );
-      //err += readvar( pfile , "Free_Planet"       , VAR_INT  , &(theSim->FREE_PLANET)  );
-      //err += readvar( pfile , "Damp_Timescale"    , VAR_DOUB , &(theSim->DAMP_TIME)  );
-      //err += readvar( pfile , "Np_Const"          , VAR_INT  , &(theSim->NP_CONST)           );
-      //err += readvar( pfile , "Cell_Aspect_Ratio" , VAR_DOUB , &(theSim->CELL_ASPECT_RATIO)  );
-      //err += readvar( pfile , "Logarithmic_Zoning", VAR_DOUB , &(theSim->LOG_ZONING)  );
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }

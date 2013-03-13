@@ -132,7 +132,3 @@ void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,voi
   }
 }
 
-
-void cell_print(struct Cell *** theCells,int n){
-  printf("%d theCells[2][5][4]: %e\n",n,theCells[2][5][4].wiph);
-}
