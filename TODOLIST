@@ -1,10 +1,7 @@
-IMPORTANT: check on r=0
-
 ****************
 desired features
 ****************
 Put real diagnostics in
-Logarithmic coords
 make it so that GravMasses don't need to be on constant orbits
 make it so that we can restart from checkpoint without a par file
 make it so that we can run on any number of procs

@@ -18,7 +18,6 @@ void sim_set_N_p(struct Sim * theSim){
       double r = sim_FacePos(theSim,i,R_DIR);
       double dr = sim_FacePos(theSim,i,R_DIR)-sim_FacePos(theSim,i-1,R_DIR);
       theSim->N_p[i] = (int)( 2.*M_PI*( 1. + (r/dr-1.)/theSim->aspect ) ) ;
-      printf("sim_FacePos(i): %e, sim_FacePos(i-1): %e, N_p[%d]: %d\n",sim_FacePos(theSim,i,R_DIR),sim_FacePos(theSim,i-1,R_DIR),i,theSim->N_p[i]);
     }
   }
 }
