@@ -69,12 +69,7 @@ void sim_set_rz(struct Sim * theSim,struct MPIsetup * theMPIsetup){
   theSim->N0[R_DIR] = N0[R_DIR];
   theSim->N0[Z_DIR] = N0[Z_DIR];
 
-  double RMIN;
-  if (theSim->MIN[R_DIR]>0.0){
-   double RMIN=theSim->MIN[R_DIR];
-  }else{
-    RMIN=0.0;
-  }
+  double RMIN = theSim->MIN[R_DIR];
   double ZMIN = theSim->MIN[Z_DIR];
   double RMAX=theSim->MAX[R_DIR];
   double ZMAX=theSim->MAX[Z_DIR];
@@ -87,7 +82,7 @@ void sim_set_rz(struct Sim * theSim,struct MPIsetup * theMPIsetup){
   //    This could, for example, correspond to the radius r0 at which a binary is located. 
   //    We would like the resolution to improve at r0 by a factor of 1+fac, and go back to normal over a scale of sigma.
   //****************************************************************************************************************************
-  
+
   // Rscale is the scale at which the points begin to get logarithmically spaced
   double Rscale = 0.25;
   //sigma is the approx size of the hi-res region
@@ -96,7 +91,7 @@ void sim_set_rz(struct Sim * theSim,struct MPIsetup * theMPIsetup){
   double r0 = 0.5;
   // how much the res increases. res changes by factor of 1+fac at r0.
   double fac = 1.;
- 
+
   // r1 is a different coordinate in which the cells are evenly spaced. Here we find the max/min of r1.
   double r2_max = RMAX + fac*sigma*sqrt(M_PI/4.0)*(erf((RMAX-r0)/sigma)+1.0);
   double r2_min = RMIN + fac*sigma*sqrt(M_PI/4.0)*(erf((RMIN-r0)/sigma)+1.0);
@@ -106,18 +101,17 @@ void sim_set_rz(struct Sim * theSim,struct MPIsetup * theMPIsetup){
   int i,k;
   for(i = 0; i < sim_N(theSim,R_DIR)+1; i++){
     int ig;
-    if (mpisetup_check_rin_bndry(theMPIsetup) && theSim->MIN[R_DIR]<0.0){ //if we are on an inner proc and we want no inner BC
-      ig = i+N0[R_DIR];
-    }else{
-      ig = i-theSim->Nghost_min[R_DIR]+N0[R_DIR];
-    }
+    //if (mpisetup_check_rin_bndry(theMPIsetup) && theSim->MIN[R_DIR]<0.0){ //if we are on an inner proc and we want no inner BC
+    //  ig = i+N0[R_DIR];
+    //}else{
+    ig = i-theSim->Nghost_min[R_DIR]+N0[R_DIR];
+    //}
     double delta = (r1_max-r1_min)/(double)theSim->N_global[R_DIR];
     //theSim->r_faces[i] = RMIN+(double)ig*delta;
     double r1 = r1_min+(double)ig*delta;
     double r2 = Rscale*(exp(r1/Rscale)-1.0);
 
     theSim->r_faces[i] = get_r(r2,0.,2.*RMAX,r0,sigma,fac);
-    printf("r_faces[%d]: %e, r2: %e\n",i,theSim->r_faces[i],r2);
 
   }
 
@@ -131,7 +125,7 @@ void sim_set_rz(struct Sim * theSim,struct MPIsetup * theMPIsetup){
     int kg = k-theSim->Nghost_min[Z_DIR]+N0[Z_DIR];
     double delta = (z1_max-z1_min)/(double)theSim->N_global[Z_DIR];
     double z1 = z1_min+(double)kg*delta;
-    theSim->z_faces[k] = sgn(z1)*Zscale*(exp(sgn(z1)/Zscale)-1.0);
+    theSim->z_faces[k] = sgn(z1)*Zscale*(exp(fabs(z1)/Zscale)-1.0);
   } 
 }
 

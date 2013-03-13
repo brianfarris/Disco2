@@ -96,12 +96,7 @@ void cell_update_dphi( struct Cell *** theCells,struct Sim * theSim ){
 void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int) ){
   int NUM_Q = sim_NUM_Q(theSim);
 
-  double RMIN;
-  if (sim_MIN(theSim,R_DIR)>0.0){
-    RMIN = sim_MIN(theSim,R_DIR);
-  } else{
-    RMIN = 0.0;
-  }
+  double RMIN = sim_MIN(theSim,R_DIR);
   double RMAX = sim_MAX(theSim,R_DIR);
   double ZMIN = sim_MIN(theSim,Z_DIR);
   double ZMAX = sim_MAX(theSim,Z_DIR);

@@ -82,11 +82,11 @@ void cell_syncproc_r( struct Cell *** theCells , struct Sim *theSim,struct MPIse
   int i2g = 2*sim_Nghost_min(theSim,R_DIR);
   int k0 = 0;
   int kN = sim_N(theSim,Z_DIR);
-  
+
   int buffersize_r_hi_send,buffersize_r_hi_recv;
   double * buffer_r_hi_send;
   double * buffer_r_hi_recv;
-  
+
   //if we are not at the global outer boundary, set up buffers normally
   if (!mpisetup_check_rout_bndry(theMPIsetup)){
     // find buffer sizes

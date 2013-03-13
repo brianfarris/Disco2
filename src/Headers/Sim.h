@@ -21,6 +21,7 @@ struct Sim {
   int GravMassType;
   int BoundTypeR;
   int BoundTypeZ;
+  int NoInnerBC;
   int Restart;
   int N_global[2];
   int NP_CONST;
@@ -70,6 +71,7 @@ int sim_N0(struct Sim * ,int );
 int sim_N_p(struct Sim *,int);
 double sim_FacePos(struct Sim *,int,int);
 int sim_N(struct Sim *,int );
+int sim_NoInnerBC(struct Sim *);
 int sim_Restart(struct Sim *);
 int sim_BoundTypeR(struct Sim *);
 int sim_BoundTypeZ(struct Sim *);

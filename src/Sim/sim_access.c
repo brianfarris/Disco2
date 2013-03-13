@@ -46,6 +46,9 @@ int sim_BoundTypeZ(struct Sim *theSim){
 int sim_Ncells(struct Sim *theSim){
   return(theSim->Ncells);
 }
+int sim_NoInnerBC(struct Sim *theSim){
+  return(theSim->NoInnerBC);
+}
 int sim_Restart(struct Sim *theSim){
   return(theSim->Restart);
 }

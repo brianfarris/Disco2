@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
   sim_set_rz(theSim,theMPIsetup);
   sim_set_N_p(theSim);
   sim_set_misc(theSim,theMPIsetup);
-
+  
   // set up gravitating masses. 
   struct GravMass *theGravMasses = gravMass_create(sim_NumGravMass(theSim));
   (*gravMass_init_ptr(theSim))(theGravMasses);
