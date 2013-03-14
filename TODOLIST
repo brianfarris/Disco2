@@ -1,20 +1,24 @@
-****************
-desired features
-****************
-Have Dan update the viscosity so that it can accomodate an alpha law.
-Put real diagnostics in. Now we simply compute average density and pressure. We can add more as we go, but at some point we should find a more elegant solution so that we are not constantly changing the source code.
-make it so that GravMasses don't need to be on constant orbits
-make it so that we can restart from checkpoint without a par file if we want to.
-make it so that we can run on any number of procs
-work on load balancing
-see if it is possible to avoid using buffers in syncing and IO
-openMP support
-create awesome documentation using doxygen
+**************************************
+desired features - no particular order
+**************************************
+-Have Dan update the viscosity so that it can accomodate an alpha law.
+-Put real diagnostics in. Now we simply compute average density and pressure. We can add more as we go, but at some point we should find a more elegant solution so that we are not constantly changing the source code.
+-make it so that GravMasses don't need to be on constant orbits
+-make it so that we can restart from checkpoint without a par file if we want to.
+-make it so that we can run on any number of procs
+-work on load balancing
+-see if it is possible to avoid using buffers in syncing and IO. This would probably require totally changing the way our data arrays are set up. May not be worth the trouble
+-openMP support. Since we aren't splitting in phi, this could be a pretty huge help in cases where would like to use more resources but cant because the grid can't be split up any more.
+-create awesome documentation using doxygen
+-Improve the way the grid is split among the processors. See TODOLIST for more details.
+-Have a set of python plotting scripts in the repository that we can share.
+-Add output of equatorial and meridional slices to be used for plotting purposes.
+-generalize the boundary condition routines
 
-***************
-quality control
-***************
-add other code tests
-test for 2nd order convergence
-check that checkpoint restart agrees to machine precision
-thoroughly test boundary damping
+*************************************
+quality control - no particular order
+*************************************
+-add other code tests
+-test for 2nd order convergence
+-check that checkpoint restart agrees to machine precision
+-thoroughly test boundary damping routine
