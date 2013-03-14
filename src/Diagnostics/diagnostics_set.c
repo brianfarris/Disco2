@@ -51,7 +51,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+0] += r/sim_N_p(theSim,i)*dz ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1] += (cell_prim(cell_single(theCells,i,j,k),RHO)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+2] += (cell_prim(cell_single(theCells,i,j,k),PPP)/sim_N_p(theSim,i)*dz) ;
-          //etc
+          // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }
     }

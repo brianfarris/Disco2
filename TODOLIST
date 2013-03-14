@@ -22,3 +22,4 @@ quality control - no particular order
 -test for 2nd order convergence
 -check that checkpoint restart agrees to machine precision
 -thoroughly test boundary damping routine
+-There is currently no consistent naming convention for functions, variables, etc. This would be nice.

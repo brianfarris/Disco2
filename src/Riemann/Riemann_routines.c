@@ -8,6 +8,13 @@
 #include "../Headers/Face.h"
 #include "../Headers/header.h"
 
+
+// ********************************************************************************************
+// WE REALLY SHOULD IMPROVE THE COMMENTING OF ALL OF THESE ROUTINES. 
+// THERE IS SOME COMPLICATED STUFF HERE. 
+// LETS CHOOSE A REFERENCE SUCH AS TORO AND IDENTIFY LINES OF CODE WITH EQUATIONS IN THE BOOK.
+// ********************************************************************************************
+
 // this routine is only called by riemann_set_vel.
 // It is used to find various L/R quantities. 
 void LR_speed(double *prim,double r,int * n,double GAMMALAW,double * p_vn,double * p_cf2,double *Fm,double * p_mn){

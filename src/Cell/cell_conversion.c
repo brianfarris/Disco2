@@ -22,7 +22,7 @@ void cell_prim2cons( double * prim , double * cons , double r , double dV ,struc
 
   cons[DDD] = rho*dV;
   cons[SRR] = rho*vr*dV;
-  cons[LLL] = r*rho*vp*dV;
+  cons[LLL] = r*rho*vp*dV; // note that the conserved variable is angular momentum, not linear momentum
   cons[SZZ] = rho*vz*dV;
   cons[TAU] = ( .5*rho*v2 + rhoe )*dV;
 
@@ -33,8 +33,8 @@ void cell_prim2cons( double * prim , double * cons , double r , double dV ,struc
     double B2 = Br*Br + Bp*Bp + Bz*Bz;
 
     cons[TAU] += .5*B2*dV;
-    cons[BRR] = Br*dV/r;
-    cons[BPP] = Bp*dV/r;
+    cons[BRR] = Br*dV/r; // note that the conserved variable is Br/r. This helps us reduce geometric source terms
+    cons[BPP] = Bp*dV/r; // note that the conserved variable is Bp/r. This helps us reduce geometric source terms
     cons[BZZ] = Bz*dV;
     cons[PSI] = prim[PSI]*dV;
   }

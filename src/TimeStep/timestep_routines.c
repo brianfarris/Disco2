@@ -29,7 +29,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
 
   // reset wiph
   cell_clear_w(theCells,theSim);
-  cell_set( theCells ,theSim);
+  cell_set_w( theCells ,theSim);
 
   // this is part of the runge-kutta method
   cell_adjust_RK_cons( theCells, theSim, theTimeStep->RK);
@@ -46,7 +46,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem 
         riemann_setup_p(theRiemann,theCells,theSim,i,j,k,PDIRECTION); // set various quantities in theRiemann
-        riemann_AddFlux( theRiemann,theSim,dt); // solve Riemann problem
+        riemann_AddFlux( theRiemann,theSim,dt); // solve Riemann problem and update RHS
         riemann_destroy(theRiemann); // clean up
       }
     }
@@ -57,7 +57,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR) ; ++n ){
     struct Riemann * theRiemann = riemann_create(theSim); //struct to contain everything we need to solve Riemann problem
     riemann_setup_rz(theRiemann,theFaces_r,theSim,n,RDIRECTION);  //set various quantities in theRiemann
-    riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem
+    riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS
     riemann_destroy(theRiemann); // clean up
   }
 
@@ -67,7 +67,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-1,Z_DIR); ++n ){
       struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem
       riemann_setup_rz(theRiemann,theFaces_z,theSim,n,ZDIRECTION); // set various quantities in theRiemann
-      riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem 
+      riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS 
       riemann_destroy(theRiemann); // clean up
     }
   }

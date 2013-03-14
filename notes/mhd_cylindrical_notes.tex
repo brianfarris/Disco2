@@ -1,0 +1,135 @@
+\documentclass[landscape]{article}
+\usepackage[landscape]{geometry}
+\begin{document}
+We should update this to include Powell terms. 
+\begin{eqnarray*}
+  \partial_t  \left(
+  \begin{array}{c}
+    \rho\\
+    \rho v_r\\
+    \rho r v_{\phi}\\
+    \rho v_z\\
+    E\\
+    B_r/r\\
+    B_{\phi}/r\\
+    B_z\\
+    \psi
+  \end{array}
+  \right) 
+  &+& \frac{1}{r} \partial_r \left(
+  \begin{array}{c}
+    r \rho v_r\\
+    r (\rho v_r v_r - B_r B_r + P^*)\\
+    r^2 (\rho v_r v_{\phi} - B_r B_{\phi})\\
+    r (\rho v_r v_z - B_r B_z)\\
+    r((E+P^*)v_r - B_r(\mathbf{B}\cdot\mathbf{v}))\\
+    r \psi/r \\
+    r(v_r B_{\phi} - B_r v_{\phi})/r\\
+    r (v_r B_z - B_r v_z)\\
+    c_h^2 r B_r
+    \end{array}
+  \right) + \frac{1}{r} \partial_{\phi} \left(
+    \begin{array}{c}
+      \rho v_{\phi}\\
+      \rho v_r v_{\phi} - B_r B_{\phi}\\
+      r(\rho v_{\phi} v_{\phi} - B_{\phi} B_{\phi} + P^* )\\
+      \rho v_z v_{\phi} - B_z B_{\phi}\\
+      (E+P^*)v_{\phi}-B_{\phi}(\mathbf{B}\cdot\mathbf{v})\\
+      (v_{\phi}B_r-B_{\phi}v_r)/r\\
+      \psi/r\\
+      v_{\phi}B_z-B_{\phi}v_z\\
+      c_h^2 B_{\phi}
+    \end{array}
+    \right)+ \partial_z \left(
+    \begin{array}{c}
+      \rho v_z\\
+      \rho v_r v_z - B_r B_z\\
+      r(\rho v_z v_{\phi} - B_z B_{\phi} )\\
+      \rho v_z v_z - B_z B_z + P^*\\
+      (E+P^*)v_z-B_z(\mathbf{B}\cdot\mathbf{v})\\
+      (v_z B_r-B_z v_r)/r\\
+      (v_z B_{\phi}-B_z v_{\phi})/r\\
+      \psi\\
+      c_h^2 B_z
+    \end{array}
+    \right)\\
+    &=&\left(
+    \begin{array}{c}
+      0\\
+      (\rho v_{\phi} v_{\phi} - B_{\phi} B_{\phi}+P^*)/r\\
+      0\\
+      0\\
+      0\\
+      0\\
+      0\\
+      -c_h^2/c_p^2 \psi
+    \end{array}
+    \right)
+\end{eqnarray*}
+\pagebreak
+\begin{eqnarray*}
+  \partial_t  \left(
+  \begin{array}{c}
+    \int dV \ \rho\\
+    \int dV \ \rho v_r\\
+    \int dV \ \rho r v_{\phi}\\
+    \int dV \ \rho v_z\\
+    \int dV \ E\\
+    \int dV \ B_r/r\\
+    \int dV \ B_{\phi}/r\\
+    \int dV \ B_z\\
+    \int dV \ \psi
+  \end{array}
+  \right)
+  &+&   \left(
+  \begin{array}{c}
+    \int r d\phi dz \ \rho v_r\ \\
+    \int r d\phi dz (\rho v_r v_r - B_r B_r + P^*)\\
+    \int r d\phi dz \ r(\rho v_r v_{\phi} - B_r B_{\phi})\\
+    \int r d\phi dz (\rho v_r v_z - B_r B_z)\\
+    \int r d\phi dz ((E+P^*)v_r - B_r(\mathbf{B}\cdot\mathbf{v}))\\
+    \int r d\phi dz \ \psi/r\\
+    \int r d\phi dz (v_r B_{\phi} - B_r v_{\phi})/r\\
+    \int r d\phi dz (v_r B_z - B_r v_z)\\
+    \int r d\phi dz \ c_h^2 B_r
+    \end{array}
+  \right)^{r+\delta r}_r + \left(
+    \begin{array}{c}
+      \int dr dz \ \rho v_{\phi}\\
+      \int dr dz (\rho v_r v_{\phi} - B_r B_{\phi})\\
+      \int dr dz \ r(\rho v_{\phi} v_{\phi} - B_{\phi} B_{\phi} + P^* )\\
+      \int dr dz (\rho v_z v_{\phi} - B_z B_{\phi})\\
+      \int dr dz ((E+P^*)v_{\phi}-B_{\phi}(\mathbf{B}\cdot\mathbf{v}))\\
+      \int dr dz (v_{\phi}B_r-B_{\phi}v_r)\\
+      \int dr dz \ \psi/r\\
+      \int dr dz (v_{\phi}B_z-B_{\phi}v_z)\\
+      \int dr dz \ c_h^2 B_{\phi}
+    \end{array}
+    \right)^{\phi + \delta \phi}_{\phi}\\
+    &+& \left(
+    \begin{array}{c}
+      \int r dr d \phi \ \rho v_z\\
+      \int r dr d \phi (\rho v_r v_z - B_r B_z)\\
+      \int r dr d \phi r(\rho v_z v_{\phi} - B_z B_{\phi} )\\
+      \int r dr d \phi (\rho v_z v_z - B_z B_z + P^*)\\
+      \int r dr d \phi ((E+P^*)v_z-B_z(\mathbf{B}\cdot\mathbf{v}))\\
+      \int r dr d \phi (v_z B_r-B_z v_r)\\
+      \int r dr d \phi (v_z B_{\phi}-B_z v_{\phi})/r\\
+      \int r dr d \phi \ \psi\\
+      \int r dr d \phi \ c_h^2 B_z
+    \end{array}
+    \right)^{z+\delta z}_{z} 
+    =\left(
+    \begin{array}{c}
+      0\\
+      \int dV (\rho v_{\phi} v_{\phi} - B_{\phi} B_{\phi}+P^*)/r\\
+      0\\
+      0\\
+      0\\
+      0\\
+      0\\
+      0\\
+      -\int dV c_h^2/c_p^2 \psi 
+    \end{array}
+    \right)
+\end{eqnarray*}\end{document}
