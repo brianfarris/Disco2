@@ -47,11 +47,30 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
         double rm = sim_FacePos(theSim,i-1,R_DIR);
         double r = 0.5*(rm+rp);
         for (j=0;j<sim_N_p(theSim,i);++j){
+          double rho = cell_prim(cell_single(theCells,i,j,k),RHO);
+          double press = cell_prim(cell_single(theCells,i,j,k),PPP);
+          double vr = cell_prim(cell_single(theCells,i,j,k),URR);
+          double vp = cell_prim(cell_single(theCells,i,j,k),UPP)*r;
+          double vz = cell_prim(cell_single(theCells,i,j,k),UZZ);
+          double Br = cell_prim(cell_single(theCells,i,j,k),BRR);
+          double Bp = cell_prim(cell_single(theCells,i,j,k),BPP);
+          double Bz = cell_prim(cell_single(theCells,i,j,k),BZZ);
+          double v2   = vr*vr + vp*vp + vz*vz;
+          double B2   = Br*Br + Bp*Bp + Bz*Bz;
+          double rhoe = press/(sim_GAMMALAW(theSim)-1.);
+
+
+
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+0] += r/sim_N_p(theSim,i)*dz ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1] += (cell_prim(cell_single(theCells,i,j,k),RHO)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+2] += (cell_prim(cell_single(theCells,i,j,k),PPP)/sim_N_p(theSim,i)*dz) ;
-          // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+0] += (r/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1] += (rho/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+2] += (rho*vr/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+3] += (rho*vr*vp/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+4] += (press/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+5] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+6] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
+
+             // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }
     }
