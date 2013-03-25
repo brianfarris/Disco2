@@ -12,7 +12,9 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_vortex);
   } else if (sim_InitialDataType(theSim)==STONE){
     return(&cell_init_stone);
-  } else{
+  } else if (sim_InitialDataType(theSim)==FIELDLOOP){
+    return(&cell_init_fieldloop);
+   } else{
     printf("ERROR\n");
     exit(0);
   }
@@ -27,7 +29,9 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_vortex);
   } else if (sim_InitialDataType(theSim)==STONE){
     return(&cell_single_init_vortex);
-   } else{
+  } else if (sim_InitialDataType(theSim)==FIELDLOOP){
+    return(&cell_single_init_fieldloop);
+    } else{
     printf("ERROR\n");
     exit(0);
   }

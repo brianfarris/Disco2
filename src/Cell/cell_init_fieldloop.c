@@ -1,0 +1,116 @@
+#define CELL_PRIVATE_DEFS
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include "../Headers/Cell.h"
+#include "../Headers/Sim.h"
+#include "../Headers/Face.h"
+#include "../Headers/GravMass.h"
+#include "../Headers/header.h"
+
+void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
+
+  double Rv = 0.5;
+  double Rl = 0.2;
+  double B0 = 0.1;
+  double Om = 1.0;
+  double P0 = 1.0;
+
+  double x0 = 0.25;
+
+  double rm = sim_FacePos(theSim,i-1,R_DIR);
+  double rp = sim_FacePos(theSim,i,R_DIR);
+  double r = 0.5*(rm+rp);
+  double omega = Om;
+  if( r>Rv ) omega = 0.0;
+  double Pp = P0 + .5*Om*Om*r*r;
+  if( r>Rv ) Pp = P0 + .5*Om*Om*Rv*Rv;
+
+  double phi = theCell->tiph - .5*theCell->dphi;
+
+  double x = r*cos(phi)-x0;
+  double y = r*sin(phi);
+
+  double rl = sqrt(x*x+y*y);
+  double xx = M_PI*rl/Rl;
+
+  double Bp = B0*pow(sin(xx),2.)*sqrt(2.*rl/Rl);
+  if( rl > Rl ) Bp = 0.0;
+
+  double dP = B0*B0*( - (rl/Rl)*pow(sin(xx),4.) - (1./16./M_PI)*( 12.*xx - 8.*sin(2.*xx) + sin(4.*xx) ) );
+
+  double Bx = -Bp*y/rl;
+  double By =  Bp*x/rl;
+
+  theCell->prim[RHO] = 1.0;
+  theCell->prim[PPP] = Pp+dP;
+  theCell->prim[URR] = 0.0;
+  theCell->prim[UPP] = omega;
+  theCell->prim[UZZ] = 0.0;
+  theCell->prim[BRR] =  Bx*cos(phi) + By*sin(phi);
+  theCell->prim[BPP] = -Bx*sin(phi) + By*cos(phi);
+  theCell->prim[BZZ] = 0.0;
+  theCell->prim[PSI] = 0.0;
+
+  theCell->divB = 0.0;
+  theCell->GradPsi[0] = 0.0;
+  theCell->GradPsi[1] = 0.0;
+  theCell->GradPsi[2] = 0.0;
+}
+
+void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
+
+  double Rv = 0.5;
+  double Rl = 0.2;
+  double B0 = 0.1;
+  double Om = 1.0;
+  double P0 = 1.0;
+
+  double x0 = 0.25;
+
+  int i, j,k;
+  for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
+    for (i = 0; i < sim_N(theSim,R_DIR); i++) {
+      double rm = sim_FacePos(theSim,i-1,R_DIR);
+      double rp = sim_FacePos(theSim,i,R_DIR);
+      double r = 0.5*(rm+rp);
+      double omega = Om;
+      if( r>Rv ) omega = 0.0;
+      double Pp = P0 + .5*Om*Om*r*r;
+      if( r>Rv ) Pp = P0 + .5*Om*Om*Rv*Rv;
+
+      for (j = 0; j < sim_N_p(theSim,i); j++) {
+        double phi = theCells[k][i][j].tiph - .5*theCells[k][i][j].dphi;
+
+        double x = r*cos(phi)-x0;
+        double y = r*sin(phi);
+
+        double rl = sqrt(x*x+y*y);
+        double xx = M_PI*rl/Rl;
+
+        double Bp = B0*pow(sin(xx),2.)*sqrt(2.*rl/Rl);
+        if( rl > Rl ) Bp = 0.0;
+
+        double dP = B0*B0*( - (rl/Rl)*pow(sin(xx),4.) - (1./16./M_PI)*( 12.*xx - 8.*sin(2.*xx) + sin(4.*xx) ) );
+
+        double Bx = -Bp*y/rl;
+        double By =  Bp*x/rl;
+
+        theCells[k][i][j].prim[RHO] = 1.0;
+        theCells[k][i][j].prim[PPP] = Pp+dP;
+        theCells[k][i][j].prim[URR] = 0.0;
+        theCells[k][i][j].prim[UPP] = omega;
+        theCells[k][i][j].prim[UZZ] = 0.0;
+        theCells[k][i][j].prim[BRR] =  Bx*cos(phi) + By*sin(phi);
+        theCells[k][i][j].prim[BPP] = -Bx*sin(phi) + By*cos(phi);
+        theCells[k][i][j].prim[BZZ] = 0.0;
+        theCells[k][i][j].prim[PSI] = 0.0;
+
+        theCells[k][i][j].divB = 0.0;
+        theCells[k][i][j].GradPsi[0] = 0.0;
+        theCells[k][i][j].GradPsi[1] = 0.0;
+        theCells[k][i][j].GradPsi[2] = 0.0;
+      }
+    }
+  }
+}

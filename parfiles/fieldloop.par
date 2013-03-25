@@ -1,0 +1,63 @@
+
+//Disco Parameter File//
+
+InitialDataType         4               // 0 Flock, 1 Shear, 2 vortex, 3 stone, 4 fieldloop
+GravMassType            0               // 0 none, 1 single, 2 binary
+Restart			0		//If this=1 restart using input.h5
+
+//Computational Grid
+NumR			128			//Radial Zones
+NumZ			1			//Vertical Zones
+ng                      2
+R_Min			0.05
+R_Max			1.0
+Z_Min			-1.0
+Z_Max			1.0
+NP_CONST                -1
+aspect                  1.0
+
+NUM_C                   9
+NUM_N                   0
+Time_Max                1.0
+Num_Checkpoints	        50	
+Num_Diag_Dump           50
+Num_Diag_Measure        100
+
+NoInnerBC               1
+BoundTypeR           0               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
+
+Move_Cells              0
+RiemannSolver           0           // 0 hllc, 1 hll
+Adiabatic_Index         1.6666666666
+Explicit_Viscosity      0.01
+
+DivB_Ch			0.06		//Dedner divergence cleaning
+DivB_l			0.1
+//Numerical Parameters
+CFL			0.5
+PLM			1.0
+
+POWELL                  1
+Grav_2D			1
+G_EPS			0.0
+
+PHI_ORDER               2
+
+//Atmosphere Parameters
+Rho_Floor		0.00001
+Cs_Floor		0.0001		
+Cs_Cap			100.0
+Vel_Cap			100.0
+
+runtype                 0
+
+DAMP_TIME               -1.0        // Set negative to turn off
+RDAMP_INNER             0.0
+RDAMP_OUTER             0.0
+
+RLogScale               1000.0
+ZLogScale               1000.0
+HiResSigma              1000.0
+HiResR0                 1000.0
+HiResFac                0.0

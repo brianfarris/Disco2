@@ -18,7 +18,7 @@ SRCDIRS := $(shell find . -name '*.$(SRCEXT)' -exec dirname {} \; | uniq)
 OBJS    := $(patsubst %.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
 
 DEBUG    = -g
-#INCLUDES = -I$(H55)/include
+INCLUDES = -I$(H55)/include
 CFLAGS   = -O3 -c $(DEBUG) $(INCLUDES)
 #CFLAGS   = -c $(DEBUG) $(INCLUDES)
 LDFLAGS  = -lm -lz -L$(H55)/lib -lhdf5
