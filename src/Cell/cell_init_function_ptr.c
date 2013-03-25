@@ -10,6 +10,8 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_shear);
   } else if (sim_InitialDataType(theSim)==VORTEX){
     return(&cell_init_vortex);
+  } else if (sim_InitialDataType(theSim)==STONE){
+    return(&cell_init_stone);
   } else{
     printf("ERROR\n");
     exit(0);
@@ -22,6 +24,8 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
   } else if (sim_InitialDataType(theSim)==SHEAR){
     return(&cell_single_init_shear);
   } else if (sim_InitialDataType(theSim)==VORTEX){
+    return(&cell_single_init_vortex);
+  } else if (sim_InitialDataType(theSim)==STONE){
     return(&cell_single_init_vortex);
    } else{
     printf("ERROR\n");

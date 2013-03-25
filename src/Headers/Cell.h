@@ -34,6 +34,8 @@ void cell_init_shear(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_shear(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_vortex(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_vortex(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_stone(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_stone(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
