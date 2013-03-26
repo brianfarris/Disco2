@@ -1,6 +1,7 @@
 #define DIAGNOSTICS_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "../Headers/Sim.h"
 #include "../Headers/Cell.h"
 #include "../Headers/Diagnostics.h"
@@ -14,7 +15,12 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 
     int NUM_SCAL = theDiagnostics->NUM_DIAG;
     int NUM_VEC = theDiagnostics->NUM_DIAG+1;
+    int NUM_EQ = theDiagnostics->NUM_DIAG+2;
 
+    int i,j,k,n;
+
+    double * EquatDiag_temp = malloc(sizeof(double) * theDiagnostics->N_eq_cells*NUM_EQ);
+    double * EquatDiag_reduce = malloc(sizeof(double) * theDiagnostics->N_eq_cells*NUM_EQ);
     double * VectorDiag_temp = malloc(sizeof(double) * num_r_points_global*NUM_VEC);
     double * VectorDiag_reduce = malloc(sizeof(double) * num_r_points_global*NUM_VEC);
     double * ScalarDiag_temp = malloc(sizeof(double)*NUM_SCAL);
@@ -26,7 +32,6 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     int imax = sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR);
     int kmin = sim_Nghost_min(theSim,Z_DIR);
     int kmax = sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR);
-    int i,j,k,n;
 
     for (n=0;n<NUM_SCAL;++n){
       ScalarDiag_temp[n]=0.0;
@@ -38,15 +43,28 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       }
     }
 
+    int position=0;
+    for (i=0;i<num_r_points_global;++i){
+      for(j = 0; j < theDiagnostics->N_p_global[i]; j++){
+        for (n=0;n<NUM_EQ;++n){
+          EquatDiag_temp[position]=0.0;
+          ++position;
+        }
+      }
+    }
+
+    position=0;
     for (k=kmin;k<kmax;++k){
       double zp = sim_FacePos(theSim,k,Z_DIR);
       double zm = sim_FacePos(theSim,k-1,Z_DIR);
+      double z = 0.5*(zm+zp);
       double dz = zp-zm;
       for (i=imin;i<imax;++i){
         double rp = sim_FacePos(theSim,i,R_DIR);
         double rm = sim_FacePos(theSim,i-1,R_DIR);
         double r = 0.5*(rm+rp);
         for (j=0;j<sim_N_p(theSim,i);++j){
+          double phi = cell_tiph(cell_single(theCells,i,j,k));
           double rho = cell_prim(cell_single(theCells,i,j,k),RHO);
           double press = cell_prim(cell_single(theCells,i,j,k),PPP);
           double vr = cell_prim(cell_single(theCells,i,j,k),URR);
@@ -58,9 +76,18 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double v2   = vr*vr + vp*vp + vz*vz;
           double B2   = Br*Br + Bp*Bp + Bz*Bz;
           double rhoe = press/(sim_GAMMALAW(theSim)-1.);
-
-
-
+  
+        if ((fabs(zp)<0.0000001)||(fabs(z)<0.0000001)){
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+0] = r;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+1] = phi;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+2] = rho;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+3] = rho*vr;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+4] = rho*vr*vp;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+5] = press;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+6] = 0.5*B2;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+7] = Br*Bp;
+            ++position;
+          }
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+0] += (r/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1] += (rho/sim_N_p(theSim,i)*dz) ;
@@ -70,7 +97,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+5] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+6] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
 
-             // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
+          // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }
     }
@@ -86,6 +113,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 
     MPI_Allreduce( ScalarDiag_temp,ScalarDiag_reduce , NUM_SCAL, MPI_DOUBLE, MPI_SUM, sim_comm);
     MPI_Allreduce( VectorDiag_temp,VectorDiag_reduce , num_r_points_global*NUM_VEC, MPI_DOUBLE, MPI_SUM, sim_comm);
+    MPI_Allreduce( EquatDiag_temp,EquatDiag_reduce ,theDiagnostics->N_eq_cells*NUM_EQ, MPI_DOUBLE, MPI_SUM, sim_comm);
+
+
     double RMIN = sim_MIN(theSim,R_DIR);
     double RMAX = sim_MAX(theSim,R_DIR);
     double ZMIN = sim_MIN(theSim,Z_DIR);
@@ -111,6 +141,16 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     for (n=0;n<NUM_SCAL;++n){
       theDiagnostics->ScalarDiag[n] += ScalarDiag_reduce[n] ;
     }
+  
+    position=0;
+    for (i=0;i<num_r_points_global;++i){
+      for(j = 0; j < theDiagnostics->N_p_global[i]; j++){
+        for (n=0;n<NUM_EQ;++n){
+          theDiagnostics->EquatDiag[position][n] = EquatDiag_reduce[position*NUM_EQ+n];
+        }
+        ++position;
+      }
+    }
 
     //update output time;
     theDiagnostics->toutprev = timestep_get_t(theTimeStep);
@@ -119,6 +159,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     free(ScalarDiag_reduce);
     free(VectorDiag_temp);
     free(VectorDiag_reduce);
+    free(EquatDiag_temp);
+    free(EquatDiag_reduce);
 
     theDiagnostics->tdiag_measure += theDiagnostics->dtdiag_measure;
   } 

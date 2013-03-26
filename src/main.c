@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
   cell_calc_cons(theCells,theSim);
 
   // set up diagnostics struct
-  struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep);
+  struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep,theMPIsetup);
 
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
     // here the actual timestep is taken
@@ -122,6 +122,7 @@ int main(int argc, char **argv) {
     // calculate diagnostics
     diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep);
     //write diagnostics to file
+    MPI_Barrier(sim_comm);    
     diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
 
     // checkpointing

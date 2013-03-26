@@ -1,12 +1,12 @@
 
 //Disco Parameter File//
 
-InitialDataType         0               // 0 Flock, 1 Shear
+InitialDataType         3               // 0 Flock, 1 Shear, 2 vortex, 3 stone
 GravMassType            1               // 0 none, 1 single, 2 binary
 Restart			0		//If this=1 restart using input.h5
 
 //Computational Grid
-NumR			128			//Radial Zones
+NumR			512			//Radial Zones
 NumZ			128			//Vertical Zones
 ng                      2
 R_Min			1.0
@@ -19,9 +19,9 @@ aspect                  1.0
 
 NUM_C                   9
 NUM_N                   0
-Time_Max                1000.0
-Num_Checkpoints	        20	
-Num_Diag_Dump           100
+Time_Max                100.0
+Num_Checkpoints	        200	
+Num_Diag_Dump           500
 Num_Diag_Measure        10000
 
 NoInnerBC               0
@@ -30,7 +30,7 @@ BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
 
 Move_Cells              3
 RiemannSolver           0           // 0 hllc, 1 hll
-Adiabatic_Index		1.6666666666
+Adiabatic_Index		1.001
 //Include_Viscosity       0
 Explicit_Viscosity      -1.0
 

@@ -10,21 +10,19 @@
 
 void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
 
-  double Rv = 0.5;
-  double Rl = 0.2;
-  double B0 = 0.1;
-  double Om = 1.0;
+  double Rl = 0.15;
+  double B0 = 0.01;
+  double Om = 10.0;
+  double Rho0 = 1.0;
   double P0 = 1.0;
-
-  double x0 = 0.25;
+  double xinner = 1.0;
+  double x0 = 0.3;
 
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
   double r = 0.5*(rm+rp);
   double omega = Om;
-  if( r>Rv ) omega = 0.0;
-  double Pp = P0 + .5*Om*Om*r*r;
-  if( r>Rv ) Pp = P0 + .5*Om*Om*Rv*Rv;
+  double Pp = P0 + .5*Rho0*Om*Om*r*r;
 
   double phi = theCell->tiph - .5*theCell->dphi;
 
@@ -34,15 +32,16 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
   double rl = sqrt(x*x+y*y);
   double xx = M_PI*rl/Rl;
 
-  double Bp = B0*pow(sin(xx),2.)*sqrt(2.*rl/Rl);
-  if( rl > Rl ) Bp = 0.0;
+  double Bp = B0*pow(sin(xx-xinner),2.)*sqrt(2./M_PI*(xx-xinner));
+  if( (xx-xinner > M_PI)||(xx<xinner) ) Bp = 0.0;
 
   double dP = B0*B0*( - (rl/Rl)*pow(sin(xx),4.) - (1./16./M_PI)*( 12.*xx - 8.*sin(2.*xx) + sin(4.*xx) ) );
+  if ((xx-xinner > M_PI)||(xx<xinner) ) dP = 0.0;
 
   double Bx = -Bp*y/rl;
   double By =  Bp*x/rl;
 
-  theCell->prim[RHO] = 1.0;
+  theCell->prim[RHO] = Rho0;
   theCell->prim[PPP] = Pp+dP;
   theCell->prim[URR] = 0.0;
   theCell->prim[UPP] = omega;
@@ -60,13 +59,13 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
 
 void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 
-  double Rv = 0.5;
-  double Rl = 0.2;
-  double B0 = 0.1;
-  double Om = 1.0;
+  double Rl = 0.15;
+  double B0 = 0.01;
+  double Om = 10.0;
+  double Rho0 = 1.0;
   double P0 = 1.0;
-
-  double x0 = 0.25;
+  double xinner = 1.0;
+  double x0 = 0.3;
 
   int i, j,k;
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
@@ -75,9 +74,7 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
       double rp = sim_FacePos(theSim,i,R_DIR);
       double r = 0.5*(rm+rp);
       double omega = Om;
-      if( r>Rv ) omega = 0.0;
-      double Pp = P0 + .5*Om*Om*r*r;
-      if( r>Rv ) Pp = P0 + .5*Om*Om*Rv*Rv;
+      double Pp = P0 + .5*Rho0*Om*Om*r*r;
 
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         double phi = theCells[k][i][j].tiph - .5*theCells[k][i][j].dphi;
@@ -88,15 +85,16 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
         double rl = sqrt(x*x+y*y);
         double xx = M_PI*rl/Rl;
 
-        double Bp = B0*pow(sin(xx),2.)*sqrt(2.*rl/Rl);
-        if( rl > Rl ) Bp = 0.0;
+        double Bp = B0*pow(sin(xx-xinner),2.)*sqrt(2./M_PI*(xx-xinner));
+        if( (xx-xinner > M_PI)||(xx<xinner) ) Bp = 0.0;
 
         double dP = B0*B0*( - (rl/Rl)*pow(sin(xx),4.) - (1./16./M_PI)*( 12.*xx - 8.*sin(2.*xx) + sin(4.*xx) ) );
+        if ((xx-xinner > M_PI)||(xx<xinner) ) dP = 0.0;
 
         double Bx = -Bp*y/rl;
         double By =  Bp*x/rl;
 
-        theCells[k][i][j].prim[RHO] = 1.0;
+        theCells[k][i][j].prim[RHO] = Rho0;
         theCells[k][i][j].prim[PPP] = Pp+dP;
         theCells[k][i][j].prim[URR] = 0.0;
         theCells[k][i][j].prim[UPP] = omega;

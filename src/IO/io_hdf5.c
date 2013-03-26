@@ -88,7 +88,6 @@ void io_hdf5_out(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeS
   H5Pclose(plist_id);
   H5Sclose(filespace);
 
-  // Select hyperslab in the file.
   filespace = H5Dget_space(dset_id);
 
   // Create property list for collective dataset write.
