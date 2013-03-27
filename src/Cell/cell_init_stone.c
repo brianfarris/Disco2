@@ -17,7 +17,7 @@ void cell_single_init_stone(struct Cell *theCell, struct Sim *theSim,int i,int j
   double r = .5*(rm+rp);
   double omega = 1./pow(r,1.5);
   double cs = 1.0/DISK_MACH*omega*r;
-  double rho = 1.0;
+  double rho = 100.0;
   double Pp = cs*cs*rho/GAMMALAW;
 
   theCell->prim[RHO] = 1.0;
@@ -38,7 +38,7 @@ void cell_single_init_stone(struct Cell *theCell, struct Sim *theSim,int i,int j
 
 void cell_init_stone(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 
-  double rho0 = 1.0;
+  double rho0 = 100.0;
   double DISK_MACH = 20.;
   double GAMMALAW = sim_GAMMALAW(theSim);
   double H0     = 0.2;
