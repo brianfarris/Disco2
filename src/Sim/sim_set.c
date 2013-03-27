@@ -109,7 +109,8 @@ void sim_set_rz(struct Sim * theSim,struct MPIsetup * theMPIsetup){
 
   }
 
-  if (theSim->NoInnerBC == 1){
+  // if we have no inner BC, then the inner zones should extend to the origin
+  if ((theSim->NoInnerBC == 1)&&(mpisetup_check_rin_bndry(theMPIsetup))){
     theSim->r_faces[0] = 0.0;
   }
 
