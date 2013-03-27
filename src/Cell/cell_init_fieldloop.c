@@ -12,11 +12,12 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
 
   double Rl = 0.15;
   double B0 = 0.01;
-  double Om = 10.0;
+  double Om = 0.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
   double xinner = 1.0;
   double x0 = 0.3;
+  double Vx = 0.5;
 
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
@@ -43,8 +44,8 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
 
   theCell->prim[RHO] = Rho0;
   theCell->prim[PPP] = Pp+dP;
-  theCell->prim[URR] = 0.0;
-  theCell->prim[UPP] = omega;
+  theCell->prim[URR] = Vx*cos(phi);
+  theCell->prim[UPP] = omega-Vx*sin(phi);
   theCell->prim[UZZ] = 0.0;
   theCell->prim[BRR] =  Bx*cos(phi) + By*sin(phi);
   theCell->prim[BPP] = -Bx*sin(phi) + By*cos(phi);
@@ -61,11 +62,12 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
 
   double Rl = 0.15;
   double B0 = 0.01;
-  double Om = 10.0;
+  double Om = 0.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
   double xinner = 1.0;
   double x0 = 0.3;
+  double Vx = 0.5;
 
   int i, j,k;
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
@@ -96,8 +98,8 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
 
         theCells[k][i][j].prim[RHO] = Rho0;
         theCells[k][i][j].prim[PPP] = Pp+dP;
-        theCells[k][i][j].prim[URR] = 0.0;
-        theCells[k][i][j].prim[UPP] = omega;
+        theCells[k][i][j].prim[URR] = Vx*cos(phi);
+        theCells[k][i][j].prim[UPP] = omega-Vx*sin(phi);
         theCells[k][i][j].prim[UZZ] = 0.0;
         theCells[k][i][j].prim[BRR] =  Bx*cos(phi) + By*sin(phi);
         theCells[k][i][j].prim[BPP] = -Bx*sin(phi) + By*cos(phi);
