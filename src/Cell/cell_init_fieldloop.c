@@ -17,7 +17,7 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
   double P0 = 1.0;
   double xinner = 1.0;
   double x0 = 0.3;
-  double Vx = 0.5;
+  double Vx = 0.0;
 
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
@@ -67,7 +67,7 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
   double P0 = 1.0;
   double xinner = 1.0;
   double x0 = 0.3;
-  double Vx = 0.5;
+  double Vx = 0.0;
 
   int i, j,k;
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
