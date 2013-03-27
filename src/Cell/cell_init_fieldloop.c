@@ -11,7 +11,7 @@
 void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
 
   double Rl = 0.15;
-  double B0 = 0.01;
+  double B0 = 0.0;//0.01;
   double Om = 0.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
@@ -61,7 +61,7 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
 void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 
   double Rl = 0.15;
-  double B0 = 0.01;
+  double B0 = 0.0;//0.01;
   double Om = 0.0;
   double Rho0 = 1.0;
   double P0 = 1.0;

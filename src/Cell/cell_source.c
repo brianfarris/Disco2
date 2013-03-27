@@ -142,7 +142,7 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, double dt
         double vr  = c->prim[URR];
         double dz = zp-zm;
         double dV = dphi*.5*(rp*rp-rm*rm)*dz;
-         if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
+        if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
           double nu = sim_EXPLICIT_VISCOSITY(theSim);
           c->cons[SRR] += -dt*dV*nu*rho*vr/r/r;
         }

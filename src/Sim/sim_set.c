@@ -109,6 +109,10 @@ void sim_set_rz(struct Sim * theSim,struct MPIsetup * theMPIsetup){
 
   }
 
+  if (theSim->NoInnerBC == 1){
+    theSim->r_faces[0] = 0.0;
+  }
+
   // Zscale is the scale at which the points begin to get logarithmically spaced
   double Zscale = theSim->ZLogScale; 
 

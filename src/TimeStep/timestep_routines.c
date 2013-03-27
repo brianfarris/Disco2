@@ -37,6 +37,10 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   // divB and GradPsi are needed for Powell source terms in MHD eqns. Here we reset them to 0.
   cell_clear_divB(theCells,theSim);
   cell_clear_GradPsi(theCells,theSim);
+ 
+  double r0 = sim_FacePos(theSim,0,R_DIR);
+  double r1 = sim_FacePos(theSim,1,R_DIR);
+  double r2 = sim_FacePos(theSim,2,R_DIR);
   
   //Phi Flux
   cell_plm_p(theCells,theSim);//piecewise-linear reconstruction
@@ -51,6 +55,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       }
     }
   }
+
   //R Flux
   cell_plm_rz(theCells,theSim,theFaces_r,theTimeStep,R_DIR); //piecewise-linear reconstruction
   int n;

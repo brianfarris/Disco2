@@ -4,6 +4,7 @@
 #include <math.h>
 #include "../Headers/Sim.h"
 #include "../Headers/Diagnostics.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
