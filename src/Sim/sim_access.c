@@ -43,6 +43,9 @@ int sim_BoundTypeR(struct Sim *theSim){
 int sim_BoundTypeZ(struct Sim *theSim){
   return(theSim->BoundTypeZ);
 }
+int sim_ZeroPsiBndry(struct Sim *theSim){
+  return(theSim->ZeroPsiBndry);
+}
 int sim_Ncells(struct Sim *theSim){
   return(theSim->Ncells);
 }
