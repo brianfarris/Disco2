@@ -17,6 +17,7 @@ void addFace( struct Face * theFaces , int n , struct Cell * cL , struct Cell * 
   theFaces[n].dphi= dphi;
   theFaces[n].dA  = r*dphi*deltaPerp;
   theFaces[n].cm  = tp - .5*dphi;
+  //printf("%d %e %e %e %e %e\n",n,theFaces[n].r,deltaPerp,theFaces[n].dphi,theFaces[n].cm,theFaces[n].dA);
 } 
 
 void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells,struct Face * theFaces,struct Sim * theSim, int mode){
@@ -31,6 +32,7 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
     double zp = sim_FacePos(theSim,k,Z_DIR);
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     deltaPerp = zp-zm;
+    //printf("deltaPerp: %e, deltaL: %e, deltaR: %e\n",deltaPerp,deltaL,deltaR);
   }
   if (zDir){
     deltaL = .5*(sim_FacePos(theSim,k,Z_DIR)-sim_FacePos(theSim,k-1,Z_DIR));

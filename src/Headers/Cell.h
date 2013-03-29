@@ -38,6 +38,8 @@ void cell_init_stone(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_stone(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_fieldloop(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_fieldloop(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_psigrad(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_psigrad(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
@@ -48,6 +50,7 @@ struct Cell *cell_single(struct Cell ***,int,int,int);
 double cell_tiph(struct Cell *);
 double cell_dphi(struct Cell *);
 double cell_wiph(struct Cell *);
+double cell_GradPsi(struct Cell ***,int ,int ,int ,int );
 //modify cell data
 void cell_add_cons(struct Cell *, int, double);
 void cell_add_divB(struct Cell *, double);

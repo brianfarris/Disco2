@@ -29,4 +29,6 @@ double cell_dphi(struct Cell *oneCell){
 double cell_wiph(struct Cell *oneCell){
   return(oneCell->wiph);
 }
-
+double cell_GradPsi(struct Cell ***theCells,int i,int j,int k,int n){
+  return(theCells[k][i][j].GradPsi[n]);
+}

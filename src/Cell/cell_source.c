@@ -55,6 +55,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
   int GRAV2D=sim_GRAV2D(theSim);
   int POWELL=sim_POWELL(theSim);
   int i,j,k;
+  FILE * gradpsifile= fopen("gradpsi.dat","w");
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     double zp = sim_FacePos(theSim,k,Z_DIR);
@@ -110,11 +111,19 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           double Bz = c->prim[BZZ];
           double B2 = Br*Br+Bp*Bp+Bz*Bz;
           double divB = c->divB;
-          double *GradPsi = c->GradPsi;
-          double vdotB = vr*Br+vp*Bp+vz*Bz;
-          double BdotGradPsi = dV*(Br*GradPsi[0]+Bp*GradPsi[1]+Bz*GradPsi[2]);
-          double vdotGradPsi = dV*(vr*GradPsi[0]+vp*GradPsi[1]+vz*GradPsi[2]);
+          double GradPsi[3];
+          GradPsi[0] = (c->GradPsi[0]/dV - c->prim[PSI]/r)*dV;
+          GradPsi[1] = 0.;
+          GradPsi[2] = 0.;
 
+          FINISH THIS
+          double vdotB = vr*Br+vp*Bp+vz*Bz;
+          double BdotGradPsi = /*dV**/(Br*GradPsi[0]+Bp*GradPsi[1]+Bz*GradPsi[2]);
+          double vdotGradPsi = /*dV**/(vr*GradPsi[0]+vp*GradPsi[1]+vz*GradPsi[2]);
+
+          if (fabs(z)<0.00001){
+            fprintf(gradpsifile,"%e %e %e %e %e\n",r,phi,dV,GradPsi[0]/dV, c->prim[PSI]);
+          }
           c->cons[SRR] += dt*dV*( .5*B2 - Bp*Bp )/r;
           c->cons[SRR] -= POWELL*dt*divB*Br;
           c->cons[SZZ] -= POWELL*dt*divB*Bz;
@@ -132,6 +141,9 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
       }
     }
   }
+  close(gradpsifile);
+  exit(0);
+
 }
 
 void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, double dt ){
