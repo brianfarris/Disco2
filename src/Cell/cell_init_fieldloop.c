@@ -12,7 +12,7 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
 
   double Rl = 0.15;
   double B0 = 0.01;
-  double Om = 20.0;
+  double Om = 10.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
   double xinner = 1.0;
@@ -62,7 +62,7 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
 
   double Rl = 0.15;
   double B0 = 0.01;
-  double Om = 20.0;
+  double Om = 10.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
   double xinner = 1.0;

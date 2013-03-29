@@ -494,10 +494,14 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
 
     cell_add_divB(theRiemann->cL,theRiemann->dA*Bk_face);
     cell_add_divB(theRiemann->cR,-theRiemann->dA*Bk_face);
-    cell_add_GradPsi(theRiemann->cL,direction,Psi_face);
-    cell_add_GradPsi(theRiemann->cR,direction,-Psi_face);
+    if (direction==PDIRECTION){
+      cell_add_GradPsi(theRiemann->cL,direction,Psi_face/theRiemann->r);
+      cell_add_GradPsi(theRiemann->cR,direction,-Psi_face/theRiemann->r);
+    }else {
+      cell_add_GradPsi(theRiemann->cL,direction,Psi_face);
+      cell_add_GradPsi(theRiemann->cR,direction,-Psi_face);
+    }
   }
-
 }
 
 
