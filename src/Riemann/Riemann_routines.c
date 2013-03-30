@@ -496,21 +496,14 @@ void riemann_AddFlux(struct Cell *** theCells, struct Riemann * theRiemann, stru
 
     cell_add_divB(theRiemann->cL,theRiemann->dA*Bk_face);
     cell_add_divB(theRiemann->cR,-theRiemann->dA*Bk_face);
-    if (direction==PDIRECTION){
-      //cell_add_GradPsi(theRiemann->cL,direction,Psi_face/theRiemann->r);
-      //cell_add_GradPsi(theRiemann->cR,direction,-Psi_face/theRiemann->r);
-      cell_add_GradPsi(theRiemann->cL,direction,Psi_face*theRiemann->dA);
-      cell_add_GradPsi(theRiemann->cR,direction,-Psi_face*theRiemann->dA);
-    }else {
-      //cell_add_GradPsi(theRiemann->cL,direction,Psi_face);
-      //cell_add_GradPsi(theRiemann->cR,direction,-Psi_face);
-      cell_add_GradPsi(theRiemann->cL,direction,Psi_face*theRiemann->dA);
-      cell_add_GradPsi(theRiemann->cR,direction,-Psi_face*theRiemann->dA);
-      if (fabs(theRiemann->r - 0.5)<0.02){
-        printf("%e %e %d %d %d %d %e\n",theRiemann->r,Psi_face, theRiemann->n[0],theRiemann->n[1],theRiemann->n[2],direction, theRiemann->dA);
-        printf("sim_rfaces(theSim,58): %e sim_rfaces(theSim,59): %e, cell_GradPsi(theCells,59,10,2): %e\n",sim_FacePos(theSim,58,R_DIR),sim_FacePos(theSim,59,R_DIR),cell_GradPsi(theCells,59,10,2,0));
-      }
+    cell_add_GradPsi(theRiemann->cL,direction,Psi_face*theRiemann->dA/theRiemann->r);
+    cell_add_GradPsi(theRiemann->cR,direction,-Psi_face*theRiemann->dA/theRiemann->r);
+    /*
+    if (fabs(theRiemann->r - 0.5)<0.02){
+      printf("%e %e %d %d %d %d %e\n",theRiemann->r,Psi_face, theRiemann->n[0],theRiemann->n[1],theRiemann->n[2],direction, theRiemann->dA);
+      printf("sim_rfaces(theSim,58): %e sim_rfaces(theSim,59): %e, cell_GradPsi(theCells,59,10,2): %e\n",sim_FacePos(theSim,58,R_DIR),sim_FacePos(theSim,59,R_DIR),cell_GradPsi(theCells,59,10,2,0));
     }
+    */
   }
 }
 
