@@ -402,7 +402,7 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
 }
 
 
-void riemann_AddFlux(struct Cell *** theCells, struct Riemann * theRiemann, struct Sim *theSim,double dt ){
+void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt ){
   int NUM_Q = sim_NUM_Q(theSim);
   double GAMMALAW = sim_GAMMALAW(theSim);
   double DIVB_CH = sim_DIVB_CH(theSim);
