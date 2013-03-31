@@ -396,8 +396,8 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
   theRiemann->r = r; 
   int q;
   for (q=0;q<NUM_Q;++q){
-    theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_gradp(theRiemann->cL,q)*dpL;
-    theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_gradp(theRiemann->cR,q)*dpR;
+    theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + 0.5*cell_gradp(theRiemann->cL,q)*dpL;
+    theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - 0.5*cell_gradp(theRiemann->cR,q)*dpR;
   }
 }
 
