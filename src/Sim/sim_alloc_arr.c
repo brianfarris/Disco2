@@ -20,9 +20,13 @@ void sim_alloc_arr(struct Sim * theSim, struct MPIsetup * theMPIsetup) {
     Nghost_min[R_DIR]  = theSim->ng;
   }
   Nghost_max[R_DIR] = theSim->ng;
-  Nghost_min[Z_DIR] = theSim->ng;
-  Nghost_max[Z_DIR] = theSim->ng;
-
+  if (sim_N_global(theSim,Z_DIR)==1){
+    Nghost_min[Z_DIR]=0;
+    Nghost_max[Z_DIR]=0;
+  }else{
+    Nghost_min[Z_DIR] = theSim->ng;
+    Nghost_max[Z_DIR] = theSim->ng;
+  }
 
   int N_withghost[2];
   N_withghost[R_DIR] = N_noghost[R_DIR]+Nghost_min[R_DIR]+Nghost_max[R_DIR];
@@ -30,7 +34,7 @@ void sim_alloc_arr(struct Sim * theSim, struct MPIsetup * theMPIsetup) {
 
   theSim->N_noghost[R_DIR] = N_noghost[R_DIR];
   theSim->N_noghost[Z_DIR] = N_noghost[Z_DIR];
- 
+
   theSim->Nghost_min[R_DIR] = Nghost_min[R_DIR];
   theSim->Nghost_max[R_DIR] = Nghost_max[R_DIR];
   theSim->Nghost_min[Z_DIR] = Nghost_min[Z_DIR];

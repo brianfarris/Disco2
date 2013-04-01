@@ -44,7 +44,6 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
     for( q=0 ; q<NUM_Q ; ++q ){
       double WL = cL->prim[q] + dpL*cL->gradp[q];
       double WR = cR->prim[q] - dpR*cR->gradp[q];
-
       double S = (WR-WL)/(deltaR+deltaL);
       cL->grad[q] += S*dA;
       cR->grad[q] += S*dA; 
@@ -67,7 +66,6 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       }
     }
   }
-
   for( n=0 ; n<Nf ; ++n ){
     struct Cell * cL = face_L_pointer(theFaces,n);
     struct Cell * cR = face_R_pointer(theFaces,n);
@@ -81,6 +79,7 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
     double dpR = pR - face_cm(theFaces,n);
     while( dpR >  M_PI ) dpR -= 2.*M_PI;
     while( dpR < -M_PI ) dpR += 2.*M_PI;
+
     for( q=0 ; q<NUM_Q ; ++q ){
       double WL = cL->prim[q] + dpL*cL->gradp[q];
       double WR = cR->prim[q] - dpR*cR->gradp[q];
@@ -144,7 +143,6 @@ void cell_plm_p( struct Cell *** theCells ,struct Sim * theSim){
       }
     }
   }   
-
 }
 
 

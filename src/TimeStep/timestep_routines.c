@@ -18,7 +18,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     struct MPIsetup * theMPIsetup,double timestep_fac){
 
   double dt = timestep_fac*theTimeStep->dt;
-  
+
   // figure out what all the faces need to be and set them up
   struct Face *theFaces_r = face_create(theCells,theSim,theTimeStep,0); // r-direction
   struct Face *theFaces_z = face_create(theCells,theSim,theTimeStep,1); // z-direction
@@ -37,14 +37,14 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   // divB and GradPsi are needed for Powell source terms in MHD eqns. Here we reset them to 0.
   cell_clear_divB(theCells,theSim);
   cell_clear_GradPsi(theCells,theSim);
- 
+
   double r0 = sim_FacePos(theSim,0,R_DIR);
   double r1 = sim_FacePos(theSim,1,R_DIR);
   double r2 = sim_FacePos(theSim,2,R_DIR);
-  
+
+  int i,j,k,q;
   //Phi Flux
   cell_plm_p(theCells,theSim);//piecewise-linear reconstruction
-  int i,j,k;
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
@@ -58,6 +58,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
 
   //R Flux
   cell_plm_rz(theCells,theSim,theFaces_r,theTimeStep,R_DIR); //piecewise-linear reconstruction
+
   int n;
   for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR) ; ++n ){
     struct Riemann * theRiemann = riemann_create(theSim); //struct to contain everything we need to solve Riemann problem
@@ -110,7 +111,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   if (sim_N_global(theSim,Z_DIR)>1){
     face_destroy(theFaces_z);
   }
- 
+
   // if DAMP_TIME is set to a positive number, apply damping near boundary
   if (sim_DAMP_TIME(theSim)>0.0) cell_bc_damp( theCells , theSim, dt,(*cell_single_init_ptr(theSim)) );
 
@@ -121,7 +122,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   //re-calculate conserved quantities. 
   //things may have changed due to syncing and/or caps/floors applied in primitive solver.
   cell_calc_cons( theCells,theSim );
-
 }
 
 void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCells , struct Sim * theSim,struct MPIsetup * theMPIsetup){

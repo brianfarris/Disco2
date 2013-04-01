@@ -131,7 +131,7 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
 }
 
 // Which state of the riemann problem are we in?
-void riemann_set_state(struct Riemann * theRiemann,int w ){
+void riemann_set_state(struct Riemann * theRiemann,double w ){
   if (w < theRiemann->Sl){
     theRiemann->state=LEFT;
   }else if( w > theRiemann->Sr ){
@@ -195,7 +195,7 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
   double Msp   = ( Sk - vn )*mp / ( Sk - Ss );
   double Msz   = ( Sk - vn )*mz / ( Sk - Ss );
   double Estar = ( ( Sk - vn )*E_hydro + Ps*Ss - Pp*vn ) / ( Sk - Ss );
-
+  
   if (sim_runtype(theSim)==MHD){
     double Bsn = Bpack[0];
     double Bsr = Bpack[1];
@@ -368,7 +368,6 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
     theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_grad(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
     theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_grad(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
   }
-  //printf("hello %e %e %e %e %e\n",theRiemann->r,cell_prim(theRiemann->cL,PSI),cell_prim(theRiemann->cR,PSI),theRiemann->primL[PSI],theRiemann->primR[PSI]);
 }
 
 void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct Sim * theSim,int i,int j_low,int k,int direction){
@@ -428,9 +427,9 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   } else{
     w = 0.0;
   }
-
   // which state of the riemann problem are we in?
   riemann_set_state(theRiemann,w);
+  
 
   if (theRiemann->state==LEFT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);//in this case, we only need FL
@@ -498,12 +497,6 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     cell_add_divB(theRiemann->cR,-theRiemann->dA*Bk_face);
     cell_add_GradPsi(theRiemann->cL,direction,Psi_face*theRiemann->dA/theRiemann->r);
     cell_add_GradPsi(theRiemann->cR,direction,-Psi_face*theRiemann->dA/theRiemann->r);
-    /*
-    if (fabs(theRiemann->r - 0.5)<0.02){
-      printf("%e %e %d %d %d %d %e\n",theRiemann->r,Psi_face, theRiemann->n[0],theRiemann->n[1],theRiemann->n[2],direction, theRiemann->dA);
-      printf("sim_rfaces(theSim,58): %e sim_rfaces(theSim,59): %e, cell_GradPsi(theCells,59,10,2): %e\n",sim_FacePos(theSim,58,R_DIR),sim_FacePos(theSim,59,R_DIR),cell_GradPsi(theCells,59,10,2,0));
-    }
-    */
   }
 }
 

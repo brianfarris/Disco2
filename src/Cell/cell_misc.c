@@ -128,9 +128,12 @@ void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,voi
 }
 
 void cell_print(struct Cell *** theCells,int i,int j,int k){
+  /*
   printf("at i: %d, j: %d, k: %d, DDD: %e\n",i,j,k,theCells[k][i][j].cons[DDD]);
   printf("at i: %d, j: %d, k: %d, TAU: %e\n",i,j,k,theCells[k][i][j].cons[TAU]);
   printf("at i: %d, j: %d, k: %d, SRR: %e\n",i,j,k,theCells[k][i][j].cons[SRR]);
   printf("at i: %d, j: %d, k: %d, LLL: %e\n",i,j,k,theCells[k][i][j].cons[LLL]);
   printf("at i: %d, j: %d, k: %d, SZZ: %e\n",i,j,k,theCells[k][i][j].cons[SZZ]);
+  */
+  printf("theCells[%d][%d][%d].cons[BPP]: %e\n",k,i,j,theCells[k][i][j].cons[BPP]);
 }  

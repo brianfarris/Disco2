@@ -55,7 +55,7 @@
 
 int main(int argc, char **argv) {
   char* inputfilename = argv[1];
-  
+
   // start MPI 
   struct MPIsetup * theMPIsetup = mpisetup_create(argc,argv);
   mpisetup_setprocs(theMPIsetup,inputfilename);
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
   sim_set_rz(theSim,theMPIsetup);
   sim_set_N_p(theSim);
   sim_set_misc(theSim,theMPIsetup);
-  
+
   //allocate memory for gravitating masses
   struct GravMass *theGravMasses = gravMass_create(sim_NumGravMass(theSim));
 
@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
 
   // set conserved quantities
   cell_calc_cons(theCells,theSim);
-
+  
   // set up diagnostics struct
   struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep,theMPIsetup);
 

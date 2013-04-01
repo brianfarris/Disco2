@@ -37,7 +37,7 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim){
 double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
   int i_m,j_m,k_m;
   double dt_m = 1.e100;//HUGE_VAL;
-  double a_m,r_m;
+  double a_m,r_m,dx_m;
   double mag_vel_m;
   int i,j,k;
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -76,6 +76,7 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
         if( dt_m > dt ) {
           mag_vel_m = sqrt(b2);
           a_m = a;
+          dx_m = dx;
           dt_m = dt;
           i_m = i;
           j_m = j;
@@ -85,7 +86,7 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
       } 
     }
   }
-  printf("r_m: %e, i_m: %d, j_m: %d, k_m: %d, a_m: %e mag_vel_m: %e\n",r_m,i_m,j_m,k_m,a_m,mag_vel_m);
+  //printf("r_m: %e, i_m: %d, j_m: %d, k_m: %d, a_m: %e, dx_m: %e, mag_vel_m: %e\n",r_m,i_m,j_m,k_m,a_m,dx_m,mag_vel_m);
   double dt2;
   MPI_Allreduce( &dt_m , &dt2 , 1 , MPI_DOUBLE , MPI_MIN , sim_comm );
   return( dt2 );
