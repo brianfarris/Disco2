@@ -112,6 +112,9 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           double B2 = Br*Br+Bp*Bp+Bz*Bz;
           double divB = c->divB;
           double GradPsi[3];
+          //GradPsi[0] = 0.0;//r*c->GradPsi[0];
+          //GradPsi[1] = 0.0;//r*c->GradPsi[1];
+          //GradPsi[2] = 0.0;//r*c->GradPsi[2];
           GradPsi[0] = r*c->GradPsi[0];
           GradPsi[1] = r*c->GradPsi[1];
           GradPsi[2] = r*c->GradPsi[2];
@@ -131,7 +134,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[LLL] -= POWELL*dt*divB*Bp*r;
           c->cons[TAU] -= POWELL*dt*(divB*vdotB+BdotGradPsi);
 
-          double psi = c->prim[PSI];
+          //double psi = c->prim[PSI];
           //cons[BRR] += dt*dV*( psi )/r;
           //cons[PSI] -= dt*dV*psi*DIVB_CH/DIVB_L;//DIVB_CH2/DIVB_CP2;
           c->cons[BRR] -= POWELL*dt*divB*vr/r;

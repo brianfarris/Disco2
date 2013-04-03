@@ -74,7 +74,6 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
       }
     }
     r = sim_FacePos(theSim,sim_N(theSim,R_DIR)-2,R_DIR);
-
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       double zp = sim_FacePos(theSim,k,Z_DIR);
       double zm = sim_FacePos(theSim,k-1,Z_DIR);
@@ -84,7 +83,8 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         for( q=0 ; q<NUM_Q ; ++q ){
           theCells[k][sim_N(theSim,R_DIR)-1][j].prim[q] /= dA;
         }
-        theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] *= -1.;
+        //theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] *= -1.;
+        if( theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] < 0.0 ) theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] = 0.0;
       }
     }
 
