@@ -10,7 +10,7 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim){
 
   double Pp  = prim[PPP];
   double rho = prim[RHO];
-  double vp  = prim[UPP]*r-w;
+  double vp  = prim[UPP]*r;//-w;
   double vr  = prim[URR];
   double vz  = prim[UZZ];
   double cs  = sqrt(sim_GAMMALAW(theSim)*Pp/rho);
