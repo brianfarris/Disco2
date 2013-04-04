@@ -13,5 +13,5 @@ enum{RDIRECTION,PDIRECTION,ZDIRECTION};
 enum{HLLC,HLL};
 #include "mpi.h"
 MPI_Comm sim_comm;
-
+#define farris_mpi_factorization 1
 

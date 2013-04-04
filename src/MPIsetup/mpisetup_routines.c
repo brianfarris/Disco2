@@ -1,8 +1,18 @@
 #define MPISETUP_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
+
+void get_proc_factorization(int N_r_global,int N_z_global,int numprocs,int * factorization){
+  double ratio = (double)N_z_global/(double)N_r_global;
+  int nz = (int)sqrt(ratio*numprocs);
+  if (nz==0) nz=1;
+  int nr = numprocs/nz;
+  factorization[0] = nr;
+  factorization[1] = nz;
+}
 
 void mpisetup_setprocs(struct MPIsetup * theMPIsetup,char * filename){
   int readvar(char *,char *, int,void *);
@@ -13,7 +23,6 @@ void mpisetup_setprocs(struct MPIsetup * theMPIsetup,char * filename){
    
   int ierr;
   int NumProcs,MyProc;
-  //int dim_NumProcs[2];
   theMPIsetup->dim_NumProcs[0] = 0;
   theMPIsetup->dim_NumProcs[1] = 0;
 
@@ -29,7 +38,11 @@ void mpisetup_setprocs(struct MPIsetup * theMPIsetup,char * filename){
   ierr = MPI_Comm_rank(MPI_COMM_WORLD, &MyProc);
   //This gives me the most efficient factorization of
   //the number of processes being used into a j-by-k Mesh.
-  MPI_Dims_create(NumProcs,theMPIsetup->ndims_mpi,theMPIsetup->dim_NumProcs);
+  if (farris_mpi_factorization){
+    get_proc_factorization(N_r_global,N_z_global,NumProcs,theMPIsetup->dim_NumProcs);
+  } else{
+    MPI_Dims_create(NumProcs,theMPIsetup->ndims_mpi,theMPIsetup->dim_NumProcs);
+  }
   //Just in case the dimensions don't make sense; I don't know how
   //the MPI_Dims_create funcition works, so you never know.
   if( (theMPIsetup->dim_NumProcs[0])*(theMPIsetup->dim_NumProcs[1]) != NumProcs ){
