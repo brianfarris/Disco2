@@ -11,8 +11,8 @@ NumZ			128			//Vertical Zones
 ng                      2
 R_Min			1.0
 R_Max			4.0
-Z_Min			-1.0
-Z_Max			1.0
+Z_Min			-0.5
+Z_Max			0.5
 NP_CONST                128 
 aspect                  1.0
 
@@ -27,6 +27,7 @@ Num_Diag_Measure        10
 NoInnerBC               0
 BoundTypeR           0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
+ZeroPsiBndry          0
 
 Move_Cells              3
 RiemannSolver           0           // 0 hllc, 1 hll
@@ -34,8 +35,8 @@ Adiabatic_Index		1.6666666666
 //Include_Viscosity       0
 Explicit_Viscosity      -1.0
 
-DivB_Ch			0.06		//Dedner divergence cleaning
-DivB_l			0.1
+DivB_Ch			0.0		//Dedner divergence cleaning
+DivB_l			1000000000.1
 //Numerical Parameters
 CFL			0.5
 PLM			1.0
