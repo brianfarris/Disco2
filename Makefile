@@ -10,7 +10,8 @@ ifeq ($(UNAME),Linux)
 H55 = /home/install/app/hdf5-1.6_intel_mpi
 endif
 ifeq ($(UNAME),Darwin)
-H55 = /usr/local/hdf5
+##H55 = /usr/local/hdf5
+H55 = /opt/local
 endif
 
 SRCS    := $(shell find $(SRCDIR) -name '*.$(SRCEXT)')
