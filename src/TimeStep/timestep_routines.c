@@ -98,7 +98,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   }
   if (sim_N_global(theSim,Z_DIR)>1){
     if (sim_BoundTypeZ(theSim)==BOUND_OUTFLOW){
-      cell_boundary_outflow_z( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
+      cell_boundary_outflow_z( theCells , theFaces_z ,theSim,theMPIsetup, theTimeStep );
     }else if (sim_BoundTypeZ(theSim)==BOUND_FIXED){
       cell_boundary_fixed_z(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
     } else if (sim_BoundTypeZ(theSim)==BOUND_PERIODIC){

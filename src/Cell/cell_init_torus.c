@@ -19,7 +19,7 @@ void cell_init_torus(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
   double M = 1.0; 
   double r_inner = 0.7;
   double r_max = 1.0;
-  double q = 1.55;
+  double q = 2.;
   double s = 2.*q-q;
   double GammaFac = (GAMMALAW-1.)/GAMMALAW;
   double Phi_inner = -1.0/r_inner;
@@ -28,6 +28,7 @@ void cell_init_torus(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
   double PoRho_max = GammaFac*(Phi_inner-Phi_max+pow(r_inner,-s)/s-pow(1.0,-s)/s);
 
   int i, j,k;
+  srand(666 + mpisetup_MyProc(theMPIsetup));
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
     double zp = sim_FacePos(theSim,k  ,Z_DIR);
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
@@ -48,18 +49,33 @@ void cell_init_torus(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
       }
       double rho = pow(PoRho,1.0/(GAMMALAW-1.0))/Rho_norm;
       double Pp = pow(PoRho,1.0/GammaFac)/Rho_norm;
-  
-      printf("%e %e %e\n",r,rho,Pp);
+ 
+      if (PoRho<1.0e-20){
+        Pp = rho;
+      }
+
+      double magfac;
+      if (rho>0.75){
+        magfac = 0.05/PoRho_max;
+      } else{
+        magfac = 0.0/PoRho_max;
+      }
+      double Br = magfac*GammaFac*M/R/R*z/R;
+      double Bp = 0.0;
+      double Bz = magfac*(GammaFac*(-M/R/R*r/R+pow(r,-s-1.))+PoRho/r );
+
+
       for (j = 0; j < sim_N_p(theSim,i); j++) {
+        double delta = .02*( (double)rand()/(double)RAND_MAX - .5 );
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = Pp;
         theCells[k][i][j].prim[URR] = 0.0;
-        theCells[k][i][j].prim[UPP] = omega;
+        theCells[k][i][j].prim[UPP] = omega*(1.+delta);
         theCells[k][i][j].prim[UZZ] = 0.0;
-        //theCells[k][i][j].prim[BRR] = 0.0;
-        //theCells[k][i][j].prim[BPP] = 0.0;
-        //theCells[k][i][j].prim[BZZ] = Bz;
-        //theCells[k][i][j].prim[PSI] = 0.0;
+        theCells[k][i][j].prim[BRR] = Br;
+        theCells[k][i][j].prim[BPP] = Bp;
+        theCells[k][i][j].prim[BZZ] = Bz;
+        theCells[k][i][j].prim[PSI] = 0.0;
         theCells[k][i][j].wiph = omega*r;
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;
