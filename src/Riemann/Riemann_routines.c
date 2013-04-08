@@ -15,6 +15,14 @@
 // LETS CHOOSE A REFERENCE SUCH AS TORO AND IDENTIFY LINES OF CODE WITH EQUATIONS IN THE BOOK.
 // ********************************************************************************************
 
+double w_analytic(double r){
+  return(pow(r,-0.5));
+}
+
+double dw_dr_analytic(double r){
+  return(-0.5*pow(r,-1.5));
+}
+
 // this routine is only called by riemann_set_vel.
 // It is used to find various L/R quantities. 
 void LR_speed(double *prim,double r,int * n,double GAMMALAW,double * p_vn,double * p_cf2,double *Fm,double * p_mn){
@@ -101,9 +109,19 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
   double aL = L_Plus;
   double aR = -L_Mins;
 
-  double mr = ( aR*theRiemann->primL[RHO]*theRiemann->primL[URR] + aL*theRiemann->primR[RHO]*theRiemann->primR[URR] + FmL[0] - FmR[0] )/( aL + aR );
-  double mp = ( aR*theRiemann->primL[RHO]*theRiemann->primL[UPP]*r + aL*theRiemann->primR[RHO]*theRiemann->primR[UPP]*r + FmL[1] - FmR[1] )/( aL + aR );
-  double mz = ( aR*theRiemann->primL[RHO]*theRiemann->primL[UZZ] + aL*theRiemann->primR[RHO]*theRiemann->primR[UZZ] + FmL[2] - FmR[2] )/( aL + aR );
+  double mrL = theRiemann->primL[RHO]*theRiemann->primL[URR];
+  double mpL = theRiemann->primL[RHO]*theRiemann->primL[UPP]*r;
+  double mzL = theRiemann->primL[RHO]*theRiemann->primL[UZZ];
+
+  double mrR = theRiemann->primR[RHO]*theRiemann->primR[URR];
+  double mpR = theRiemann->primR[RHO]*theRiemann->primR[UPP]*r;
+  double mzR = theRiemann->primR[RHO]*theRiemann->primR[UZZ];
+
+
+  double mr = ( aR*mrL + aL*mrR + FmL[0] - FmR[0] )/( aL + aR );
+  double mp = ( aR*mpL + aL*mpR + FmL[1] - FmR[1] )/( aL + aR );
+  double mz = ( aR*mzL + aL*mzR + FmL[2] - FmR[2] )/( aL + aR );
+
   double rho = ( aR*theRiemann->primL[RHO] + aL*theRiemann->primR[RHO] + mnL - mnR )/( aL + aR );
 
   L_Star = (theRiemann->primR[RHO]*vnR*(L_Plus-vnR)-theRiemann->primL[RHO]*vnL*(L_Mins-vnL)+theRiemann->primL[PPP]-theRiemann->primR[PPP])
@@ -264,8 +282,10 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
   double Pp  = prim[PPP];
   double vr  = prim[URR];
   double vp  = prim[UPP]*r;
+  double vp_minus_w_analytic  = prim[UPP]*r-w_analytic(r);
   double vz  = prim[UZZ];
   double vn = vr*theRiemann->n[0] + vp*theRiemann->n[1] + vz*theRiemann->n[2];
+  double vn_minus_w_analytic =vr*theRiemann->n[0] + vp_minus_w_analytic*theRiemann->n[1] + vz*theRiemann->n[2];
   double rhoe = Pp/(GAMMALAW-1.);
   double v2 = vr*vr + vp*vp + vz*vz;
   F[DDD] = rho*vn;
@@ -287,9 +307,9 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     F[SZZ] +=     .5*B2*theRiemann->n[2] - Bz*Bn;
     F[TAU] += B2*vn - vB*Bn;
     double psi = prim[PSI];
-    F[BRR] =(Br*vn - vr*Bn + psi*theRiemann->n[0])/r;
-    F[BPP] =(Bp*vn - vp*Bn + psi*theRiemann->n[1])/r;
-    F[BZZ] = Bz*vn - vz*Bn + psi*theRiemann->n[2];
+    F[BRR] =(Br*vn_minus_w_analytic - vr*Bn + psi*theRiemann->n[0])/r;
+    F[BPP] =(Bp*vn_minus_w_analytic - vp_minus_w_analytic*Bn + psi*theRiemann->n[1])/r;
+    F[BZZ] = Bz*vn_minus_w_analytic - vz*Bn + psi*theRiemann->n[2];
     F[PSI] = pow(DIVB_CH,2.)*Bn;
   }
 

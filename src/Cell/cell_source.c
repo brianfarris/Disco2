@@ -8,6 +8,9 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
+double w_analytic(double);
+double dw_dr_analytic(double);
+
 double fgrav( double M , double r , double eps, double n ){
   return( M*pow(r,n-1.)/pow( pow(r,n) + pow(eps,n) ,1.+1./n) );
 }
@@ -124,10 +127,10 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           double vdotGradPsi = /*dV**/(vr*GradPsi[0]+vp*GradPsi[1]+vz*GradPsi[2]);
 
           /*
-          if (fabs(z)<0.00001){
-            fprintf(gradpsifile,"%e %e %e %e %e\n",r,phi,dV,GradPsi[0]/dV, c->prim[PSI]);
-          }
-          */
+             if (fabs(z)<0.00001){
+             fprintf(gradpsifile,"%e %e %e %e %e\n",r,phi,dV,GradPsi[0]/dV, c->prim[PSI]);
+             }
+             */
           c->cons[SRR] += dt*dV*( .5*B2 - Bp*Bp )/r;
           c->cons[SRR] -= POWELL*dt*divB*Br;
           c->cons[SZZ] -= POWELL*dt*divB*Bz;
@@ -141,6 +144,9 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[BPP] -= POWELL*dt*divB*vp/r;
           c->cons[BZZ] -= POWELL*dt*divB*vz;
           c->cons[PSI] -= POWELL*dt*vdotGradPsi;
+
+          c->cons[BRR] -= dt*dV*Bp*w_analytic(r)/r/r;
+          c->cons[BPP] += dt*dV*Br*dw_dr_analytic(r)/r;
         }
       }
     }
