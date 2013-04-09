@@ -598,9 +598,6 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   double GAMMALAW = sim_GAMMALAW(theSim);
   double DIVB_CH = sim_DIVB_CH(theSim);
 
-  double Bpack[6];
-  riemann_set_vel(theRiemann,theSim,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
-
   double Bk_face,Psi_face;
   if (sim_runtype(theSim)==1){
     if (theRiemann->n[RDIRECTION]){
@@ -612,6 +609,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     }
     Psi_face = 0.5*(theRiemann->primL[PSI]+theRiemann->primR[PSI]);
   }
+
   double w,w_minus_w_analytic;
   if (theRiemann->n[PDIRECTION]){
     if( sim_MOVE_CELLS(theSim) == C_WRIEMANN ) cell_add_wiph(theRiemann->cL,theRiemann->Ss);
@@ -619,54 +617,93 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     w_minus_w_analytic = cell_wiph(theRiemann->cL)-w_analytic(theRiemann->r) ;
   } else{
     w = 0.0;
+    w_minus_w_analytic = 0.0;
   }
+
+  double Bpack[6];
+  riemann_set_vel(theRiemann,theSim,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
+
   // which state of the riemann problem are we in?
   riemann_set_state(theRiemann,w);
 
+  /***********************************/
 
   if (theRiemann->state==LEFT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);//in this case, we only need FL
-    riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);
     cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
     int q;
-    for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
+    for (q=0;q<5;++q ){
       theRiemann->F[q] = theRiemann->FL[q] - w*theRiemann->UL[q];// w is only nonzero when we are in phi direction
-    }
-    if (theRiemann->n[PDIRECTION]){
-      theRiemann->F[BRR] += w_analytic(theRiemann->r)*theRiemann->UL[BRR];
-      theRiemann->F[BPP] += w_analytic(theRiemann->r)*theRiemann->UL[BPP];
-      theRiemann->F[BZZ] += w_analytic(theRiemann->r)*theRiemann->UL[BZZ];
     }
   } else if (theRiemann->state==RIGHT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);//in this case, we only need FR
-    riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);
     cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
     int q;
-    for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
+    for (q=0;q<5;++q ){
       theRiemann->F[q] = theRiemann->FR[q] - w*theRiemann->UR[q];// w is only nonzero when we are in phi direction
-    }
-    if (theRiemann->n[PDIRECTION]){
-      theRiemann->F[BRR] += w_analytic(theRiemann->r)*theRiemann->UR[BRR];
-      theRiemann->F[BPP] += w_analytic(theRiemann->r)*theRiemann->UR[BPP];
-      theRiemann->F[BZZ] += w_analytic(theRiemann->r)*theRiemann->UR[BZZ];
     }
   } else{
     if (sim_Riemann(theSim)==HLL){
       riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);  //we need both
-      riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);  
       riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);    
-      riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);    
       cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);//we need both
       cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
       riemann_set_star_hll(theRiemann,theSim);// get Ustar and Fstar
     } else if (sim_Riemann(theSim)==HLLC){
       if (theRiemann->state==LEFTSTAR){
         riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);//in this case, we only need FL
-        riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);
         cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
         riemann_set_star_hllc(theRiemann,theSim,Bpack,GAMMALAW);// get Ustar and Fstar
       } else if (theRiemann->state==RIGHTSTAR){
         riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);//in this case, we only need FR      
+        cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
+        riemann_set_star_hllc(theRiemann,theSim,Bpack,GAMMALAW);// get Ustar and Fstar
+      }
+    } else{
+      printf("ERROR\n");
+      exit(0);
+    }
+    int q;
+    for (q=0;q<5;++q ){
+      theRiemann->F[q] = theRiemann->Fstar[q] - w*theRiemann->Ustar[q];// w is only nonzero when we are in phi direction
+    }
+  }
+
+
+  /***********************************/
+  riemann_set_vel_minus_w_analytic(theRiemann,theSim,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
+
+  // which state of the riemann problem are we in?
+  riemann_set_state(theRiemann,w_minus_w_analytic);
+
+
+  if (theRiemann->state==LEFT){
+    riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);
+    cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
+    int q;
+    for (q=5;q<sim_NUM_Q(theSim) ; ++q ){
+      theRiemann->F[q] = theRiemann->FL[q] - w_minus_w_analytic*theRiemann->UL[q];// w is only nonzero when we are in phi direction
+    }
+  } else if (theRiemann->state==RIGHT){
+    riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);
+    cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
+    int q;
+    for (q=5;q<sim_NUM_Q(theSim) ; ++q ){
+      theRiemann->F[q] = theRiemann->FR[q] - w_minus_w_analytic*theRiemann->UR[q];// w is only nonzero when we are in phi direction
+    }
+  } else{
+    if (sim_Riemann(theSim)==HLL){
+      riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);  
+      riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);    
+      cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);//we need both
+      cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
+      riemann_set_star_hll(theRiemann,theSim);// get Ustar and Fstar
+    } else if (sim_Riemann(theSim)==HLLC){
+      if (theRiemann->state==LEFTSTAR){
+        riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);
+        cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
+        riemann_set_star_hllc(theRiemann,theSim,Bpack,GAMMALAW);// get Ustar and Fstar
+      } else if (theRiemann->state==RIGHTSTAR){
         riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);
         cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
         riemann_set_star_hllc(theRiemann,theSim,Bpack,GAMMALAW);// get Ustar and Fstar
@@ -676,13 +713,8 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
       exit(0);
     }
     int q;
-    for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
-      theRiemann->F[q] = theRiemann->Fstar[q] - w*theRiemann->Ustar[q];// w is only nonzero when we are in phi direction
-    }
-    if (theRiemann->n[PDIRECTION]){
-      theRiemann->F[BRR] += w_analytic(theRiemann->r)*theRiemann->Ustar[BRR];
-      theRiemann->F[BPP] += w_analytic(theRiemann->r)*theRiemann->Ustar[BPP];
-      theRiemann->F[BZZ] += w_analytic(theRiemann->r)*theRiemann->Ustar[BZZ];
+    for (q=5;q<sim_NUM_Q(theSim) ; ++q ){
+      theRiemann->F[q] = theRiemann->Fstar[q] - w_minus_w_analytic*theRiemann->Ustar[q];// w is only nonzero when we are in phi direction
     }
   }
 
