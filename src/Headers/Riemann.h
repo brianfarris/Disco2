@@ -23,7 +23,10 @@ struct Riemann {
   double Sl;
   double Sr;
   double Ss;
-  int state;
+  double Sl_minus_w_analytic;
+  double Sr_minus_w_analytic;
+  double Ss_minus_w_analytic;
+   int state;
   int n[3];
 };
 #endif

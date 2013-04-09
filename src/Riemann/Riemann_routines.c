@@ -48,6 +48,28 @@ void LR_speed(double *prim,double r,int * n,double GAMMALAW,double * p_vn,double
   *p_cf2 = cf2;
   *p_mn = mn;
 }
+void LR_speed_minus_w_analytic(double *prim,double r,int * n,double GAMMALAW,double * p_vn,double * p_cf2,double *Fm,double * p_mn){
+  double P   = prim[PPP];
+  double rho = prim[RHO];
+  double vr  =   prim[URR];
+  double vp  = r*prim[UPP] - w_analytic(r);
+  double vz  =   prim[UZZ];
+  double vn  = vr*n[0] + vp*n[1] + vz*n[2];
+  double cf2  = GAMMALAW*(P/rho);
+  double mr = rho*vr;
+  double mp = rho*vp;
+  double mz = rho*vz;
+  double mn = mr*n[0]+mp*n[1]+mz*n[2];
+
+  Fm[0] = rho*vr*vn + P*n[0];
+  Fm[1] = rho*vp*vn + P*n[1];
+  Fm[2] = rho*vz*vn + P*n[2];
+
+  *p_vn = vn;
+  *p_cf2 = cf2;
+  *p_mn = mn;
+}
+
 
 // this routine is only called by riemann_set_vel.
 // It is used to find various L/R quantities. 
@@ -83,6 +105,40 @@ void LR_speed_mhd(double *prim,double r,int * n,double ch, double * p_cf2,double
   *p_Bn = Bn;
   *p_B2 = B2;
 }
+
+void LR_speed_mhd_minus_w_analytic(double *prim,double r,int * n,double ch, double * p_cf2,double *F,double *Fm,double * p_Bn,double * p_B2){
+  double rho  =   prim[RHO];
+  double vr  =   prim[URR];
+  double vp  = r*prim[UPP]-w_analytic(r);
+  double vz  =   prim[UZZ];
+  double vn  = vr*n[0] + vp*n[1] + vz*n[2];
+ 
+  double Br = prim[BRR];
+  double Bp = prim[BPP];
+  double Bz = prim[BZZ];
+  double psi = prim[PSI];
+
+  double Bn =  Br*n[0] + Bp*n[1] + Bz*n[2];
+  double B2 = (Br*Br  + Bp*Bp  + Bz*Bz);
+  double Fps = pow(ch,2.)*Bn;
+
+  F[0] = vn*Br - Bn*vr + psi*n[0];
+  F[1] = vn*Bp - Bn*vp + psi*n[1];
+  F[2] = vn*Bz - Bn*vz + psi*n[2];
+
+  Fm[0] +=  .5*B2*n[0] - Br*Bn;
+  Fm[1] +=  .5*B2*n[1] - Bp*Bn;
+  Fm[2] +=  .5*B2*n[2] - Bz*Bn;
+
+
+  double c2_mag = *p_cf2 + B2/rho;
+
+  *p_cf2 = .5*( c2_mag + sqrt(fabs(  c2_mag*c2_mag - 4.0*(*p_cf2)*Bn*Bn/rho )) );
+
+  *p_Bn = Bn;
+  *p_B2 = B2;
+}
+
 
 // Find velocities needed for the Riemann problem
 void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,double *Bpack,double GAMMALAW,double DIVB_CH){
@@ -156,6 +212,80 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
   theRiemann->Ss = L_Star;
 
 }
+
+// Find velocities needed for the Riemann problem
+void riemann_set_vel_minus_w_analytic(struct Riemann * theRiemann,struct Sim * theSim,double r,double *Bpack,double GAMMALAW,double DIVB_CH){
+  double L_Mins, L_Plus, L_Star;
+
+  double vnL,cf2L,mnL,BnL,B2L;
+  double FL[3], FmL[3];
+  LR_speed_minus_w_analytic(theRiemann->primL,r,theRiemann->n,GAMMALAW,&vnL,&cf2L,FmL,&mnL);
+  if (sim_runtype(theSim)==MHD){
+    LR_speed_mhd_minus_w_analytic(theRiemann->primL,r,theRiemann->n,DIVB_CH,&cf2L,FL,FmL,&BnL,&B2L);
+  }
+  L_Mins = vnL - sqrt( cf2L );
+  L_Plus = vnL + sqrt( cf2L );
+
+  double vnR,cf2R,mnR,BnR,B2R;
+  double FR[3],FmR[3];
+  LR_speed_minus_w_analytic(theRiemann->primR,r,theRiemann->n,GAMMALAW,&vnR,&cf2R,FmR,&mnR);
+  if (sim_runtype(theSim)==MHD){
+    LR_speed_mhd_minus_w_analytic(theRiemann->primR,r,theRiemann->n,DIVB_CH,&cf2R,FR,FmR,&BnR,&B2R);
+  }
+  if( L_Mins > vnR - sqrt( cf2R ) ) L_Mins = vnR - sqrt( cf2R );
+  if( L_Plus < vnR + sqrt( cf2R ) ) L_Plus = vnR + sqrt( cf2R );
+  
+  if (sim_runtype(theSim)==MHD){
+    if( L_Mins > -DIVB_CH ) L_Mins = -DIVB_CH;
+    if( L_Plus <  DIVB_CH ) L_Plus =  DIVB_CH;
+  }
+
+  double aL = L_Plus;
+  double aR = -L_Mins;
+
+  double mrL = theRiemann->primL[RHO]*theRiemann->primL[URR];
+  double mpL = theRiemann->primL[RHO]*theRiemann->primL[UPP]*r;
+  double mzL = theRiemann->primL[RHO]*theRiemann->primL[UZZ];
+
+  double mrR = theRiemann->primR[RHO]*theRiemann->primR[URR];
+  double mpR = theRiemann->primR[RHO]*theRiemann->primR[UPP]*r;
+  double mzR = theRiemann->primR[RHO]*theRiemann->primR[UZZ];
+
+
+  double mr = ( aR*mrL + aL*mrR + FmL[0] - FmR[0] )/( aL + aR );
+  double mp = ( aR*mpL + aL*mpR + FmL[1] - FmR[1] )/( aL + aR );
+  double mz = ( aR*mzL + aL*mzR + FmL[2] - FmR[2] )/( aL + aR );
+
+  double rho = ( aR*theRiemann->primL[RHO] + aL*theRiemann->primR[RHO] + mnL - mnR )/( aL + aR );
+
+  double rhoL = theRiemann->primL[RHO]; 
+  double rhoR = theRiemann->primR[RHO]; 
+  double PL = theRiemann->primL[PPP]; 
+  double PR = theRiemann->primR[PPP];
+
+  L_Star = (rhoR*vnR*(L_Plus-vnR)-rhoL*vnL*(L_Mins-vnL)+PL-PR)/(rhoR*(L_Plus-vnR)-rhoL*(L_Mins-vnL));
+
+  if (sim_runtype(theSim)==MHD){  
+    double Br = ( aR*theRiemann->primL[BRR] + aL*theRiemann->primR[BRR] + FL[0] - FR[0] )/( aL + aR );
+    double Bp = ( aR*theRiemann->primL[BPP] + aL*theRiemann->primR[BPP] + FL[1] - FR[1] )/( aL + aR );
+    double Bz = ( aR*theRiemann->primL[BZZ] + aL*theRiemann->primR[BZZ] + FL[2] - FR[2] )/( aL + aR );
+    double psi = ( aR*theRiemann->primL[PSI] + aL*theRiemann->primR[PSI] + pow(DIVB_CH,2.)*BnL - pow(DIVB_CH,2.)*BnR )/( aL + aR );
+    Bpack[0] = Br*theRiemann->n[0] + Bp*theRiemann->n[1] + Bz*theRiemann->n[2]; // Bn
+    Bpack[1] = Br;
+    Bpack[2] = Bp;
+    Bpack[3] = Bz;
+    Bpack[4] = (mr*Br + mp*Bp + mz*Bz)/rho; // v dot B
+    Bpack[5] = psi;
+
+    L_Star += ((.5*B2L-BnL*BnL)-.5*B2R+BnR*BnR)
+      /(theRiemann->primR[RHO]*(L_Plus-vnR)-theRiemann->primL[RHO]*(L_Mins-vnL));
+  }
+  theRiemann->Sl_minus_w_analytic = L_Mins;
+  theRiemann->Sr_minus_w_analytic = L_Plus;
+  theRiemann->Ss_minus_w_analytic = L_Star;
+
+}
+
 
 // Which state of the riemann problem are we in?
 void riemann_set_state(struct Riemann * theRiemann,double w ){
@@ -315,11 +445,6 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     F[LLL] += r*( .5*B2*theRiemann->n[1] - Bp*Bn );
     F[SZZ] +=     .5*B2*theRiemann->n[2] - Bz*Bn;
     F[TAU] += B2*vn - vB*Bn;
-    double psi = prim[PSI];
-    F[BRR] =(Br*vn_minus_w_analytic - vr*Bn + psi*theRiemann->n[0])/r;
-    F[BPP] =(Bp*vn_minus_w_analytic - vp_minus_w_analytic*Bn + psi*theRiemann->n[1])/r;
-    F[BZZ] = Bz*vn_minus_w_analytic - vz*Bn + psi*theRiemann->n[2];
-    F[PSI] = pow(DIVB_CH,2.)*Bn;
   }
 
   int q;
@@ -328,6 +453,44 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
   }
 
 }
+void riemann_set_flux_induction_and_psi_eqns(struct Riemann * theRiemann, struct Sim * theSim,double GAMMALAW,double DIVB_CH,int SetState){
+  double r = theRiemann->r;
+  double *prim;
+  double *F;
+  if (SetState==LEFT){
+    prim = theRiemann->primL;
+    F = theRiemann->FL;
+  }else if (SetState==RIGHT){
+    prim = theRiemann->primR;
+    F = theRiemann->FR;
+  } else{
+    printf("ERROR\n");
+    exit(0);
+  }
+
+  double rho = prim[RHO];
+  double vr  = prim[URR];
+  double vp  = prim[UPP]*r;
+  double vp_minus_w_analytic  = prim[UPP]*r-w_analytic(r);
+  double vz  = prim[UZZ];
+  double vn_minus_w_analytic =vr*theRiemann->n[0] + vp_minus_w_analytic*theRiemann->n[1] + vz*theRiemann->n[2];
+
+  if (sim_runtype(theSim)==MHD){ 
+    double Br  = prim[BRR];
+    double Bp  = prim[BPP];
+    double Bz  = prim[BZZ];
+    double Bn = Br*theRiemann->n[0] + Bp*theRiemann->n[1] + Bz*theRiemann->n[2];
+    double vB = vr*Br + vp*Bp + vz*Bz;
+    double B2 = Br*Br + Bp*Bp + Bz*Bz;
+
+    double psi = prim[PSI];
+    F[BRR] =(Br*vn_minus_w_analytic - vr*Bn + psi*theRiemann->n[0])/r;
+    F[BPP] =(Bp*vn_minus_w_analytic - vp_minus_w_analytic*Bn + psi*theRiemann->n[1])/r;
+    F[BZZ] = Bz*vn_minus_w_analytic - vz*Bn + psi*theRiemann->n[2];
+    F[PSI] = pow(DIVB_CH,2.)*Bn;
+  }
+}
+
 
 void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   double nu = sim_EXPLICIT_VISCOSITY(theSim);
@@ -449,10 +612,11 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     }
     Psi_face = 0.5*(theRiemann->primL[PSI]+theRiemann->primR[PSI]);
   }
-  double w;
+  double w,w_minus_w_analytic;
   if (theRiemann->n[PDIRECTION]){
     if( sim_MOVE_CELLS(theSim) == C_WRIEMANN ) cell_add_wiph(theRiemann->cL,theRiemann->Ss);
     w = cell_wiph(theRiemann->cL);
+    w_minus_w_analytic = cell_wiph(theRiemann->cL)-w_analytic(theRiemann->r) ;
   } else{
     w = 0.0;
   }
@@ -462,6 +626,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
 
   if (theRiemann->state==LEFT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);//in this case, we only need FL
+    riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);
     cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
     int q;
     for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
@@ -474,6 +639,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     }
   } else if (theRiemann->state==RIGHT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);//in this case, we only need FR
+    riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);
     cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
     int q;
     for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
@@ -487,17 +653,21 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   } else{
     if (sim_Riemann(theSim)==HLL){
       riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);  //we need both
+      riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);  
       riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);    
+      riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);    
       cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);//we need both
       cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
       riemann_set_star_hll(theRiemann,theSim);// get Ustar and Fstar
     } else if (sim_Riemann(theSim)==HLLC){
       if (theRiemann->state==LEFTSTAR){
         riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);//in this case, we only need FL
+        riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);
         cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
         riemann_set_star_hllc(theRiemann,theSim,Bpack,GAMMALAW);// get Ustar and Fstar
       } else if (theRiemann->state==RIGHTSTAR){
         riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);//in this case, we only need FR      
+        riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);
         cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
         riemann_set_star_hllc(theRiemann,theSim,Bpack,GAMMALAW);// get Ustar and Fstar
       }
