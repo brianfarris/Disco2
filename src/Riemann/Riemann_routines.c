@@ -16,11 +16,13 @@
 // ********************************************************************************************
 
 double w_analytic(double r){
-  return(pow(r,-0.5));
+  //return(pow(r,-0.5));
+  return(10.0*r);
 }
 
 double dw_dr_analytic(double r){
-  return(-0.5*pow(r,-1.5));
+  //return(-0.5*pow(r,-1.5));
+  return(10.0);
 }
 
 // this routine is only called by riemann_set_vel.
@@ -458,12 +460,22 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
       theRiemann->F[q] = theRiemann->FL[q] - w*theRiemann->UL[q];// w is only nonzero when we are in phi direction
     }
+    if (theRiemann->n[PDIRECTION]){
+      theRiemann->F[BRR] += w_analytic(theRiemann->r)*theRiemann->UL[BRR];
+      theRiemann->F[BPP] += w_analytic(theRiemann->r)*theRiemann->UL[BPP];
+      theRiemann->F[BZZ] += w_analytic(theRiemann->r)*theRiemann->UL[BZZ];
+    }
   } else if (theRiemann->state==RIGHT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);//in this case, we only need FR
     cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
     int q;
     for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
       theRiemann->F[q] = theRiemann->FR[q] - w*theRiemann->UR[q];// w is only nonzero when we are in phi direction
+    }
+    if (theRiemann->n[PDIRECTION]){
+      theRiemann->F[BRR] += w_analytic(theRiemann->r)*theRiemann->UR[BRR];
+      theRiemann->F[BPP] += w_analytic(theRiemann->r)*theRiemann->UR[BPP];
+      theRiemann->F[BZZ] += w_analytic(theRiemann->r)*theRiemann->UR[BZZ];
     }
   } else{
     if (sim_Riemann(theSim)==HLL){
@@ -489,6 +501,11 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     int q;
     for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
       theRiemann->F[q] = theRiemann->Fstar[q] - w*theRiemann->Ustar[q];// w is only nonzero when we are in phi direction
+    }
+    if (theRiemann->n[PDIRECTION]){
+      theRiemann->F[BRR] += w_analytic(theRiemann->r)*theRiemann->Ustar[BRR];
+      theRiemann->F[BPP] += w_analytic(theRiemann->r)*theRiemann->Ustar[BPP];
+      theRiemann->F[BZZ] += w_analytic(theRiemann->r)*theRiemann->Ustar[BZZ];
     }
   }
 
