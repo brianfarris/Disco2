@@ -17,12 +17,12 @@
 
 double w_analytic(double r){
   //return(pow(r,-0.5));
-  return(10.0*r);
+  return(20.0*r);
 }
 
 double dw_dr_analytic(double r){
   //return(-0.5*pow(r,-1.5));
-  return(10.0);
+  return(20.0);
 }
 
 // this routine is only called by riemann_set_vel.
@@ -75,7 +75,10 @@ void LR_speed_mhd(double *prim,double r,int * n,double ch, double * p_cf2,double
   Fm[1] +=  .5*B2*n[1] - Bp*Bn;
   Fm[2] +=  .5*B2*n[2] - Bz*Bn;
 
-  *p_cf2 = .5*( *p_cf2 + B2/rho + sqrt(fabs(  (*p_cf2+B2/rho)*(*p_cf2+B2/rho) - 4.0*(*p_cf2)*Bn*Bn/rho )) );
+
+  double c2_mag = *p_cf2 + B2/rho;
+
+  *p_cf2 = .5*( c2_mag + sqrt(fabs(  c2_mag*c2_mag - 4.0*(*p_cf2)*Bn*Bn/rho )) );
 
   *p_Bn = Bn;
   *p_B2 = B2;
@@ -85,23 +88,23 @@ void LR_speed_mhd(double *prim,double r,int * n,double ch, double * p_cf2,double
 void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,double *Bpack,double GAMMALAW,double DIVB_CH){
   double L_Mins, L_Plus, L_Star;
 
-  double vnL,cf21,mnL,BnL,B2L;
+  double vnL,cf2L,mnL,BnL,B2L;
   double FL[3], FmL[3];
-  LR_speed(theRiemann->primL,r,theRiemann->n,GAMMALAW,&vnL,&cf21,FmL,&mnL);
+  LR_speed(theRiemann->primL,r,theRiemann->n,GAMMALAW,&vnL,&cf2L,FmL,&mnL);
   if (sim_runtype(theSim)==MHD){
-    LR_speed_mhd(theRiemann->primL,r,theRiemann->n,DIVB_CH,&cf21,FL,FmL,&BnL,&B2L);
+    LR_speed_mhd(theRiemann->primL,r,theRiemann->n,DIVB_CH,&cf2L,FL,FmL,&BnL,&B2L);
   }
-  L_Mins = vnL - sqrt( cf21 );
-  L_Plus = vnL + sqrt( cf21 );
+  L_Mins = vnL - sqrt( cf2L );
+  L_Plus = vnL + sqrt( cf2L );
 
-  double vnR,cf22,mnR,BnR,B2R;
+  double vnR,cf2R,mnR,BnR,B2R;
   double FR[3],FmR[3];
-  LR_speed(theRiemann->primR,r,theRiemann->n,GAMMALAW,&vnR,&cf22,FmR,&mnR);
+  LR_speed(theRiemann->primR,r,theRiemann->n,GAMMALAW,&vnR,&cf2R,FmR,&mnR);
   if (sim_runtype(theSim)==MHD){
-    LR_speed_mhd(theRiemann->primR,r,theRiemann->n,DIVB_CH,&cf22,FR,FmR,&BnR,&B2R);
+    LR_speed_mhd(theRiemann->primR,r,theRiemann->n,DIVB_CH,&cf2R,FR,FmR,&BnR,&B2R);
   }
-  if( L_Mins > vnR - sqrt( cf22 ) ) L_Mins = vnR - sqrt( cf22 );
-  if( L_Plus < vnR + sqrt( cf22 ) ) L_Plus = vnR + sqrt( cf22 );
+  if( L_Mins > vnR - sqrt( cf2R ) ) L_Mins = vnR - sqrt( cf2R );
+  if( L_Plus < vnR + sqrt( cf2R ) ) L_Plus = vnR + sqrt( cf2R );
   
   if (sim_runtype(theSim)==MHD){
     if( L_Mins > -DIVB_CH ) L_Mins = -DIVB_CH;
@@ -126,8 +129,12 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
 
   double rho = ( aR*theRiemann->primL[RHO] + aL*theRiemann->primR[RHO] + mnL - mnR )/( aL + aR );
 
-  L_Star = (theRiemann->primR[RHO]*vnR*(L_Plus-vnR)-theRiemann->primL[RHO]*vnL*(L_Mins-vnL)+theRiemann->primL[PPP]-theRiemann->primR[PPP])
-    /(theRiemann->primR[RHO]*(L_Plus-vnR)-theRiemann->primL[RHO]*(L_Mins-vnL));
+  double rhoL = theRiemann->primL[RHO]; 
+  double rhoR = theRiemann->primR[RHO]; 
+  double PL = theRiemann->primL[PPP]; 
+  double PR = theRiemann->primR[PPP];
+
+  L_Star = (rhoR*vnR*(L_Plus-vnR)-rhoL*vnL*(L_Mins-vnL)+PL-PR)/(rhoR*(L_Plus-vnR)-rhoL*(L_Mins-vnL));
 
   if (sim_runtype(theSim)==MHD){  
     double Br = ( aR*theRiemann->primL[BRR] + aL*theRiemann->primR[BRR] + FL[0] - FR[0] )/( aL + aR );
@@ -215,7 +222,7 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
   double Msp   = ( Sk - vn )*mp / ( Sk - Ss );
   double Msz   = ( Sk - vn )*mz / ( Sk - Ss );
   double Estar = ( ( Sk - vn )*E_hydro + Ps*Ss - Pp*vn ) / ( Sk - Ss );
-  
+
   if (sim_runtype(theSim)==MHD){
     double Bsn = Bpack[0];
     double Bsr = Bpack[1];
@@ -383,7 +390,7 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
   dpR = dpR;
   theRiemann->r = face_r(theFaces,FaceNumber);
   theRiemann->dA = face_dA(theFaces,FaceNumber);
-  
+
 
   int q;
   for (q=0;q<NUM_Q;++q){
@@ -451,7 +458,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   }
   // which state of the riemann problem are we in?
   riemann_set_state(theRiemann,w);
-  
+
 
   if (theRiemann->state==LEFT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);//in this case, we only need FL
