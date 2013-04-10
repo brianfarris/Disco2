@@ -82,22 +82,22 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+0] = r;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+1] = phi;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+2] = rho;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+3] = rho*vr;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+4] = rho*vr*vp;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+5] = press;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+6] = 0.5*B2;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+7] = Br*Bp;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+3] = vr;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+4] = vp;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+5] = v2;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+6] = press;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+7] = 0.5*B2;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+8] = psi;
             ++position;
           }
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+0] += (r/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1] += (rho/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+2] += (rho*vr/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+3] += (rho*vr*vp/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+4] += (press/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+5] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+6] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+2] += (vr/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+3] += (vp/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+4] += (v2/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+5] += (press/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+6] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+7] += (psi/sim_N_p(theSim,i)*dz) ;
 
           // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
