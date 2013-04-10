@@ -302,6 +302,15 @@ void riemann_set_state(struct Riemann * theRiemann,double w ){
   }
 }
 
+void riemann_set_star_hll_minus_w_analytic(struct Riemann * theRiemann,struct Sim * theSim){
+  double aL =  theRiemann->Sr_minus_w_analytic;
+  double aR = -theRiemann->Sl_minus_w_analytic;
+  int q;
+  for( q=0 ; q<sim_NUM_Q(theSim) ; ++q ){
+    theRiemann->Ustar[q] = ( aR*theRiemann->UL[q] + aL*theRiemann->UR[q] + theRiemann->FL[q] - theRiemann->FR[q] )/( aL + aR );
+    theRiemann->Fstar[q] = ( aL*theRiemann->FL[q] + aR*theRiemann->FR[q] + aL*aR*( theRiemann->UL[q] - theRiemann->UR[q] ) )/( aL + aR );
+  }
+}
 void riemann_set_star_hll(struct Riemann * theRiemann,struct Sim * theSim){
   double aL =  theRiemann->Sr;
   double aR = -theRiemann->Sl;
@@ -695,7 +704,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
       riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);    
       cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);//we need both
       cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
-      riemann_set_star_hll(theRiemann,theSim);// get Ustar and Fstar
+      riemann_set_star_hll_minus_w_analytic(theRiemann,theSim);// get Ustar and Fstar
     } else if (sim_Riemann(theSim)==HLLC){
       if (theRiemann->state==LEFTSTAR){
         riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);
