@@ -421,10 +421,8 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
   double Pp  = prim[PPP];
   double vr  = prim[URR];
   double vp  = prim[UPP]*r;
-  double vp_minus_w_analytic  = prim[UPP]*r-w_analytic(r);
   double vz  = prim[UZZ];
   double vn = vr*theRiemann->n[0] + vp*theRiemann->n[1] + vz*theRiemann->n[2];
-  double vn_minus_w_analytic =vr*theRiemann->n[0] + vp_minus_w_analytic*theRiemann->n[1] + vz*theRiemann->n[2];
   double rhoe = Pp/(GAMMALAW-1.);
   double v2 = vr*vr + vp*vp + vz*vz;
   F[DDD] = rho*vn;
