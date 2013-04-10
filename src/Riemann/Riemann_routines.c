@@ -383,10 +383,6 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
     Msz   += ( Bz*Bn - Bsz*Bsn ) / ( Sk - Ss );
     Estar += ( ( Sk - vn )*.5*B2 + (Ps_mag+.5*Bs2)*Ss - .5*B2*vn - vBs*Bsn + vB*Bn ) / ( Sk - Ss );
 
-    theRiemann->Ustar[BRR] = Bsr/r;
-    theRiemann->Ustar[BPP] = Bsp/r;
-    theRiemann->Ustar[BZZ] = Bsz;
-    theRiemann->Ustar[PSI] = psi;
   }
   double mn  = Msr*theRiemann->n[0] + Msp*theRiemann->n[1] + Msz*theRiemann->n[2];
 
@@ -406,10 +402,101 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
   }
 
   //Now set Fstar
-  for (q=0;q<sim_NUM_Q(theSim);++q){
+  for (q=0;q<5;++q){
     theRiemann->Fstar[q] = Fk[q] + Sk*( theRiemann->Ustar[q] - Uk[q] ) ;
   }
 }
+
+void riemann_set_star_hllc_minus_w_analytic(struct Riemann * theRiemann,struct Sim * theSim,double *Bpack,double GAMMALAW){
+  double r = theRiemann->r;
+  double *prim;
+  double Sk;
+  double *Uk;
+  double *Fk;
+  if (theRiemann->state==LEFTSTAR){
+    prim = theRiemann->primL;
+    Sk = theRiemann->Sl_minus_w_analytic;
+    Uk = theRiemann->UL;
+    Fk = theRiemann->FL;
+  }else{
+    prim = theRiemann->primR;
+    Sk = theRiemann->Sr_minus_w_analytic;
+    Uk = theRiemann->UR;
+    Fk = theRiemann->FR;
+  }
+  double Ss=theRiemann->Ss_minus_w_analytic;
+
+  double rho = prim[RHO];
+  double vr  = prim[URR];
+  double vp  = prim[UPP]*r-w_analytic(r);
+  double vz  = prim[UZZ];
+  double Pp  = prim[PPP];
+  double v2 = vr*vr+vp*vp+vz*vz;
+  double vn = vr*theRiemann->n[0] + vp*theRiemann->n[1] + vz*theRiemann->n[2];
+  double rhoe = Pp/(GAMMALAW-1.);
+  double D  = rho;
+  double mr = rho*vr;
+  double mp = rho*vp;
+  double mz = rho*vz;
+  double E_hydro  = .5*rho*v2 + rhoe;
+  double Ps  = rho*( Sk - vn )*( Ss - vn ) + Pp;
+  double Dstar = ( Sk - vn )*D/( Sk - Ss );
+  double Msn = Dstar*Ss;
+  double Msr   = ( Sk - vn )*mr / ( Sk - Ss );
+  double Msp   = ( Sk - vn )*mp / ( Sk - Ss );
+  double Msz   = ( Sk - vn )*mz / ( Sk - Ss );
+  double Estar = ( ( Sk - vn )*E_hydro + Ps*Ss - Pp*vn ) / ( Sk - Ss );
+
+  if (sim_runtype(theSim)==MHD){
+    double Bsn = Bpack[0];
+    double Bsr = Bpack[1];
+    double Bsp = Bpack[2];
+    double Bsz = Bpack[3];
+    double vBs = Bpack[4];
+    double psi = Bpack[5];
+
+    double Br  = prim[BRR];
+    double Bp  = prim[BPP];
+    double Bz  = prim[BZZ];
+    double B2 = Br*Br+Bp*Bp+Bz*Bz;
+    double Bn = Br*theRiemann->n[0] + Bp*theRiemann->n[1] + Bz*theRiemann->n[2];
+    double vB = vr*Br   + vp*Bp   + vz*Bz;
+    double Bs2 = Bsr*Bsr+Bsp*Bsp+Bsz*Bsz;
+    double Ps_mag = (.5*B2-Bn*Bn) - .5*Bs2 + Bsn*Bsn;
+    Msr   += ( Br*Bn - Bsr*Bsn ) / ( Sk - Ss );
+    Msp   += ( Bp*Bn - Bsp*Bsn ) / ( Sk - Ss );
+    Msz   += ( Bz*Bn - Bsz*Bsn ) / ( Sk - Ss );
+    Estar += ( ( Sk - vn )*.5*B2 + (Ps_mag+.5*Bs2)*Ss - .5*B2*vn - vBs*Bsn + vB*Bn ) / ( Sk - Ss );
+
+    theRiemann->Ustar[BRR] = Bsr/r;
+    theRiemann->Ustar[BPP] = Bsp/r;
+    theRiemann->Ustar[BZZ] = Bsz;
+    theRiemann->Ustar[PSI] = psi;
+  }
+  double mn  = Msr*theRiemann->n[0] + Msp*theRiemann->n[1] + Msz*theRiemann->n[2];
+
+  Msr += theRiemann->n[0]*( Msn - mn );
+  Msp += theRiemann->n[1]*( Msn - mn );
+  Msz += theRiemann->n[2]*( Msn - mn );
+
+  /*
+     theRiemann->Ustar[DDD] = Dstar;
+     theRiemann->Ustar[SRR] = Msr;
+     theRiemann->Ustar[LLL] = r*Msp;
+     theRiemann->Ustar[SZZ] = Msz;
+     theRiemann->Ustar[TAU] = Estar;
+     */
+  int q;
+  for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q ){
+    theRiemann->Ustar[q] = prim[q]*theRiemann->Ustar[DDD];
+  }
+
+  //Now set Fstar
+  for (q=5;q<sim_NUM_Q(theSim);++q){
+    theRiemann->Fstar[q] = Fk[q] + Sk*( theRiemann->Ustar[q] - Uk[q] ) ;
+  }
+}
+
 
 void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GAMMALAW,double DIVB_CH,int SetState){
   double r = theRiemann->r;
@@ -709,11 +796,11 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
       if (theRiemann->state==LEFTSTAR){
         riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);
         cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
-        riemann_set_star_hllc(theRiemann,theSim,Bpack,GAMMALAW);// get Ustar and Fstar
+        riemann_set_star_hllc_minus_w_analytic(theRiemann,theSim,Bpack,GAMMALAW);// get Ustar and Fstar
       } else if (theRiemann->state==RIGHTSTAR){
         riemann_set_flux_induction_and_psi_eqns( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);
         cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
-        riemann_set_star_hllc(theRiemann,theSim,Bpack,GAMMALAW);// get Ustar and Fstar
+        riemann_set_star_hllc_minus_w_analytic(theRiemann,theSim,Bpack,GAMMALAW);// get Ustar and Fstar
       }
     } else{
       printf("ERROR\n");
