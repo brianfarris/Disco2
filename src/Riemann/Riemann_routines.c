@@ -306,7 +306,7 @@ void riemann_set_star_hll_minus_w_analytic(struct Riemann * theRiemann,struct Si
   double aL =  theRiemann->Sr_minus_w_analytic;
   double aR = -theRiemann->Sl_minus_w_analytic;
   int q;
-  for( q=0 ; q<sim_NUM_Q(theSim) ; ++q ){
+  for( q=5 ; q<sim_NUM_Q(theSim) ; ++q ){
     theRiemann->Ustar[q] = ( aR*theRiemann->UL[q] + aL*theRiemann->UR[q] + theRiemann->FL[q] - theRiemann->FR[q] )/( aL + aR );
     theRiemann->Fstar[q] = ( aL*theRiemann->FL[q] + aR*theRiemann->FR[q] + aL*aR*( theRiemann->UL[q] - theRiemann->UR[q] ) )/( aL + aR );
   }
@@ -315,7 +315,7 @@ void riemann_set_star_hll(struct Riemann * theRiemann,struct Sim * theSim){
   double aL =  theRiemann->Sr;
   double aR = -theRiemann->Sl;
   int q;
-  for( q=0 ; q<sim_NUM_Q(theSim) ; ++q ){
+  for( q=0 ; q<5 ; ++q ){
     theRiemann->Ustar[q] = ( aR*theRiemann->UL[q] + aL*theRiemann->UR[q] + theRiemann->FL[q] - theRiemann->FR[q] )/( aL + aR );
     theRiemann->Fstar[q] = ( aL*theRiemann->FL[q] + aR*theRiemann->FR[q] + aL*aR*( theRiemann->UL[q] - theRiemann->UR[q] ) )/( aL + aR );
   }
