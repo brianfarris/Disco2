@@ -124,7 +124,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
           double vdotB = vr*Br+vp*Bp+vz*Bz;
           double BdotGradPsi = /*dV**/(Br*GradPsi[0]+Bp*GradPsi[1]+Bz*GradPsi[2]);
-          double vdotGradPsi = /*dV**/(vr*GradPsi[0]+vp*GradPsi[1]+vz*GradPsi[2]);
+          double vdotGradPsi = /*dV**/(vr*GradPsi[0]+(vp-w_analytic(r))*GradPsi[1]+vz*GradPsi[2]);
 
           /*
              if (fabs(z)<0.00001){
@@ -141,7 +141,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           //cons[BRR] += dt*dV*( psi )/r;
           //cons[PSI] -= dt*dV*psi*DIVB_CH/DIVB_L;//DIVB_CH2/DIVB_CP2;
           c->cons[BRR] -= POWELL*dt*divB*vr/r;
-          c->cons[BPP] -= POWELL*dt*divB*vp/r;
+          c->cons[BPP] -= POWELL*dt*divB*(vp-w_analytic(r))/r;
           c->cons[BZZ] -= POWELL*dt*divB*vz;
           c->cons[PSI] -= POWELL*dt*vdotGradPsi;
 

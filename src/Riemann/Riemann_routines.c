@@ -17,12 +17,14 @@
 
 double w_analytic(double r){
   //return(pow(r,-0.5));
-  return(OMEGA_FIELDLOOP*r);
+  //return(OMEGA_FIELDLOOP*r);
+  return(0.0);
 }
 
 double dw_dr_analytic(double r){
   //return(-0.5*pow(r,-1.5));
-  return(OMEGA_FIELDLOOP);
+  //return(OMEGA_FIELDLOOP);
+  return(0.0);
 }
 
 // this routine is only called by riemann_set_vel.

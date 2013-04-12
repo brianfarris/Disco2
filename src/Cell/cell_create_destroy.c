@@ -64,8 +64,8 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
   srand(666+mpisetup_MyProc(theMPIsetup));
   for(k = 0; k < sim_N(theSim,Z_DIR); k++){
     for(i = 0; i < sim_N(theSim,R_DIR); i++){
-      //double tiph_0 = 0.0;
-      double tiph_0 = 2.*M_PI*(double)rand()/(double)RAND_MAX;
+      double tiph_0 = 0.0;
+      //double tiph_0 = 2.*M_PI*(double)rand()/(double)RAND_MAX;
       double dphi = 2.*M_PI/(double)sim_N_p(theSim,i);
       for(j = 0; j < sim_N_p(theSim,i); j++){
         double tiph = tiph_0 + (double)j*dphi;
