@@ -16,12 +16,16 @@
 // ********************************************************************************************
 
 double w_analytic(double r){
+  //keplerian option
   return(pow(r,-0.5));
+  //uniform rotation option
   //return(OMEGA_FIELDLOOP*r);
 }
 
 double dOm_dr_analytic(double r){
+  // keplerian option
   return(-1.5*pow(r,-2.5));
+  //uniform rotation option
   //return(0.0);
 }
 
