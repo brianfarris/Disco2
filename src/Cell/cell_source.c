@@ -9,7 +9,7 @@
 #include "../Headers/header.h"
 
 double w_analytic(double);
-double dw_dr_analytic(double);
+double dOm_dr_analytic(double);
 
 double fgrav( double M , double r , double eps, double n ){
   return( M*pow(r,n-1.)/pow( pow(r,n) + pow(eps,n) ,1.+1./n) );
