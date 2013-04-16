@@ -38,10 +38,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_clear_divB(theCells,theSim);
   cell_clear_GradPsi(theCells,theSim);
 
-  double r0 = sim_FacePos(theSim,0,R_DIR);
-  double r1 = sim_FacePos(theSim,1,R_DIR);
-  double r2 = sim_FacePos(theSim,2,R_DIR);
-
   int i,j,k,q;
   //Phi Flux
   cell_plm_p(theCells,theSim);//piecewise-linear reconstruction
@@ -50,11 +46,12 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem 
         riemann_setup_p(theRiemann,theCells,theSim,i,j,k,PDIRECTION); // set various quantities in theRiemann
-        if( sim_MOVE_CELLS(theSim) == C_WRIEMANN ) cell_add_wiph(theRiemann->cL,theRiemann->Ss);
         riemann_set_B_Psi_face(theRiemann,theSim);
-        riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS
+        //riemann_AddFlux(theRiemann,theSim); // solve Riemann problem and update RHS
+        riemann_compute_flux(theRiemann,theSim,0); //solve riemann problem for continuity, momentum, and energy eqns
+        riemann_compute_flux(theRiemann,theSim,1); //solve riamann problem for induction equation
         riemann_visc_flux(theRiemann,theSim);
-        riemann_add_to_cells(theRiemann,theSim);
+        riemann_add_to_cells(theRiemann,theSim,dt);
         riemann_destroy(theRiemann); // clean up
       }
     }
@@ -68,9 +65,11 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     struct Riemann * theRiemann = riemann_create(theSim); //struct to contain everything we need to solve Riemann problem
     riemann_setup_rz(theRiemann,theFaces_r,theSim,n,RDIRECTION);  //set various quantities in theRiemann
     riemann_set_B_Psi_face(theRiemann,theSim);
-    riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS
+    //riemann_AddFlux(theRiemann,theSim); // solve Riemann problem and update RHS
+    riemann_compute_flux(theRiemann,theSim,0); //solve riemann problem for continuity, momentum, and energy eqns
+    riemann_compute_flux(theRiemann,theSim,1); //solve riamann problem for induction equation
     riemann_visc_flux(theRiemann,theSim);
-    riemann_add_to_cells(theRiemann,theSim);
+    riemann_add_to_cells(theRiemann,theSim,dt);
     riemann_destroy(theRiemann); // clean up
   }
 
@@ -81,9 +80,11 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem
       riemann_setup_rz(theRiemann,theFaces_z,theSim,n,ZDIRECTION); // set various quantities in theRiemann
       riemann_set_B_Psi_face(theRiemann,theSim);
-      riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS 
+      //riemann_AddFlux(theRiemann,theSim); // solve Riemann problem and update RHS 
+      riemann_compute_flux(theRiemann,theSim,0); //solve riemann problem for continuity, momentum, and energy eqns
+      riemann_compute_flux(theRiemann,theSim,1); //solve riamann problem for induction equation
       riemann_visc_flux(theRiemann,theSim);
-      riemann_add_to_cells(theRiemann,theSim);
+      riemann_add_to_cells(theRiemann,theSim,dt);
       riemann_destroy(theRiemann); // clean up
     }
   }

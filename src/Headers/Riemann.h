@@ -40,7 +40,8 @@ void riemann_destroy(struct Riemann *);
 void riemann_setup_rz(struct Riemann *,struct Face * , struct Sim *,int,int );
 void riemann_setup_p(struct Riemann * ,struct Cell *** ,struct Sim * ,int ,int ,int,int );
 void riemann_set_B_Psi_face(struct Riemann * ,struct Sim *);
-void riemann_AddFlux(struct Riemann *, struct Sim *,double);
+//void riemann_AddFlux(struct Riemann *, struct Sim *);
+void riemann_compute_flux(struct Riemann * ,struct Sim * ,int );
 void riemann_visc_flux(struct Riemann * ,struct Sim * );
-void riemann_add_to_cells(struct Riemann * ,struct Sim * );
+void riemann_add_to_cells(struct Riemann * ,struct Sim *,double );
 #endif
