@@ -42,6 +42,8 @@ void cell_init_psigrad(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_psigrad(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_torus(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_torus(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_mhdexp(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_mhdexp(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
