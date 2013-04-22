@@ -16,6 +16,9 @@ double cell_W_A(struct Sim * theSim,double r){
   } else if (sim_W_A_TYPE(theSim)==A_KEPLER){
     //keplerian rotation
     return(pow(r,-1.5));
+  } else{
+    printf("ERROR\n");
+    exit(0);
   }
 }
 
@@ -29,6 +32,9 @@ double cell_OM_A_DERIV(struct Sim * theSim,double r){
   } else if (sim_W_A_TYPE(theSim)==A_KEPLER){
     //keplerian rotation
     return(-1.5*pow(r,-2.5));
+  } else{
+    printf("ERROR\n");
+    exit(0);
   }
 }
 
