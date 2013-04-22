@@ -25,6 +25,8 @@ struct Riemann {
   double Ss;
   int state;
   int n[3];
+  double Bk_face;
+  double Psi_face;
 };
 #endif
 
@@ -35,4 +37,5 @@ void riemann_destroy(struct Riemann *);
 void riemann_setup_rz(struct Riemann *,struct Face * , struct Sim *,int,int );
 void riemann_setup_p(struct Riemann * ,struct Cell *** ,struct Sim * ,int ,int ,int,int );
 void riemann_AddFlux(struct Riemann *, struct Sim *,double);
+void riemann_add_to_cells(struct Riemann * ,struct Sim *,double );
 #endif

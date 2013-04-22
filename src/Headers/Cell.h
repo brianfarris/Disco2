@@ -94,4 +94,7 @@ void cell_adjust_RK_cons( struct Cell *** , struct Sim * , double );
 void cell_set_prim(struct Cell ***,int,int,int,int,double);//this will morph into a checkpoint restart routine
 void cell_set_tiph(struct Cell ***,int,int,int,double);//this will morph into a checkpoint restart routine
 void cell_print(struct Cell *** ,int ,int ,int );
+//w analytic
+double cell_W_A(struct Sim * ,double);
+double cell_OM_A_DERIV(struct Sim * ,double);
 #endif

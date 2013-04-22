@@ -83,6 +83,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "CFL"               , VAR_DOUB , &(theSim->CFL)  );
       err += readvar( pfile , "PLM"               , VAR_DOUB , &(theSim->PLM)  );
       err += readvar( pfile , "POWELL"               , VAR_INT , &(theSim->POWELL)  );
+      err += readvar( pfile , "w_a_type"               , VAR_INT , &(theSim->W_A_TYPE)  );
       err += readvar( pfile , "Grav_2D"            , VAR_INT  , &(theSim->GRAV2D)  );
       err += readvar( pfile , "G_EPS"             , VAR_DOUB , &(theSim->G_EPS)  );
       err += readvar( pfile , "PHI_ORDER"             , VAR_DOUB , &(theSim->PHI_ORDER)  );

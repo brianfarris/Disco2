@@ -51,6 +51,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
         struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem 
         riemann_setup_p(theRiemann,theCells,theSim,i,j,k,PDIRECTION); // set various quantities in theRiemann
         riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS
+        riemann_add_to_cells(theRiemann,theSim,dt);
         riemann_destroy(theRiemann); // clean up
       }
     }
@@ -64,6 +65,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     struct Riemann * theRiemann = riemann_create(theSim); //struct to contain everything we need to solve Riemann problem
     riemann_setup_rz(theRiemann,theFaces_r,theSim,n,RDIRECTION);  //set various quantities in theRiemann
     riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS
+    riemann_add_to_cells(theRiemann,theSim,dt);
     riemann_destroy(theRiemann); // clean up
   }
 
@@ -74,6 +76,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem
       riemann_setup_rz(theRiemann,theFaces_z,theSim,n,ZDIRECTION); // set various quantities in theRiemann
       riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS 
+      riemann_add_to_cells(theRiemann,theSim,dt);
       riemann_destroy(theRiemann); // clean up
     }
   }

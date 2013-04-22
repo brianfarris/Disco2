@@ -47,6 +47,7 @@ struct Sim {
   double CFL;
   double PLM;
   int POWELL;
+  int W_A_TYPE;
   int GRAV2D;
   double G_EPS;
   double PHI_ORDER;
@@ -99,6 +100,7 @@ double sim_DIVB_L(struct Sim *);
 double sim_CFL(struct Sim *);
 double sim_PLM(struct Sim *);
 int sim_POWELL(struct Sim *);
+int sim_W_A_TYPE(struct Sim *);
 int sim_GRAV2D(struct Sim *);
 double sim_G_EPS(struct Sim *);
 double sim_PHI_ORDER(struct Sim *);
