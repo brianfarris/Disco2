@@ -1,0 +1,95 @@
+#define CELL_PRIVATE_DEFS
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include "../Headers/Cell.h"
+#include "../Headers/Sim.h"
+#include "../Headers/Face.h"
+#include "../Headers/GravMass.h"
+#include "../Headers/header.h"
+
+void cell_single_init_milos_macfadyen(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
+  printf("ERROR. cell_single_init_shear isnt set up right now\n");
+  exit(0);
+}
+
+void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
+  double rs = 10.0;
+
+  double rho0   = 1.0;
+  double Mach   = 10.0;
+
+  double delta_exp   = 3.0;
+  double xi_exp = 2.0;
+
+  double Gam = sim_GAMMALAW(theSim);
+  double r_planet = 0.5;
+  double mbh1 = 0.5;
+  double mbh2 = 0.5;
+  double eps = sim_G_EPS(theSim)*r_planet;
+  double cp = 1./Mach;
+  double fac = 0.0001;
+
+  double DISK_ALPHA = 0.01;
+
+  int i, j,k;
+  for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
+    for (i = 0; i < sim_N(theSim,R_DIR); i++) {
+      double rm = sim_FacePos(theSim,i-1,R_DIR);
+      double rp = sim_FacePos(theSim,i,R_DIR);
+      double r = 0.5*(rm+rp);
+
+      double cs;
+      if (r<1.){
+        cs = 1./Mach;
+      }else{
+        cs = sqrt(1./r)/Mach;
+      }
+      double xbh1 = r_planet;
+      double xbh2 = -r_planet;
+      double ybh1 = 0.0;
+      double ybh2 = 0.0;
+
+      for (j = 0; j < sim_N_p(theSim,i); j++) {
+
+        double phi = theCells[k][i][j].tiph - 0.5*theCells[k][i][j].dphi;
+        double xpos = r*cos(phi);
+        double ypos = r*sin(phi);
+
+        double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
+        double dist_bh2 = sqrt((xpos-xbh2)*(xpos-xbh2)+(ypos-ybh2)*(ypos-ybh2));
+
+        double n = sim_PHI_ORDER(theSim);
+        double Pot1 = mbh1/pow( pow(dist_bh1,n) + pow(eps,n) , 1./n );
+        double Pot2 = mbh2/pow( pow(dist_bh2,n) + pow(eps,n) , 1./n );
+
+        double rho = rho0*( pow(rs/r,delta_exp) )*exp(-pow(rs/r,xi_exp) );
+        double omega = sqrt(1.)/pow(r,1.5);
+        omega *= 1.+3./16./r/r;
+        double O2 = omega*omega + cs*cs/r/r*( 2.*rs*rs/r/r - 3. );
+        double vr;
+        if (r<1.){
+          omega = sqrt(O2)*pow(r,2.);
+          vr = (-3.0*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(1./rs,-xi_exp)))*pow(r,2.);
+        }else{
+          omega = sqrt(O2);
+          vr = -3.0/sqrt(r)*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(r/rs,-xi_exp));
+        }
+        if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
+        double Pp = cs*cs*rho/Gam;
+
+        theCells[k][i][j].prim[RHO] = rho*exp(fac*(Pot1+Pot2)/cp/cp);
+        theCells[k][i][j].prim[PPP] = Pp*exp(fac*(Pot1+Pot2)/cp/cp);
+        theCells[k][i][j].prim[URR] = vr;
+        theCells[k][i][j].prim[UPP] = omega;
+        theCells[k][i][j].prim[UZZ] = 0.0;
+        theCells[k][i][j].wiph = 0.0;
+        theCells[k][i][j].divB = 0.0;
+        theCells[k][i][j].GradPsi[0] = 0.0;
+        theCells[k][i][j].GradPsi[1] = 0.0;
+        theCells[k][i][j].GradPsi[2] = 0.0;
+      }
+    }
+  }
+
+}

@@ -18,6 +18,8 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_psigrad);
   } else if (sim_InitialDataType(theSim)==TORUS){
     return(&cell_init_torus);
+  } else if (sim_InitialDataType(theSim)==MILOS_MACFADYEN){
+    return(&cell_init_milos_macfadyen);
   } else{
     printf("ERROR\n");
     exit(0);
@@ -39,6 +41,8 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_psigrad);
   } else if (sim_InitialDataType(theSim)==TORUS){
     return(&cell_single_init_torus);
+  } else if (sim_InitialDataType(theSim)==MILOS_MACFADYEN){
+    return(&cell_single_init_milos_macfadyen);
   } else{
     printf("ERROR\n");
     exit(0);

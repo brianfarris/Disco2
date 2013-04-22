@@ -17,8 +17,8 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
       char DiagEquatFilename[256];
       char DiagVectorFilename[256];
       char DiagScalarFilename[256];
-      sprintf(DiagEquatFilename,"DiagEquat_%6.4f.h5",timestep_get_t(theTimeStep));
-      sprintf(DiagVectorFilename,"DiagVector_%6.4f.dat",timestep_get_t(theTimeStep));
+      sprintf(DiagEquatFilename,"DiagEquat_%7.5f.h5",timestep_get_t(theTimeStep));
+      sprintf(DiagVectorFilename,"DiagVector_%7.5f.dat",timestep_get_t(theTimeStep));
       sprintf(DiagScalarFilename,"DiagScalar.dat");
       FILE * DiagVectorFile = fopen(DiagVectorFilename,"w");
       FILE * DiagScalarFile = fopen(DiagScalarFilename,"a");
