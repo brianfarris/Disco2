@@ -15,4 +15,4 @@ enum{HLLC,HLL};
 MPI_Comm sim_comm;
 #define farris_mpi_factorization 0
 #define NO_W_IN_CFL 0
-#define OMEGA_FIELDLOOP 20.0
+#define OMEGA_FIELDLOOP 2.0

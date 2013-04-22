@@ -6,6 +6,8 @@
 #include "../Headers/Sim.h"
 #include "../Headers/header.h"
 
+double w_analytic(double);
+
 double maxvel(double * prim , double w , double r ,struct Sim * theSim){
 
   double Pp  = prim[PPP];
@@ -14,7 +16,7 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim){
   if (NO_W_IN_CFL==1){ 
     vp  = prim[UPP]*r;//-w;
   } else{
-    vp = prim[UPP]*r-w;
+    vp = prim[UPP]*r-w_analytic(r);
   }
   double vr  = prim[URR];
   double vz  = prim[UZZ];
