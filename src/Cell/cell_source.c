@@ -142,7 +142,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[BZZ] -= POWELL*dt*divB*vz;
           c->cons[PSI] -= POWELL*dt*vdotGradPsi;
 
-          printf("POWELL*dt*divB*(vp-cell_W_A(theSim,r))/r: %e, vp: %e, W_A: %e\n",POWELL*dt*divB*(vp-cell_W_A(theSim,r))/r,vp,cell_W_A(theSim,r));
+        //  printf("POWELL*dt*divB*(vp-cell_W_A(theSim,r))/r: %e, vp: %e, W_A: %e\n",POWELL*dt*divB*(vp-cell_W_A(theSim,r))/r,vp,cell_W_A(theSim,r));
 
           c->cons[BPP] += dt*dV*Br*cell_OM_A_DERIV(theSim,r);
         }
