@@ -288,9 +288,9 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
     FR[1] = vnR*BpR - BnR*vpR + psiR*theRiemann->n[1]+cell_W_A(theSim,r)*BnR;
     FR[2] = vnR*BzR - BnR*vzR + psiR*theRiemann->n[2];
 
-    Bsr = ( -theRiemann->Sl*BrL + theRiemann->Sr*BrR + FL[0] - FR[0] )/( theRiemann->Sr - theRiemann->Sl ); 
-    Bsp = ( -theRiemann->Sl*BpL + theRiemann->Sr*BpR + FL[1] - FR[1] )/( theRiemann->Sr - theRiemann->Sl ); 
-    Bsz = ( -theRiemann->Sl*BzL + theRiemann->Sr*BzR + FL[2] - FR[2] )/( theRiemann->Sr - theRiemann->Sl ); 
+    Bsr_alt = ( -theRiemann->Sl*BrL + theRiemann->Sr*BrR + FL[0] - FR[0] )/( theRiemann->Sr - theRiemann->Sl ); 
+    Bsp_alt = ( -theRiemann->Sl*BpL + theRiemann->Sr*BpR + FL[1] - FR[1] )/( theRiemann->Sr - theRiemann->Sl ); 
+    Bsz_alt = ( -theRiemann->Sl*BzL + theRiemann->Sr*BzR + FL[2] - FR[2] )/( theRiemann->Sr - theRiemann->Sl ); 
 
     double Br  = prim[BRR];
     double Bp  = prim[BPP];
@@ -305,9 +305,9 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
     Msz   += ( Bz*Bn - Bsz*Bsn ) / ( Sk - Ss );
     Estar += ( ( Sk - vn )*.5*B2 + (Ps_mag+.5*Bs2)*Ss - .5*B2*vn - vBs*Bsn + vB*Bn ) / ( Sk - Ss );
 
-    theRiemann->Ustar[BRR] = Bsr/r;
-    theRiemann->Ustar[BPP] = Bsp/r;
-    theRiemann->Ustar[BZZ] = Bsz;
+    theRiemann->Ustar[BRR] = Bsr_alt/r;
+    theRiemann->Ustar[BPP] = Bsp_alt/r;
+    theRiemann->Ustar[BZZ] = Bsz_alt;
     theRiemann->Ustar[PSI] = psi;
   }
   double mn  = Msr*theRiemann->n[0] + Msp*theRiemann->n[1] + Msz*theRiemann->n[2];
