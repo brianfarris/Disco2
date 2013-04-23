@@ -14,7 +14,8 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim){
   if (NO_W_IN_CFL==1){ 
     vp  = prim[UPP]*r;//-w;
   } else{
-    vp = prim[UPP]*r-w;
+    //vp = prim[UPP]*r-w;
+    vp = prim[UPP]*r-cell_W_A(theSim,r);
   }
   double vr  = prim[URR];
   double vz  = prim[UZZ];

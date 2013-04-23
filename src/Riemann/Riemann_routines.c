@@ -347,6 +347,7 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     double psi = prim[PSI];
     F[BRR] =(Br*vn - vr*Bn + psi*theRiemann->n[0])/r;
     F[BPP] =(Bp*vn - (vp-cell_W_A(theSim,r))*Bn + psi*theRiemann->n[1])/r;
+    //F[BPP] =(Bp*vn - vp*Bn + psi*theRiemann->n[1])/r;
     F[BZZ] = Bz*vn - vz*Bn + psi*theRiemann->n[2];
     F[PSI] = pow(DIVB_CH,2.)*Bn;
   }
