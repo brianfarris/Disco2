@@ -94,8 +94,8 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
   if( L_Plus < vnR + sqrt( cf22 ) ) L_Plus = vnR + sqrt( cf22 );
   
   if (sim_runtype(theSim)==MHD){
-    if( L_Mins > -DIVB_CH ) L_Mins = -DIVB_CH;
-    if( L_Plus <  DIVB_CH ) L_Plus =  DIVB_CH;
+    if( L_Mins-theRiemann->n[1]*10.0*r > -DIVB_CH ) L_Mins = -DIVB_CH+theRiemann->n[1]*10.0*r;
+    if( L_Plus-theRiemann->n[1]*10.0*r <  DIVB_CH ) L_Plus =  DIVB_CH+theRiemann->n[1]*10.0*r;
   }
 
   double aL = L_Plus;
@@ -217,8 +217,17 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
     Msz   += ( Bz*Bn - Bsz*Bsn ) / ( Sk - Ss );
     Estar += ( ( Sk - vn )*.5*B2 + (Ps_mag+.5*Bs2)*Ss - .5*B2*vn - vBs*Bsn + vB*Bn ) / ( Sk - Ss );
 
+    double BnL = theRiemann->primL[BRR]*theRiemann->n[0] 
+      + theRiemann->primL[BPP]*theRiemann->n[1] 
+      + theRiemann->primL[BZZ]*theRiemann->n[2];
+
+    double BnR = theRiemann->primR[BRR]*theRiemann->n[0] 
+      + theRiemann->primR[BPP]*theRiemann->n[1] 
+      + theRiemann->primR[BZZ]*theRiemann->n[2];
+
+
     theRiemann->Ustar[BRR] = Bsr/r;
-    theRiemann->Ustar[BPP] = Bsp/r;
+    theRiemann->Ustar[BPP] = (Bsp+10.*r*(BnL-BnR)/(theRiemann->Sr-theRiemann->Sl))/r;
     theRiemann->Ustar[BZZ] = Bsz;
     theRiemann->Ustar[PSI] = psi;
   }
@@ -288,7 +297,7 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     F[TAU] += B2*vn - vB*Bn;
     double psi = prim[PSI];
     F[BRR] =(Br*vn - vr*Bn + psi*theRiemann->n[0])/r;
-    F[BPP] =(Bp*vn - vp*Bn + psi*theRiemann->n[1])/r;
+    F[BPP] =(Bp*vn - vp*Bn + 10.0*r*Bn + psi*theRiemann->n[1])/r;
     F[BZZ] = Bz*vn - vz*Bn + psi*theRiemann->n[2];
     F[PSI] = pow(DIVB_CH,2.)*Bn;
   }
@@ -361,7 +370,7 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
   dpR = dpR;
   theRiemann->r = face_r(theFaces,FaceNumber);
   theRiemann->dA = face_dA(theFaces,FaceNumber);
-  
+
 
   int q;
   for (q=0;q<NUM_Q;++q){
@@ -429,7 +438,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   }
   // which state of the riemann problem are we in?
   riemann_set_state(theRiemann,w);
-  
+
 
   if (theRiemann->state==LEFT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);//in this case, we only need FL

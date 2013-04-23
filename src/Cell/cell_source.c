@@ -138,7 +138,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           //cons[BRR] += dt*dV*( psi )/r;
           //cons[PSI] -= dt*dV*psi*DIVB_CH/DIVB_L;//DIVB_CH2/DIVB_CP2;
           c->cons[BRR] -= POWELL*dt*divB*vr/r;
-          c->cons[BPP] -= POWELL*dt*divB*vp/r;
+          c->cons[BPP] -= POWELL*dt*divB*(vp-10.*r)/r;
           c->cons[BZZ] -= POWELL*dt*divB*vz;
           c->cons[PSI] -= POWELL*dt*vdotGradPsi;
         }
