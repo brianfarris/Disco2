@@ -288,9 +288,9 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
     FR[1] = vnR*BpR - BnR*vpR + psiR*theRiemann->n[1]+cell_W_A(theSim,r)*BnR;
     FR[2] = vnR*BzR - BnR*vzR + psiR*theRiemann->n[2];
 
-    Bsr_alt = ( -theRiemann->Sl*BrL + theRiemann->Sr*BrR + FL[0] - FR[0] )/( theRiemann->Sr - theRiemann->Sl ); 
-    Bsp_alt = ( -theRiemann->Sl*BpL + theRiemann->Sr*BpR + FL[1] - FR[1] )/( theRiemann->Sr - theRiemann->Sl ); 
-    Bsz_alt = ( -theRiemann->Sl*BzL + theRiemann->Sr*BzR + FL[2] - FR[2] )/( theRiemann->Sr - theRiemann->Sl ); 
+    double Bsr_alt = ( -theRiemann->Sl*BrL + theRiemann->Sr*BrR + FL[0] - FR[0] )/( theRiemann->Sr - theRiemann->Sl ); 
+    double Bsp_alt = ( -theRiemann->Sl*BpL + theRiemann->Sr*BpR + FL[1] - FR[1] )/( theRiemann->Sr - theRiemann->Sl ); 
+    double Bsz_alt = ( -theRiemann->Sl*BzL + theRiemann->Sr*BzR + FL[2] - FR[2] )/( theRiemann->Sr - theRiemann->Sl ); 
 
     double Br  = prim[BRR];
     double Bp  = prim[BPP];
