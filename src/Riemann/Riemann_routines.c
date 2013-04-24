@@ -420,6 +420,19 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
     theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + 0.5*cell_gradp(theRiemann->cL,q)*dpL;
     theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - 0.5*cell_gradp(theRiemann->cR,q)*dpR;
   }
+  if (sim_runtype(theSim)==1){
+    if (direction==RDIRECTION){
+      theRiemann->primL[BRR] = 0.5*(theRiemann->primL[BRR] + theRiemann->primR[BRR]);
+      theRiemann->primR[BRR] = 0.5*(theRiemann->primL[BRR] + theRiemann->primR[BRR]);
+    } else if (direction==PDIRECTION){
+      theRiemann->primL[BPP] = 0.5*(theRiemann->primL[BPP] + theRiemann->primR[BPP]);
+      theRiemann->primR[BPP] = 0.5*(theRiemann->primL[BPP] + theRiemann->primR[BPP]);
+    } else if (direction==ZDIRECTION){
+      theRiemann->primL[BZZ] = 0.5*(theRiemann->primL[BZZ] + theRiemann->primR[BZZ]);
+      theRiemann->primR[BZZ] = 0.5*(theRiemann->primL[BZZ] + theRiemann->primR[BZZ]);
+    }
+  }
+
 }
 
 
