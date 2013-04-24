@@ -99,6 +99,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "HiResSigma"           , VAR_DOUB , &(theSim->HiResSigma)  );
       err += readvar( pfile , "HiResR0"           , VAR_DOUB , &(theSim->HiResR0)  );
       err += readvar( pfile , "HiResFac"           , VAR_DOUB , &(theSim->HiResFac)  );
+      err += readvar( pfile , "w_a_type"            , VAR_INT , &(theSim->W_A_TYPE));
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }

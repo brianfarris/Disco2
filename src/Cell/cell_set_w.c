@@ -57,7 +57,7 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         }
       }
     }
-  } else if (sim_MOVE_CELLS(theSim) == C_OMEGA10) {
+  } else if (sim_MOVE_CELLS(theSim) == C_OMEGA20) {
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
         double rp = sim_FacePos(theSim,i,R_DIR);

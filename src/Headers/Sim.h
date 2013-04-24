@@ -63,6 +63,7 @@ struct Sim {
   double HiResSigma;
   double HiResR0;
   double HiResFac;
+  int W_A_TYPE;
 };
 #endif
 
@@ -99,6 +100,7 @@ double sim_DIVB_L(struct Sim *);
 double sim_CFL(struct Sim *);
 double sim_PLM(struct Sim *);
 int sim_POWELL(struct Sim *);
+int sim_W_A_TYPE(struct Sim *);
 int sim_GRAV2D(struct Sim *);
 double sim_G_EPS(struct Sim *);
 double sim_PHI_ORDER(struct Sim *);
@@ -124,4 +126,7 @@ int sim_read_par_file(struct Sim * ,struct MPIsetup *, char * );
 void sim_set_N_p(struct Sim *);
 void sim_set_rz(struct Sim *,struct MPIsetup *);
 void sim_set_misc(struct Sim *,struct MPIsetup *);
+// W_A stuff
+double sim_W_A(struct Sim * ,double );
+double sim_OM_A_DERIV(struct Sim * ,double );
 #endif

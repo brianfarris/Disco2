@@ -109,6 +109,9 @@ double sim_PLM(struct Sim *theSim){
 int sim_POWELL(struct Sim *theSim){
   return(theSim->POWELL);
 }
+int sim_W_A_TYPE(struct Sim *theSim){
+  return(theSim->W_A_TYPE);
+}
 int sim_GRAV2D(struct Sim *theSim){
   return(theSim->GRAV2D);
 }

@@ -92,10 +92,11 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
   }
   if( Sl > vnR - sqrt( cf22 ) ) Sl = vnR - sqrt( cf22 );
   if( Sr < vnR + sqrt( cf22 ) ) Sr = vnR + sqrt( cf22 );
-  
+ 
+  double wp_a = theRiemann->n[1]*sim_W_A(theSim,r);
   if (sim_runtype(theSim)==MHD){
-    if( Sl-theRiemann->n[1]*10.0*r > -DIVB_CH ) Sl = -DIVB_CH+theRiemann->n[1]*10.0*r;
-    if( Sr-theRiemann->n[1]*10.0*r <  DIVB_CH ) Sr =  DIVB_CH+theRiemann->n[1]*10.0*r;
+    if( Sl - wp_a > -DIVB_CH ) Sl = -DIVB_CH + wp_a;
+    if( Sr - wp_a <  DIVB_CH ) Sr =  DIVB_CH + wp_a;
   }
 
   double mr = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[URR] + Sr*theRiemann->primR[RHO]*theRiemann->primR[URR] + FmL[0] - FmR[0] )/( Sr - Sl );
@@ -118,8 +119,7 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
     Bpack[4] = (mr*Br + mp*Bp + mz*Bz)/rho; // v dot B
     Bpack[5] = psi;
 
-    Ss += ((.5*B2L-BnL*BnL)-.5*B2R+BnR*BnR)
-      /(theRiemann->primR[RHO]*(Sr-vnR)-theRiemann->primL[RHO]*(Sl-vnL));
+    Ss += ((.5*B2L-BnL*BnL)-.5*B2R+BnR*BnR) / (theRiemann->primR[RHO]*(Sr-vnR)-theRiemann->primL[RHO]*(Sl-vnL));
   }
   theRiemann->Sl = Sl;
   theRiemann->Sr = Sr;
@@ -222,9 +222,10 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
       + theRiemann->primR[BPP]*theRiemann->n[1] 
       + theRiemann->primR[BZZ]*theRiemann->n[2];
 
+    double wp_a = theRiemann->n[1]*sim_W_A(theSim,r);
 
     theRiemann->Ustar[BRR] = Bsr/r;
-    theRiemann->Ustar[BPP] = (Bsp+10.*r*(BnL-BnR)/(theRiemann->Sr-theRiemann->Sl))/r;
+    theRiemann->Ustar[BPP] = (Bsp + wp_a*(BnL-BnR)/(theRiemann->Sr-theRiemann->Sl))/r;
     theRiemann->Ustar[BZZ] = Bsz;
     theRiemann->Ustar[PSI] = psi;
   }
@@ -288,13 +289,15 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     double vB = vr*Br + vp*Bp + vz*Bz;
     double B2 = Br*Br + Bp*Bp + Bz*Bz;
 
+    double wp_a = theRiemann->n[1]*sim_W_A(theSim,r);
+
     F[SRR] +=     .5*B2*theRiemann->n[0] - Br*Bn;
     F[LLL] += r*( .5*B2*theRiemann->n[1] - Bp*Bn );
     F[SZZ] +=     .5*B2*theRiemann->n[2] - Bz*Bn;
     F[TAU] += B2*vn - vB*Bn;
     double psi = prim[PSI];
     F[BRR] =(Br*vn - vr*Bn + psi*theRiemann->n[0])/r;
-    F[BPP] =(Bp*vn - vp*Bn + 10.0*r*Bn + psi*theRiemann->n[1])/r;
+    F[BPP] =(Bp*vn - vp*Bn + wp_a*Bn + psi*theRiemann->n[1])/r;
     F[BZZ] = Bz*vn - vz*Bn + psi*theRiemann->n[2];
     F[PSI] = pow(DIVB_CH,2.)*Bn;
   }
