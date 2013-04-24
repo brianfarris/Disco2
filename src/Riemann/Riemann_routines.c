@@ -222,7 +222,7 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
       + theRiemann->primR[BPP]*theRiemann->n[1] 
       + theRiemann->primR[BZZ]*theRiemann->n[2];
 
-    double wp_a = theRiemann->n[1]*sim_W_A(theSim,r);
+    double wp_a = sim_W_A(theSim,r);
 
     theRiemann->Ustar[BRR] = Bsr/r;
     theRiemann->Ustar[BPP] = (Bsp + wp_a*(BnL-BnR)/(theRiemann->Sr-theRiemann->Sl))/r;
@@ -289,7 +289,7 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     double vB = vr*Br + vp*Bp + vz*Bz;
     double B2 = Br*Br + Bp*Bp + Bz*Bz;
 
-    double wp_a = theRiemann->n[1]*sim_W_A(theSim,r);
+    double wp_a = sim_W_A(theSim,r);
 
     F[SRR] +=     .5*B2*theRiemann->n[0] - Br*Bn;
     F[LLL] += r*( .5*B2*theRiemann->n[1] - Bp*Bn );
