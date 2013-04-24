@@ -107,6 +107,7 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
   Ss = (theRiemann->primR[RHO]*vnR*(Sr-vnR)-theRiemann->primL[RHO]*vnL*(Sl-vnL)+theRiemann->primL[PPP]-theRiemann->primR[PPP])
     /(theRiemann->primR[RHO]*(Sr-vnR)-theRiemann->primL[RHO]*(Sl-vnL));
 
+  //add mhd terms
   if (sim_runtype(theSim)==MHD){  
     double Br = ( -Sl*theRiemann->primL[BRR] + Sr*theRiemann->primR[BRR] + FL[0] - FR[0] )/( Sr - Sl );
     double Bp = ( -Sl*theRiemann->primL[BPP] + Sr*theRiemann->primR[BPP] + FL[1] - FR[1] )/( Sr - Sl );
@@ -147,7 +148,7 @@ void riemann_set_star_hll(struct Riemann * theRiemann,struct Sim * theSim){
   double Sl = theRiemann->Sl;
   int q;
   for( q=0 ; q<sim_NUM_Q(theSim) ; ++q ){
-    theRiemann->Ustar[q] = ( -Sl*theRiemann->UL[q] + Sr*theRiemann->UR[q] + theRiemann->FL[q] - theRiemann->FR[q] )/( Sr - Sl );
+    theRiemann->Ustar[q] = ( Sr*theRiemann->UR[q] - Sl*theRiemann->UL[q] + theRiemann->FL[q] - theRiemann->FR[q] )/( Sr - Sl );
     theRiemann->Fstar[q] = ( Sr*theRiemann->FL[q] - Sl*theRiemann->FR[q] - Sr*Sl*( theRiemann->UL[q] - theRiemann->UR[q] ) )/( Sr - Sl );
   }
 }
@@ -376,6 +377,18 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
   for (q=0;q<NUM_Q;++q){
     theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_grad(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
     theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_grad(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
+  }
+  if (sim_runtype(theSim)==1){
+    if (direction==RDIRECTION){
+      theRiemann->primL[BRR] = 0.5*(theRiemann->primL[BRR] + theRiemann->primR[BRR]);
+      theRiemann->primR[BRR] = 0.5*(theRiemann->primL[BRR] + theRiemann->primR[BRR]);
+    } else if (direction==PDIRECTION){
+      theRiemann->primL[BPP] = 0.5*(theRiemann->primL[BPP] + theRiemann->primR[BPP]);
+      theRiemann->primR[BPP] = 0.5*(theRiemann->primL[BPP] + theRiemann->primR[BPP]);
+    } else if (direction==ZDIRECTION){
+      theRiemann->primL[BZZ] = 0.5*(theRiemann->primL[BZZ] + theRiemann->primR[BZZ]);
+      theRiemann->primR[BZZ] = 0.5*(theRiemann->primL[BZZ] + theRiemann->primR[BZZ]);
+    }
   }
 }
 
