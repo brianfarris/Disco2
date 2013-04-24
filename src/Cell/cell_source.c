@@ -141,6 +141,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[BPP] -= POWELL*dt*divB*(vp-sim_W_A(theSim,r))/r;
           c->cons[BZZ] -= POWELL*dt*divB*vz;
           c->cons[PSI] -= POWELL*dt*vdotGradPsi;
+
+          c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
         }
       }
     }
