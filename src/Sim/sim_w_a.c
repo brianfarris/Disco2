@@ -36,7 +36,7 @@ double sim_OM_A_DERIV(struct Sim * theSim,double r){
     return(-1.5*pow(r,-2.5));
   } else if (sim_W_A_TYPE(theSim)==A_WEIRD){
     //weird rotation
-    return((.1/r/r-.5/r)*pow(r,-0.5)*exp(-.1/r));
+    return((.1/r/r-1.5/r)*pow(r,-1.5)*exp(-.1/r));
   } else{
     printf("ERROR\n");
     exit(0);
