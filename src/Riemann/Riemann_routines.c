@@ -112,7 +112,7 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
     double Br = ( -Sl*theRiemann->primL[BRR] + Sr*theRiemann->primR[BRR] + FL[0] - FR[0] )/( Sr - Sl );
     double Bp = ( -Sl*theRiemann->primL[BPP] + Sr*theRiemann->primR[BPP] + FL[1] - FR[1] )/( Sr - Sl );
     double Bz = ( -Sl*theRiemann->primL[BZZ] + Sr*theRiemann->primR[BZZ] + FL[2] - FR[2] )/( Sr - Sl );
-    double psi = ( -Sl*theRiemann->primL[PSI] + Sr*theRiemann->primR[PSI] + pow(DIVB_CH,2.)*BnL - pow(DIVB_CH,2.)*BnR )/( Sr - Sl );
+    double psi = ( -Sl*theRiemann->primL[PSI] + Sr*theRiemann->primR[PSI] + pow(DIVB_CH,2.)*BnL + wp_a*theRiemann->primL[PSI] - pow(DIVB_CH,2.)*BnR - wp_a*theRiemann->primR[PSI] )/( Sr - Sl );
     Bpack[0] = Br*theRiemann->n[0] + Bp*theRiemann->n[1] + Bz*theRiemann->n[2]; // Bn
     Bpack[1] = Br;
     Bpack[2] = Bp;
@@ -300,7 +300,7 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     F[BRR] =(Br*vn - vr*Bn + psi*theRiemann->n[0])/r;
     F[BPP] =(Bp*vn - vp*Bn + wp_a*Bn + psi*theRiemann->n[1])/r;
     F[BZZ] = Bz*vn - vz*Bn + psi*theRiemann->n[2];
-    F[PSI] = pow(DIVB_CH,2.)*Bn;
+    F[PSI] = pow(DIVB_CH,2.)*Bn + wp_a*psi*theRiemann->n[1];
   }
 
   int q;
