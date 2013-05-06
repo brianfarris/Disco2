@@ -378,7 +378,7 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
     theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_grad(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
     theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_grad(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
   }
-  if (sim_runtype(theSim)==1){
+  if ((sim_runtype(theSim)==1)&&(BNORM_AVG==1)){
     if (direction==RDIRECTION){
       theRiemann->primL[BRR] = 0.5*(theRiemann->primL[BRR] + theRiemann->primR[BRR]);
       theRiemann->primR[BRR] = 0.5*(theRiemann->primL[BRR] + theRiemann->primR[BRR]);
@@ -420,7 +420,7 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
     theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + 0.5*cell_gradp(theRiemann->cL,q)*dpL;
     theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - 0.5*cell_gradp(theRiemann->cR,q)*dpR;
   }
-  if (sim_runtype(theSim)==1){
+  if ((sim_runtype(theSim)==1)&&(BNORM_AVG==1)){
     if (direction==RDIRECTION){
       theRiemann->primL[BRR] = 0.5*(theRiemann->primL[BRR] + theRiemann->primR[BRR]);
       theRiemann->primR[BRR] = 0.5*(theRiemann->primL[BRR] + theRiemann->primR[BRR]);

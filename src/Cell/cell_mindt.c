@@ -45,11 +45,11 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
   double a_m,r_m,dx_m;
   double mag_vel_m;
   int i,j,k;
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+  for( k=sim_Nghost_min(theSim,Z_DIR) ; k<sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     double zp = sim_FacePos(theSim,k,Z_DIR);
     double dz = zp-zm;
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+    for( i=sim_Nghost_min(theSim,R_DIR) ; i<sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR) ; ++i ){
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       double rp = sim_FacePos(theSim,i,R_DIR);
       double dr = rp-rm;

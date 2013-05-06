@@ -12,6 +12,7 @@ void get_proc_factorization(int N_r_global,int N_z_global,int numprocs,int * fac
   int nr = numprocs/nz;
   factorization[0] = nr;
   factorization[1] = nz;
+	printf("nr: %d, nz: %d\n",nr,nz);
 }
 
 void mpisetup_setprocs(struct MPIsetup * theMPIsetup,char * filename){
@@ -42,7 +43,10 @@ void mpisetup_setprocs(struct MPIsetup * theMPIsetup,char * filename){
     get_proc_factorization(N_r_global,N_z_global,NumProcs,theMPIsetup->dim_NumProcs);
   } else{
     MPI_Dims_create(NumProcs,theMPIsetup->ndims_mpi,theMPIsetup->dim_NumProcs);
-  }
+	//theMPIsetup->dim_NumProcs[0] = 24;
+	//theMPIsetup->dim_NumProcs[1] = 16; 
+	//printf("nr: %d, nz: %d\n",theMPIsetup->dim_NumProcs[0],theMPIsetup->dim_NumProcs[1]); 
+ }
   //Just in case the dimensions don't make sense; I don't know how
   //the MPI_Dims_create funcition works, so you never know.
   if( (theMPIsetup->dim_NumProcs[0])*(theMPIsetup->dim_NumProcs[1]) != NumProcs ){

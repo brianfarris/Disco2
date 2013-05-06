@@ -16,3 +16,6 @@ enum{HLLC,HLL};
 MPI_Comm sim_comm;
 #define farris_mpi_factorization 0
 #define NO_W_IN_CFL 0
+#define KEP_BNDRY 1
+#define BzZ 0
+#define BNORM_AVG 1

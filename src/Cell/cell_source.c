@@ -121,7 +121,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
           double vdotB = vr*Br+vp*Bp+vz*Bz;
           double BdotGradPsi = /*dV**/(Br*GradPsi[0]+Bp*GradPsi[1]+Bz*GradPsi[2]);
-          double vdotGradPsi = /*dV**/(vr*GradPsi[0]+vp*GradPsi[1]+vz*GradPsi[2]);
+          double vdotGradPsi = /*dV**/(vr*GradPsi[0]+(vp-sim_W_A(theSim,r))*GradPsi[1]+vz*GradPsi[2]);
 
           /*
           if (fabs(z)<0.00001){

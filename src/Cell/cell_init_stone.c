@@ -60,6 +60,7 @@ void cell_init_stone(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
       if( r<1.4 ) IR *= (r-1.2)/.2;
       if( r>3.6 ) IR *= (3.8-r)/.2;
       double Bz = A_N*IR*omega;
+      if (BzZ==1) Bz *= sin(2*M_PI*(r-2.)/.2);
 
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         double delta = .02*( (double)rand()/(double)RAND_MAX - .5 );
