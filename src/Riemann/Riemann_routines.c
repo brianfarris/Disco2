@@ -318,6 +318,62 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
 
   double * VFlux = malloc(NUM_Q*sizeof(double));
   double * AvgPrim = malloc(NUM_Q*sizeof(double));
+  double * Grad_r_prim = malloc(NUM_Q*sizeof(double));
+  double * Grad_ph_prim = malloc(NUM_Q*sizeof(double));
+  int q;
+  for (q=0;q<NUM_Q;++q){
+    AvgPrim[q] = .5*(theRiemann->primL[q]+theRiemann->primR[q]);
+    //if (theRiemann->n[1]==1){ 
+    Grad_ph_prim[q] = .5*(cell_gradp(theRiemann->cL,q)+cell_gradp(theRiemann->cR,q));    
+    //} else{
+    Grad_r_prim[q] = .5*(cell_grad(theRiemann->cL,q)+cell_grad(theRiemann->cR,q));
+    //}
+    VFlux[q] = 0.0;
+  }
+
+  double rho = AvgPrim[RHO];
+  double vr  = AvgPrim[URR];
+  double om  = AvgPrim[UPP];
+  double vz  = AvgPrim[UZZ];
+
+  double Gr_vr = Grad_r[URR];
+  double Gr_om = Grad_r_prim[UPP];
+  double Gr_vz = Grad_r_prim[UZZ];
+
+  double Gp_vr = Grad_ph_prim[URR];
+  double Gp_om = Grad_ph_prim[UPP];
+  double Gp_vz = Grad_ph_prim[UZZ];
+
+   
+  //r direction
+  VFlux[SRR] = -nu*rho*( Gr_vr - r*Gp_om - vr/r );
+  VFlux[LLL] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
+  VFlux[SZZ] = -nu*rho*dnvz;
+  VFlux[TAU] = -nu*rho*(vr*dnvr+r*r*om*dnom+vz*dnvz);  
+
+  //phi direction
+  VFlux[SRR] = -nu*rho*( r*Gr_om + Gp_vr );
+  VFlux[LLL] = -nu*rho*( r*r*Gp_om - r*Gr_vr );
+  VFlux[SZZ] = -nu*rho*dnvz;
+  VFlux[TAU] = -nu*rho*(vr*dnvr+r*r*om*dnom+vz*dnvz);  
+
+
+  for (q=0;q<NUM_Q;++q){
+    theRiemann->F[q] += VFlux[q];
+  }
+  free(VFlux);
+  free(Gprim);
+  free(AvgPrim);
+}
+
+void riemann_visc_flux_old(struct Riemann * theRiemann,struct Sim * theSim ){
+  double nu = sim_EXPLICIT_VISCOSITY(theSim);
+  int NUM_Q = sim_NUM_Q(theSim);
+
+  double r = theRiemann->r;
+
+  double * VFlux = malloc(NUM_Q*sizeof(double));
+  double * AvgPrim = malloc(NUM_Q*sizeof(double));
   double * Gprim = malloc(NUM_Q*sizeof(double));
   int q;
   for (q=0;q<NUM_Q;++q){
@@ -351,6 +407,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   free(Gprim);
   free(AvgPrim);
 }
+
 
 void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct Sim * theSim,int FaceNumber,int direction){
   theRiemann->n[direction]=1; // set
