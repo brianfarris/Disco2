@@ -408,7 +408,7 @@ void riemann_visc_flux_old(struct Riemann * theRiemann,struct Sim * theSim ){
   VFlux[TAU] = -nu*rho*(vr*dnvr+r*r*om*dnom+vz*dnvz);  
 
   for (q=0;q<NUM_Q;++q){
-    theRiemann->F[q] += VFlux[q];
+    theRiemann->Fvisc[q] = VFlux[q];
   }
   free(VFlux);
   free(Gprim);
@@ -580,7 +580,9 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   for( q=0 ; q<NUM_Q ; ++q ){
     cell_add_cons(theRiemann->cL,q,-dt*theRiemann->dA*theRiemann->F[q]);
     cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->F[q]);
-  }
+    cell_add_cons(theRiemann->cL,q,-dt*theRiemann->dA*theRiemann->Fvisc[q]);
+    cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->Fvisc[q]);
+   }
 
   if (sim_runtype(theSim)==1){
     int direction;
