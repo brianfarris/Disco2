@@ -40,6 +40,7 @@ CFL			0.5
 PLM			1.0
 
 POWELL                  1
+w_a_type                0
 Grav_2D			1
 G_EPS			0.0
 
