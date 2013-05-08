@@ -168,7 +168,7 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, double dt
         double dz = zp-zm;
         double dV = dphi*.5*(rp*rp-rm*rm)*dz;
         double nu = sim_EXPLICIT_VISCOSITY(theSim);
-        c->cons[SRR] += -dt*dV*nu*rho*vr/r/r;
+       // c->cons[SRR] += -dt*dV*nu*rho*vr/r/r;
       }
     }
   }

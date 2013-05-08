@@ -10,6 +10,8 @@ struct Riemann {
   struct Cell * cL;
   struct Cell * cR;
   double r;
+  double r_cell_L;
+  double r_cell_R;
   double dA;
   double *primL;
   double *primR;

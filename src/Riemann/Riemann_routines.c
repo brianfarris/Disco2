@@ -351,12 +351,12 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
 
    
   //r direction
-  VFlux[SRR] = -nu*rho*( Gr_vr - r*Gp_om - vr/r );
+  VFlux[SRR] = -nu*rho*( r*Gr_vr - r*r*Gp_om - vr );
   VFlux[LLL] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
   VFlux[SZZ] = 0.0; //deal with this later
 
   //phi direction
-  VFlux[SRR] = -nu*rho*( r*Gr_om + Gp_vr );
+  VFlux[SRR] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
   VFlux[LLL] = -nu*rho*( r*r*Gp_om - r*Gr_vr + vr);
   VFlux[SZZ] = 0.0; //deal with this later
 
@@ -365,7 +365,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
 
 
   for (q=0;q<NUM_Q;++q){
-    theRiemann->F[q] += VFlux[q];
+    theRiemann->Fvisc[q] = VFlux[q];
   }
   free(VFlux);
   free(Grad_r_prim);
@@ -436,6 +436,13 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
   theRiemann->r = face_r(theFaces,FaceNumber);
   theRiemann->dA = face_dA(theFaces,FaceNumber);
 
+  if (direction==0){
+    theRiemann->r_cell_L = theRiemann->r-deltaL;
+    theRiemann->r_cell_R = theRiemann->r-deltaR;
+  } else{
+    theRiemann->r_cell_L = theRiemann->r;
+    theRiemann->r_cell_R = theRiemann->r;
+  }
 
   int q;
   for (q=0;q<NUM_Q;++q){
@@ -479,6 +486,10 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
   double r = .5*(rp+rm);
   theRiemann->dA = dr*dz;
   theRiemann->r = r; 
+
+  theRiemann->r_cell_L = r;
+  theRiemann->r_cell_R = r;
+
   int q;
   for (q=0;q<NUM_Q;++q){
     theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + 0.5*cell_gradp(theRiemann->cL,q)*dpL;
@@ -573,16 +584,21 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
 
   // viscous flux terms
   if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
-    riemann_visc_flux_old(theRiemann,theSim );
+    riemann_visc_flux(theRiemann,theSim );
   }
 
   int q;
   for( q=0 ; q<NUM_Q ; ++q ){
     cell_add_cons(theRiemann->cL,q,-dt*theRiemann->dA*theRiemann->F[q]);
     cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->F[q]);
-    cell_add_cons(theRiemann->cL,q,-dt*theRiemann->dA*theRiemann->Fvisc[q]);
-    cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->Fvisc[q]);
-   }
+  }
+
+  cell_add_cons(theRiemann->cL,SRR,-dt*theRiemann->dA*theRiemann->Fvisc[SRR]/theRiemann->r_cell_L);
+  cell_add_cons(theRiemann->cR,SRR, dt*theRiemann->dA*theRiemann->Fvisc[SRR]/theRiemann->r_cell_R);
+
+  cell_add_cons(theRiemann->cL,LLL,-dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
+  cell_add_cons(theRiemann->cR,LLL, dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
+
 
   if (sim_runtype(theSim)==1){
     int direction;
