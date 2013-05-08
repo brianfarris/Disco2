@@ -20,6 +20,7 @@ struct Riemann {
   double *FR;
   double *Fstar;
   double *F;
+  double *Fvisc;
   double Sl;
   double Sr;
   double Ss;

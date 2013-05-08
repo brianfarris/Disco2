@@ -99,9 +99,9 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
     if( Sr - wp_a <  DIVB_CH ) Sr =  DIVB_CH + wp_a;
   }
 
-  double mr = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[URR] + Sr*theRiemann->primR[RHO]*theRiemann->primR[URR] + FmL[0] - FmR[0] )/( Sr - Sl );
-  double mp = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[UPP]*r + Sr*theRiemann->primR[RHO]*theRiemann->primR[UPP]*r + FmL[1] - FmR[1] )/( Sr - Sl );
-  double mz = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[UZZ] + Sr*theRiemann->primR[RHO]*theRiemann->primR[UZZ] + FmL[2] - FmR[2] )/( Sr - Sl );
+  double  mr = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[URR] + Sr*theRiemann->primR[RHO]*theRiemann->primR[URR] + FmL[0] - FmR[0] )/( Sr - Sl );
+  double  mp = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[UPP]*r + Sr*theRiemann->primR[RHO]*theRiemann->primR[UPP]*r + FmL[1] - FmR[1] )/( Sr - Sl );
+  double  mz = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[UZZ] + Sr*theRiemann->primR[RHO]*theRiemann->primR[UZZ] + FmL[2] - FmR[2] )/( Sr - Sl );
   double rho = ( -Sl*theRiemann->primL[RHO] + Sr*theRiemann->primR[RHO] + mnL - mnR )/( Sr - Sl );
 
   Ss = (theRiemann->primR[RHO]*vnR*(Sr-vnR)-theRiemann->primL[RHO]*vnL*(Sl-vnL)+theRiemann->primL[PPP]-theRiemann->primR[PPP])
@@ -336,7 +336,12 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   double om  = AvgPrim[UPP];
   double vz  = AvgPrim[UZZ];
 
-  double Gr_vr = Grad_r[URR];
+  if (fabs(vz)>1.e-12){
+    printf("you should not be using viscosity and having a nonzero component of velocity in z direction. Viscosity is only for 2d planar motion right now\n");
+    exit(0);
+  }
+
+  double Gr_vr = Grad_r_prim[URR];
   double Gr_om = Grad_r_prim[UPP];
   double Gr_vz = Grad_r_prim[UZZ];
 
@@ -348,21 +353,23 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   //r direction
   VFlux[SRR] = -nu*rho*( Gr_vr - r*Gp_om - vr/r );
   VFlux[LLL] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
-  VFlux[SZZ] = -nu*rho*dnvz;
-  VFlux[TAU] = -nu*rho*(vr*dnvr+r*r*om*dnom+vz*dnvz);  
+  VFlux[SZZ] = 0.0; //deal with this later
 
   //phi direction
   VFlux[SRR] = -nu*rho*( r*Gr_om + Gp_vr );
-  VFlux[LLL] = -nu*rho*( r*r*Gp_om - r*Gr_vr );
-  VFlux[SZZ] = -nu*rho*dnvz;
-  VFlux[TAU] = -nu*rho*(vr*dnvr+r*r*om*dnom+vz*dnvz);  
+  VFlux[LLL] = -nu*rho*( r*r*Gp_om - r*Gr_vr + vr);
+  VFlux[SZZ] = 0.0; //deal with this later
+
+  // add viscous heating properly
+  VFlux[TAU] = 0.0; //-nu*rho*(vr*dnvr+r*r*om*dnom+vz*dnvz);  
 
 
   for (q=0;q<NUM_Q;++q){
     theRiemann->F[q] += VFlux[q];
   }
   free(VFlux);
-  free(Gprim);
+  free(Grad_r_prim);
+  free(Grad_ph_prim);
   free(AvgPrim);
 }
 
