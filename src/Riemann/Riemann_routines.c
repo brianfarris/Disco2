@@ -349,16 +349,19 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   double Gp_om = Grad_ph_prim[UPP];
   double Gp_vz = Grad_ph_prim[UZZ];
 
-   
-  //r direction
-  VFlux[SRR] = -nu*rho*( r*Gr_vr - r*r*Gp_om - vr );
-  VFlux[LLL] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
-  VFlux[SZZ] = 0.0; //deal with this later
 
+  //r direction
+  if (theRiemann->n[0] ==1){
+    VFlux[SRR] = -nu*rho*( r*Gr_vr - r*r*Gp_om - vr );
+    VFlux[LLL] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
+    VFlux[SZZ] = 0.0; //deal with this later
+  }
   //phi direction
-  VFlux[SRR] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
-  VFlux[LLL] = -nu*rho*( r*r*Gp_om - r*Gr_vr + vr);
-  VFlux[SZZ] = 0.0; //deal with this later
+  if (theRiemann->n[1] ==1){
+    VFlux[SRR] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
+    VFlux[LLL] = -nu*rho*( r*r*Gp_om - r*Gr_vr + vr);
+    VFlux[SZZ] = 0.0; //deal with this later
+  }
 
   // add viscous heating properly
   VFlux[TAU] = 0.0; //-nu*rho*(vr*dnvr+r*r*om*dnom+vz*dnvz);  
