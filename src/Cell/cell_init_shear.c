@@ -42,8 +42,8 @@ void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
 
   double rho = 1.0;
   double Pp  = 1.0;
-  double v0  = 0.1;
-  double t0  = 0.2;
+  double v0  = 1.0;
+  double t0  = 0.5;
 
   double nu = sim_EXPLICIT_VISCOSITY(theSim);
   int i, j,k;
@@ -57,7 +57,7 @@ void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
         double x  = r*cos(t)-1.;
 
-        double vy = v0*exp(-x*x/(2.*nu*t0))/sqrt(2.*M_PI*nu*t0);
+        double vy = v0*exp(-x*x/(4.*nu*t0))/sqrt(2.*M_PI*nu*t0);
 
         double vr    = vy*sin(t);
         double omega = vy*cos(t)/r;
