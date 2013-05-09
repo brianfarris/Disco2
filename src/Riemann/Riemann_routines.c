@@ -609,7 +609,11 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
 
   // viscous flux terms
   if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
-    riemann_visc_flux(theRiemann,theSim );
+    if (VISC_OLD==1){
+      riemann_visc_flux_old(theRiemann,theSim );
+    } else{
+      riemann_visc_flux(theRiemann,theSim );  
+    }
   }
 
   int q;

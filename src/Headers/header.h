@@ -20,4 +20,4 @@ MPI_Comm sim_comm;
 #define BzZ 0
 #define BNORM_AVG 1
 #define VISC_CONST 1
-#define VISC_OLD 0
+#define VISC_OLD 1

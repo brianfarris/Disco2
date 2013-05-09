@@ -81,7 +81,11 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   //Source Terms
   cell_add_src( theCells ,theSim, theGravMasses , dt ); // add source terms
   if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
-    cell_add_visc_src( theCells ,theSim,dt ); // add viscous source terms
+    if (VISC_OLD==1){
+      cell_add_visc_src_old( theCells ,theSim,dt ); // add viscous source terms
+    } else{
+      cell_add_visc_src( theCells ,theSim,dt ); // add viscous source terms
+    }
   }
 
   //Bookkeeping
