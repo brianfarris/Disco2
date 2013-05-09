@@ -629,7 +629,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   cell_add_cons(theRiemann->cL,LLL,-dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
   cell_add_cons(theRiemann->cR,LLL, dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
 
-  printf("n[0]: %d, n[1]: %d, r_cell_L: %e, r_cell_R: %e\n",theRiemann->n[0],theRiemann->n[1],theRiemann->r_cell_L,theRiemann->r_cell_R);
+  //printf("n[0]: %d, n[1]: %d, r_cell_L: %e, r_cell_R: %e\n",theRiemann->n[0],theRiemann->n[1],theRiemann->r_cell_L,theRiemann->r_cell_R);
 
   if (sim_runtype(theSim)==1){
     int direction;
