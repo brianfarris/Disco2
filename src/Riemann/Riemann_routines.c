@@ -312,7 +312,7 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
 
 double Gr_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_r_prim , double r){
   if (VISC_CONST==1){
-    return(0.0);
+    return(2./r);
   } else{
     return(7./2./r + Grad_r_prim[PPP]/AvgPrim[PPP]);    
   }
@@ -618,8 +618,13 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->F[q]);
   }
 
-  cell_add_cons(theRiemann->cL,SRR,-dt*theRiemann->dA*theRiemann->Fvisc[SRR]/theRiemann->r_cell_L);
-  cell_add_cons(theRiemann->cR,SRR, dt*theRiemann->dA*theRiemann->Fvisc[SRR]/theRiemann->r_cell_R);
+  if (VISC_OLD==1){
+    cell_add_cons(theRiemann->cL,SRR,-dt*theRiemann->dA*theRiemann->Fvisc[SRR]);
+    cell_add_cons(theRiemann->cR,SRR, dt*theRiemann->dA*theRiemann->Fvisc[SRR]);
+  }else {
+    cell_add_cons(theRiemann->cL,SRR,-dt*theRiemann->dA*theRiemann->Fvisc[SRR]/theRiemann->r_cell_L);
+    cell_add_cons(theRiemann->cR,SRR, dt*theRiemann->dA*theRiemann->Fvisc[SRR]/theRiemann->r_cell_R);
+  }
 
   cell_add_cons(theRiemann->cL,LLL,-dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
   cell_add_cons(theRiemann->cR,LLL, dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
