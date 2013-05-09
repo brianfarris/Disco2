@@ -310,6 +310,22 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
 
 }
 
+double Gr_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_r_prim , double r){
+  if (VISC_CONST==1){
+    return(0.0);
+  } else{
+    return(7./2./r + Grad_r_prim[PPP]/AvgPrim[PPP]);    
+  }
+}
+
+double Gp_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_ph_prim){
+  if (VISC_CONST==1){
+    return(0.0);
+  } else{
+    return(Grad_ph_prim[PPP]/AvgPrim[PPP]);    
+  }
+}
+
 void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   double nu = sim_EXPLICIT_VISCOSITY(theSim);
   int NUM_Q = sim_NUM_Q(theSim);
@@ -352,14 +368,20 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
 
   //r direction
   if (theRiemann->n[0] ==1){
-    VFlux[SRR] = -nu*rho*( r*Gr_vr - r*r*Gp_om - vr );
-    VFlux[LLL] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
+    //VFlux[SRR] = -nu*rho*( r*Gr_vr - r*r*Gp_om - vr );
+    //VFlux[LLL] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
+    VFlux[SRR] = -nu*rho*( r*Gr_vr - vr + om*r*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim) );
+    VFlux[LLL] = -nu*rho*( r*r*Gr_om - vr*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim) );
+ 
     VFlux[SZZ] = 0.0; //deal with this later
   }
   //phi direction
   if (theRiemann->n[1] ==1){
-    VFlux[SRR] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
-    VFlux[LLL] = -nu*rho*( r*r*Gp_om - r*Gr_vr + vr);
+    //VFlux[SRR] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
+    //VFlux[LLL] = -nu*rho*( r*r*Gp_om - r*Gr_vr + vr);
+    VFlux[SRR] = -nu*rho*( -om*r*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r)  + r*Gp_vr );
+    VFlux[LLL] = -nu*rho*( r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r));
+
     VFlux[SZZ] = 0.0; //deal with this later
   }
 
@@ -602,7 +624,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   cell_add_cons(theRiemann->cL,LLL,-dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
   cell_add_cons(theRiemann->cR,LLL, dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
 
-  //printf("n[0]: %d, n[1]: %d, r_cell_L: %e, r_cell_R: %e\n",theRiemann->n[0],theRiemann->n[1],theRiemann->r_cell_L,theRiemann->r_cell_R);
+  printf("n[0]: %d, n[1]: %d, r_cell_L: %e, r_cell_R: %e\n",theRiemann->n[0],theRiemann->n[1],theRiemann->r_cell_L,theRiemann->r_cell_R);
 
   if (sim_runtype(theSim)==1){
     int direction;
