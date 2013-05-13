@@ -12,16 +12,18 @@ void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,int i,int j
   double rho = 1.0;
   double Pp  = 1.0;
   double v0  = 0.1;
-  double t0  = 0.2;
+  double t0  = 2.+time_global;
 
   double nu = sim_EXPLICIT_VISCOSITY(theSim);
+  nu = 0.01;
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
   double r = 0.5*(rm+rp);
   double t = theCell->tiph-.5*theCell->dphi;
-  double x  = r*cos(t)-1.;
+  double x  = r*cos(t)-2.;
 
-  double vy = v0*exp(-x*x/(2.*nu*t0))/sqrt(2.*M_PI*nu*t0);
+  printf("single t0: %e\n",t0);
+  double vy = v0*exp(-x*x/(4.*nu*t0))/sqrt(2.*M_PI*nu*t0);
 
   double vr    = vy*sin(t);
   double omega = vy*cos(t)/r;
@@ -42,10 +44,11 @@ void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
 
   double rho = 1.0;
   double Pp  = 1.0;
-  double v0  = 1.0;
-  double t0  = 0.5;
+  double v0  = 0.1;
+  double t0  = 2.0;
 
   double nu = sim_EXPLICIT_VISCOSITY(theSim);
+  nu = 0.01;
   int i, j,k;
 
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
@@ -55,7 +58,7 @@ void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
       double r = 0.5*(rm+rp);
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
-        double x  = r*cos(t)-1.;
+        double x  = r*cos(t)-2.;
 
         double vy = v0*exp(-x*x/(4.*nu*t0))/sqrt(2.*M_PI*nu*t0);
 

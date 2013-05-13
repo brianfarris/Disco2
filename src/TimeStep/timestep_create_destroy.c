@@ -8,6 +8,7 @@
 struct TimeStep *timestep_create(struct Sim * theSim) {
   struct TimeStep *theTimeStep = (struct TimeStep *) malloc(sizeof(struct TimeStep));
   theTimeStep->t = 0.0;
+  time_global = 0.0;
   theTimeStep->nri = (int *)malloc(sim_N(theSim,R_DIR)*sizeof(int));
   theTimeStep->nzk = (int *)malloc(sim_N(theSim,Z_DIR)*sizeof(int));
   return theTimeStep;

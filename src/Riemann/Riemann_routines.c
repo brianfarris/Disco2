@@ -340,7 +340,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   for (q=0;q<NUM_Q;++q){
     AvgPrim[q] = .5*(theRiemann->primL[q]+theRiemann->primR[q]);
     //if (theRiemann->n[1]==1){ 
-    Grad_ph_prim[q] = .5*(cell_gradp(theRiemann->cL,q)+cell_gradp(theRiemann->cR,q));    
+    Grad_ph_prim[q] = .5*(cell_gradp(theRiemann->cL,q)+cell_gradp(theRiemann->cR,q))/r;    
     //} else{
     Grad_r_prim[q] = .5*(cell_grad(theRiemann->cL,q)+cell_grad(theRiemann->cR,q));
     //}

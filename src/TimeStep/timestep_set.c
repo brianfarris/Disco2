@@ -22,6 +22,7 @@ void timestep_set_dt(struct TimeStep * theTimeStep, struct Cell *** theCells, st
 }
 void timestep_update_t(struct TimeStep * theTimeStep){
   theTimeStep->t += theTimeStep->dt;
+  time_global = theTimeStep->t;
 }
 void timestep_set_RK(struct TimeStep * theTimeStep,double RK){
   theTimeStep->RK = RK;
