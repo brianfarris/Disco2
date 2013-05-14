@@ -68,6 +68,7 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
         }
         double a  = maxvel( theCells[k][i][j].prim , w , r ,theSim);
         double rho = theCells[k][i][j].prim[RHO]; 
+        double Pp  = theCells[k][i][j].prim[PPP]; 
         double Br  = theCells[k][i][j].prim[BRR];
         double Bp  = theCells[k][i][j].prim[BPP];
         double Bz  = theCells[k][i][j].prim[BZZ];
@@ -75,7 +76,13 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
 
         double dt = sim_CFL(theSim)*dx/a;
         if( sim_EXPLICIT_VISCOSITY(theSim)>0.0 ){
-          double dt_visc = .9*dx*dx/(sim_EXPLICIT_VISCOSITY(theSim));
+          double nu;
+          if (VISC_CONST==1){
+            nu = sim_EXPLICIT_VISCOSITY(theSim);
+          } else{
+            nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(r,1.5);
+          }
+          double dt_visc = .9*dx*dx/nu;
           dt = dt/( 1. + dt/dt_visc );
         }
         if( dt_m > dt ) {

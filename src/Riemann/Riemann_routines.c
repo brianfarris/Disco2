@@ -327,7 +327,6 @@ double Gp_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_ph_prim){
 }
 
 void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
-  double nu = sim_EXPLICIT_VISCOSITY(theSim);
   int NUM_Q = sim_NUM_Q(theSim);
 
   double r = theRiemann->r;
@@ -345,6 +344,13 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
     Grad_r_prim[q] = .5*(cell_grad(theRiemann->cL,q)+cell_grad(theRiemann->cR,q));
     //}
     VFlux[q] = 0.0;
+  }
+
+  double nu;
+  if (VISC_CONST==1){
+    nu = sim_EXPLICIT_VISCOSITY(theSim);
+  } else{
+    nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
   }
 
   double rho = AvgPrim[RHO];
