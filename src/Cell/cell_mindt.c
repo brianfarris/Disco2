@@ -74,13 +74,15 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
         double Bz  = theCells[k][i][j].prim[BZZ];
         double b2  = (Br*Br+Bp*Bp+Bz*Bz)/rho;
 
+
         double dt = sim_CFL(theSim)*dx/a;
         if( sim_EXPLICIT_VISCOSITY(theSim)>0.0 ){
           double nu;
           if (VISC_CONST==1){
             nu = sim_EXPLICIT_VISCOSITY(theSim);
           } else{
-            nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(r,1.5);
+            double tiph = theCells[k][i][j].tiph - 0.5*theCells[k][i][j].dphi;
+            nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(r*cos(tiph),1.5);
           }
           double dt_visc = .9*dx*dx/nu;
           dt = dt/( 1. + dt/dt_visc );

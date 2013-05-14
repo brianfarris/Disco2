@@ -350,7 +350,8 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   if (VISC_CONST==1){
     nu = sim_EXPLICIT_VISCOSITY(theSim);
   } else{
-    nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
+    double tiph = theRiemann->cm;
+    nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r*cos(tiph),1.5);
   }
 
   double rho = AvgPrim[RHO];
@@ -466,7 +467,8 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
   dpR = dpR;
   theRiemann->r = face_r(theFaces,FaceNumber);
   theRiemann->dA = face_dA(theFaces,FaceNumber);
-
+  theRiemann->cm = face_cm(theFaces,FaceNumber);
+  
   if (direction==0){
     theRiemann->r_cell_L = theRiemann->r-deltaL;
     theRiemann->r_cell_R = theRiemann->r+deltaR;
@@ -517,6 +519,7 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
   double r = .5*(rp+rm);
   theRiemann->dA = dr*dz;
   theRiemann->r = r; 
+  theRiemann->cm = cell_tiph(theRiemann->cL);
 
   theRiemann->r_cell_L = r;
   theRiemann->r_cell_R = r;

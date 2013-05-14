@@ -13,6 +13,7 @@ struct Riemann {
   double r_cell_L;
   double r_cell_R;
   double dA;
+  double cm;
   double *primL;
   double *primR;
   double *UL;
