@@ -351,7 +351,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
     nu = sim_EXPLICIT_VISCOSITY(theSim);
   } else{
     double tiph = theRiemann->cm;
-    nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r*cos(tiph),1.5);
+    nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(fabs(r/4.*cos(tiph)),1.5);
   }
 
   double rho = AvgPrim[RHO];
