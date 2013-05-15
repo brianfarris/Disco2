@@ -318,11 +318,15 @@ double Gr_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_r_prim , double r){
   }
 }
 
-double Gp_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_ph_prim){
+double Gp_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_ph_prim, double r, double tiph, int IDtype){
   if (VISC_CONST==1){
     return(0.0);
   } else{
-    return(Grad_ph_prim[PPP]/AvgPrim[PPP]);    
+    if (IDtype==SHEAR){
+      return(Grad_ph_prim[PPP]/AvgPrim[PPP] - 1.5/r * tan(tiph));    
+    } else{
+      return(Grad_ph_prim[PPP]/AvgPrim[PPP]);
+    }
   }
 }
 
@@ -346,12 +350,17 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
     VFlux[q] = 0.0;
   }
 
+  double tiph = theRiemann->cm;
   double nu;
   if (VISC_CONST==1){
     nu = sim_EXPLICIT_VISCOSITY(theSim);
   } else{
-    double tiph = theRiemann->cm;
-    nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(fabs(r/4.*cos(tiph)),1.5);
+    if (sim_InitialDataType(theSim)==SHEAR){
+      nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(fabs(r*cos(tiph)),1.5);    } else{
+        nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
+      }
+
+    nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(fabs(r/3.*cos(tiph)),1.5);
   }
 
   double rho = AvgPrim[RHO];
@@ -377,9 +386,9 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   if (theRiemann->n[0] ==1){
     //VFlux[SRR] = -nu*rho*( r*Gr_vr - r*r*Gp_om - vr );
     //VFlux[LLL] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
-    VFlux[SRR] = -nu*rho*( r*Gr_vr - vr + om*r*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim) );
-    VFlux[LLL] = -nu*rho*( r*r*Gr_om - vr*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim) );
- 
+    VFlux[SRR] = -nu*rho*( r*Gr_vr - vr + om*r*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
+    VFlux[LLL] = -nu*rho*( r*r*Gr_om - vr*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
+
     VFlux[SZZ] = 0.0; //deal with this later
   }
   //phi direction
@@ -468,7 +477,7 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
   theRiemann->r = face_r(theFaces,FaceNumber);
   theRiemann->dA = face_dA(theFaces,FaceNumber);
   theRiemann->cm = face_cm(theFaces,FaceNumber);
-  
+
   if (direction==0){
     theRiemann->r_cell_L = theRiemann->r-deltaL;
     theRiemann->r_cell_R = theRiemann->r+deltaR;

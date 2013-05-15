@@ -18,12 +18,12 @@ void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,int i,int j
   double rp = sim_FacePos(theSim,i,R_DIR);
   double r = 0.5*(rm+rp);
   double t = theCell->tiph-.5*theCell->dphi;
-  double x  = r*cos(t)-4.;
+  double x  = r*cos(t)-3.;
   double nu;
   if (VISC_CONST==1){
     nu = sim_EXPLICIT_VISCOSITY(theSim);
   } else{
-    nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(fabs(r/4.*cos(t)),1.5);
+    nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(fabs(r/3.*cos(t)),1.5);
   }
 
   double vy = v0*exp(-x*x/(4.*sim_EXPLICIT_VISCOSITY(theSim)*t0))/sqrt(2.*M_PI*sim_EXPLICIT_VISCOSITY(theSim)*t0);
@@ -60,13 +60,13 @@ void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
 
      for (j = 0; j < sim_N_p(theSim,i); j++) {
        double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
-       double x  = r*cos(t)-4.;
+       double x  = r*cos(t)-3.;
 
        double nu;
        if (VISC_CONST==1){
          nu = sim_EXPLICIT_VISCOSITY(theSim);
        } else{
-         nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(fabs(r/4.*cos(t)),1.5);
+         nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(fabs(r/3.*cos(t)),1.5);
        }
 
        double vy = v0*exp(-x*x/(4.*sim_EXPLICIT_VISCOSITY(theSim)*t0))/sqrt(2.*M_PI*sim_EXPLICIT_VISCOSITY(theSim)*t0);

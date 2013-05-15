@@ -82,7 +82,11 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
             nu = sim_EXPLICIT_VISCOSITY(theSim);
           } else{
             double tiph = theCells[k][i][j].tiph - 0.5*theCells[k][i][j].dphi;
-            nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(fabs(r/4.*cos(tiph)),1.5);
+            if (sim_InitialDataType(theSim)==SHEAR){
+              nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(fabs(r*cos(tiph)),1.5);
+            } else{
+              nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(r,1.5);
+            }
           }
           double dt_visc = .9*dx*dx/nu;
           dt = dt/( 1. + dt/dt_visc );
