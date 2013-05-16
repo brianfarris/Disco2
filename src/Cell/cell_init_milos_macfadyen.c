@@ -70,12 +70,20 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
         double vr;
         if (r<1.){
           omega = sqrt(O2)*pow(r,2.);
+          vr = 0.0;
           vr = (-3.0*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(1./rs,-xi_exp)))*pow(r,2.);
         }else{
           omega = sqrt(O2);
+          vr = 0.0;
           vr = -3.0/sqrt(r)*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(r/rs,-xi_exp));
         }
+        /* 
+        if (r<3.){
+          omega = 0.0;//pow(r,-1.5);
+        }
+        */
         if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
+        
         double Pp = cs*cs*rho/Gam;
 
         theCells[k][i][j].prim[RHO] = rho*exp(fac*(Pot1+Pot2)/cp/cp);

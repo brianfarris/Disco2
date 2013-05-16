@@ -54,6 +54,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
             for( q=0 ; q<NUM_Q ; ++q ){
               theCells[k][i][j].prim[q] /= dA;
             }
+            //printf("r: %e, theCells[k][i][j].prim[URR]: %e\n",r_face,theCells[k][i][j].prim[URR]);
             if( theCells[k][i][j].prim[URR] > 0.0 ) theCells[k][i][j].prim[URR] = 0.0;
             if (KEP_BNDRY==1){
               theCells[k][i][j].prim[UPP] = pow(r_cell,-1.5);          

@@ -356,11 +356,10 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
     nu = sim_EXPLICIT_VISCOSITY(theSim);
   } else{
     if (sim_InitialDataType(theSim)==SHEAR){
-      nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(fabs(r*cos(tiph)),1.5);    } else{
-        nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
-      }
-
-    nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(fabs(r/3.*cos(tiph)),1.5);
+      nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(fabs(r*cos(tiph)),1.5);    
+    } else{
+      nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
+    }
   }
 
   double rho = AvgPrim[RHO];
