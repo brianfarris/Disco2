@@ -65,6 +65,7 @@ void cell_add_wiph(struct Cell *, double);
 void cell_add_src( struct Cell *** ,struct Sim * , struct GravMass * , double );
 void cell_add_visc_src( struct Cell *** ,struct Sim * , double );
 void cell_add_visc_src_old( struct Cell *** ,struct Sim * , double );
+void cell_setT( struct Cell *** ,struct Sim * );
 void cell_mult_psi(struct Cell *, double);
 void cell_clean_pi(struct Cell *** ,struct Sim *);
 void cell_update_phi( struct Cell *** , struct Sim * , double , double );

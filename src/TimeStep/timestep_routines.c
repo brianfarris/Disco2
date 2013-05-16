@@ -94,6 +94,11 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   gravMass_update_RK( theGravMasses ,theSim, theTimeStep->RK ); // allow the GravMasses to move
   cell_calc_prim( theCells ,theSim); // calculate primitives
 
+  //Set temperature to keep HoR constant
+  if (SET_T==1){
+    cell_setT(theCells,theSim); 
+  }
+
   //Boundary Data
   if (sim_BoundTypeR(theSim)==BOUND_OUTFLOW){
     cell_boundary_outflow_r( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
