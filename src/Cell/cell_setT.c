@@ -19,9 +19,16 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
         double HoR = 0.1;
-        double Omega_K = pow(r,-1.5);
-        double cs = HoR*Omega_K*r;
-        double PoRho = cs*cs/sim_GAMMALAW(theSim);
+	double Omega_K;
+	double cs;
+        if (r>1.){
+		Omega_K = pow(r,-1.5);
+        	cs = HoR*Omega_K*r;
+        } else{
+		Omega_K = 1.;
+		cs = HoR;
+	}
+	double PoRho = cs*cs/sim_GAMMALAW(theSim);
         double rho = c->prim[RHO];
         c->prim[PPP] = PoRho * rho;
       }
