@@ -21,6 +21,6 @@ MPI_Comm sim_comm;
 #define BNORM_AVG 1
 #define VISC_CONST 0
 #define VISC_OLD 0
-#define SET_T 0
+#define SET_T 1
 #define NPCAP 128
 double time_global;
