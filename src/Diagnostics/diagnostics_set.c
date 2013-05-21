@@ -168,7 +168,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagMdotFilename[256];
       sprintf(DiagMdotFilename,"DiagMdot.dat");
       FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
-      fprintf(DiagMdotFile,"%e %e \n",r_near_req1, Mdot_near_req1);       
+      fprintf(DiagMdotFile,"%e %e %e \n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1);       
       fclose(DiagMdotFile);
     }
 
