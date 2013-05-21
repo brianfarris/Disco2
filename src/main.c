@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
     timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
 
     // calculate diagnostics
-    diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep);
+    diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep,theMPIsetup);
     //write diagnostics to file
     MPI_Barrier(sim_comm);    
     diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);

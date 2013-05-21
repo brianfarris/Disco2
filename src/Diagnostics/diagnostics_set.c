@@ -6,9 +6,10 @@
 #include "../Headers/Cell.h"
 #include "../Headers/Diagnostics.h"
 #include "../Headers/TimeStep.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
-void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCells,struct Sim * theSim,struct TimeStep * theTimeStep){
+void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCells,struct Sim * theSim,struct TimeStep * theTimeStep,struct MPIsetup * theMPIsetup){
   if (timestep_get_t(theTimeStep)>diagnostics_tdiag_measure(theDiagnostics)){
     int num_r_points = sim_N(theSim,R_DIR)-sim_Nghost_min(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR);
     int num_r_points_global = sim_N_global(theSim,R_DIR);
@@ -163,12 +164,13 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       }
     }
 
-    char DiagMdotFilename[256];
-    sprintf(DiagMdotFilename,"DiagMdot.dat");
-    FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
-    fprintf(DiagMdotFile,"%e %e \n",r_near_req1, Mdot_near_req1);       
-    fclose(DiagMdotFile);
-
+    if(mpisetup_MyProc(theMPIsetup)==0){
+      char DiagMdotFilename[256];
+      sprintf(DiagMdotFilename,"DiagMdot.dat");
+      FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
+      fprintf(DiagMdotFile,"%e %e \n",r_near_req1, Mdot_near_req1);       
+      fclose(DiagMdotFile);
+    }
 
     //We are doing time averaged diagnostics, so mult by delta t and add it
     //We will divide by the total delta next time we save to disk;

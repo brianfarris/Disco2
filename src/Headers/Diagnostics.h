@@ -28,7 +28,7 @@ struct Diagnostics *diagnostics_create(struct Sim *, struct TimeStep *, struct M
 void diagnostics_destroy(struct Diagnostics *,struct Sim *);
 // set
 void diagnostics_reset(struct Diagnostics * theDiagnostics,struct Cell ***,struct Sim *,struct TimeStep *);
-void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell ***,struct Sim *,struct TimeStep *);
+void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell ***,struct Sim *,struct TimeStep *,struct MPIsetup *);
 // print
 void diagnostics_print(struct Diagnostics * ,struct TimeStep * ,struct Sim * ,struct MPIsetup * );
 // access
