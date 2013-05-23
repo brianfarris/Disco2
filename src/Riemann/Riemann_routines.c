@@ -385,8 +385,8 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   if (theRiemann->n[0] ==1){
     //VFlux[SRR] = -nu*rho*( r*Gr_vr - r*r*Gp_om - vr );
     //VFlux[LLL] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
-    VFlux[SRR] = -nu*rho*( r*Gr_vr - vr + om*r*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
-    VFlux[LLL] = -nu*rho*( r*r*Gr_om - vr*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
+    VFlux[SRR] = -INCLUDE_ALL_VISC_TERMS*nu*rho*( r*Gr_vr - vr + om*r*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
+    VFlux[LLL] = -nu*rho*( r*r*Gr_om - INCLUDE_ALL_VISC_TERMS*vr*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
 
     VFlux[SZZ] = 0.0; //deal with this later
   }
@@ -394,8 +394,8 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   if (theRiemann->n[1] ==1){
     //VFlux[SRR] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
     //VFlux[LLL] = -nu*rho*( r*r*Gp_om - r*Gr_vr + vr);
-    VFlux[SRR] = -nu*rho*( -om*r*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r)  + r*Gp_vr );
-    VFlux[LLL] = -nu*rho*( r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r));
+    VFlux[SRR] = -INCLUDE_ALL_VISC_TERMS*nu*rho*( -om*r*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r)  + r*Gp_vr );
+    VFlux[LLL] = -INCLUDE_ALL_VISC_TERMS*nu*rho*( r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r));
 
     VFlux[SZZ] = 0.0; //deal with this later
   }
