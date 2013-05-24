@@ -5,6 +5,7 @@ struct Sim;
 struct Cell;
 struct TimeStep;
 struct MPIsetup;
+struct GravMass;
 #ifdef DIAGNOSTICS_PRIVATE_DEFS
 struct Diagnostics{
   int * N_p_global;
