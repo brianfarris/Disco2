@@ -93,9 +93,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
               pow(r*r+.25+r*cos(phi-Omega*t),-1.5));
 
           double r_bh0 = gravMass_r(theGravMasses,0);
-          double phi_bh0 = gravMass_r(theGravMasses,0);
+          double phi_bh0 = gravMass_phi(theGravMasses,0);
           double r_bh1 = gravMass_r(theGravMasses,1);
-          double phi_bh1 = gravMass_r(theGravMasses,1);
+          double phi_bh1 = gravMass_phi(theGravMasses,1);
 
           double dist_bh0 = sqrt(r_bh0*r_bh0 + r*r - 2.*r_bh0*r*cos(phi_bh0-phi));
           double dist_bh1 = sqrt(r_bh1*r_bh1 + r*r - 2.*r_bh1*r*cos(phi_bh1-phi));
