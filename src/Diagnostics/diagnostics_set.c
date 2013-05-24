@@ -4,12 +4,13 @@
 #include <math.h>
 #include "../Headers/Sim.h"
 #include "../Headers/Cell.h"
+#include "../Headers/GravMass.h"
 #include "../Headers/Diagnostics.h"
 #include "../Headers/TimeStep.h"
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
-void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCells,struct Sim * theSim,struct TimeStep * theTimeStep,struct MPIsetup * theMPIsetup){
+void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCells,struct Sim * theSim,struct TimeStep * theTimeStep,struct MPIsetup * theMPIsetup,struct GravMass * theGravMasses){
   if (timestep_get_t(theTimeStep)>diagnostics_tdiag_measure(theDiagnostics)){
     int num_r_points = sim_N(theSim,R_DIR)-sim_Nghost_min(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR);
     int num_r_points_global = sim_N_global(theSim,R_DIR);
@@ -26,6 +27,11 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     double * VectorDiag_reduce = malloc(sizeof(double) * num_r_points_global*NUM_VEC);
     double * ScalarDiag_temp = malloc(sizeof(double)*NUM_SCAL);
     double * ScalarDiag_reduce = malloc(sizeof(double)*NUM_SCAL);
+
+    double mass_near_bh0_temp = 0.0;
+    double mass_near_bh1_temp = 0.0;
+    double mass_near_bh0_reduce = 0.0;
+    double mass_near_bh1_reduce = 0.0;
 
     double dtout = timestep_get_t(theTimeStep)-theDiagnostics->toutprev;
 
@@ -66,6 +72,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
         double r = 0.5*(rm+rp);
         for (j=0;j<sim_N_p(theSim,i);++j){
           double phi = cell_tiph(cell_single(theCells,i,j,k));
+          double dphi = cell_dphi(cell_single(theCells,i,j,k));
           double rho = cell_prim(cell_single(theCells,i,j,k),RHO);
           double press = cell_prim(cell_single(theCells,i,j,k),PPP);
           double vr = cell_prim(cell_single(theCells,i,j,k),URR);
@@ -85,7 +92,27 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
               pow(r*r+.25-r*cos(phi-Omega*t),-1.5) -  
               pow(r*r+.25+r*cos(phi-Omega*t),-1.5));
 
-        if ((fabs(zp)<0.0000001)||(fabs(z)<0.0000001)){
+          double r_bh0 = gravMass_r(theGravMasses,0);
+          double phi_bh0 = gravMass_r(theGravMasses,0);
+          double r_bh1 = gravMass_r(theGravMasses,1);
+          double phi_bh1 = gravMass_r(theGravMasses,1);
+
+          double dist_bh0 = sqrt(r_bh0*r_bh0 + r*r - 2.*r_bh0*r*cos(phi_bh0-phi));
+          double dist_bh1 = sqrt(r_bh1*r_bh1 + r*r - 2.*r_bh1*r*cos(phi_bh1-phi));
+
+          if (dist_bh0<0.2){
+            double dV = 0.5*(rp*rp-rm*rm)*dphi;
+            double dM = rho*dV;
+            mass_near_bh0_temp +=dM;
+          }
+          if (dist_bh1<0.2){
+            double dV = 0.5*(rp*rp-rm*rm)*dphi;
+            double dM = rho*dV;
+            mass_near_bh1_temp +=dM;
+          }
+
+
+          if ((fabs(zp)<0.0000001)||(fabs(z)<0.0000001)){
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+0] = r;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+1] = phi;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+2] = rho;
@@ -127,6 +154,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       }
     }
 
+    printf("mass_near_bh0_temp: %e\n",mass_near_bh0_temp);
+    printf("mass_near_bh1_temp: %e\n",mass_near_bh1_temp);
+
     for (i=imin;i<imax;++i){
       double rp = sim_FacePos(theSim,i,R_DIR);
       double rm = sim_FacePos(theSim,i-1,R_DIR);
@@ -140,6 +170,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     MPI_Allreduce( VectorDiag_temp,VectorDiag_reduce , num_r_points_global*NUM_VEC, MPI_DOUBLE, MPI_SUM, sim_comm);
     MPI_Allreduce( EquatDiag_temp,EquatDiag_reduce ,theDiagnostics->N_eq_cells*NUM_EQ, MPI_DOUBLE, MPI_SUM, sim_comm);
 
+    MPI_Allreduce( &mass_near_bh0_temp,&mass_near_bh0_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
+    MPI_Allreduce( &mass_near_bh1_temp,&mass_near_bh1_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
+   
 
     double RMIN = sim_MIN(theSim,R_DIR);
     double RMAX = sim_MAX(theSim,R_DIR);
@@ -168,7 +201,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagMdotFilename[256];
       sprintf(DiagMdotFilename,"DiagMdot.dat");
       FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
-      fprintf(DiagMdotFile,"%e %e %e \n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1);       
+      fprintf(DiagMdotFile,"%e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_near_bh0_reduce,mass_near_bh1_reduce);       
       fclose(DiagMdotFile);
     }
 

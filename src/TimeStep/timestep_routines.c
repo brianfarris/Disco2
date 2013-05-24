@@ -114,7 +114,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       //do nothing, this is already handled by the syncing routine
     }
   } 
-
+  
   //clean up
   face_destroy(theFaces_r);
   if (sim_N_global(theSim,Z_DIR)>1){
@@ -159,6 +159,7 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
   if (sim_N_global(theSim,Z_DIR)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
+  printf("hello 6\n");
 }
 
 
