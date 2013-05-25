@@ -37,7 +37,7 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
 
       fclose(DiagVectorFile);
       fclose(DiagScalarFile);
-
+      
       // HDF5 APIs definitions
       hid_t       file_id, dset_id;         /* file and dataset identifiers */
       hid_t       filespace, memspace;      /* file and memory dataspace identifiers */
@@ -50,7 +50,7 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
 
       // Create a new file collectively and release property list identifier.
       file_id = H5Fcreate(DiagEquatFilename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT /*plist_id*/);
-
+      
       // ***************************
       // Now we save the equatorial data
       // ***************************
@@ -61,14 +61,10 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
       filespace = H5Screate_simple(2, dimsf2, NULL); 
       memspace  = H5Screate_simple(2, dimsf2, NULL); 
 
-
       dset_id = H5Dcreate1(file_id, "EQUAT", H5T_NATIVE_DOUBLE, filespace,H5P_DEFAULT);//,plist_id);
       H5Sclose(filespace);
-
       filespace = H5Dget_space(dset_id);
-
       status = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, memspace, filespace, H5P_DEFAULT , &(theDiagnostics->EquatDiag[0][0]));
-
       // Close/release resources.
       H5Dclose(dset_id);
       H5Sclose(filespace);
@@ -77,7 +73,6 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
     }
     //update output time;
     theDiagnostics->toutprev_dump = timestep_get_t(theTimeStep);
-
     //reset 
     int i,n;
     for (i=0;i<sim_N_global(theSim,R_DIR);++i){
@@ -88,7 +83,6 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
     for (n=0;n<theDiagnostics->NUM_DIAG;++n){
       theDiagnostics->ScalarDiag[n]=0.0;
     }
-
     theDiagnostics->tdiag_dump += theDiagnostics->dtdiag_dump;
   }
 }

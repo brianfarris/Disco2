@@ -54,17 +54,6 @@ void cell_init_torus(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         Pp = rho;
       }
 
-      double magfac;
-      if (rho>0.75){
-        magfac = 0.05/PoRho_max;
-      } else{
-        magfac = 0.0/PoRho_max;
-      }
-      double Br = magfac*GammaFac*M/R/R*z/R;
-      double Bp = 0.0;
-      double Bz = magfac*(GammaFac*(-M/R/R*r/R+pow(r,-s-1.))+PoRho/r );
-
-
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         double delta = .02*( (double)rand()/(double)RAND_MAX - .5 );
         theCells[k][i][j].prim[RHO] = rho;
@@ -72,15 +61,7 @@ void cell_init_torus(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         theCells[k][i][j].prim[URR] = 0.0;
         theCells[k][i][j].prim[UPP] = omega*(1.+delta);
         theCells[k][i][j].prim[UZZ] = 0.0;
-        theCells[k][i][j].prim[BRR] = Br;
-        theCells[k][i][j].prim[BPP] = Bp;
-        theCells[k][i][j].prim[BZZ] = Bz;
-        theCells[k][i][j].prim[PSI] = 0.0;
         theCells[k][i][j].wiph = omega*r;
-        theCells[k][i][j].divB = 0.0;
-        theCells[k][i][j].GradPsi[0] = 0.0;
-        theCells[k][i][j].GradPsi[1] = 0.0;
-        theCells[k][i][j].GradPsi[2] = 0.0;
       }
     }
   }

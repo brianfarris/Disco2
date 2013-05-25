@@ -57,7 +57,6 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "GravMassType"      , VAR_INT  , &(theSim->GravMassType)  );
       err += readvar( pfile , "BoundTypeR"         , VAR_INT  , &(theSim->BoundTypeR)  );
       err += readvar( pfile , "BoundTypeZ"         , VAR_INT  , &(theSim->BoundTypeZ)  );
-      err += readvar( pfile , "ZeroPsiBndry"         , VAR_INT  , &(theSim->ZeroPsiBndry)  );
       err += readvar( pfile , "NoInnerBC"         , VAR_INT  , &(theSim->NoInnerBC)  );
       err += readvar( pfile , "NumR"              , VAR_INT  , &(theSim->N_global[R_DIR]) );
       err += readvar( pfile , "NumZ"              , VAR_INT  , &(theSim->N_global[Z_DIR]) );
@@ -77,12 +76,8 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Move_Cells"        , VAR_INT  , &(theSim->MOVE_CELLS)  );
       err += readvar( pfile , "RiemannSolver"   , VAR_INT , &(theSim->Riemann)  );
       err += readvar( pfile , "Adiabatic_Index"   , VAR_DOUB , &(theSim->GAMMALAW)  );
-      err += readvar( pfile , "Explicit_Viscosity" , VAR_DOUB  , &(theSim->EXPLICIT_VISCOSITY)  );
-      err += readvar( pfile , "DivB_Ch"           , VAR_DOUB , &(theSim->DIVB_CH)  );
-      err += readvar( pfile , "DivB_l"            , VAR_DOUB , &(theSim->DIVB_L)  );
       err += readvar( pfile , "CFL"               , VAR_DOUB , &(theSim->CFL)  );
       err += readvar( pfile , "PLM"               , VAR_DOUB , &(theSim->PLM)  );
-      err += readvar( pfile , "POWELL"               , VAR_INT , &(theSim->POWELL)  );
       err += readvar( pfile , "Grav_2D"            , VAR_INT  , &(theSim->GRAV2D)  );
       err += readvar( pfile , "G_EPS"             , VAR_DOUB , &(theSim->G_EPS)  );
       err += readvar( pfile , "PHI_ORDER"             , VAR_DOUB , &(theSim->PHI_ORDER)  );
@@ -90,7 +85,6 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Cs_Floor"          , VAR_DOUB , &(theSim->CS_FLOOR)  );
       err += readvar( pfile , "Cs_Cap"            , VAR_DOUB , &(theSim->CS_CAP)  );
       err += readvar( pfile , "Vel_Cap"           , VAR_DOUB , &(theSim->VEL_CAP)  );
-      err += readvar( pfile , "runtype"           , VAR_INT , &(theSim->runtype)  );
       err += readvar( pfile , "DAMP_TIME"           , VAR_DOUB , &(theSim->DAMP_TIME)  );
       err += readvar( pfile , "RDAMP_INNER"           , VAR_DOUB , &(theSim->RDAMP_INNER)  );
       err += readvar( pfile , "RDAMP_OUTER"           , VAR_DOUB , &(theSim->RDAMP_OUTER)  );
@@ -99,7 +93,6 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "HiResSigma"           , VAR_DOUB , &(theSim->HiResSigma)  );
       err += readvar( pfile , "HiResR0"           , VAR_DOUB , &(theSim->HiResR0)  );
       err += readvar( pfile , "HiResFac"           , VAR_DOUB , &(theSim->HiResFac)  );
-      err += readvar( pfile , "w_a_type"            , VAR_INT , &(theSim->W_A_TYPE));
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }

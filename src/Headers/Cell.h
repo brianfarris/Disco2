@@ -28,24 +28,10 @@ void cell_destroy(struct Cell ***,struct Sim *);
 struct Cell * cell_single_create(struct Sim * );
 void cell_single_destroy(struct Cell * );
 //initial data
-void cell_init_flock(struct Cell ***,struct Sim *, struct MPIsetup *);
-void cell_single_init_flock(struct Cell *, struct Sim *,int ,int ,int );
-void cell_init_shear(struct Cell ***,struct Sim *, struct MPIsetup *);
-void cell_single_init_shear(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_vortex(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_vortex(struct Cell *, struct Sim *,int ,int ,int );
-void cell_init_stone(struct Cell ***,struct Sim *, struct MPIsetup *);
-void cell_single_init_stone(struct Cell *, struct Sim *,int ,int ,int );
-void cell_init_fieldloop(struct Cell ***,struct Sim *, struct MPIsetup *);
-void cell_single_init_fieldloop(struct Cell *, struct Sim *,int ,int ,int );
-void cell_init_psigrad(struct Cell ***,struct Sim *, struct MPIsetup *);
-void cell_single_init_psigrad(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_torus(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_torus(struct Cell *, struct Sim *,int ,int ,int );
-void cell_init_milos_macfadyen(struct Cell ***,struct Sim *, struct MPIsetup *);
-void cell_single_init_milos_macfadyen(struct Cell *, struct Sim *,int ,int ,int );
-void cell_init_mhdexp(struct Cell ***,struct Sim *, struct MPIsetup *);
-void cell_single_init_mhdexp(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
@@ -56,24 +42,15 @@ struct Cell *cell_single(struct Cell ***,int,int,int);
 double cell_tiph(struct Cell *);
 double cell_dphi(struct Cell *);
 double cell_wiph(struct Cell *);
-double cell_GradPsi(struct Cell ***,int ,int ,int ,int );
 //modify cell data
 void cell_add_cons(struct Cell *, int, double);
-void cell_add_divB(struct Cell *, double);
-void cell_add_GradPsi(struct Cell *, int, double);
 void cell_add_wiph(struct Cell *, double);
 void cell_add_src( struct Cell *** ,struct Sim * , struct GravMass * , double );
-void cell_add_visc_src( struct Cell *** ,struct Sim * , double );
-void cell_add_visc_src_old( struct Cell *** ,struct Sim * , double );
-void cell_setT( struct Cell *** ,struct Sim * );
-void cell_mult_psi(struct Cell *, double);
 void cell_clean_pi(struct Cell *** ,struct Sim *);
 void cell_update_phi( struct Cell *** , struct Sim * , double , double );
 void cell_update_dphi( struct Cell *** ,struct Sim * );
 //clear
 void cell_clear_w(struct Cell ***,struct Sim * );
-void cell_clear_divB( struct Cell ***,struct Sim * );
-void cell_clear_GradPsi( struct Cell ***,struct Sim * );
 //set w
 void cell_set_w(struct Cell ***,struct Sim *);
 //processor syncs

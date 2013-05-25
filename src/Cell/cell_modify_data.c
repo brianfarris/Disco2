@@ -11,17 +11,8 @@
 void cell_add_cons(struct Cell *oneCell, int q, double add){
   oneCell->cons[q] += add;
 }
-void cell_add_divB(struct Cell *oneCell, double add){
-  oneCell->divB += add;
-}
-void cell_add_GradPsi(struct Cell *oneCell, int i, double add){
-  oneCell->GradPsi[i] += add;
-}
 void cell_add_wiph(struct Cell *oneCell, double add){
   oneCell->wiph += add;
-}
-void cell_mult_psi(struct Cell *oneCell, double mult){
-  oneCell->cons[PSI] *= mult;
 }
 
 

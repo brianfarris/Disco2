@@ -84,25 +84,7 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
         theCells[k][i][j].RKcons[SRR] = 0.0;
         theCells[k][i][j].RKcons[LLL] = 0.0;
         theCells[k][i][j].RKcons[SZZ] = 0.0;
-        if (sim_runtype(theSim)==1){
-          theCells[k][i][j].prim[BRR] = 0.0;
-          theCells[k][i][j].prim[BPP] = 0.0;
-          theCells[k][i][j].prim[BZZ] = 0.0;
-          theCells[k][i][j].prim[PSI] = 0.0;
-          theCells[k][i][j].cons[BRR] = 0.0;
-          theCells[k][i][j].cons[BPP] = 0.0;
-          theCells[k][i][j].cons[BZZ] = 0.0;
-          theCells[k][i][j].cons[PSI] = 0.0;
-          theCells[k][i][j].RKcons[BRR] = 0.0;
-          theCells[k][i][j].RKcons[BPP] = 0.0;
-          theCells[k][i][j].RKcons[BZZ] = 0.0;
-          theCells[k][i][j].RKcons[PSI] = 0.0;
-        }
         theCells[k][i][j].wiph = 0.0;
-        theCells[k][i][j].divB = 0.0;
-        theCells[k][i][j].GradPsi[0] = 0.0;
-        theCells[k][i][j].GradPsi[1] = 0.0;
-        theCells[k][i][j].GradPsi[2] = 0.0;
         theCells[k][i][j].tiph = tiph;
         theCells[k][i][j].RKtiph = tiph;
         theCells[k][i][j].dphi = dphi;

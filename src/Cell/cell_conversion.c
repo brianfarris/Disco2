@@ -10,7 +10,6 @@
 
 void cell_prim2cons( double * prim , double * cons , double r , double dV ,struct Sim * theSim){
   double GAMMALAW = sim_GAMMALAW(theSim);
-  int runtype = sim_runtype(theSim);
 
   double rho = prim[RHO];
   double Pp  = prim[PPP];
@@ -25,19 +24,6 @@ void cell_prim2cons( double * prim , double * cons , double r , double dV ,struc
   cons[LLL] = r*rho*vp*dV; // note that the conserved variable is angular momentum, not linear momentum
   cons[SZZ] = rho*vz*dV;
   cons[TAU] = ( .5*rho*v2 + rhoe )*dV;
-
-  if (runtype==MHD){
-    double Br  = prim[BRR];
-    double Bp  = prim[BPP];
-    double Bz  = prim[BZZ];
-    double B2 = Br*Br + Bp*Bp + Bz*Bz;
-
-    cons[TAU] += .5*B2*dV;
-    cons[BRR] = Br*dV/r; // note that the conserved variable is Br/r. This helps us reduce geometric source terms
-    cons[BPP] = Bp*dV/r; // note that the conserved variable is Bp/r. This helps us reduce geometric source terms
-    cons[BZZ] = Bz*dV;
-    cons[PSI] = prim[PSI]*dV;
-  }
 
   int q;
   for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q ){
@@ -68,7 +54,6 @@ void cell_calc_cons( struct Cell *** theCells,struct Sim *theSim ){
 }
 
 void cell_cons2prim( double * cons , double * prim , double r , double dV ,struct Sim * theSim){
-  int runtype = sim_runtype(theSim);
   double CS_FLOOR = sim_CS_FLOOR(theSim);
   double CS_CAP = sim_CS_CAP(theSim);
   double RHO_FLOOR = sim_RHO_FLOOR(theSim);
@@ -87,18 +72,7 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
   double KE = .5*( Sr*vr + Sp*vp + Sz*vz );
   double v_magnitude = sqrt(2.*KE/rho);
 
-  double B2 = 0.0;
-  if (runtype==MHD){
-    double Br  = cons[BRR]/dV*r;
-    double Bp  = cons[BPP]/dV*r;
-    double Bz  = cons[BZZ]/dV;
-    B2 = Br*Br+Bp*Bp+Bz*Bz;
-    prim[BRR] = Br;
-    prim[BPP] = Bp;
-    prim[BZZ] = Bz;
-    prim[PSI] = cons[PSI]/dV;
-  }
-  double rhoe = E - KE - .5*B2;
+  double rhoe = E - KE;
   double Pp = (GAMMALAW-1.)*rhoe;
 
   if( Pp < CS_FLOOR*CS_FLOOR*rho/GAMMALAW ) {

@@ -28,11 +28,6 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     double * ScalarDiag_temp = malloc(sizeof(double)*NUM_SCAL);
     double * ScalarDiag_reduce = malloc(sizeof(double)*NUM_SCAL);
 
-    double mass_near_bh0_temp = 0.0;
-    double mass_near_bh1_temp = 0.0;
-    double mass_near_bh0_reduce = 0.0;
-    double mass_near_bh1_reduce = 0.0;
-
     double dtout = timestep_get_t(theTimeStep)-theDiagnostics->toutprev;
 
     int imin = sim_Nghost_min(theSim,R_DIR);
@@ -78,39 +73,14 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double vr = cell_prim(cell_single(theCells,i,j,k),URR);
           double vp = cell_prim(cell_single(theCells,i,j,k),UPP)*r;
           double vz = cell_prim(cell_single(theCells,i,j,k),UZZ);
-          double Br = cell_prim(cell_single(theCells,i,j,k),BRR);
-          double Bp = cell_prim(cell_single(theCells,i,j,k),BPP);
-          double Bz = cell_prim(cell_single(theCells,i,j,k),BZZ);
           double v2   = vr*vr + vp*vp + vz*vz;
-          double B2   = Br*Br + Bp*Bp + Bz*Bz;
           double rhoe = press/(sim_GAMMALAW(theSim)-1.);
-          double psi = cell_prim(cell_single(theCells,i,j,k),PSI);
 
           double Omega = 1.;
           double t = timestep_get_t(theTimeStep);
           double dPhi_dphi = 1/4.*r*sin(phi-Omega*t) * (
               pow(r*r+.25-r*cos(phi-Omega*t),-1.5) -  
               pow(r*r+.25+r*cos(phi-Omega*t),-1.5));
-
-          double r_bh0 = gravMass_r(theGravMasses,0);
-          double phi_bh0 = gravMass_phi(theGravMasses,0);
-          double r_bh1 = gravMass_r(theGravMasses,1);
-          double phi_bh1 = gravMass_phi(theGravMasses,1);
-
-          double dist_bh0 = sqrt(r_bh0*r_bh0 + r*r - 2.*r_bh0*r*cos(phi_bh0-phi));
-          double dist_bh1 = sqrt(r_bh1*r_bh1 + r*r - 2.*r_bh1*r*cos(phi_bh1-phi));
-
-          if (dist_bh0<0.2){
-            double dV = 0.5*(rp*rp-rm*rm)*dphi;
-            double dM = rho*dV;
-            mass_near_bh0_temp +=dM;
-          }
-          if (dist_bh1<0.2){
-            double dV = 0.5*(rp*rp-rm*rm)*dphi;
-            double dM = rho*dV;
-            mass_near_bh1_temp +=dM;
-          }
-
 
           if ((fabs(zp)<0.0000001)||(fabs(z)<0.0000001)){
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+0] = r;
@@ -126,10 +96,6 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+10] = rho*vr*cos(2.*phi);            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+11] = rho*vr*sin(2.*phi);            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = -2.*M_PI*r*rho*dPhi_dphi;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+13] = 0.5*B2;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = Br*Bp;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = psi;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+16] = 180./M_PI*0.5*asin(-Br*Bp/(0.5*B2));
             ++position;
           }
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
@@ -145,17 +111,10 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (rho*vr*cos(2.*phi)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (rho*vr*sin(2.*phi)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (-2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (psi/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += (180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
           // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }
     }
-
-    printf("mass_near_bh0_temp: %e\n",mass_near_bh0_temp);
-    printf("mass_near_bh1_temp: %e\n",mass_near_bh1_temp);
 
     for (i=imin;i<imax;++i){
       double rp = sim_FacePos(theSim,i,R_DIR);
@@ -170,10 +129,6 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     MPI_Allreduce( VectorDiag_temp,VectorDiag_reduce , num_r_points_global*NUM_VEC, MPI_DOUBLE, MPI_SUM, sim_comm);
     MPI_Allreduce( EquatDiag_temp,EquatDiag_reduce ,theDiagnostics->N_eq_cells*NUM_EQ, MPI_DOUBLE, MPI_SUM, sim_comm);
 
-    MPI_Allreduce( &mass_near_bh0_temp,&mass_near_bh0_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
-    MPI_Allreduce( &mass_near_bh1_temp,&mass_near_bh1_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
-   
-
     double RMIN = sim_MIN(theSim,R_DIR);
     double RMAX = sim_MAX(theSim,R_DIR);
     double ZMIN = sim_MIN(theSim,Z_DIR);
@@ -183,26 +138,10 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       ScalarDiag_reduce[n] *= dtout/((ZMAX-ZMIN)*(RMAX*RMAX-RMIN*RMIN));
     }
 
-    int req1_found = 0;
-    double Mdot_near_req1,r_near_req1;
     for (i=0;i<num_r_points_global;++i){
-      double r = VectorDiag_reduce[i*NUM_VEC];
-      if (r>1.0 && req1_found==0){
-        Mdot_near_req1 = VectorDiag_reduce[i*NUM_VEC+5]*2.*M_PI*r/(ZMAX-ZMIN);
-        r_near_req1 = r;
-        req1_found = 1;
-      }
       for (n=0;n<NUM_VEC;++n){
         VectorDiag_reduce[i*NUM_VEC+n] *= dtout/(ZMAX-ZMIN);
       }
-    }
-
-    if(mpisetup_MyProc(theMPIsetup)==0){
-      char DiagMdotFilename[256];
-      sprintf(DiagMdotFilename,"DiagMdot.dat");
-      FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
-      fprintf(DiagMdotFile,"%e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_near_bh0_reduce,mass_near_bh1_reduce);       
-      fclose(DiagMdotFile);
     }
 
     //We are doing time averaged diagnostics, so mult by delta t and add it

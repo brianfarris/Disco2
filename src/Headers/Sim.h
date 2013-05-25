@@ -21,7 +21,6 @@ struct Sim {
   int GravMassType;
   int BoundTypeR;
   int BoundTypeZ;
-  int ZeroPsiBndry;
   int NoInnerBC;
   int Restart;
   int N_global[2];
@@ -41,12 +40,8 @@ struct Sim {
   int NumGravMass;
   int Riemann;
   double GAMMALAW;
-  double EXPLICIT_VISCOSITY;
-  double DIVB_CH;
-  double DIVB_L;
   double CFL;
   double PLM;
-  int POWELL;
   int GRAV2D;
   double G_EPS;
   double PHI_ORDER;
@@ -54,7 +49,6 @@ struct Sim {
   double CS_FLOOR;
   double CS_CAP;
   double VEL_CAP;
-  int runtype;
   double DAMP_TIME;
   double RDAMP_INNER;
   double RDAMP_OUTER;
@@ -63,7 +57,6 @@ struct Sim {
   double HiResSigma;
   double HiResR0;
   double HiResFac;
-  int W_A_TYPE;
 };
 #endif
 
@@ -82,7 +75,6 @@ int sim_NoInnerBC(struct Sim *);
 int sim_Restart(struct Sim *);
 int sim_BoundTypeR(struct Sim *);
 int sim_BoundTypeZ(struct Sim *);
-int sim_ZeroPsiBndry(struct Sim *);
 int sim_N_global(struct Sim *,int);
 int sim_Ncells(struct Sim *);
 int sim_Ncells_global(struct Sim *);
@@ -94,9 +86,6 @@ int sim_MOVE_CELLS(struct Sim *);
 int sim_NumGravMass(struct Sim *);
 int sim_Riemann(struct Sim *);
 double sim_GAMMALAW(struct Sim *);
-double sim_EXPLICIT_VISCOSITY(struct Sim *);
-double sim_DIVB_CH(struct Sim *);
-double sim_DIVB_L(struct Sim *);
 double sim_CFL(struct Sim *);
 double sim_PLM(struct Sim *);
 int sim_POWELL(struct Sim *);
@@ -114,7 +103,6 @@ double sim_get_T_MAX(struct Sim * );
 int sim_NUM_CHECKPOINTS(struct Sim * );
 int sim_NUM_DIAG_DUMP(struct Sim * );
 int sim_NUM_DIAG_MEASURE(struct Sim * );
-int sim_runtype(struct Sim * );
 int sim_InitialDataType(struct Sim * );
 double sim_DAMP_TIME(struct Sim *);
 double sim_RDAMP_INNER(struct Sim *);
