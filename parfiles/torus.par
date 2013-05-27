@@ -6,8 +6,8 @@ GravMassType            1               // 0 none, 1 single, 2 binary
 Restart			0		//If this=1 restart using input.h5
 
 //Computational Grid
-NumR			32			//Radial Zones
-NumZ			8			//Vertical Zones
+NumR			128			//Radial Zones
+NumZ			32			//Vertical Zones
 ng                      2
 R_Min			0.2
 R_Max			2.0
