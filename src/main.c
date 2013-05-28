@@ -56,6 +56,8 @@
 int main(int argc, char **argv) {
   char* inputfilename = argv[1];
 
+	// This is a comment
+
   // start MPI 
   struct MPIsetup * theMPIsetup = mpisetup_create(argc,argv);
   mpisetup_setprocs(theMPIsetup,inputfilename);
