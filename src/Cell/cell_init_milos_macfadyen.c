@@ -70,11 +70,11 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
         double vr;
         if (r<1.){
           omega = sqrt(O2)*pow(r,2.);
-          vr = 0.0;
+          //vr = 0.0;
           vr = (-3.0*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(1./rs,-xi_exp)))*pow(r,2.);
         }else{
           omega = sqrt(O2);
-          vr = 0.0;
+          //vr = 0.0;
           vr = -3.0/sqrt(r)*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(r/rs,-xi_exp));
         }
         /* 
