@@ -24,5 +24,4 @@ MPI_Comm sim_comm;
 #define SET_T 1
 #define NPCAP 128 
 #define INCLUDE_ALL_VISC_TERMS 1
-#define RHO_SINK_TIMESCALE 1.0
 double time_global;
