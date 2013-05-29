@@ -118,6 +118,9 @@ int sim_GRAV2D(struct Sim *theSim){
 double sim_G_EPS(struct Sim *theSim){
   return(theSim->G_EPS);
 }
+double sim_RhoSinkTimescale(struct Sim *theSim){
+  return(theSim->RhoSinkTimescale);
+}
 double sim_PHI_ORDER(struct Sim *theSim){
   return(theSim->PHI_ORDER);
 }

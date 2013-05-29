@@ -49,6 +49,7 @@ struct Sim {
   int POWELL;
   int GRAV2D;
   double G_EPS;
+  double RhoSinkTimescale;
   double PHI_ORDER;
   double RHO_FLOOR;
   double CS_FLOOR;
@@ -103,6 +104,7 @@ int sim_POWELL(struct Sim *);
 int sim_W_A_TYPE(struct Sim *);
 int sim_GRAV2D(struct Sim *);
 double sim_G_EPS(struct Sim *);
+double sim_RhoSinkTimescale(struct Sim *);
 double sim_PHI_ORDER(struct Sim *);
 double sim_RHO_FLOOR(struct Sim *);
 double sim_CS_FLOOR(struct Sim *);
