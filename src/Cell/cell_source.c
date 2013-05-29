@@ -17,6 +17,19 @@ double fgrav_neg_centrifugal( double M , double r , double eps, double n ){
   return( M*r*Om*Om );
 }
 
+void get_rho_sink( struct GravMass * theGravMasses, int p, double r, double phi, double rho, double * rho_sink){
+  double rp = gravMass_r(theGravMasses,p);
+  double pp = gravMass_phi(theGravMasses,p);
+  double cosp = cos(phi);
+  double sinp = sin(phi);
+  double dx = r*cosp-rp*cos(pp);
+  double dy = r*sinp-rp*sin(pp);
+  double script_r = sqrt(dx*dx+dy*dy);
+
+  *rho_sink = rho / RHO_SINK_TIMESCALE * exp(-script_r*script_r/(0.1*0.1));
+
+}
+
 void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p , double r , double phi , double * fr , double * fp ){
   double G_EPS=sim_G_EPS(theSim);
   double PHI_ORDER=sim_PHI_ORDER(theSim);
@@ -124,10 +137,10 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           double vdotGradPsi = /*dV**/(vr*GradPsi[0]+(vp-sim_W_A(theSim,r))*GradPsi[1]+vz*GradPsi[2]);
 
           /*
-          if (fabs(z)<0.00001){
-            fprintf(gradpsifile,"%e %e %e %e %e\n",r,phi,dV,GradPsi[0]/dV, c->prim[PSI]);
-          }
-          */
+             if (fabs(z)<0.00001){
+             fprintf(gradpsifile,"%e %e %e %e %e\n",r,phi,dV,GradPsi[0]/dV, c->prim[PSI]);
+             }
+             */
           c->cons[SRR] += dt*dV*( .5*B2 - Bp*Bp )/r;
           c->cons[SRR] -= POWELL*dt*divB*Br;
           c->cons[SZZ] -= POWELL*dt*divB*Bz;
@@ -143,6 +156,12 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[PSI] -= POWELL*dt*vdotGradPsi;
 
           c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
+        
+          double rho_sink;
+          for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
+            get_rho_sink(theGravMasses,p,gravdist,phi,rho, &rho_sink);
+            c->cons[RHO] -= rho_sink * dt * dV;
+          }   
         }
       }
     }
@@ -168,7 +187,7 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, double dt
         double dz = zp-zm;
         double dV = dphi*.5*(rp*rp-rm*rm)*dz;
         double nu = sim_EXPLICIT_VISCOSITY(theSim);
-       // c->cons[SRR] += -dt*dV*nu*rho*vr/r/r;
+        // c->cons[SRR] += -dt*dV*nu*rho*vr/r/r;
       }
     }
   }
