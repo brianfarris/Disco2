@@ -26,6 +26,7 @@ void get_rho_sink( struct GravMass * theGravMasses, int p, double r, double phi,
   double dy = r*sinp-rp*sin(pp);
   double script_r = sqrt(dx*dx+dy*dy);
 
+  //printf("rho: %e, RHO_SINK_TIMESCALE: %e, script_r: %e, exp(-script_r*script_r/(0.1*0.1)): %e, rho_sink: %e\n",rho,RHO_SINK_TIMESCALE,script_r,exp(-script_r*script_r/(0.1*0.1)),rho / RHO_SINK_TIMESCALE * exp(-script_r*script_r/(0.1*0.1)));
   *rho_sink = rho / RHO_SINK_TIMESCALE * exp(-script_r*script_r/(0.1*0.1));
 
 }
@@ -117,6 +118,13 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         c->cons[LLL] += dt*dV*rho*Fp*r;
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( Fr*(vr*sint+vz*cost) + Fp*vp );
+  
+        double rho_sink;
+        for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
+          get_rho_sink(theGravMasses,p,gravdist,phi,rho, &rho_sink);
+          //printf("gravdist: %e, rho_sink: %e\n",gravdist,rho_sink);
+          c->cons[RHO] -= rho_sink * dt * dV;
+        }
 
         if(sim_runtype(theSim)==MHD){
           double Br = c->prim[BRR];
@@ -156,12 +164,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[PSI] -= POWELL*dt*vdotGradPsi;
 
           c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
-        
-          double rho_sink;
-          for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
-            get_rho_sink(theGravMasses,p,gravdist,phi,rho, &rho_sink);
-            c->cons[RHO] -= rho_sink * dt * dV;
-          }   
+
         }
       }
     }
