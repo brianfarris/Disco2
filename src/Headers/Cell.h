@@ -32,6 +32,8 @@ void cell_init_vortex(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_vortex(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_torus(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_torus(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_bondi(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_bondi(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
