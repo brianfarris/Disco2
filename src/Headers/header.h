@@ -15,5 +15,5 @@ enum{HLLC,HLL};
 MPI_Comm sim_comm;
 #define farris_mpi_factorization 0
 #define KEP_BNDRY 0
-#define NPCAP 256 
+//#define NPCAP 256 
 double time_global;
