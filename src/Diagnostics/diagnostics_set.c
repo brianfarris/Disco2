@@ -76,11 +76,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double v2   = vr*vr + vp*vp + vz*vz;
           double rhoe = press/(sim_GAMMALAW(theSim)-1.);
 
-          double Omega = 1.;
-          double t = timestep_get_t(theTimeStep);
-          double dPhi_dphi = 1/4.*r*sin(phi-Omega*t) * (
-              pow(r*r+.25-r*cos(phi-Omega*t),-1.5) -  
-              pow(r*r+.25+r*cos(phi-Omega*t),-1.5));
+          double passive_scalar = cell_prim(cell_single(theCells,i,j,k),5);
 
           if ((fabs(zp)<0.0000001)||(fabs(z)<0.0000001)){
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+0] = r;
@@ -89,13 +85,13 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+3] = vr;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+4] = vp;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+5] = press;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+6] = rho*vr;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+7] = rho*vp;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+8] = rho*vr*cos(phi);            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+9] = rho*vr*sin(phi);            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+10] = rho*vr*cos(2.*phi);            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+11] = rho*vr*sin(2.*phi);            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = -2.*M_PI*r*rho*dPhi_dphi;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+6] = passive_scalar;            
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+7] = rho*vr;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+8] = rho*vp;            
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+9] = rho*vr*cos(phi);            
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+10] = rho*vr*sin(phi);            
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+11] = rho*vr*cos(2.*phi);            
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = rho*vr*sin(2.*phi);            
             ++position;
           }
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
@@ -104,13 +100,13 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+2] += (vr/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+3] += (vp/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+4] += (press/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+5] += (rho*vr/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+6] += (rho*vp/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+7] += (rho*vr*cos(phi)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+8] += (rho*vr*sin(phi)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (rho*vr*cos(2.*phi)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (rho*vr*sin(2.*phi)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (-2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+5] += (passive_scalar/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+6] += (rho*vr/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+7] += (rho*vp/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+8] += (rho*vr*cos(phi)/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (rho*vr*sin(phi)/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (rho*vr*cos(2.*phi)/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (rho*vr*sin(2.*phi)/sim_N_p(theSim,i)*dz) ;
           // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }
