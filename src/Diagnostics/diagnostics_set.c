@@ -97,6 +97,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double rhoe = press/(sim_GAMMALAW(theSim)-1.);
           double psi = cell_prim(cell_single(theCells,i,j,k),PSI);
 
+          double passive_scalar = cell_prim(cell_single(theCells,i,j,k),5);
           double Omega = 1.;
           double t = timestep_get_t(theTimeStep);
           double dPhi_dphi = 1/4.*r*sin(phi-Omega*t) * (
@@ -164,6 +165,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = Br*Bp;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = psi;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+16] = 180./M_PI*0.5*asin(-Br*Bp/(0.5*B2));
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+17] = passive_scalar;
             ++position;
           }
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
@@ -183,6 +185,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (psi/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += (180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (passive_scalar/sim_N_p(theSim,i)*dz) ; 
           // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }
