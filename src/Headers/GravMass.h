@@ -20,10 +20,10 @@ struct GravMass{
 struct GravMass *gravMass_create(int);
 void gravMass_destroy(struct GravMass *);
 //initialization
-void gravMass_init_none(struct GravMass *);
-void gravMass_init_single(struct GravMass *);
-void gravMass_init_binary(struct GravMass *);
-void (*gravMass_init_ptr(struct Sim * ))(struct GravMass *);
+void gravMass_init_none(struct GravMass *,struct Sim *);
+void gravMass_init_single(struct GravMass *,struct Sim *);
+void gravMass_init_binary(struct GravMass *,struct Sim *);
+void (*gravMass_init_ptr(struct Sim * ))(struct GravMass *,struct Sim *);
 void gravMass_set_chkpt(struct GravMass * ,int ,double ,double ,double, double );
 //access data
 double gravMass_r(struct GravMass * ,int);

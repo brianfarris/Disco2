@@ -23,13 +23,22 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
   double xi_exp = 2.0;
 
   double Gam = sim_GAMMALAW(theSim);
-  double r_planet = 0.5;
-  double mbh1 = 0.5;
-  double mbh2 = 0.5;
-  double eps = sim_G_EPS(theSim)*r_planet;
   double cp = 1./Mach;
   double fac = 0.0001;
 
+  //printf("rbh1: %e, rbh2: %e, mbh1: %e, mbh2: %e\n",gravMass_r(theGravMasses,0),gravMass_r(theGravMasses,1),gravMass_M(theGravMasses,0),gravMass_M(theGravMasses,1));
+
+  double Mtotal = 1.0;
+  double sep = 1.0;
+  double massratio = sim_MassRatio(theSim);
+  double M0 = Mtotal/(1.+massratio);
+  double M1 = Mtotal/(1.+1./massratio);
+  double r0 = M1/Mtotal*sep;
+  double r1 = M0/Mtotal*sep;
+
+  double eps0 = sim_G_EPS(theSim)*r0;
+  double eps1 = sim_G_EPS(theSim)*r1;
+  
   double DISK_ALPHA = 0.01;
 
   int i, j,k;
@@ -45,10 +54,10 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
       }else{
         cs = sqrt(1./r)/Mach;
       }
-      double xbh1 = r_planet;
-      double xbh2 = -r_planet;
+      double xbh0 = r0;
+      double xbh1 = -r1;
+      double ybh0 = 0.0;
       double ybh1 = 0.0;
-      double ybh2 = 0.0;
 
       for (j = 0; j < sim_N_p(theSim,i); j++) {
 
@@ -56,12 +65,12 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
         double xpos = r*cos(phi);
         double ypos = r*sin(phi);
 
-        double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
-        double dist_bh2 = sqrt((xpos-xbh2)*(xpos-xbh2)+(ypos-ybh2)*(ypos-ybh2));
+        double dist_bh1 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
+        double dist_bh2 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
 
         double n = sim_PHI_ORDER(theSim);
-        double Pot1 = mbh1/pow( pow(dist_bh1,n) + pow(eps,n) , 1./n );
-        double Pot2 = mbh2/pow( pow(dist_bh2,n) + pow(eps,n) , 1./n );
+        double Pot1 = M0/pow( pow(dist_bh1,n) + pow(eps0,n) , 1./n );
+        double Pot2 = M1/pow( pow(dist_bh2,n) + pow(eps1,n) , 1./n );
 
         double rho = rho0*( pow(rs/r,delta_exp) )*exp(-pow(rs/r,xi_exp) );
         double omega = sqrt(1.)/pow(r,1.5);

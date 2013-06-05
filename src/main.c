@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
     io_readbuf(theIO,theCells,theSim,theGravMasses); // read from buffer into theCells and theGravMasses
     io_deallocbuf(theIO); // get rid of buffer
   }else{
-    (*gravMass_init_ptr(theSim))(theGravMasses); // set up gravitating masses. 
+    (*gravMass_init_ptr(theSim))(theGravMasses,theSim); // set up gravitating masses. 
     (*cell_init_ptr(theSim))(theCells,theSim,theMPIsetup); // setup initial data using routine specified in .par file
   }
   gravMass_clean_pi(theGravMasses,theSim); // make sure GravMasses have phi between 0 and 2 pi.

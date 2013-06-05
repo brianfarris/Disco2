@@ -6,7 +6,7 @@
 #include "../Headers/Sim.h"
 #include "../Headers/header.h"
 
-void (*gravMass_init_ptr(struct Sim * theSim))(struct GravMass *){
+void (*gravMass_init_ptr(struct Sim * theSim))(struct GravMass *,struct Sim *){
   if (sim_GravMassType(theSim)==NONE){
     return(&gravMass_init_none);
   } else if (sim_GravMassType(theSim)==SINGLE){
@@ -19,7 +19,7 @@ void (*gravMass_init_ptr(struct Sim * theSim))(struct GravMass *){
   }
 }
 
-void gravMass_init_none(struct GravMass * theGravMasses){
+void gravMass_init_none(struct GravMass * theGravMasses,struct Sim * theSim){
   theGravMasses[0].M   = 0.0;
   theGravMasses[0].r   = 0.0;
   theGravMasses[0].phi = 0.0;
@@ -31,7 +31,7 @@ void gravMass_init_none(struct GravMass * theGravMasses){
 
 }
 
-void gravMass_init_single(struct GravMass * theGravMasses){
+void gravMass_init_single(struct GravMass * theGravMasses,struct Sim * theSim){
   theGravMasses[0].M   = 1.0;
   theGravMasses[0].r   = 0.0;
   theGravMasses[0].phi = 0.0;
@@ -43,10 +43,11 @@ void gravMass_init_single(struct GravMass * theGravMasses){
 
 }
 
-void gravMass_init_binary(struct GravMass * theGravMasses){
+void gravMass_init_binary(struct GravMass * theGravMasses,struct Sim * theSim){
   double Mtotal = 1.0;
   double sep = 1.0;
-  double massratio = 1.0;
+  //double massratio = 1.0;
+  double massratio = sim_MassRatio(theSim);
   double M0 = Mtotal/(1.+massratio);
   double M1 = Mtotal/(1.+1./massratio);
   double r0 = M1/Mtotal*sep;
