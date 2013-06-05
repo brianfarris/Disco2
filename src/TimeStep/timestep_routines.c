@@ -31,6 +31,9 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_clear_w(theCells,theSim);
   cell_set_w( theCells ,theSim);
 
+  // this is part of the runge-kutta method
+  cell_adjust_RK_cons( theCells, theSim, theTimeStep->RK);
+
   int i,j,k,q;
   //Phi Flux
   cell_plm_p(theCells,theSim);//piecewise-linear reconstruction
