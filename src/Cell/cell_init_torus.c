@@ -30,9 +30,14 @@ void cell_init_torus(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
   int i, j,k;
   srand(666 + mpisetup_MyProc(theMPIsetup));
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
-    double zp = sim_FacePos(theSim,k  ,Z_DIR);
-    double zm = sim_FacePos(theSim,k-1,Z_DIR);
-    double z = 0.5*(zm+zp); 
+    double z;
+    if( sim_N_global(theSim,Z_DIR) != 1 ){
+      double zp = sim_FacePos(theSim,k  ,Z_DIR);
+      double zm = sim_FacePos(theSim,k-1,Z_DIR);
+      z = 0.5*(zm+zp); 
+    } else{
+      z = 0.0;
+    }
     for (i = 0; i < sim_N(theSim,R_DIR); i++) {
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       double rp = sim_FacePos(theSim,i,R_DIR);
@@ -49,7 +54,7 @@ void cell_init_torus(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
       }
       double rho = pow(PoRho,1.0/(GAMMALAW-1.0))/Rho_norm;
       double Pp = pow(PoRho,1.0/GammaFac)/Rho_norm;
- 
+
       if (PoRho<1.0e-20){
         Pp = rho;
       }
@@ -72,15 +77,17 @@ void cell_init_torus(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         theCells[k][i][j].prim[URR] = 0.0;
         theCells[k][i][j].prim[UPP] = omega*(1.+delta);
         theCells[k][i][j].prim[UZZ] = 0.0;
+        if (sim_runtype(theSim)==MHD){
         theCells[k][i][j].prim[BRR] = Br;
         theCells[k][i][j].prim[BPP] = Bp;
         theCells[k][i][j].prim[BZZ] = Bz;
         theCells[k][i][j].prim[PSI] = 0.0;
-        theCells[k][i][j].wiph = omega*r;
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;
         theCells[k][i][j].GradPsi[1] = 0.0;
         theCells[k][i][j].GradPsi[2] = 0.0;
+        }
+        theCells[k][i][j].wiph = omega*r;
       }
     }
   }
