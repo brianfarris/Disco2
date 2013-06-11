@@ -21,14 +21,11 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
   double r_face,r_face_m1,r_face_p1,r_cell;
 
   if( mpisetup_check_rin_bndry(theMPIsetup) ){
-
     if (sim_NoInnerBC(theSim)!=1){ // if the global inner radius is set negative, we don't apply an inner BC
       for( i=0 ; i>=0 ; --i ){
         r_face=sim_FacePos(theSim,i,R_DIR);
         r_face_m1=sim_FacePos(theSim,i-1,R_DIR);
         r_cell = 0.5*(r_face+r_face_m1);
-        //printf("r_cell inner: %e\n",r_cell);
-
         for( n=timestep_n(theTimeStep,i,R_DIR) ; n<timestep_n(theTimeStep,i+1,R_DIR) ; ++n ){
           for( q=0 ; q<NUM_Q ; ++q ){
             face_L_pointer(theFaces,n)->prim[q] = 0.0;
@@ -44,7 +41,6 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
             cL->prim[PSI] = 0.0;
           }
         }
-
         for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
           double zp = sim_FacePos(theSim,k,Z_DIR);
           double zm = sim_FacePos(theSim,k-1,Z_DIR);
@@ -54,7 +50,6 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
             for( q=0 ; q<NUM_Q ; ++q ){
               theCells[k][i][j].prim[q] /= dA;
             }
-            //printf("r: %e, theCells[k][i][j].prim[URR]: %e\n",r_face,theCells[k][i][j].prim[URR]);
             if( theCells[k][i][j].prim[URR] > 0.0 ) theCells[k][i][j].prim[URR] = 0.0;
             if (KEP_BNDRY==1){
               theCells[k][i][j].prim[UPP] = pow(r_cell,-1.5);          
@@ -64,6 +59,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
       }
     }
   }
+
 
   if( mpisetup_check_rout_bndry(theMPIsetup) ){
     for( n=n1 ; n<Nf ; ++n ){
@@ -83,7 +79,6 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
     }
     r_face = sim_FacePos(theSim,sim_N(theSim,R_DIR)-2,R_DIR);
     r_face_p1 = sim_FacePos(theSim,sim_N(theSim,R_DIR)-1,R_DIR);
-    r_cell = 0.5*(r_face+r_face_p1);
     //printf("r_cell outer: %e\n",r_cell);
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       double zp = sim_FacePos(theSim,k,Z_DIR);

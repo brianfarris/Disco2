@@ -25,6 +25,7 @@ int sim_N_p(struct Sim *theSim,int i){
 //}
 double sim_FacePos(struct Sim *theSim,int index,int direction){
   if (direction==R_DIR){
+    //printf("index: %d, theSim->r_faces[index+1]: %e\n",index,theSim->r_faces[index+1]);
     return(theSim->r_faces[index+1]);
   } else if (direction==Z_DIR){
     return(theSim->z_faces[index+1]);
