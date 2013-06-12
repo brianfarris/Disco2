@@ -137,8 +137,11 @@ double sim_CS_FLOOR(struct Sim *theSim){
 double sim_CS_CAP(struct Sim *theSim){
   return(theSim->CS_CAP);
 }
-double sim_VEL_CAP(struct Sim *theSim) {
+double sim_VEL_CAP(struct Sim *theSim){
   return(theSim->VEL_CAP);
+}
+int sim_SET_T(struct Sim *theSim){
+  return(theSim->SET_T);
 }
 double sim_get_T_MAX(struct Sim * theSim){
   return(theSim->T_MAX);

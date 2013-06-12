@@ -68,6 +68,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Z_Min"             , VAR_DOUB , &(theSim->MIN[Z_DIR])  );
       err += readvar( pfile , "Z_Max"             , VAR_DOUB , &(theSim->MAX[Z_DIR])  );
       err += readvar( pfile , "NP_CONST"             , VAR_INT , &(theSim->NP_CONST)  );
+      err += readvar( pfile , "NPCAP"             , VAR_INT , &(theSim->NPCAP)  );
       err += readvar( pfile , "aspect"             , VAR_DOUB , &(theSim->aspect)  );
       err += readvar( pfile , "NUM_C"              , VAR_INT  , &(theSim->NUM_C) );
       err += readvar( pfile , "NUM_N"              , VAR_INT  , &(theSim->NUM_N) );
@@ -92,6 +93,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Cs_Floor"          , VAR_DOUB , &(theSim->CS_FLOOR)  );
       err += readvar( pfile , "Cs_Cap"            , VAR_DOUB , &(theSim->CS_CAP)  );
       err += readvar( pfile , "Vel_Cap"           , VAR_DOUB , &(theSim->VEL_CAP)  );
+      err += readvar( pfile , "SET_T"           , VAR_INT , &(theSim->SET_T)  );
       err += readvar( pfile , "runtype"           , VAR_INT , &(theSim->runtype)  );
       err += readvar( pfile , "DAMP_TIME"           , VAR_DOUB , &(theSim->DAMP_TIME)  );
       err += readvar( pfile , "RDAMP_INNER"           , VAR_DOUB , &(theSim->RDAMP_INNER)  );

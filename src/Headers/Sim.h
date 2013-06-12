@@ -9,6 +9,7 @@ struct Sim {
   double *r_faces;
   double *z_faces;
   int *N_p;
+  int NPCAP;
   int N0[2];
   int N_noghost[2];
   int Nghost_min[2];
@@ -56,6 +57,7 @@ struct Sim {
   double CS_FLOOR;
   double CS_CAP;
   double VEL_CAP;
+  int SET_T;
   int runtype;
   double DAMP_TIME;
   double RDAMP_INNER;
@@ -112,6 +114,7 @@ double sim_RHO_FLOOR(struct Sim *);
 double sim_CS_FLOOR(struct Sim *);
 double sim_CS_CAP(struct Sim *);
 double sim_VEL_CAP(struct Sim *);
+int sim_SET_T(struct Sim *);
 int sim_NUM_C(struct Sim *);
 int sim_NUM_Q(struct Sim *);
 double sim_get_T_MAX(struct Sim * );

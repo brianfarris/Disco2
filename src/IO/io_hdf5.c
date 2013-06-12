@@ -11,6 +11,7 @@
 #include "../Headers/IO.h"
 #include "../Headers/header.h"
 
+#ifdef CHECKPOINTING
 void io_hdf5_out(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeStep){
   int NUM_Q = sim_NUM_Q(theSim);
   int Ncells = sim_Ncells(theSim);
@@ -204,7 +205,7 @@ void io_hdf5_in(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeSt
   // ********************************************
   // Then we read in the info of the 1st GravMass
   // ********************************************
-  
+
   dataset = H5Dopen1(file,"GravMass");
   dims2[0] = 2;
   dims2[1] = 4;
@@ -263,3 +264,4 @@ void io_hdf5_in(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeSt
   H5Sclose(memspace);
   H5Fclose(file);
 }
+#endif

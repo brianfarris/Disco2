@@ -95,7 +95,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_calc_prim( theCells ,theSim); // calculate primitives
 
   //Set temperature to keep HoR constant
-  if (SET_T==1){
+  if (sim_SET_T(theSim)==1){
     cell_setT(theCells,theSim); 
   }
 
