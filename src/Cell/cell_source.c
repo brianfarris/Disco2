@@ -26,8 +26,7 @@ void get_rho_sink( struct GravMass * theGravMasses, double RhoSinkTimescale, int
   double dy = r*sinp-rp*sin(pp);
   double script_r = sqrt(dx*dx+dy*dy);
 
-  //printf("rho: %e, RHO_SINK_TIMESCALE: %e, script_r: %e, exp(-script_r*script_r/(0.1*0.1)): %e, rho_sink: %e\n",rho,RHO_SINK_TIMESCALE,script_r,exp(-script_r*script_r/(0.1*0.1)),rho / RHO_SINK_TIMESCALE * exp(-script_r*script_r/(0.1*0.1)));
-  *rho_sink = rho / (RhoSinkTimescale*2.0*M_PI) * exp(-script_r*script_r/(0.1*0.1));
+  *rho_sink = rho / (RhoSinkTimescale*2.0*M_PI) * exp(-script_r*script_r/(0.25*0.25));
 
 }
 
