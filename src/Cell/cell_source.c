@@ -67,6 +67,7 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
 void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses , double dt ){
   int GRAV2D=sim_GRAV2D(theSim);
   int POWELL=sim_POWELL(theSim);
+  gravMass_reset_Mdot(theGravMasses,theSim);
   int i,j,k;
   //FILE * gradpsifile= fopen("gradpsi.dat","w");
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -123,6 +124,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
             get_rho_sink(theGravMasses,sim_RhoSinkTimescale(theSim),p,gravdist,phi,rho, &rho_sink);
             c->cons[RHO] -= rho_sink * dt * dV;
+            gravMass_add_Mdot(theGravMasses,rho_sink*dV,p);
           }
         }
 
@@ -169,6 +171,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
       }
     }
   }
+  //printf("gravMass_Mdot(theGravMasses,0): %e, gravMass_Mdot(theGravMasses,1): %e, dt: %e\n",gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),dt);
   //fclose(gradpsifile);
 
 }

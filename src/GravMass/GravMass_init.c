@@ -24,11 +24,12 @@ void gravMass_init_none(struct GravMass * theGravMasses,struct Sim * theSim){
   theGravMasses[0].r   = 0.0;
   theGravMasses[0].phi = 0.0;
   theGravMasses[0].omega = 0.0;
+  theGravMasses[0].Mdot = 0.0;
   theGravMasses[1].M   = 0.0;
   theGravMasses[1].r   = 0.0;
   theGravMasses[1].phi = 0.0;
   theGravMasses[1].omega = 0.0;
-
+  theGravMasses[1].Mdot = 0.0;
 }
 
 void gravMass_init_single(struct GravMass * theGravMasses,struct Sim * theSim){
@@ -36,10 +37,12 @@ void gravMass_init_single(struct GravMass * theGravMasses,struct Sim * theSim){
   theGravMasses[0].r   = 0.0;
   theGravMasses[0].phi = 0.0;
   theGravMasses[0].omega = 0.0;
+  theGravMasses[0].Mdot = 0.0;
   theGravMasses[1].M   = 0.0;
   theGravMasses[1].r   = 0.0;
   theGravMasses[1].phi = 0.0;
   theGravMasses[1].omega = 0.0;
+  theGravMasses[1].Mdot = 0.0;
 
 }
 
@@ -58,10 +61,12 @@ void gravMass_init_binary(struct GravMass * theGravMasses,struct Sim * theSim){
   theGravMasses[0].r   = r0;
   theGravMasses[0].phi = 0.0;
   theGravMasses[0].omega = sqrt(om2);
+  theGravMasses[0].Mdot = 0.0;
   theGravMasses[1].M   = M1;
   theGravMasses[1].r   = r1;
   theGravMasses[1].phi = M_PI;
   theGravMasses[1].omega = sqrt(om2);
+  theGravMasses[1].Mdot = 0.0;
 }
 
 void gravMass_set_chkpt(struct GravMass * theGravMasses,int p,double r,double phi,double M, double omega){
