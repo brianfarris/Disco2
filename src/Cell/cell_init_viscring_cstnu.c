@@ -12,7 +12,7 @@ void cell_single_init_viscring_cstnu(struct Cell *theCell, struct Sim *theSim,in
 	double R0     = 1.0;
 	double GM     = 1.0;
 	double rho0   = 1.0;
-	double Mach   = 30.0;
+	double Mach   = 100.0;
 	
 	
 	
@@ -86,7 +86,7 @@ void cell_init_viscring_cstnu(struct Cell ***theCells,struct Sim *theSim,struct 
   double R0     = 1.0;
   double GM     = 1.0;
   double rho0   = 1.0;
-  double Mach   = 30.0;
+  double Mach   = 100.0;
 
 
   double nu = sim_EXPLICIT_VISCOSITY(theSim); //DISK_ALPHA*(1.0/Mach)*(1.0/Mach);
