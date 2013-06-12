@@ -79,6 +79,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
     }
     r_face = sim_FacePos(theSim,sim_N(theSim,R_DIR)-2,R_DIR);
     r_face_p1 = sim_FacePos(theSim,sim_N(theSim,R_DIR)-1,R_DIR);
+    r_cell = 0.5*(r_face+r_face_p1);
     //printf("r_cell outer: %e\n",r_cell);
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       double zp = sim_FacePos(theSim,k,Z_DIR);

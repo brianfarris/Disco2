@@ -21,6 +21,7 @@ void sim_set_N_p(struct Sim * theSim){
       if (NPCAP>0){
         if (theSim->N_p[i]>NPCAP) theSim->N_p[i] = NPCAP;
       }
+      printf("%e %e %e\n",r,dr,2.*M_PI*r/theSim->N_p[i]);
     }
   }
 }
