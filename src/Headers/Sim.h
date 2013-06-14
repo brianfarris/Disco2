@@ -66,7 +66,8 @@ struct Sim {
   double RLogScale;
   double ZLogScale;
   double HiResSigma;
-  double HiResR0;
+  double HiResR0a;
+  double HiResR0b;
   double HiResFac;
   int W_A_TYPE;
 };
