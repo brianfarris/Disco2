@@ -24,6 +24,7 @@ struct Sim {
   int BoundTypeZ;
   int ZeroPsiBndry;
   int NoInnerBC;
+  double HoR;
   int Restart;
   int N_global[2];
   int NP_CONST;
@@ -115,6 +116,7 @@ double sim_CS_FLOOR(struct Sim *);
 double sim_CS_CAP(struct Sim *);
 double sim_VEL_CAP(struct Sim *);
 int sim_SET_T(struct Sim *);
+double sim_HoR(struct Sim *);
 int sim_NUM_C(struct Sim *);
 int sim_NUM_Q(struct Sim *);
 double sim_get_T_MAX(struct Sim * );

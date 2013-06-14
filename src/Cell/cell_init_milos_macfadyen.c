@@ -17,7 +17,7 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
   double rs = 10.0;
 
   double rho0   = 1.0;
-  double Mach   = 10.0;
+  double Mach   = 1/sim_HoR(theSim);
 
   double delta_exp   = 3.0;
   double xi_exp = 2.0;
