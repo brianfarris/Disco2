@@ -71,6 +71,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       }
     }
 
+    double mass_inside_1_temp=0.0;
     position=0;
     for (k=kmin;k<kmax;++k){
       double zp = sim_FacePos(theSim,k,Z_DIR);
@@ -97,6 +98,10 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double rhoe = press/(sim_GAMMALAW(theSim)-1.);
           double psi = cell_prim(cell_single(theCells,i,j,k),PSI);
 
+          double dV = 0.5*(rp*rp-rm*rm)*dphi;
+          if (rp<=1.0){
+            mass_inside_1_temp += rho*dV;
+          }
           double passive_scalar = cell_prim(cell_single(theCells,i,j,k),5);
           double Omega = 1.;
           double t = timestep_get_t(theTimeStep);
@@ -113,34 +118,28 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double dist_bh1 = sqrt(r_bh1*r_bh1 + r*r - 2.*r_bh1*r*cos(phi_bh1-phi));
 
           if (dist_bh0<0.1){
-            double dV = 0.5*(rp*rp-rm*rm)*dphi;
             double dM = rho*dV;
             mass_near_bh0_r0p1_temp +=dM;
           }
           if (dist_bh1<0.1){
-            double dV = 0.5*(rp*rp-rm*rm)*dphi;
             double dM = rho*dV;
             mass_near_bh1_r0p1_temp +=dM;
           }
 
           if (dist_bh0<0.2){
-            double dV = 0.5*(rp*rp-rm*rm)*dphi;
             double dM = rho*dV;
             mass_near_bh0_r0p2_temp +=dM;
           }
           if (dist_bh1<0.2){
-            double dV = 0.5*(rp*rp-rm*rm)*dphi;
             double dM = rho*dV;
             mass_near_bh1_r0p2_temp +=dM;
           }
 
           if (dist_bh0<0.4){
-            double dV = 0.5*(rp*rp-rm*rm)*dphi;
             double dM = rho*dV;
             mass_near_bh0_r0p4_temp +=dM;
           }
           if (dist_bh1<0.4){
-            double dV = 0.5*(rp*rp-rm*rm)*dphi;
             double dM = rho*dV;
             mass_near_bh1_r0p4_temp +=dM;
           }
@@ -201,6 +200,18 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       }
     }
 
+    double mass_inner_wedge_temp = 0.0;
+    if (mpisetup_MyProc(theMPIsetup)==0){
+      //printf("myproc: %d, rm(0): %e, rp(0): %e\n",mpisetup_MyProc(theMPIsetup),sim_FacePos(theSim,-1,R_DIR),sim_FacePos(theSim,0,R_DIR));
+      double rp = sim_FacePos(theSim,0,R_DIR);
+      double rm = sim_FacePos(theSim,-1,R_DIR);
+      for (j=0;j<sim_N_p(theSim,i);++j){
+        double dphi = cell_dphi(cell_single(theCells,0,j,0));
+        double dV = 0.5*(rp*rp-rm*rm)*dphi;
+        double rho = cell_prim(cell_single(theCells,0,j,0),RHO);
+        mass_inner_wedge_temp += rho*dV;
+      }
+    }
     MPI_Allreduce( ScalarDiag_temp,ScalarDiag_reduce , NUM_SCAL, MPI_DOUBLE, MPI_SUM, sim_comm);
     MPI_Allreduce( VectorDiag_temp,VectorDiag_reduce , num_r_points_global*NUM_VEC, MPI_DOUBLE, MPI_SUM, sim_comm);
     MPI_Allreduce( EquatDiag_temp,EquatDiag_reduce ,theDiagnostics->N_eq_cells*NUM_EQ, MPI_DOUBLE, MPI_SUM, sim_comm);
@@ -210,10 +221,15 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 
     MPI_Allreduce( &mass_near_bh0_r0p2_temp,&mass_near_bh0_r0p2_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
     MPI_Allreduce( &mass_near_bh1_r0p2_temp,&mass_near_bh1_r0p2_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
- 
+
     MPI_Allreduce( &mass_near_bh0_r0p4_temp,&mass_near_bh0_r0p4_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
     MPI_Allreduce( &mass_near_bh1_r0p4_temp,&mass_near_bh1_r0p4_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
- 
+
+    double mass_inside_1_reduce;
+    MPI_Allreduce( &mass_inside_1_temp,&mass_inside_1_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
+
+    double mass_inner_wedge_reduce;
+    MPI_Allreduce( &mass_inner_wedge_temp,&mass_inner_wedge_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
 
     double RMIN = sim_MIN(theSim,R_DIR);
     double RMAX = sim_MAX(theSim,R_DIR);
@@ -228,9 +244,10 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     double Mdot_near_req1,r_near_req1;
     for (i=0;i<num_r_points_global;++i){
       double r = VectorDiag_reduce[i*NUM_VEC]/(ZMAX-ZMIN);
-      if (r>1.0 && req1_found==0){
+      if (r>.96 && req1_found==0){
         Mdot_near_req1 = VectorDiag_reduce[i*NUM_VEC+5]*2.*M_PI*r/(ZMAX-ZMIN);
         r_near_req1 = r;
+        //printf("req1_found i: %d, r: %e\n",i,r);
         req1_found = 1;
       }
       for (n=0;n<NUM_VEC;++n){
@@ -242,7 +259,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagMdotFilename[256];
       sprintf(DiagMdotFilename,"DiagMdot.dat");
       FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
-      fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),mass_near_bh0_r0p1_reduce,mass_near_bh1_r0p1_reduce,mass_near_bh0_r0p2_reduce,mass_near_bh1_r0p2_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_r0p4_reduce);       
+      fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_inside_1_reduce,mass_inner_wedge_reduce,gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),mass_near_bh0_r0p1_reduce,mass_near_bh1_r0p1_reduce,mass_near_bh0_r0p2_reduce,mass_near_bh1_r0p2_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_r0p4_reduce);       
       fclose(DiagMdotFile);
     }
 

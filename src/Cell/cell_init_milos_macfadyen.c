@@ -17,7 +17,7 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
   double rs = 10.0;
 
   double rho0   = 1.0;
-  double Mach   = 10.0;
+  double Mach   = 20.0;
 
   double delta_exp   = 3.0;
   double xi_exp = 2.0;
@@ -92,7 +92,7 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
         }
         */
         if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
-        
+  
         double Pp = cs*cs*rho/Gam;
 
         theCells[k][i][j].prim[RHO] = rho*exp(fac*(Pot1+Pot2)/cp/cp);

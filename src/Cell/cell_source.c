@@ -124,7 +124,9 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
             get_rho_sink(theGravMasses,sim_RhoSinkTimescale(theSim),p,gravdist,phi,rho, &rho_sink);
             c->cons[RHO] -= rho_sink * dt * dV;
-            gravMass_add_Mdot(theGravMasses,rho_sink*dV,p);
+            if ((i>sim_Nghost_min(theSim,R_DIR)) && (i<(sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)))){
+              gravMass_add_Mdot(theGravMasses,rho_sink*dV,p);
+            }
           }
         }
 

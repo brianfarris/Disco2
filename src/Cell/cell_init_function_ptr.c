@@ -24,7 +24,9 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_mhdexp);
   } else if (sim_InitialDataType(theSim)==VISCRING){
     return(&cell_init_viscring_cstnu);
-   } else{
+  } else if (sim_InitialDataType(theSim)==TESTING){
+    return(&cell_init_testing);
+  } else{
     printf("ERROR\n");
     exit(0);
   }
@@ -49,7 +51,9 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_mhdexp);
   } else if (sim_InitialDataType(theSim)==VISCRING){
     return(&cell_single_init_viscring_cstnu);
-   } else{
+  } else if (sim_InitialDataType(theSim)==TESTING){
+    return(&cell_single_init_testing);
+  } else{
     printf("ERROR\n");
     exit(0);
   }

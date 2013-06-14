@@ -48,6 +48,8 @@ void cell_init_mhdexp(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_mhdexp(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_viscring_cstnu(struct Cell ***,struct Sim *,struct MPIsetup * ) ;
 void cell_single_init_viscring_cstnu(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_testing(struct Cell ***,struct Sim *,struct MPIsetup * ) ;
+void cell_single_init_testing(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
