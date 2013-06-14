@@ -21,9 +21,9 @@ aspect                  1.0
 NUM_C                   5
 NUM_N                   0
 Time_Max                100000.0
-Num_Checkpoints	        5	
-Num_Diag_Dump           10000
-Num_Diag_Measure        1000000
+Num_Checkpoints	        100	
+Num_Diag_Dump           1000
+Num_Diag_Measure        10000
 
 NoInnerBC               1
 BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
@@ -33,9 +33,9 @@ ZeroPsiBndry          1
 Move_Cells              3
 RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index         1.001
-Explicit_Viscosity      0.01
+Explicit_Viscosity      0.1
 
-RhoSinkTimescale        100.0
+RhoSinkTimescale        -100.0
 
 DivB_Ch			0.06		//Dedner divergence cleaning
 DivB_l			0.1
@@ -52,7 +52,7 @@ PHI_ORDER               2
 
 //Atmosphere Parameters
 Rho_Floor		0.00001
-Cs_Floor		0.0001		
+Cs_Floor		0.00001		
 Cs_Cap			1.0
 Vel_Cap			10.0
 SET_T                   1
