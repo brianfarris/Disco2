@@ -102,7 +102,8 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "RLogScale"           , VAR_DOUB , &(theSim->RLogScale)  );
       err += readvar( pfile , "ZLogScale"           , VAR_DOUB , &(theSim->ZLogScale)  );
       err += readvar( pfile , "HiResSigma"           , VAR_DOUB , &(theSim->HiResSigma)  );
-      err += readvar( pfile , "HiResR0"           , VAR_DOUB , &(theSim->HiResR0)  );
+      err += readvar( pfile , "HiResR0a"           , VAR_DOUB , &(theSim->HiResR0a)  );
+      err += readvar( pfile , "HiResR0b"           , VAR_DOUB , &(theSim->HiResR0b)  );
       err += readvar( pfile , "HiResFac"           , VAR_DOUB , &(theSim->HiResFac)  );
       err += readvar( pfile , "w_a_type"            , VAR_INT , &(theSim->W_A_TYPE));
     }

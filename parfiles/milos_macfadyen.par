@@ -67,5 +67,6 @@ RDAMP_OUTER             0.0
 RLogScale               5.0
 ZLogScale               1000.0
 HiResSigma              0.1
-HiResR0                 0.5
+HiResR0a                0.5
+HiResR0b                10000000.0
 HiResFac                3.0
