@@ -244,7 +244,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     double Mdot_near_req1,r_near_req1;
     for (i=0;i<num_r_points_global;++i){
       double r = VectorDiag_reduce[i*NUM_VEC]/(ZMAX-ZMIN);
-      if (r>.96 && req1_found==0){
+      if (r>1.0 && req1_found==0){
         Mdot_near_req1 = VectorDiag_reduce[i*NUM_VEC+5]*2.*M_PI*r/(ZMAX-ZMIN);
         r_near_req1 = r;
         //printf("req1_found i: %d, r: %e\n",i,r);

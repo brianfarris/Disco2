@@ -67,4 +67,4 @@ RLogScale               13.14
 ZLogScale               1000.0
 HiResSigma              0.1
 HiResR0                 0.5
-HiResFac                1.0
+HiResFac                0.0

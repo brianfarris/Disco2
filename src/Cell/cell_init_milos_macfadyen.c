@@ -17,7 +17,7 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
   double rs = 10.0;
 
   double rho0   = 1.0;
-  double Mach   = 20.0;
+  double Mach   = 10.0;
 
   double delta_exp   = 3.0;
   double xi_exp = 2.0;
@@ -78,9 +78,9 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
         double O2 = omega*omega + cs*cs/r/r*( 2.*rs*rs/r/r - 3. );
         double vr;
         if (r<1.){
-          omega = sqrt(O2)*pow(r,2.);
-          //vr = 0.0;
-          vr = (-3.0*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(1./rs,-xi_exp)))*pow(r,2.);
+          omega = sqrt(O2);
+          vr = 0.0;
+          //vr = (-3.0*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(1./rs,-xi_exp)))*pow(r,2.);
         }else{
           omega = sqrt(O2);
           //vr = 0.0;
@@ -91,7 +91,7 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
           omega = 0.0;//pow(r,-1.5);
         }
         */
-        if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
+        if( rho<(100.*sim_RHO_FLOOR(theSim)) ) rho = 100.*sim_RHO_FLOOR(theSim);
   
         double Pp = cs*cs*rho/Gam;
 
