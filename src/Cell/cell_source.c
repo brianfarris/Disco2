@@ -45,6 +45,8 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, double 
   double alpha = sim_EXPLICIT_VISCOSITY(theSim);
   double m = gravMass_M(theGravMasses,p);
   double t_visc = 2./3. * 1./(alpha*HoR*HoR)*pow(script_r,1.5)*pow(m,-.5);
+  //printf("m: %e, t_visc: %e\n",m,t_visc);
+  *drho_dt_sink = 0.0;
   if (t_visc < 10.* dt){
     t_visc = 10.*dt;
   }
