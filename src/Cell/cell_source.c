@@ -93,12 +93,24 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
 void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses , double dt ){
   int GRAV2D=sim_GRAV2D(theSim);
   int POWELL=sim_POWELL(theSim);
-  gravMass_reset_Mdot(theGravMasses,theSim);
   int i,j,k;
   double Mdot_temp[2];
   Mdot_temp[0] = 0.0;
   Mdot_temp[1] = 0.0;
-  //FILE * gradpsifile= fopen("gradpsi.dat","w");
+
+  int imin_noghost;
+  if (sim_Nghost_min(theSim,R_DIR) == 1){
+    imin_noghost = 0;
+  } else{
+    imin_noghost = sim_Nghost_min(theSim,R_DIR);
+  }
+  int kmin_noghost = sim_Nghost_min(theSim,Z_DIR);
+  int imax_noghost = sim_N(theSim,R_DIR) - sim_Nghost_max(theSim,R_DIR);
+  int kmax_noghost = sim_N(theSim,Z_DIR) - sim_Nghost_max(theSim,Z_DIR);
+
+  double total_torque_temp = 0.0;
+//  double total_Fr_temp = 0.0;
+  
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     double zp = sim_FacePos(theSim,k,Z_DIR);
@@ -148,17 +160,22 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( Fr*(vr*sint+vz*cost) + Fp*vp );
 
+        if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
+          total_torque_temp += Fp*r;
+          //total_Fr_temp += Fr;
+        }
+
         /*
-        if (sim_RhoSinkTimescale(theSim)>0.0){
-          double drho_dt_sink;
-          for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
-            get_rho_sink(theGravMasses,sim_RhoSinkTimescale(theSim),p,gravdist,phi,rho, &rho_sink);
-            c->cons[RHO] -= rho_sink * dt * dV;
-            if ((i>sim_Nghost_min(theSim,R_DIR)) && (i<(sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)))){
-              //gravMass_add_Mdot(theGravMasses,rho_sink*dV,p);
-              Mdot_temp[p] += rho_sink*dV;
-            }
-          }
+           if (sim_RhoSinkTimescale(theSim)>0.0){
+           double drho_dt_sink;
+           for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
+           get_rho_sink(theGravMasses,sim_RhoSinkTimescale(theSim),p,gravdist,phi,rho, &rho_sink);
+           c->cons[RHO] -= rho_sink * dt * dV;
+           if ((i>sim_Nghost_min(theSim,R_DIR)) && (i<(sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)))){
+        //gravMass_add_Mdot(theGravMasses,rho_sink*dV,p);
+        Mdot_temp[p] += rho_sink*dV;
+        }
+        }
         }
         */
 
@@ -167,7 +184,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
             get_rho_sink( theGravMasses, theSim, dt, p, r, phi, rho, &drho_dt_sink);
             c->cons[RHO] -= drho_dt_sink * dt * dV;
-            if ((i>sim_Nghost_min(theSim,R_DIR)) && (i<(sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)))){
+            if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
               //gravMass_add_Mdot(theGravMasses,rho_sink*dV,p);
               Mdot_temp[p] += drho_dt_sink*dV;
             }
@@ -217,12 +234,19 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
       }
     }
   }
+
   double Mdot_reduce[2];
   MPI_Allreduce( Mdot_temp,Mdot_reduce , 2, MPI_DOUBLE, MPI_SUM, sim_comm);
+  double total_torque_reduce;
+  MPI_Allreduce( &total_torque_temp,&total_torque_reduce, 1, MPI_DOUBLE, MPI_SUM, sim_comm);
+  //double total_Fr_reduce;
+  //MPI_Allreduce( &total_Fr_temp,&total_Fr_reduce, 1, MPI_DOUBLE, MPI_SUM, sim_comm);
   int p;
   for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
-    gravMass_add_Mdot(theGravMasses,Mdot_reduce[p],p);
+    gravMass_set_Mdot(theGravMasses,Mdot_reduce[p],p);
+    gravMass_set_total_torque(theGravMasses,total_torque_reduce,p);
   }
+
 
 
   //printf("gravMass_Mdot(theGravMasses,0): %e, gravMass_Mdot(theGravMasses,1): %e, dt: %e\n",gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),dt);

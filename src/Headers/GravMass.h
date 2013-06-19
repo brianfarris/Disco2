@@ -14,6 +14,7 @@ struct GravMass{
    double RK_M;
    double RK_omega;
    double Mdot;
+   double total_torque;
 };
 #endif
 
@@ -32,11 +33,12 @@ double gravMass_phi(struct GravMass * ,int);
 double gravMass_M(struct GravMass * ,int);
 double gravMass_omega(struct GravMass * ,int );
 double gravMass_Mdot(struct GravMass *,int);
+double gravMass_total_torque(struct GravMass *,int);
 //miscellaneous
 void gravMass_clean_pi(struct GravMass *,struct Sim *);
 void gravMass_copy(struct GravMass *,struct Sim *);
 void gravMass_move(struct GravMass *,double);
 void gravMass_update_RK( struct GravMass * ,struct Sim * , double );
-void gravMass_reset_Mdot( struct GravMass * , struct Sim * );
-void gravMass_add_Mdot( struct GravMass * , double, int );
+void gravMass_set_Mdot( struct GravMass * , double, int );
+void gravMass_set_total_torque( struct GravMass * , double , int );
 #endif 

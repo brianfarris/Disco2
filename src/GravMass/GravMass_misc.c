@@ -52,12 +52,10 @@ void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, do
 
 }
 
-void gravMass_reset_Mdot( struct GravMass * theGravMasses, struct Sim * theSim){
-  int p;
-  for( p=0 ; p<sim_NumGravMass(theSim) ; ++p ){
-    theGravMasses[p].Mdot = 0.0;
-  }
+void gravMass_set_Mdot( struct GravMass * theGravMasses, double Mdot, int p){
+  theGravMasses[p].Mdot = Mdot;
 }
-void gravMass_add_Mdot( struct GravMass * theGravMasses, double Mdot, int p){
-  theGravMasses[p].Mdot += Mdot;
+
+void gravMass_set_total_torque( struct GravMass * theGravMasses, double total_torque, int p){
+  theGravMasses[p].total_torque = total_torque;
 }

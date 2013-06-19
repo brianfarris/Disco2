@@ -261,6 +261,13 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
       fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_inside_1_reduce,mass_inner_wedge_reduce,gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),mass_near_bh0_r0p1_reduce,mass_near_bh1_r0p1_reduce,mass_near_bh0_r0p2_reduce,mass_near_bh1_r0p2_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_r0p4_reduce);       
       fclose(DiagMdotFile);
+    
+      char DiagTorqueFilename[256];
+      sprintf(DiagTorqueFilename,"DiagTorque.dat");
+      FILE * DiagTorqueFile = fopen(DiagTorqueFilename,"a");
+      fprintf(DiagTorqueFile,"%e %e\n",timestep_get_t(theTimeStep), gravMass_total_torque(theGravMasses,0));       
+      fclose(DiagTorqueFile);
+      
     }
 
     //We are doing time averaged diagnostics, so mult by delta t and add it
