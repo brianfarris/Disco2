@@ -17,6 +17,7 @@ double fgrav_neg_centrifugal( double M , double r , double eps, double n ){
   return( M*r*Om*Om );
 }
 
+/*
 void get_rho_sink( struct GravMass * theGravMasses, double RhoSinkTimescale, int p, double r, double phi, double rho, double * rho_sink){
   double rp = gravMass_r(theGravMasses,p);
   double pp = gravMass_phi(theGravMasses,p);
@@ -27,6 +28,29 @@ void get_rho_sink( struct GravMass * theGravMasses, double RhoSinkTimescale, int
   double script_r = sqrt(dx*dx+dy*dy);
 
   *rho_sink = rho / (RhoSinkTimescale*2.0*M_PI) * exp(-script_r*script_r/(0.25*0.25));
+
+}
+*/
+void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, double dt, int p, double r, double phi, double rho, double * drho_dt_sink){
+
+  double rp = gravMass_r(theGravMasses,p);
+  double pp = gravMass_phi(theGravMasses,p);
+  double cosp = cos(phi);
+  double sinp = sin(phi);
+  double dx = r*cosp-rp*cos(pp);
+  double dy = r*sinp-rp*sin(pp);
+  double script_r = sqrt(dx*dx+dy*dy);
+
+  double HoR = sim_HoR(theSim);
+  double alpha = sim_EXPLICIT_VISCOSITY(theSim);
+  double m = gravMass_M(theGravMasses,p);
+  double t_visc = 2./3. * 1./(alpha*HoR*HoR)*pow(script_r,1.5)*pow(m,-.5);
+  if (t_visc < 10.* dt){
+    t_visc = 10.*dt;
+  }
+  if (script_r<0.5){
+    *drho_dt_sink = rho / t_visc;
+  }
 
 }
 
@@ -122,14 +146,28 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( Fr*(vr*sint+vz*cost) + Fp*vp );
 
+        /*
         if (sim_RhoSinkTimescale(theSim)>0.0){
-          double rho_sink;
+          double drho_dt_sink;
           for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
             get_rho_sink(theGravMasses,sim_RhoSinkTimescale(theSim),p,gravdist,phi,rho, &rho_sink);
             c->cons[RHO] -= rho_sink * dt * dV;
             if ((i>sim_Nghost_min(theSim,R_DIR)) && (i<(sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)))){
               //gravMass_add_Mdot(theGravMasses,rho_sink*dV,p);
               Mdot_temp[p] += rho_sink*dV;
+            }
+          }
+        }
+        */
+
+        if (sim_RhoSinkTimescale(theSim)>0.0){
+          double drho_dt_sink;
+          for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
+            get_rho_sink( theGravMasses, theSim, dt, p, r, phi, rho, &drho_dt_sink);
+            c->cons[RHO] -= drho_dt_sink * dt * dV;
+            if ((i>sim_Nghost_min(theSim,R_DIR)) && (i<(sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)))){
+              //gravMass_add_Mdot(theGravMasses,rho_sink*dV,p);
+              Mdot_temp[p] += drho_dt_sink*dV;
             }
           }
         }
