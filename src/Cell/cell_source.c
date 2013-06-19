@@ -179,7 +179,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         }
         */
 
-        if (sim_RhoSinkTimescale(theSim)>0.0){
+        if (sim_RhoSinkOn(theSim)==1){
           double drho_dt_sink;
           for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
             get_rho_sink( theGravMasses, theSim, dt, p, r, phi, rho, &drho_dt_sink);

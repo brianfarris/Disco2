@@ -87,7 +87,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "POWELL"               , VAR_INT , &(theSim->POWELL)  );
       err += readvar( pfile , "Grav_2D"            , VAR_INT  , &(theSim->GRAV2D)  );
       err += readvar( pfile , "G_EPS"             , VAR_DOUB , &(theSim->G_EPS)  );
-      err += readvar( pfile , "RhoSinkTimescale"   , VAR_DOUB , &(theSim->RhoSinkTimescale)  );
+      err += readvar( pfile , "RhoSinkTimescale"   , VAR_INT, &(theSim->RhoSinkOn)  );
       err += readvar( pfile , "PHI_ORDER"             , VAR_DOUB , &(theSim->PHI_ORDER)  );
       err += readvar( pfile , "Rho_Floor"         , VAR_DOUB , &(theSim->RHO_FLOOR)  );
       err += readvar( pfile , "Cs_Floor"          , VAR_DOUB , &(theSim->CS_FLOOR)  );
