@@ -39,7 +39,8 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
   double eps0 = sim_G_EPS(theSim)*r0;
   double eps1 = sim_G_EPS(theSim)*r1;
   
-  double DISK_ALPHA = 0.01;
+  //double DISK_ALPHA = 0.01;
+  double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
 
   int i, j,k;
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
@@ -70,13 +71,13 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
 
         double cs0;
         double cs1;
-        if (dist_bh0<0.01){
-          cs0 = sqrt(1./.01)/Mach * sqrt(M0);
+        if (dist_bh0<0.05){
+          cs0 = sqrt(1./.05)/Mach * sqrt(M0);
         }else{
           cs0 = sqrt(1./dist_bh0)/Mach* sqrt(M0);
         }
-        if (dist_bh1<0.01){
-          cs1 = sqrt(1./.01)/Mach * sqrt(M1);
+        if (dist_bh1<0.05){
+          cs1 = sqrt(1./.05)/Mach * sqrt(M1);
         }else{
           cs1 = sqrt(1./dist_bh1)/Mach* sqrt(M0);
         }

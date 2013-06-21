@@ -56,22 +56,22 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim, struct GravMass *
 	double cs0,cs1;
         double PoRho0,PoRho1,PoRho;
         double vp0,vp1;
-        if (dist_bh0>0.01){
+        if (dist_bh0>0.05){
 		vp0 = pow(dist_bh0,-0.5) * sqrt(M0) ;
         	cs0 = HoR*vp0;
                 PoRho0 = cs0*cs0/sim_GAMMALAW(theSim);
         } else{
-		vp0 = pow(0.01,-0.5);
+		vp0 = pow(0.05,-0.5);
 		cs0 = HoR*vp0;
                 PoRho0 = cs0*cs0/sim_GAMMALAW(theSim);
                 //PoRho = T0 * exp(-r*r/(r_a*r_a)); 
 	}
-        if (dist_bh1>0.01){
+        if (dist_bh1>0.05){
 		vp1 = pow(dist_bh1,-0.5) * sqrt(M1) ;
         	cs1 = HoR*vp1;
                 PoRho1 = cs1*cs1/sim_GAMMALAW(theSim);
         } else{
-		vp1 = pow(0.01,-0.5);
+		vp1 = pow(0.05,-0.5);
 		cs1 = HoR*vp1;
                 PoRho1 = cs1*cs1/sim_GAMMALAW(theSim);
                 //PoRho = T0 * exp(-r*r/(r_a*r_a)); 
