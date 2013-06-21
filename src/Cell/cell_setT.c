@@ -26,7 +26,6 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim, struct GravMass *
   double xbh1 = r1*cos(phi_bh1);
   double ybh1 = r1*sin(phi_bh1);
         
-  printf("xbh0: %e, ybh0: %e, xbh1: %e, ybh1: %e, M0: %e, M1: %e\n",xbh0,ybh0,xbh1,ybh1,M0,M1);
 
   double HoR = sim_HoR(theSim);
   double T0 = 0.02*(HoR/0.1)*(HoR/0.1);
