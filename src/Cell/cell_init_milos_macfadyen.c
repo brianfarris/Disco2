@@ -17,7 +17,7 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
   double rs = 10.0;
 
   double rho0   = 1.0;
-  double Mach   = 1/sim_HoR(theSim);
+  double Mach   = 1./sim_HoR(theSim);
 
   double delta_exp   = 3.0;
   double xi_exp = 2.0;
@@ -65,12 +65,27 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
         double xpos = r*cos(phi);
         double ypos = r*sin(phi);
 
-        double dist_bh1 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
-        double dist_bh2 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
+        double dist_bh0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
+        double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
+
+        double cs0;
+        double cs1;
+        if (dist_bh0<0.01){
+          cs0 = sqrt(1./.01)/Mach * sqrt(M0);
+        }else{
+          cs0 = sqrt(1./dist_bh0)/Mach* sqrt(M0);
+        }
+        if (dist_bh1<0.01){
+          cs1 = sqrt(1./.01)/Mach * sqrt(M1);
+        }else{
+          cs1 = sqrt(1./dist_bh1)/Mach* sqrt(M0);
+        }
+
+        double PoRho = (cs0*cs0+cs1*cs1)/Gam;
 
         double n = sim_PHI_ORDER(theSim);
-        double Pot1 = M0/pow( pow(dist_bh1,n) + pow(eps0,n) , 1./n );
-        double Pot2 = M1/pow( pow(dist_bh2,n) + pow(eps1,n) , 1./n );
+        double Pot1 = M0/pow( pow(dist_bh0,n) + pow(eps0,n) , 1./n );
+        double Pot2 = M1/pow( pow(dist_bh1,n) + pow(eps1,n) , 1./n );
 
         double rho = rho0*( pow(rs/r,delta_exp) )*exp(-pow(rs/r,xi_exp) );
         double omega = sqrt(1.)/pow(r,1.5);
@@ -87,13 +102,13 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
           vr = -3.0/sqrt(r)*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(r/rs,-xi_exp));
         }
         /* 
-        if (r<3.){
-          omega = 0.0;//pow(r,-1.5);
-        }
-        */
+           if (r<3.){
+           omega = 0.0;//pow(r,-1.5);
+           }
+           */
         if( rho<(100.*sim_RHO_FLOOR(theSim)) ) rho = 100.*sim_RHO_FLOOR(theSim);
-  
-        double Pp = cs*cs*rho/Gam;
+
+        double Pp = PoRho * rho;
 
         theCells[k][i][j].prim[RHO] = rho*exp(fac*(Pot1+Pot2)/cp/cp);
         theCells[k][i][j].prim[PPP] = Pp*exp(fac*(Pot1+Pot2)/cp/cp);

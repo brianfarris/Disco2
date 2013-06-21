@@ -362,10 +362,12 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
     }
   }
 
+  /*
   //turning off viscosity inside r=a
   if (r<1.0){
     nu = 0.0;
   }
+  */
 
   double rho = AvgPrim[RHO];
   double vr  = AvgPrim[URR];

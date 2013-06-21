@@ -96,7 +96,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
 
   //Set temperature to keep HoR constant
   if (sim_SET_T(theSim)==1){
-    cell_setT(theCells,theSim); 
+    cell_setT(theCells,theSim,theGravMasses); 
   }
 
   //Boundary Data
