@@ -31,14 +31,24 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
   double Mtotal = 1.0;
   double sep = 1.0;
   double massratio = sim_MassRatio(theSim);
-  double M0 = Mtotal/(1.+massratio);
-  double M1 = Mtotal/(1.+1./massratio);
+  double M0,M1;
+  if (sim_NumGravMass(theSim)==2){
+    M0 = Mtotal/(1.+massratio);
+    M1 = Mtotal/(1.+1./massratio);
+  }else if(sim_NumGravMass(theSim)==1){
+    M0 = 1.0;
+    M1 = 0.0;
+  } else{
+    printf("You should set the number of gravmasses to 1 or 2\n");
+    exit(1);
+  }
+
   double r0 = M1/Mtotal*sep;
   double r1 = M0/Mtotal*sep;
 
   double eps0 = sim_G_EPS(theSim)*r0;
   double eps1 = sim_G_EPS(theSim)*r1;
-  
+
   //double DISK_ALPHA = 0.01;
   double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
 
