@@ -310,11 +310,15 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
 
 }
 
-double Gr_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_r_prim , double r){
+double Gr_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_r_prim , double r, int IDtype){
   if (VISC_CONST==1){
     return(2./r);
   } else{
-    return(7./2./r + Grad_r_prim[PPP]/AvgPrim[PPP]);    
+    if (IDtype==SHEAR){
+      return(4./r + Grad_r_prim[PPP]/AvgPrim[PPP]);
+    } else{
+      return(7./2./r + Grad_r_prim[PPP]/AvgPrim[PPP]);    
+    }
   }
 }
 
@@ -323,7 +327,7 @@ double Gp_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_ph_prim, double r, 
     return(0.0);
   } else{
     if (IDtype==SHEAR){
-      return(Grad_ph_prim[PPP]/AvgPrim[PPP] - 1.5/r * tan(tiph));    
+      return(Grad_ph_prim[PPP]/AvgPrim[PPP] - 2.0/r * tan(tiph));    
     } else{
       return(Grad_ph_prim[PPP]/AvgPrim[PPP]);
     }
@@ -356,18 +360,21 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
     nu = sim_EXPLICIT_VISCOSITY(theSim);
   } else{
     if (sim_InitialDataType(theSim)==SHEAR){
-      nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(fabs(r*cos(tiph)),1.5);    
+      double HoR = 0.1;
+      //nu = sim_EXPLICIT_VISCOSITY(theSim)*HoR*HoR*pow(fabs((r*cos(tiph))),1.5);
+      nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(fabs(r*cos(tiph)),2.0);    
+      if (r*cos(tiph)>20.) nu=0.0;
     } else{
       nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
     }
   }
 
-  
+
   //turning off viscosity inside r=a
   if (1==0){
-  if (r<1.0){
-    nu = 0.0;
-  }
+    if (r<1.0){
+      nu = 0.0;
+    }
   }
 
   double rho = AvgPrim[RHO];
@@ -402,8 +409,8 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   if (theRiemann->n[1] ==1){
     //VFlux[SRR] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
     //VFlux[LLL] = -nu*rho*( r*r*Gp_om - r*Gr_vr + vr);
-    VFlux[SRR] = -INCLUDE_ALL_VISC_TERMS*nu*rho*( -om*r*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r)  + r*Gp_vr );
-    VFlux[LLL] = -INCLUDE_ALL_VISC_TERMS*nu*rho*( r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r));
+    VFlux[SRR] = -INCLUDE_ALL_VISC_TERMS*nu*rho*( -om*r*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r,sim_InitialDataType(theSim))  + r*Gp_vr );
+    VFlux[LLL] = -INCLUDE_ALL_VISC_TERMS*nu*rho*( r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r,sim_InitialDataType(theSim)));
 
     VFlux[SZZ] = 0.0; //deal with this later
   }
@@ -647,7 +654,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->F[q]);
   }
 
-  
+
   if (VISC_OLD==1){
     cell_add_cons(theRiemann->cL,SRR,-dt*theRiemann->dA*theRiemann->Fvisc[SRR]);
     cell_add_cons(theRiemann->cR,SRR, dt*theRiemann->dA*theRiemann->Fvisc[SRR]);
@@ -655,7 +662,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     cell_add_cons(theRiemann->cL,SRR,-dt*theRiemann->dA*theRiemann->Fvisc[SRR]/theRiemann->r_cell_L);
     cell_add_cons(theRiemann->cR,SRR, dt*theRiemann->dA*theRiemann->Fvisc[SRR]/theRiemann->r_cell_R);
   }
-  
+
   cell_add_cons(theRiemann->cL,LLL,-dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
   cell_add_cons(theRiemann->cR,LLL, dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
 
