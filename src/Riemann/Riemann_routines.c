@@ -366,6 +366,9 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
       if (r*cos(tiph)>20.) nu=0.0;
     } else{
       nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
+      //if (r<0.05){
+      //  nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(0.05,1.5);
+      //}
     }
   }
 

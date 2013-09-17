@@ -47,19 +47,23 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, double 
   double t_visc = 2./3. * 1./(alpha*HoR*HoR)*pow(script_r,1.5)*pow(m,-.5);
   //printf("m: %e, t_visc: %e\n",m,t_visc);
   *drho_dt_sink = 0.0;
-  double sink_size;
+  double sink_size = 1.0;
+  /*
   if (m>0.5){
     sink_size = 0.5;
   } else{
     sink_size = 0.5;
   }
+  */
   if (t_visc < 10.* dt){
     t_visc = 10.*dt;
   }
   if (script_r<sink_size){
     *drho_dt_sink = rho / t_visc;
   }
-
+  if (r<0.1){
+  //printf("m: %e, rp: %e, r: %e, t_visc: %e, rho/t_visc: %e\n",m,rp,r,t_visc,rho/t_visc);
+  }
 }
 
 void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p , double r , double phi , double * fr , double * fp ){
