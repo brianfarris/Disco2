@@ -345,7 +345,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
     //if (theRiemann->n[1]==1){ 
     Grad_ph_prim[q] = .5*(cell_gradp(theRiemann->cL,q)+cell_gradp(theRiemann->cR,q))/r;    
     //} else{
-    Grad_r_prim[q] = .5*(cell_grad(theRiemann->cL,q)+cell_grad(theRiemann->cR,q));
+    Grad_r_prim[q] = .5*(cell_gradr(theRiemann->cL,q)+cell_gradr(theRiemann->cR,q));
     //}
     VFlux[q] = 0.0;
   }
@@ -436,7 +436,7 @@ void riemann_visc_flux_old(struct Riemann * theRiemann,struct Sim * theSim ){
     if (theRiemann->n[1]==1){ 
       Gprim[q] = .5*(cell_gradp(theRiemann->cL,q)+cell_gradp(theRiemann->cR,q));    
     } else{
-      Gprim[q] = .5*(cell_grad(theRiemann->cL,q)+cell_grad(theRiemann->cR,q));
+      Gprim[q] = .5*(cell_gradr(theRiemann->cL,q)+cell_gradr(theRiemann->cR,q));
     }
     VFlux[q] = 0.0;
   }
@@ -494,9 +494,20 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
   }
 
   int q;
-  for (q=0;q<NUM_Q;++q){
-    theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_grad(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
-    theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_grad(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
+  if (direction==R_DIR){
+    for (q=0;q<NUM_Q;++q){
+      theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_gradr(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
+      theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_gradr(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
+    }
+  } else if (direction==Z_DIR){
+    for (q=0;q<NUM_Q;++q){
+      theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_gradz(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
+      theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_gradz(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
+    }
+
+  } else{
+    printf("SHOULD BE R OR Z DIRECTION\n");
+    exit(1);
   }
   if ((sim_runtype(theSim)==1)&&(BNORM_AVG==1)){
     if (direction==RDIRECTION){
@@ -510,6 +521,7 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
       theRiemann->primR[BZZ] = 0.5*(theRiemann->primL[BZZ] + theRiemann->primR[BZZ]);
     }
   }
+ // printf("%e %e\n",sin(pL)*theRiemann->primL[BRR]+cos(pL)*theRiemann->primL[BPP], sin(pR)*theRiemann->primR[BRR]+cos(pR)*theRiemann->primR[BPP]);
 }
 
 void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct Sim * theSim,int i,int j_low,int k,int direction){
@@ -647,7 +659,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->F[q]);
   }
 
-  
+
   if (VISC_OLD==1){
     cell_add_cons(theRiemann->cL,SRR,-dt*theRiemann->dA*theRiemann->Fvisc[SRR]);
     cell_add_cons(theRiemann->cR,SRR, dt*theRiemann->dA*theRiemann->Fvisc[SRR]);
@@ -655,7 +667,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     cell_add_cons(theRiemann->cL,SRR,-dt*theRiemann->dA*theRiemann->Fvisc[SRR]/theRiemann->r_cell_L);
     cell_add_cons(theRiemann->cR,SRR, dt*theRiemann->dA*theRiemann->Fvisc[SRR]/theRiemann->r_cell_R);
   }
-  
+
   cell_add_cons(theRiemann->cL,LLL,-dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
   cell_add_cons(theRiemann->cR,LLL, dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
 
@@ -677,6 +689,5 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     cell_add_GradPsi(theRiemann->cR,direction,-Psi_face*theRiemann->dA/theRiemann->r);
   }
 }
-
 
 

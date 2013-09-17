@@ -14,16 +14,17 @@ ifeq ($(UNAME),Darwin)
 H55 = /usr/local/hdf5
 #H55 = /opt/local/
 endif
+GSL = /opt/local
 
 SRCS    := $(shell find $(SRCDIR) -name '*.$(SRCEXT)')
 SRCDIRS := $(shell find . -name '*.$(SRCEXT)' -exec dirname {} \; | uniq)
 OBJS    := $(patsubst %.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
 
 DEBUG    = -g
-INCLUDES = -I$(H55)/include
+INCLUDES = -I$(H55)/include -I$(GSL)/include
 CFLAGS   = -O3 -c $(DEBUG) $(INCLUDES)
 #CFLAGS   = -c $(DEBUG) $(INCLUDES)
-LDFLAGS  = -lm -lz -L$(H55)/lib -lhdf5
+LDFLAGS  = -lm -lz -L$(H55)/lib -L$(GSL)/lib -lhdf5 -lgsl -lgslcblas
 
 CC       = mpicc
 

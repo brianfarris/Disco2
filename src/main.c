@@ -103,6 +103,8 @@ int main(int argc, char **argv) {
   }
   gravMass_clean_pi(theGravMasses,theSim); // make sure GravMasses have phi between 0 and 2 pi.
 
+ 
+
 #ifdef CHECKPOINTING
   // set tcheck, dtcheck, and nfile. Needs to be done after ID because it depends on current time.
   io_setup(theIO,theSim,theTimeStep);
@@ -111,6 +113,9 @@ int main(int argc, char **argv) {
   // inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);
+
+  //EXPERIMENTAL: COMPUTE CURL
+  cell_compute_curl(theCells,theSim );
 
   // set conserved quantities
   cell_calc_cons(theCells,theSim);

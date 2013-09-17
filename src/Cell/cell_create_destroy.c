@@ -53,8 +53,9 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
         theCells[k][i][j].prim = malloc(NUM_Q*sizeof(double));
         theCells[k][i][j].cons = malloc(NUM_Q*sizeof(double));
         theCells[k][i][j].RKcons = malloc(NUM_Q*sizeof(double));
-        theCells[k][i][j].grad = malloc(NUM_Q*sizeof(double));
+        theCells[k][i][j].gradr = malloc(NUM_Q*sizeof(double));
         theCells[k][i][j].gradp = malloc(NUM_Q*sizeof(double));
+        theCells[k][i][j].gradz = malloc(NUM_Q*sizeof(double));
         ++Ncells;
       }
     }
@@ -118,8 +119,9 @@ void cell_destroy(struct Cell ***theCells,struct Sim *theSim){
   for (k=0; k<sim_N(theSim,Z_DIR); k++) {
     for (i=0; i<sim_N(theSim,R_DIR);i++){
       for(j = 0; j < sim_N_p(theSim,i); j++){
-        free(theCells[k][i][j].gradp);
-        free(theCells[k][i][j].grad);
+        free(theCells[k][i][j].gradr);
+        free(theCells[k][i][j].gradp);        
+        free(theCells[k][i][j].gradz);
         free(theCells[k][i][j].RKcons);
         free(theCells[k][i][j].cons);
         free(theCells[k][i][j].prim);

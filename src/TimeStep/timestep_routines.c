@@ -78,6 +78,10 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     }
   }
 
+  cell_EMF(theCells,theSim,dt);
+  cell_compute_curl(theCells,theSim );
+  
+  
   //Source Terms
   cell_add_src( theCells ,theSim, theGravMasses , dt ); // add source terms
   if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
@@ -159,7 +163,6 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
   if (sim_N_global(theSim,Z_DIR)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
-  printf("hello 6\n");
 }
 
 

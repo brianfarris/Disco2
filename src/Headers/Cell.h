@@ -12,8 +12,9 @@ struct Cell{
   double * prim;
   double * cons;
   double * RKcons;
-  double * grad;
+  double * gradr;
   double * gradp;
+  double * gradz;
   double tiph;
   double RKtiph;
   double dphi;
@@ -54,8 +55,9 @@ void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIs
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
 double cell_prim(struct Cell *, int);
-double cell_grad(struct Cell *, int);
+double cell_gradr(struct Cell *, int);
 double cell_gradp(struct Cell *, int);
+double cell_gradz(struct Cell *, int);
 struct Cell *cell_single(struct Cell ***,int,int,int);
 double cell_tiph(struct Cell *);
 double cell_dphi(struct Cell *);
@@ -74,6 +76,8 @@ void cell_mult_psi(struct Cell *, double);
 void cell_clean_pi(struct Cell *** ,struct Sim *);
 void cell_update_phi( struct Cell *** , struct Sim * , double , double );
 void cell_update_dphi( struct Cell *** ,struct Sim * );
+void cell_compute_curl( struct Cell *** ,struct Sim * );
+void cell_EMF( struct Cell *** , struct Sim * ,double );
 //clear
 void cell_clear_w(struct Cell ***,struct Sim * );
 void cell_clear_divB( struct Cell ***,struct Sim * );

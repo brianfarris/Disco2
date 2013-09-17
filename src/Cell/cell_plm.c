@@ -20,7 +20,14 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         for( q=0 ; q<NUM_Q ; ++q ){
-          theCells[k][i][j].grad[q] = 0.0;
+          if (direction == R_DIR){
+            theCells[k][i][j].gradr[q] = 0.0;
+          } else if (direction == Z_DIR){
+            theCells[k][i][j].gradz[q] = 0.0;
+          } else{
+            printf("DIRECTION SHOULD HAVE BEEN R or Z\n");
+            exit(1);
+          }
         }
       }
     }
@@ -30,6 +37,15 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
   for( n=0 ; n<Nf ; ++n ){
     struct Cell * cL = face_L_pointer(theFaces,n);
     struct Cell * cR = face_R_pointer(theFaces,n);
+    double * grad_cL; 
+    double * grad_cR; 
+    if (direction == R_DIR){
+      grad_cL = cL->gradr;
+      grad_cR = cR->gradr;
+    } else if (direction == Z_DIR){
+      grad_cL = cL->gradz;
+      grad_cR = cR->gradz;
+    }
     double deltaL = face_deltaL(theFaces,n);
     double deltaR = face_deltaR(theFaces,n);
     double pL = cL->tiph - .5*cL->dphi;
@@ -45,8 +61,8 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       double WL = cL->prim[q] + dpL*cL->gradp[q];
       double WR = cR->prim[q] - dpR*cR->gradp[q];
       double S = (WR-WL)/(deltaR+deltaL);
-      cL->grad[q] += S*dA;
-      cR->grad[q] += S*dA; 
+      grad_cL[q] += S*dA;
+      grad_cR[q] += S*dA; 
     }
   }
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -61,7 +77,14 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
         double dAtot;
         if( direction==R_DIR ) dAtot = dz*(rp+rm)*dp; else dAtot = 2.*.5*(rp*rp-rm*rm)*dp;
         for( q=0 ; q<NUM_Q ; ++q ){
-          theCells[k][i][j].grad[q] /= dAtot;
+          if (direction == R_DIR){
+            theCells[k][i][j].gradr[q] /= dAtot;
+          } else if (direction == Z_DIR){
+            theCells[k][i][j].gradz[q] /= dAtot;
+          } else{
+            printf("DIRECTION SHOULD HAVE BEEN R or Z\n");
+            exit(1);
+          }
         }
       }
     }
@@ -69,6 +92,15 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
   for( n=0 ; n<Nf ; ++n ){
     struct Cell * cL = face_L_pointer(theFaces,n);
     struct Cell * cR = face_R_pointer(theFaces,n);
+    double * grad_cL; 
+    double * grad_cR; 
+    if (direction == R_DIR){
+      grad_cL = cL->gradr;
+      grad_cR = cR->gradr;
+    } else if (direction == Z_DIR){
+      grad_cL = cL->gradz;
+      grad_cR = cR->gradz;
+    }
     double deltaL = face_deltaL(theFaces,n);
     double deltaR = face_deltaR(theFaces,n);
     double pL = cL->tiph - .5*cL->dphi;
@@ -85,17 +117,17 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       double WR = cR->prim[q] - dpR*cR->gradp[q];
 
       double S = (WR-WL)/(deltaR+deltaL);
-      double SL = cL->grad[q];
-      double SR = cR->grad[q];
+      double SL = grad_cL[q];
+      double SR = grad_cR[q];
       if( S*SL < 0.0 ){
-        cL->grad[q] = 0.0;
+        grad_cL[q] = 0.0;
       }else if( fabs(PLM*S) < fabs(SL) ){
-        cL->grad[q] = PLM*S;
+        grad_cL[q] = PLM*S;
       }
       if( S*SR < 0.0 ){
-        cR->grad[q] = 0.0;
+        grad_cR[q] = 0.0;
       }else if( fabs(PLM*S) < fabs(SR) ){
-        cR->grad[q] = PLM*S;
+        grad_cR[q] = PLM*S;
       }
     }
   }

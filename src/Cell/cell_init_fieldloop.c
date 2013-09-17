@@ -12,7 +12,7 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
 
   double Rl = 0.15;
   double B0 = 0.01;
-  double Om = 20.0;
+  double Om = 1.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
   double xinner = 1.0;
@@ -52,6 +52,10 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
   theCell->prim[BZZ] = 0.0;
   theCell->prim[PSI] = 0.0;
 
+  theCell->prim[ARR] = 0.0;
+  theCell->prim[APP] = 0.0;
+  theCell->prim[AZZ] = r*cos(phi);
+
   theCell->divB = 0.0;
   theCell->GradPsi[0] = 0.0;
   theCell->GradPsi[1] = 0.0;
@@ -62,7 +66,7 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
 
   double Rl = 0.15;
   double B0 = 0.01;
-  double Om = 20.0;
+  double Om = 1.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
   double xinner = 1.0;
@@ -105,6 +109,12 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
         theCells[k][i][j].prim[BPP] = -Bx*sin(phi) + By*cos(phi);
         theCells[k][i][j].prim[BZZ] = 0.0;
         theCells[k][i][j].prim[PSI] = 0.0;
+          
+        theCells[k][i][j].prim[ARR] = 0.0;
+        theCells[k][i][j].prim[APP] = 0.0;
+        theCells[k][i][j].prim[AZZ] = r*cos(phi);
+
+
 
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;
