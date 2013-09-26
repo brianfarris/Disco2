@@ -13,7 +13,7 @@ void timestep_rk2(struct TimeStep * theTimeStep, struct Sim * theSim,
 
   cell_clear_w(theCells,theSim);
   cell_set_w( theCells ,theSim);
-  timestep_set_dt(theTimeStep,theCells,theSim); //set dt according to max wave speed and CFL condition
+  timestep_set_dt(theTimeStep,theCells,theSim, theGravMasses); //set dt according to max wave speed and CFL condition
   if (mpisetup_MyProc(theMPIsetup)==0){
     printf("t: %e, dt: %e\n",theTimeStep->t,theTimeStep->dt);
   }
@@ -22,12 +22,17 @@ void timestep_rk2(struct TimeStep * theTimeStep, struct Sim * theSim,
   timestep_set_RK(theTimeStep,0.0);
   // 1st step of RK2
   timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,1.0);
-  gravMass_move(theGravMasses,1.0*timestep_dt(theTimeStep));
+  //gravMass_move(theSim, theGravMasses,1.0*timestep_dt(theTimeStep), 0.0); // added RK as last argument (for direct integration of orbits)
+  gravMass_move(theSim, theGravMasses,1.0*timestep_dt(theTimeStep)); // without RK as last argument
+  //gravMass_move(theGravMasses,1.0*timestep_dt(theTimeStep));          // Old
   timestep_set_RK(theTimeStep,0.5);
 
   // 2nd step of RK2
   timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,0.5);
-  gravMass_move(theGravMasses,0.5*timestep_dt(theTimeStep));
+  //gravMass_move(theSim, theGravMasses,0.5*timestep_dt(theTimeStep), 0.5); // added RK as last argument (for direct integration of orbits)
+  gravMass_move(theSim, theGravMasses,0.5*timestep_dt(theTimeStep)); // without RK as last argument
+  //gravMass_move(theGravMasses,0.5*timestep_dt(theTimeStep));         // Old
+	
   // Psi is updated in operator split manner
   if (sim_runtype(theSim)==1) timestep_update_Psi(theTimeStep,theCells,theSim,theMPIsetup);
   timestep_update_t(theTimeStep); 
@@ -38,12 +43,14 @@ void timestep_forward_euler(struct TimeStep * theTimeStep, struct Sim * theSim,
 
   cell_clear_w(theCells,theSim);
   cell_set_w( theCells ,theSim);
-  timestep_set_dt(theTimeStep,theCells,theSim);
+  timestep_set_dt(theTimeStep,theCells,theSim, theGravMasses);
   cell_copy(theCells,theSim);
   gravMass_copy(theGravMasses,theSim);
   timestep_set_RK(theTimeStep,0.0);
   timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,1.0);
-  gravMass_move(theGravMasses,1.0*timestep_dt(theTimeStep));
+  //gravMass_move(theSim, theGravMasses,1.0*timestep_dt(theTimeStep), 0.0);  //Added RK as last argument (for direct integration of orbits)
+  gravMass_move(theSim, theGravMasses,1.0*timestep_dt(theTimeStep)); // without RK as last argument
+  //gravMass_move(theGravMasses,1.0*timestep_dt(theTimeStep));
   if (sim_runtype(theSim)==1) timestep_update_Psi(theTimeStep,theCells,theSim,theMPIsetup);
   timestep_update_t(theTimeStep); 
 

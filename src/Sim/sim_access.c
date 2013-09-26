@@ -173,4 +173,10 @@ double sim_RDAMP_INNER(struct Sim * theSim){
 double sim_RDAMP_OUTER(struct Sim * theSim){
   return(theSim->RDAMP_OUTER);
 }
+double sim_Mdisk_ovr_Ms(struct Sim *theSim){
+	return(theSim->Mdisk_ovr_Ms);
+}
+double sim_sep0(struct Sim *theSim){
+	return(theSim->sep0);
+}
 

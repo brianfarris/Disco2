@@ -93,7 +93,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Cs_Floor"          , VAR_DOUB , &(theSim->CS_FLOOR)  );
       err += readvar( pfile , "Cs_Cap"            , VAR_DOUB , &(theSim->CS_CAP)  );
       err += readvar( pfile , "Vel_Cap"           , VAR_DOUB , &(theSim->VEL_CAP)  );
-      err += readvar( pfile , "SET_T"           , VAR_INT , &(theSim->SET_T)  );
+      err += readvar( pfile , "SET_T"             , VAR_INT , &(theSim->SET_T)  );
       err += readvar( pfile , "runtype"           , VAR_INT , &(theSim->runtype)  );
       err += readvar( pfile , "DAMP_TIME"           , VAR_DOUB , &(theSim->DAMP_TIME)  );
       err += readvar( pfile , "RDAMP_INNER"           , VAR_DOUB , &(theSim->RDAMP_INNER)  );
@@ -104,6 +104,8 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "HiResR0"           , VAR_DOUB , &(theSim->HiResR0)  );
       err += readvar( pfile , "HiResFac"           , VAR_DOUB , &(theSim->HiResFac)  );
       err += readvar( pfile , "w_a_type"            , VAR_INT , &(theSim->W_A_TYPE));
+	  err += readvar( pfile , "Mdisk_ovr_Ms"           , VAR_DOUB , &(theSim->Mdisk_ovr_Ms) ); //For Live Binary
+	  err += readvar( pfile , "sep0"             , VAR_DOUB , &(theSim->sep0) );
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }

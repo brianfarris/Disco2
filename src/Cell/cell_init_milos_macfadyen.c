@@ -9,7 +9,7 @@
 #include "../Headers/header.h"
 
 void cell_single_init_milos_macfadyen(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
-  printf("ERROR. cell_single_init_shear isnt set up right now\n");
+  printf("ERROR. cell_single_init_mm isnt set up right now\n");
   exit(0);
 }
 
@@ -39,7 +39,7 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
   double eps0 = sim_G_EPS(theSim)*r0;
   double eps1 = sim_G_EPS(theSim)*r1;
   
-  double DISK_ALPHA = 0.01;
+  double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
 
   int i, j,k;
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
@@ -72,15 +72,15 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
         double Pot1 = M0/pow( pow(dist_bh1,n) + pow(eps0,n) , 1./n );
         double Pot2 = M1/pow( pow(dist_bh2,n) + pow(eps1,n) , 1./n );
 
-        double rho = rho0*( pow(rs/r,delta_exp) )*exp(-pow(rs/r,xi_exp) );
-        double omega = sqrt(1.)/pow(r,1.5);
+		double rho = rho0*( pow(rs/r,delta_exp) )*exp(-pow(rs/r,xi_exp) );
+        double omega = 1./pow(r,1.5);
         omega *= 1.+3./16./r/r;
         double O2 = omega*omega + cs*cs/r/r*( 2.*rs*rs/r/r - 3. );
         double vr;
         if (r<1.){
           omega = sqrt(O2)*pow(r,2.);
-          //vr = 0.0;
-          vr = (-3.0*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(1./rs,-xi_exp)))*pow(r,2.);
+          vr = 0.0;
+          //vr = (-3.0*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(1./rs,-xi_exp)))*pow(r,2.);
         }else{
           omega = sqrt(O2);
           //vr = 0.0;

@@ -24,6 +24,8 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_mhdexp);
   } else if (sim_InitialDataType(theSim)==VISCRING){
     return(&cell_init_viscring_cstnu);
+  } else if (sim_InitialDataType(theSim)==TYPEIISD_MIGRATION){
+	  return(&cell_init_TypeIISD_migration);
    } else{
     printf("ERROR\n");
     exit(0);

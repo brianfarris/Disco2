@@ -50,6 +50,8 @@ void cell_init_viscring_cstnu(struct Cell ***,struct Sim *,struct MPIsetup * ) ;
 void cell_single_init_viscring_cstnu(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
+void cell_init_TypeIISD_migration(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_TypeIISD_migration(struct Cell *, struct Sim *,int ,int ,int );
 ///retrieve data
 double cell_prim(struct Cell *, int);
 double cell_grad(struct Cell *, int);
@@ -72,6 +74,8 @@ void cell_mult_psi(struct Cell *, double);
 void cell_clean_pi(struct Cell *** ,struct Sim *);
 void cell_update_phi( struct Cell *** , struct Sim * , double , double );
 void cell_update_dphi( struct Cell *** ,struct Sim * );
+  //FOR LIVE BINARY
+void cell_gravMassForcePlanets(struct Sim *, struct Cell *** , struct GravMass * );
 //clear
 void cell_clear_w(struct Cell ***,struct Sim * );
 void cell_clear_divB( struct Cell ***,struct Sim * );
@@ -96,7 +100,7 @@ void cell_prim2cons( double * , double * , double , double ,struct Sim *);
 void cell_calc_cons(struct Cell ***,struct Sim *); 
 void cell_cons2prim( double * , double * , double , double ,struct Sim *);
 //miscellaneous
-double cell_mindt( struct Cell *** , struct Sim * );
+double cell_mindt( struct Cell *** , struct Sim * , struct GravMass *); // ADED GRAV for LIVE BIN
 void cell_copy(struct Cell ***,struct Sim * );
 void cell_adjust_RK_cons( struct Cell *** , struct Sim * , double );
 void cell_set_prim(struct Cell ***,int,int,int,int,double);//this will morph into a checkpoint restart routine

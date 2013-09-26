@@ -1,29 +1,31 @@
 
 //Disco Parameter File//
 
-InitialDataType         7               // 0 Flock, 1 Shear
-GravMassType            2               // 0 none, 1 single, 2 binary
-MassRatio               0.5
+InitialDataType         10               // 0 Flock, 1 Shear 7 MM08 10 SSmigration
+GravMassType            3               // 0 none, 1 single, 2 binary, 3 live binary
+MassRatio               0.01
+sep0                    1.0            // starting binary separation 
+                                        //(or permanent separations if GravMassType is not 3)
 Restart			0		//If this=1 restart using input.h5
 
 //Computational Grid
-NumR			512			//Radial Zones
+NumR			128			//Radial Zones
 NumZ			1			//Vertical Zones
 ng                      2
 R_Min			0.05
-R_Max			100.0
+R_Max			10.0
 Z_Min			-1.0
 Z_Max			1.0
 NP_CONST                -1 
-NPCAP                   128
+NPCAP                   64
 aspect                  1.0
 
 NUM_C                   5
 NUM_N                   0
 Time_Max                100000.0
-Num_Checkpoints	        5	
-Num_Diag_Dump           10000
-Num_Diag_Measure        1000000
+Num_Checkpoints	        100000.	
+Num_Diag_Dump           100000.
+Num_Diag_Measure        100000.
 
 NoInnerBC               1
 BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
@@ -33,9 +35,11 @@ ZeroPsiBndry          1
 Move_Cells              3
 RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index         1.001
-Explicit_Viscosity      0.01
+Explicit_Viscosity      0.1
 
-RhoSinkTimescale        -1.0
+RhoSinkTimescale        1.0
+
+Mdisk_ovr_Ms            0.01   //Fraction of secondary mass in disk r<a
 
 DivB_Ch			0.06		//Dedner divergence cleaning
 DivB_l			0.1
@@ -46,7 +50,7 @@ PLM			1.0
 POWELL                  1
 w_a_type                0
 Grav_2D			1
-G_EPS			0.16
+G_EPS			0.05  //0.16
 
 PHI_ORDER               2
 
@@ -63,8 +67,8 @@ DAMP_TIME               -1.0        // Set negative to turn off
 RDAMP_INNER             0.0
 RDAMP_OUTER             0.0
 
-RLogScale               13.14
+RLogScale               13.14   // Large numbers gives uniform spacing
 ZLogScale               1000.0
-HiResSigma              0.1
-HiResR0                 0.5
-HiResFac                1.0
+HiResSigma              0.98    // SET IN sim_set.c
+HiResR0                 0.99    //SET IN sim_set.c
+HiResFac                1.0 //was 1.0 res changes by factor of 1+HiResFac at r0.

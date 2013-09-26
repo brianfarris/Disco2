@@ -12,26 +12,29 @@ void cell_single_init_viscring_cstnu(struct Cell *theCell, struct Sim *theSim,in
 	double R0     = 1.0;
 	double GM     = 1.0;
 	double rho0   = 1.0;
-	double Mach   = 100.0;
+	double Mach   = 50.0;
 	
 	
 	
 
 	double nu = sim_EXPLICIT_VISCOSITY(theSim); //DISK_ALPHA*(1.0/Mach)*(1.0/Mach);
-	if (nu<=0.){
-		nu=0.;
+	if (nu<0){
+		nu=0;
 	}
 	
 	//double tau = 12.*nu*t/R0^2;
 	double tau;
 	double tau0 = 0.032;
-	if (fabs(nu)<0.000001) {
+	if (nu==0) {
        	tau = tau0;
+		//printf("nu=0");
 	}else {
-		double t    = tau0*R0*R0/(12.*nu) + time_global;
-		double tau  = 12.*nu/(R0*R0) * t;
+		//double t    = tau0*R0*R0/(12.*nu) + time_global;
+		tau  = 12.*nu/(R0*R0) * time_global + tau0;
+		//printf("nu!=0");
 	}
-		
+	
+	//printf ( " tau = %f \n\n", tau );
 	
 	double Gam = sim_GAMMALAW(theSim);
 
@@ -64,7 +67,8 @@ void cell_single_init_viscring_cstnu(struct Cell *theCell, struct Sim *theSim,in
 	//double Pot = 1./pow( pow(r,n) + pow(eps,n) , 1./n );
 	
 	if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
-	double Pp  = rho*cs*cs/Gam;
+	double Pp  = pow(rho,Gam) *cs*cs;
+	//double Pp  = rho*cs*cs/Gam;	
 	//double Pp = 1.0;
 	
 	theCell->prim[RHO] = rho;
@@ -86,12 +90,12 @@ void cell_init_viscring_cstnu(struct Cell ***theCells,struct Sim *theSim,struct 
   double R0     = 1.0;
   double GM     = 1.0;
   double rho0   = 1.0;
-  double Mach   = 100.0;
+  double Mach   = 50.0;
 
 
   double nu = sim_EXPLICIT_VISCOSITY(theSim); //DISK_ALPHA*(1.0/Mach)*(1.0/Mach);
-  if (nu<=0.){
-	nu=0.;
+  if (nu<=0){
+	nu=0;
   }
   //double tau = 12.*nu*t/R0^2;
   double tau = 0.032;
@@ -114,7 +118,7 @@ void cell_init_viscring_cstnu(struct Cell ***theCells,struct Sim *theSim,struct 
       double cs;
       //if (r<1.){
 	  cs = 1./Mach;
-     // }else{
+      // }else{
 	  //cs = sqrt(1./r)/Mach;
       //}
 				
@@ -129,14 +133,17 @@ void cell_init_viscring_cstnu(struct Cell ***theCells,struct Sim *theSim,struct 
 		
 	  double rho = rho0 * 1./tau * pow(dx,-0.25) *exp( -(1.+dx*dx)/tau )*I14;
 	  double vp  = sqrt(GM/r);
+	  //printf ( " nu = %f \n\n", nu );
 	  double vr  = -3.*nu/R0 * (  2./tau*(In34/I14 - r/R0)   );
+	  //printf ( " vr = %f \n\n", vr );
 	  double omega = vp/r;
 		
 	  //double n = sim_PHI_ORDER(theSim);
 	  //double Pot = 1./pow( pow(r,n) + pow(eps,n) , 1./n );
 		
 	  if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
-	  double Pp  = rho*cs*cs/Gam;
+	  double Pp  = pow(rho,Gam) *cs*cs;
+	  //double Pp  = rho*cs*cs/Gam;	
 	  //double Pp = 1.0;
 
       for (j = 0; j < sim_N_p(theSim,i); j++) {

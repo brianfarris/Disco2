@@ -1,40 +1,43 @@
 
 //Disco Parameter File//
 
-InitialDataType         9               // 0 Flock, 1 Shear, 7 MM08, 8 ViscRing cstnu, 
+InitialDataType         9               // 0 Flock, 1 Shear, 7 MM08, 9 ViscRing cstnu, 
 GravMassType            1               // 0 none, 1 single, 2 binary
-MassRatio               1.0
+MassRatio               0.0
 Restart			0		//If this=1 restart using input.h5
 
 //Computational Grid
-NumR			1024			//Radial Zones
+NumR			160			//Radial Zones
 NumZ			1			//Vertical Zones
 ng                      2                       //ghost zones
-R_Min			0.4
+R_Min			0.2
 R_Max			2.0
 Z_Min			-1.0
 Z_Max			1.0
-NP_CONST                -1         //<0 -> aspect ratio takes over  >0 sets number of phi cells?
+NP_CONST                -128         //<0 -> aspect ratio takes over  >0 sets number of phi cells?
+NPCAP                   128          // if >0 then keeps specified aspect ratio unless NP>NPCAP
 aspect                  1.0
 
 NUM_C                   5
 NUM_N                   0
-Time_Max                100.
-Num_Checkpoints	        1	
+Time_Max                2020.   //Mach=100 then 807
+Num_Checkpoints	        2	
 Num_Diag_Dump           25   // When Dump=measure no averaging over time in output
 Num_Diag_Measure        25   // 
 
-NoInnerBC               0
-BoundTypeR              1               // 0 fixed, 1 outflow, 2 periodic
+NoInnerBC               0               // 
+BoundTypeR              0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ              2               // 0 fixed, 1 outflow, 2 periodic
-ZeroPsiBndry            0
+ZeroPsiBndry            1
 
 Move_Cells              3
 RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index         1.001
-Explicit_Viscosity      -0.001  //fix this hardcode later -Dan (<0 is off)
+Explicit_Viscosity      0.00004      //fix this hardcode later -Dan (<0 is off)
 
-RhoSinkTimescale        -1.0
+RhoSinkTimescale        -1.0        // for minidisk sink particles
+
+
 DivB_Ch			0.06		//Dedner divergence cleaning
 DivB_l			0.1
 //Numerical Parameters
@@ -42,26 +45,27 @@ CFL			0.5
 PLM			1.0
 
 POWELL                  1
-w_a_type                0.0
+w_a_type                0    //subtract off terms for MHD keep 0 for now
 Grav_2D			1
-G_EPS			0.1
+G_EPS			0.0
 
 PHI_ORDER               2
 
 //Atmosphere Parameters
-Rho_Floor		0.000000000001  //was 10e-5
-Cs_Floor		0.000000000001	//was 10e-4	
+Rho_Floor		0.000000001  //was 10e-5
+Cs_Floor		0.00001	//was 10e-4	
 Cs_Cap			1.0
 Vel_Cap			10.0
+SET_T                   0         // SET_T=1 means set Temp so HoR is cst
 
 runtype                 0
 
 DAMP_TIME               -10.*3.14159        // Set negative to turn off
-RDAMP_INNER             0.6
-RDAMP_OUTER             1.9
+RDAMP_INNER             0.9
+RDAMP_OUTER             1.1
 
 RLogScale               1000.0   // big number turns off log spacing
 ZLogScale               1000.0   // big number turns off log spacing
-HiResSigma              0.1    // Gaussian width of HI RES region
+HiResSigma              0.4    // Gaussian width of HI RES region
 HiResR0                 0.4    // center of Gaussian HI RES
-HiResFac                0.0    // 0 on 1 off
+HiResFac                4.0    // 0 on 1 off

@@ -5,8 +5,9 @@
 #include "../Headers/Cell.h"
 #include "../Headers/Sim.h"
 #include "../Headers/header.h"
+#include "../Headers/GravMass.h" //For LIVEBINARY
 
-double maxvel(double * prim , double w , double r ,struct Sim * theSim){
+double maxvel(double * prim , double w , double r ,struct Sim * theSim, struct GravMass * theGravMasses){ // ADDED GRAV MASSES -DD
 
   double Pp  = prim[PPP];
   double rho = prim[RHO];
@@ -29,8 +30,39 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim){
     double b2  = (Br*Br+Bp*Bp+Bz*Bz)/rho;
     cf2 += b2;
   }
+	
   double maxv = sqrt(cf2) + sqrt( vr*vr + vp*vp + vz*vz );
+// BH's moving on Grid
+	//FOR CIRC ORBIT case vr is 0 but really is moving in r - put vr ~ dL/dt/(M r Omega) = Fp/(M Omega) here?
+  if (sim_GravMassType(theSim)==LIVEBINARY){
+	  double Om    = gravMass_omega(theGravMasses,0);
+	  double rBH0  = gravMass_r(theGravMasses,0);
+	  double rBH1  = gravMass_r(theGravMasses,1);
+	  double vrBH0   = gravMass_Fp(theGravMasses,0)/( gravMass_M(theGravMasses,0) * Om );
+	  double vrBH1   = gravMass_Fp(theGravMasses,1)/( gravMass_M(theGravMasses,1) * Om );
+	  //double vrBH0 = gravMass_vr(theGravMasses,0);
+	  //double vrBH1 = gravMass_vr(theGravMasses,1);
+	  double vpBH0;
+	  double vpBH1;
+	  if (NO_W_IN_CFL==1){ 
+		  vpBH0  = Om*rBH0;
+		  vpBH1  = Om*rBH1;
+	  } else{
+		  vpBH0  = Om*rBH0-w;
+		  vpBH1  = Om*rBH1-w;
+	  }
+	  
+	  double maxvBH = sqrt(vpBH1*vpBH1 + vrBH1*vrBH1);
+	  if (maxvBH > maxv){
+		  //printf("MaxVel=BHvel");
+		  maxv = maxvBH;  
+	  }
+  	
 
+  }
+
+
+	
   if (sim_runtype(theSim)==MHD){
     double ch = sim_DIVB_CH(theSim); 
     if( maxv < ch ) maxv = ch;
@@ -40,7 +72,7 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim){
 
 }
 
-double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
+double cell_mindt( struct Cell *** theCells, struct Sim * theSim, struct GravMass * theGravMasses){ // ADDED GRAV MASSES -DD
   int i_m,j_m,k_m;
   double dt_m = 1.e100;//HUGE_VAL;
   double a_m,r_m,dx_m;
@@ -67,7 +99,7 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
         if( dx>dz ) {
           dx = dz;
         }
-        double a  = maxvel( theCells[k][i][j].prim , w , r ,theSim);
+        double a  = maxvel( theCells[k][i][j].prim , w , r ,theSim, theGravMasses);
         double rho = theCells[k][i][j].prim[RHO]; 
         double Pp  = theCells[k][i][j].prim[PPP]; 
         double Br  = theCells[k][i][j].prim[BRR];
