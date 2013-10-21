@@ -1,5 +1,6 @@
 #define PLANET_PRIVATE_DEFS
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 #include "../Headers/GravMass.h"
 #include "../Headers/Sim.h"
@@ -30,9 +31,22 @@ void gravMass_copy(struct GravMass * theGravMasses,struct Sim * theSim){
 }
 
 
-void gravMass_move(struct GravMass * theGravMasses,double dt){
-  theGravMasses[0].phi += theGravMasses[0].omega*dt;
-  theGravMasses[1].phi += theGravMasses[1].omega*dt;
+void gravMass_move(struct GravMass * theGravMasses,double t,double dt){
+  double m0 = theGravMasses[0].M;
+  double m1 = theGravMasses[1].M;
+  double M = m0+m1;
+  double mu = m0*m1/M; 
+  double a_0 = 1.0;
+  double tau_0 = 100.0;//5./256. * pow(a_0,4)/(mu * M*M);
+  double a = a_0 * pow((1.0 - t/tau_0),0.25);
+  double omega = pow(a/M,-1.5);
+  printf("t: %e, a: %e, omega: %e\n",t,a,omega);
+  /*
+     theGravMasses[0].phi += theGravMasses[0].omega*dt;
+     theGravMasses[1].phi += theGravMasses[1].omega*dt;
+     */
+  theGravMasses[0].phi += omega*dt;
+  theGravMasses[1].phi += omega*dt;
 }
 
 void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, double RK){
