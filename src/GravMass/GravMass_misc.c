@@ -37,10 +37,10 @@ void gravMass_move(struct GravMass * theGravMasses,double t,double dt){
   double M = m0+m1;
   double mu = m0*m1/M; 
   double a_0 = 1.0;
-  double tau_0 = 100.0;//5./256. * pow(a_0,4)/(mu * M*M);
-  double a = a_0 * pow((1.0 - t/tau_0),0.25);
+  double tau_0 = 1000.0;//5./256. * pow(a_0,4)/(mu * M*M);
+  double a = a_0 * pow((1.0 - (t-2300.)/tau_0),0.25);
   double omega = pow(a/M,-1.5);
-  printf("t: %e, a: %e, omega: %e\n",t,a,omega);
+  //printf("t-2300: %e, a: %e, omega: %e\n",t-2300.,a,omega);
   /*
      theGravMasses[0].phi += theGravMasses[0].omega*dt;
      theGravMasses[1].phi += theGravMasses[1].omega*dt;
