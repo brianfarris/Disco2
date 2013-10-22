@@ -264,7 +264,7 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     prim = theRiemann->primR;
     F = theRiemann->FR;
   } else{
-    printf("ERROR\n");
+    printf("ERROR - Riemann state is neither LEFT nor RIGHT!\n");
     exit(0);
   }
 
@@ -629,7 +629,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
         riemann_set_star_hllc(theRiemann,theSim,Bpack,GAMMALAW);// get Ustar and Fstar
       }
     } else{
-      printf("ERROR\n");
+      printf("ERROR - Riemann state is neither left* nor right*\n");
       exit(0);
     }
     int q;

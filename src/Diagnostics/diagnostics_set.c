@@ -108,8 +108,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double phi_bh1 = gravMass_phi(theGravMasses,1);
 		  double q = sim_MassRatio(theSim);	  // Added Mass ratio DD
 		  
-		  //double abhbin = sqrt(r_bh0*r_bh0 + r_bh1*r_bh1 - 2.*r_bh0*r_bh1*cos(phi_bh1-phi_bh0)); //Added abhbin DD
-		  double abhbin = r_bh0 + r_bh1;
+		  double abhbin = sqrt(r_bh0*r_bh0 + r_bh1*r_bh1 - 2.*r_bh0*r_bh1*cos(phi_bh1-phi_bh0)); //Added abhbin DD
+		  //double abhbin = r_bh0 + r_bh1;
 			
 			//double dPhi_dphi = 1/4.*r*sin(phi-Omega*t) * (
 			//pow(r*r+.25-r*cos(phi-Omega*t),-1.5) -  
@@ -118,8 +118,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 							  pow(r*r+(abhbin/(1+1./q))*(abhbin/(1.+1./q))-2.*r*abhbin/(1.+1./q)*cos(phi-Omega*t),-1.5) -  
 							  pow(r*r+(abhbin/(1+q))*(abhbin/(1+q))+2.*r*abhbin/(1+q)*cos(phi-Omega*t),-1.5)) ;  //DD: for general q (for entire binary)
 			
-		  double dPhi_dphi_S =  abhbin*r/((1.+q)*(1.+1./q))*sin(phi-Omega*t) * (  
-							    -pow(r*r+(abhbin/(1+q))*(abhbin/(1+q))+2.*r*abhbin/(1+q)*cos(phi-Omega*t),-1.5)) ;  //DD: for general q (for secondary only)
+		  double dPhi_dphi_S =  -abhbin*r/((1.+q)*(1.+1./q))*sin(phi-Omega*t) * (  
+							    pow(r*r+(abhbin/(1+q))*(abhbin/(1+q))+2.*r*abhbin/(1+q)*cos(phi-Omega*t),-1.5)) ;  //DD: for general q (for secondary only)
 
           double dist_bh0 = sqrt(r_bh0*r_bh0 + r*r - 2.*r_bh0*r*cos(phi_bh0-phi));
           double dist_bh1 = sqrt(r_bh1*r_bh1 + r*r - 2.*r_bh1*r*cos(phi_bh1-phi));
@@ -192,13 +192,22 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+8] += (rho*vr*sin(phi)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (rho*vr*cos(2.*phi)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (rho*vr*sin(2.*phi)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (-2.*M_PI*r*rho*dPhi_dphi_S/sim_N_p(theSim,i)*dz); //DD added only secondary Pot 
+		  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (-2.*M_PI*r*rho*dPhi_dphi_S/sim_N_p(theSim,i)*dz); //DD added only secondary Pot 
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (psi/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += (180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (passive_scalar/sim_N_p(theSim,i)*dz) ; 
-          // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
+		  if (r<r_bh1) {
+			  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+18] += (-M_PI*rho*r*1.0*q*q*pow(r,6)*Omega*Omega/pow( fmax( fabs(r-r_bh1),0.1 ),4 )/sim_N_p(theSim,i)*dz) ;
+		  }
+		  if (r>r_bh1) {
+			  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+18] += (M_PI*rho*r*1.0*q*q*r*r*Omega*Omega*pow(r_bh1,4)/pow( fmax( fabs(r-r_bh1),0.1 ),4 )/sim_N_p(theSim,i)*dz) ; 
+		  }	
+		  if (r<2.*r_bh1) {
+			  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+19] += (rho*dz) ; // total mass
+		  }
+			// the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }
     }
@@ -227,16 +236,20 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 				  double phi_bh1 = gravMass_phi(theGravMasses,1);
 				  double q = sim_MassRatio(theSim);	  
 				
-				  //double abhbin = sqrt(r_bh0*r_bh0 + r_bh1*r_bh1 - 2.*r_bh0*r_bh1*cos(phi_bh1-phi_bh0));
-				  double abhbin = r_bh0 + r_bh1;
+				  double abhbin = sqrt(r_bh0*r_bh0 + r_bh1*r_bh1 - 2.*r_bh0*r_bh1*cos(phi_bh1-phi_bh0));
+				  //double abhbin = r_bh0 + r_bh1;
 				
-				  double dPhi_dphi_S =  abhbin*r/((1.+q)*(1.+1./q))*sin(phi-Omega*t) * (  
+				  double dPhi_dphi_S =  -abhbin*r/((1.+q)*(1.+1./q))*sin(phi-Omega*t) * (  
 										pow(r*r+(abhbin/(1+q))*(abhbin/(1+q))+2.*r*abhbin/(1+q)*cos(phi-Omega*t),-1.5)) ;  //DD:for general q ( For Secondary only ) CHECK
 				  if ((fabs(zp)<0.0000001)||(fabs(z)<0.0000001)){          
 					EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+18] = -2.*M_PI*r*(rho - EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+2] )*dPhi_dphi_S;
+					EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+18] = -2.*M_PI*r*(EquatDiag_temp[(theDiagnostics->offset_eq+position+1)*NUM_EQ+2] - EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+2] )*dPhi_dphi_S;
 					++position;
 				  }
-				  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += (-2.*M_PI*r*(rho - VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1])*dPhi_dphi_S/sim_N_p(theSim,i)*dz) ;
+				// Az Avg of Sig(r,phi) - <Sig(r,(phi)>_{phi}
+				VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+20] += (-2.*M_PI*r*rho - VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1]*dPhi_dphi_S/sim_N_p(theSim,i)*dz) ;
+				// <Sig(r+dr,(phi)>_{phi} - <Sig(r,(phi)>_{phi}
+				VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += (-2.*M_PI*r*VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin+1)*NUM_VEC+1] - VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1]*dPhi_dphi_S*dz); // /sim_N_p(theSim,i)*dz) ;
 			  }
 		  }
 	  }
@@ -248,8 +261,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       double rp = sim_FacePos(theSim,i,R_DIR);
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       for (n=0;n<NUM_SCAL;++n){
-        // mult by delta r^2 because we are doing an r integration -DD: should this say delta r? 
-        ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1] * (rp*rp-rm*rm); 
+        // mult by delta r^2 because we are doing an r integration 
+		  ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp*rp-rm*rm); 
       }
     }
 
@@ -271,6 +284,10 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     double RMAX = sim_MAX(theSim,R_DIR);
     double ZMIN = sim_MIN(theSim,Z_DIR);
     double ZMAX = sim_MAX(theSim,Z_DIR);
+	  
+	//double r = VectorDiag_reduce[i*NUM_VEC]/(ZMAX-ZMIN);
+	double Tr = ScalarDiag_reduce[11];//*dtout/((ZMAX-ZMIN)*(RMAX*RMAX-RMIN*RMIN));
+	double dSTr = ScalarDiag_reduce[19];//*dtout/((ZMAX-ZMIN)*(RMAX*RMAX-RMIN*RMIN));
 
     for (n=0;n<NUM_SCAL;++n){ 
       ScalarDiag_reduce[n] *= dtout/((ZMAX-ZMIN)*(RMAX*RMAX-RMIN*RMIN));
@@ -289,7 +306,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
         VectorDiag_reduce[i*NUM_VEC+n] *= dtout/(ZMAX-ZMIN);
       }
     }
-
+	  
     if(mpisetup_MyProc(theMPIsetup)==0){
       char DiagMdotFilename[256];
       sprintf(DiagMdotFilename,"DiagMdot.dat");
@@ -310,14 +327,14 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 	double M0 = gravMass_M(theGravMasses,0);
 	double M1 = gravMass_M(theGravMasses,1);
 	double E  = gravMass_E(theGravMasses,1);
-	double Om = gravMass_omega(theGravMasses,0);
+	double Om = gravMass_omega(theGravMasses,1);
 	  
 	double vr0 = gravMass_vr(theGravMasses,0);
 	double vr1 = gravMass_vr(theGravMasses,1);
 
 	  
-	double Fr0 = gravMass_Fr(theGravMasses,0);
-    double Fp0 = gravMass_Fp(theGravMasses,0);
+	double Fr0 = gravMass_Fr(theGravMasses,1);
+    double Fp0 = gravMass_Fp(theGravMasses,1);
 	//If CM of binary strays from r=0, then phi1-phi0 != pi  
 	double a_bin = sqrt(r_bh0*r_bh0 + r_bh1*r_bh1 - 2.*r_bh0*r_bh1*cos(phi_bh1-phi_bh0));
 	double mu = M0*M1/(M0+M1);
@@ -329,10 +346,11 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 		char DiagBPFilename[256];
 		sprintf(DiagBPFilename,"BinaryParams.dat");
 		FILE * DiagBpFile = fopen(DiagBPFilename,"a");
-		fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, L0, L1, vr0, Om, Fr0, Fp0 );       
+		fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, L0, L1, vr0, Om, Fr0, Fp0,Tr,dSTr );       
 		fclose(DiagBpFile);
 	}	
 
+	  
 //----------------ADDED above DD-------------------------//
 	  
     //We are doing time averaged diagnostics, so mult by delta t and add it

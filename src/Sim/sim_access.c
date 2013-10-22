@@ -179,4 +179,7 @@ double sim_Mdisk_ovr_Ms(struct Sim *theSim){
 double sim_sep0(struct Sim *theSim){
 	return(theSim->sep0);
 }
+double sim_tmig_on(struct Sim *theSim){
+	return(theSim->tmig_on);
+}
 

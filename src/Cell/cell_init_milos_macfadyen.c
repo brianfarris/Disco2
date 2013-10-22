@@ -74,8 +74,8 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
 
 		double rho = rho0*( pow(rs/r,delta_exp) )*exp(-pow(rs/r,xi_exp) );
         double omega = 1./pow(r,1.5);
-        omega *= 1.+3./16./r/r;
-        double O2 = omega*omega + cs*cs/r/r*( 2.*rs*rs/r/r - 3. );
+        omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
+        double O2 = omega*omega + cs*cs/r/r*( 2.*rs*rs/r/r - 3. ); // add derivative of Pressure term
         double vr;
         if (r<1.){
           omega = sqrt(O2)*pow(r,2.);

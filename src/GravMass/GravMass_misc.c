@@ -128,9 +128,12 @@ void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt )
 	
 	// for e=0 only
 	double e=0.0;
-	double cosE0 = 0.0;   // circular orbit or imaginary e -> something weird?
+	//double cosE0 = 0.0;
+	double cosE0 = (1.-r1/a)/e;    // from r=a(1-ecos(E))
+	if( e <= 0.0 ) cosE0 = 0.0;   // circular orbit or imaginary e -> something weird?
 	double sinE0 = sqrt(fabs(1.-cosE0*cosE0));
 	if( vr1 < 0.0 ) sinE0 = -sinE0; //???
+
 	
 	double E0 = atan2( sinE0 , cosE0 );
 	if( E>0.0 ) E0 = log( sinE0 + cosE0 );
@@ -294,8 +297,8 @@ void gravMass_update_RK( struct Cell *** theCells, struct GravMass * theGravMass
 	theGravMasses[i].omega = (1.0-RK)*theGravMasses[i].omega  + RK*theGravMasses[i].RK_omega;
 	theGravMasses[i].L     = (1.0-RK)*theGravMasses[i].L   + RK*theGravMasses[i].RK_L;
 	theGravMasses[i].E     = (1.0-RK)*theGravMasses[i].E   + RK*theGravMasses[i].RK_E;
-	theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr  + RK*theGravMasses[i].RK_vr;
-	if (sim_GravMassType(theSim)==LIVEBINARY){
+	theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr  + RK*theGravMasses[i].RK_vr; 
+	if ( (sim_GravMassType(theSim)==LIVEBINARY) && (time_global > sim_tmig_on(theSim)) ){
 		// calculate forces and velocities at given position and time in RK timestep  (for direct orbit integration)
 		//if (RK==0.5){  
 		//	cell_gravMassForcePlanets( theSim, theCells, theGravMasses ); // calculate forces on each planet from back reaction of disk (gravMass_update_RK() uses these)
