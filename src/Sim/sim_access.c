@@ -89,6 +89,12 @@ int sim_NumGravMass(struct Sim *theSim){
 double sim_MassRatio(struct Sim *theSim){
   return(theSim->MassRatio);
 }
+double sim_OrbShrinkTscale(struct Sim *theSim){
+  return(theSim->OrbShrinkTscale);
+}
+double sim_OrbShrinkT0(struct Sim *theSim){
+  return(theSim->OrbShrinkT0);
+}
 int sim_Riemann(struct Sim *theSim){
   return(theSim->Riemann);
 }

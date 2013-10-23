@@ -56,6 +56,8 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "InitialDataType"      , VAR_INT  , &(theSim->InitialDataType)  );
       err += readvar( pfile , "GravMassType"      , VAR_INT  , &(theSim->GravMassType)  );
       err += readvar( pfile , "MassRatio"      , VAR_DOUB  , &(theSim->MassRatio)  );
+      err += readvar( pfile , "OrbShrinkTscale"      , VAR_DOUB  , &(theSim->OrbShrinkTscale)  );
+      err += readvar( pfile , "OrbShrinkT0"      , VAR_DOUB  , &(theSim->OrbShrinkT0)  );
       err += readvar( pfile , "BoundTypeR"         , VAR_INT  , &(theSim->BoundTypeR)  );
       err += readvar( pfile , "BoundTypeZ"         , VAR_INT  , &(theSim->BoundTypeZ)  );
       err += readvar( pfile , "ZeroPsiBndry"         , VAR_INT  , &(theSim->ZeroPsiBndry)  );

@@ -42,6 +42,8 @@ struct Sim {
   int MOVE_CELLS;   
   int NumGravMass;
   double MassRatio;
+  double OrbShrinkTscale;
+  double OrbShrinkT0;
   int Riemann;
   double GAMMALAW;
   double EXPLICIT_VISCOSITY;
@@ -99,6 +101,8 @@ int sim_Nghost_max(struct Sim *,int);
 int sim_MOVE_CELLS(struct Sim *);
 int sim_NumGravMass(struct Sim *);
 double sim_MassRatio(struct Sim *);
+double sim_OrbShrinkTscale(struct Sim *);
+double sim_OrbShrinkT0(struct Sim *);
 int sim_Riemann(struct Sim *);
 double sim_GAMMALAW(struct Sim *);
 double sim_EXPLICIT_VISCOSITY(struct Sim *);

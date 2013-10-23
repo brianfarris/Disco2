@@ -5,16 +5,18 @@ struct Sim;
 
 #ifdef PLANET_PRIVATE_DEFS
 struct GravMass{
-   double r;
-   double phi;
-   double M;
-   double omega;
-   double RK_r;
-   double RK_phi;
-   double RK_M;
-   double RK_omega;
-   double Mdot;
-   double total_torque;
+  double OrbShrinkTscale;
+  double OrbShrinkT0;
+  double r;
+  double phi;
+  double M;
+  double omega;
+  double RK_r;
+  double RK_phi;
+  double RK_M;
+  double RK_omega;
+  double Mdot;
+  double total_torque;
 };
 #endif
 

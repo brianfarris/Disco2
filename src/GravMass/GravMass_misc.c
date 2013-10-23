@@ -37,16 +37,24 @@ void gravMass_move(struct GravMass * theGravMasses,double t,double dt){
   double M = m0+m1;
   double mu = m0*m1/M; 
   double a_0 = 1.0;
-  double tau_0 = 1000.0;//5./256. * pow(a_0,4)/(mu * M*M);
-  double a = a_0 * pow((1.0 - (t-2300.)/tau_0),0.25);
+  double OrbShrinkTscale = theGravMasses[0].OrbShrinkTscale;
+  double OrbShrinkT0 = theGravMasses[0].OrbShrinkT0;
+  double tau_0 = OrbShrinkTscale;
+  double a = a_0 * pow((1.0 - (t-OrbShrinkT0)/tau_0),0.25);
   double omega = pow(a/M,-1.5);
-  //printf("t-2300: %e, a: %e, omega: %e\n",t-2300.,a,omega);
+  double r0 = m1/M*a;
+  double r1 = m0/M*a;
   /*
      theGravMasses[0].phi += theGravMasses[0].omega*dt;
      theGravMasses[1].phi += theGravMasses[1].omega*dt;
      */
   theGravMasses[0].phi += omega*dt;
   theGravMasses[1].phi += omega*dt;
+  theGravMasses[0].r = r0;
+  theGravMasses[1].r = r1;
+  theGravMasses[0].omega = omega;
+  theGravMasses[1].omega = omega;
+
 }
 
 void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, double RK){
