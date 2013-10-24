@@ -37,6 +37,11 @@ void cell_prim2cons( double * prim , double * cons , double r , double dV ,struc
     cons[BPP] = Bp*dV/r; // note that the conserved variable is Bp/r. This helps us reduce geometric source terms
     cons[BZZ] = Bz*dV;
     cons[PSI] = prim[PSI]*dV;
+    
+    cons[ARR] = prim[ARR]*dV;
+    cons[APP] = prim[APP]*dV;
+    cons[AZZ] = prim[AZZ]*dV;
+    cons[PHI] = prim[PHI]*dV;
   }
 
   int q;
@@ -97,6 +102,11 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
     prim[BPP] = Bp;
     prim[BZZ] = Bz;
     prim[PSI] = cons[PSI]/dV;
+
+    prim[ARR] = cons[ARR]/dV;
+    prim[APP] = cons[APP]/dV;
+    prim[AZZ] = cons[AZZ]/dV;
+    prim[PHI] = cons[PHI]/dV;
   }
   double rhoe = E - KE - .5*B2;
   double Pp = (GAMMALAW-1.)*rhoe;
