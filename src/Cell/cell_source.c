@@ -13,7 +13,7 @@ double fgrav( double M , double r , double eps, double n ){
 }
 
 double fgrav_neg_centrifugal( double M , double r , double eps, double n ){
-  double Om = 20.0;
+  double Om = 1.0;
   return( M*r*Om*Om );
 }
 
@@ -200,6 +200,14 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[PSI] -= POWELL*dt*vdotGradPsi;
 
           c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
+
+
+          c->cons[ARR] += (vp*Bz-vz*Bp)*dV*dt;
+          c->cons[APP] += (vz*Br-vr*Bz)*dV*dt;
+          //printf("vr: %e, vp: %e, Br: %e, Bp: %e\n",vr,vp,Br,Bp);
+          c->cons[AZZ] += (vr*Bp-vp*Br)*dV*dt;
+          //printf("vr*Bp-vp*Br: %e, dV: %e, dt: %e,cons[AZZ]: %e\n",vr*Bp-vp*Br,dV,dt,c->cons[AZZ]);
+
 
         }
       }

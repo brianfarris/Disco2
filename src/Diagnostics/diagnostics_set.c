@@ -93,6 +93,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double Br = cell_prim(cell_single(theCells,i,j,k),BRR);
           double Bp = cell_prim(cell_single(theCells,i,j,k),BPP);
           double Bz = cell_prim(cell_single(theCells,i,j,k),BZZ);
+          double Az = cell_prim(cell_single(theCells,i,j,k),AZZ);
           double v2   = vr*vr + vp*vp + vz*vz;
           double B2   = Br*Br + Bp*Bp + Bz*Bz;
           double rhoe = press/(sim_GAMMALAW(theSim)-1.);
@@ -161,7 +162,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+11] = rho*vr*sin(2.*phi);            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = -2.*M_PI*r*rho*dPhi_dphi;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+13] = 0.5*B2;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = Br*Bp;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = Az;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = psi;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+16] = 180./M_PI*0.5*asin(-Br*Bp/(0.5*B2));
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+17] = passive_scalar;

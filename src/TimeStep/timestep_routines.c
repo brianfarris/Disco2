@@ -1,3 +1,4 @@
+#define CELL_PRIVATE_DEFS
 #define TIMESTEP_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,6 +18,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     struct Sim * theSim,struct GravMass * theGravMasses,
     struct MPIsetup * theMPIsetup,double timestep_fac){
 
+  int i,j,k,q;
   double dt = timestep_fac*theTimeStep->dt;
 
   // figure out what all the faces need to be and set them up
@@ -42,7 +44,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   double r1 = sim_FacePos(theSim,1,R_DIR);
   double r2 = sim_FacePos(theSim,2,R_DIR);
 
-  int i,j,k,q;
+ 
   //Phi Flux
   cell_plm_p(theCells,theSim);//piecewise-linear reconstruction
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -55,6 +57,20 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       }
     }
   }
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    double zm = sim_FacePos(theSim,k-1,Z_DIR);
+    double zp = sim_FacePos(theSim,k,Z_DIR);
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+      double rm = sim_FacePos(theSim,i-1,R_DIR);
+      double rp = sim_FacePos(theSim,i,R_DIR);
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+        double dphi = theCells[k][i][j].dphi;
+        double dz = zp-zm;
+        double dV = dphi*.5*(rp*rp-rm*rm)*dz;
+      }
+    }
+  }
+
 
   //R Flux
   cell_plm_rz(theCells,theSim,theFaces_r,theTimeStep,R_DIR); //piecewise-linear reconstruction
@@ -77,7 +93,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       riemann_destroy(theRiemann); // clean up
     }
   }
-
   //Source Terms
   cell_add_src( theCells ,theSim, theGravMasses , dt ); // add source terms
   if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
@@ -114,7 +129,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       //do nothing, this is already handled by the syncing routine
     }
   } 
-  
+
   //clean up
   face_destroy(theFaces_r);
   if (sim_N_global(theSim,Z_DIR)>1){
@@ -128,9 +143,13 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);
 
+  cell_compute_curl(theCells,theSim);
+
   //re-calculate conserved quantities. 
   //things may have changed due to syncing and/or caps/floors applied in primitive solver.
   cell_calc_cons( theCells,theSim );
+
+
 }
 
 void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCells , struct Sim * theSim,struct MPIsetup * theMPIsetup){

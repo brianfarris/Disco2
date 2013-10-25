@@ -11,6 +11,9 @@
 double cell_prim(struct Cell *theCell,int q){
   return(theCell->prim[q]);
 }
+double cell_cons(struct Cell *theCell,int q){
+  return(theCell->cons[q]);
+}
 double cell_grad(struct Cell *theCell,int q){
   return(theCell->grad[q]);
 }

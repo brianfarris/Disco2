@@ -10,8 +10,8 @@ double sim_W_A(struct Sim * theSim,double r){
     //no w_analytic
     return(0.0);
   }else if (sim_W_A_TYPE(theSim)==A_OMEGA20){
-    //rigid rotation with Omega = 20
-    return(r*20); 
+    //rigid rotation with Omega = 1
+    return(r*1.); 
   } else if (sim_W_A_TYPE(theSim)==A_KEPLER){
     //keplerian rotation
     return(pow(r,-0.5));
