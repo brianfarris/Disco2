@@ -21,7 +21,7 @@ MPI_Comm sim_comm;
 #define BNORM_AVG 0
 #define VISC_CONST 0
 #define VISC_OLD 0
-#define INCLUDE_ALL_VISC_TERMS 1
+#define INCLUDE_ALL_VISC_TERMS 0
 #define CHECKPOINTING 
 #define TVISC_FAC 1.0
 double time_global;

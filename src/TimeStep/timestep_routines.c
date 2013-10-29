@@ -1,4 +1,3 @@
-#define CELL_PRIVATE_DEFS
 #define TIMESTEP_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
@@ -57,20 +56,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       }
     }
   }
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    double zm = sim_FacePos(theSim,k-1,Z_DIR);
-    double zp = sim_FacePos(theSim,k,Z_DIR);
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
-      double rm = sim_FacePos(theSim,i-1,R_DIR);
-      double rp = sim_FacePos(theSim,i,R_DIR);
-      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-        double dphi = theCells[k][i][j].dphi;
-        double dz = zp-zm;
-        double dV = dphi*.5*(rp*rp-rm*rm)*dz;
-      }
-    }
-  }
-
+  
 
   //R Flux
   cell_plm_rz(theCells,theSim,theFaces_r,theTimeStep,R_DIR); //piecewise-linear reconstruction

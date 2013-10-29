@@ -10,7 +10,7 @@
 
 void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
 
-  double omega = 1.0;
+  double omega = 20.0;
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
   double r_coord = 0.5*(rm+rp);
@@ -67,10 +67,10 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
 
   double R = 0.25;
   double B02 = 0.3*1e-3;
-  double rho = 1.0;
+  double RHO0 = 1.0;
   double P0 = 1.0;
   double x0 = 0.3;
-  double omega = 1.0;
+  double omega = 20.0;
 
   int i, j,k;
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
@@ -93,8 +93,9 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
 
         double Az = 0.0;
 
-
+        double rho = RHO0;
         if( X < 1.0 ){
+          //rho = 1.5;
           Pp += dP;
           B2 = B02*X*X*pow(1.-X,2.);
           Az = R*sqrt(B02)*( X*X*( .5 - X/3. ) -1./6. );
