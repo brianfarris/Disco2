@@ -192,7 +192,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+8] += (rho*vr*sin(phi)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (rho*vr*cos(2.*phi)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (rho*vr*sin(2.*phi)/sim_N_p(theSim,i)*dz) ;
-		  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (-2.*M_PI*r*rho*dPhi_dphi_S/sim_N_p(theSim,i)*dz); //DD added only secondary Pot 
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (-2.*M_PI*r*rho*dPhi_dphi_S/sim_N_p(theSim,i)*dz); //DD added only secondary Pot 
+	  //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (-r*r*rho*dPhi_dphi_S*dz); //DD added only secondary Pot - added another r for phi integration
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (psi/sim_N_p(theSim,i)*dz) ;
@@ -262,7 +263,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       for (n=0;n<NUM_SCAL;++n){
         // mult by delta r^2 because we are doing an r integration 
-		  ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp*rp-rm*rm); 
+	       ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp*rp-rm*rm); 
+	       //ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp+rm)/2.*(rp-rm);
       }
     }
 

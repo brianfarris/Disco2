@@ -3,31 +3,31 @@
 
 InitialDataType         10               // 0 Flock, 1 Shear 7 MM08 10 SSmigration
 GravMassType            2               // 0 none, 1 single, 2 binary, 3 live binary
-MassRatio               0.0000026125    // 0.209M_{Th} for Mach=20
+MassRatio               0.0000209    // 0.0209M_{Th} for Mach=10
 sep0                    1.0            // starting binary separation 
                                         //(or permanent separations if GravMassType is not 3)
 Restart			0		//If this=1 restart using input.h5
 
 //Computational Grid
-NumR			128			//Radial Zones
+NumR			512			//Radial Zones
 NumZ			1			//Vertical Zones
 ng                      2
-R_Min			0.25   //was 0.05
-R_Max			4.0
+R_Min			0.1   //was 0.05
+R_Max			3.5
 Z_Min			-1.0
 Z_Max			1.0
 NP_CONST                -1 
-NPCAP                   128
+NPCAP                   512
 aspect                  1.0
 
 NUM_C                   5
 NUM_N                   0
 Time_Max                100000.0
 Num_Checkpoints	        4.	
-Num_Diag_Dump           100000.
-Num_Diag_Measure        1000000.
+Num_Diag_Dump           10000.
+Num_Diag_Measure        10000.
 
-NoInnerBC               1
+NoInnerBC               0
 BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry          1
@@ -37,7 +37,7 @@ RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index         1.001
 Explicit_Viscosity      -0.001
 
-RhoSinkTimescale        1.0
+RhoSinkTimescale        -1.0   // negative means no sink
 
 Mdisk_ovr_Ms            1.00   //Fraction of secondary mass in disk r<a
 tmig_on                 0.0  // time when live binary turns on
@@ -51,7 +51,7 @@ PLM			1.0
 POWELL                  1
 w_a_type                0
 Grav_2D			1
-G_EPS			0.005  //0.16
+G_EPS			0.01  //0.16
 
 PHI_ORDER               2
 
@@ -64,12 +64,12 @@ SET_T                   1
 
 runtype                 0
 
-DAMP_TIME               10000.0        // Set negative to turn off
-RDAMP_INNER             0.4
+DAMP_TIME               -100.0        // Set negative to turn off
+RDAMP_INNER             0.3
 RDAMP_OUTER             3.0
 
-RLogScale               13.14   // Large numbers gives uniform spacing
+RLogScale               1000.0//13.14   // Large numbers gives uniform spacing
 ZLogScale               1000.0
-HiResSigma              0.98    // SET IN sim_set.c
-HiResR0                 0.99    //SET IN sim_set.c
+HiResSigma              0.2    // SET IN sim_set.c
+HiResR0                 1.00    //SET IN sim_set.c
 HiResFac                1.0 //was 1.0 res changes by factor of 1+HiResFac at r0.

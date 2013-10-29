@@ -31,7 +31,7 @@ abin0 = 1.0
 # viscous paramter
 alpha=0.000
 #Mach number in iso disk
-Mach = 10.
+Mach = 20.
 #Binary mass ratio
 q = 0.0000026125 #0.00001
 #Disk mass draction of secondary
@@ -61,7 +61,7 @@ fname="DiagEquat_"
 #tsimA= 519.0039
 #tsimA = 73.0041
 #tsimA = 219.0097
-tsimA = 75.0026
+tsimA = 16.0002
 
 fnameA = fname + '%.4f' %tsimA + '.h5'
 datA  = h5py.File(fnameA, 'r')

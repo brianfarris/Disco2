@@ -11,11 +11,10 @@
 void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
 
 	double rho   = 1.0;
-	double Mach   = 20.0;
+	double Mach   = 10.0;
 	
 	
 	double Gam = sim_GAMMALAW(theSim);
-	double cp = 1./Mach;
 	double fac = 0.0001;
 
 	double Mtotal = 1.0;
@@ -37,11 +36,12 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 
 			
 	double cs;
-	if (r<1.){
-		cs = 1./Mach;
-	}else{
-		cs = sqrt(1./r)/Mach;
-	}
+	cs = pow(sep,(-0.5))/(1.+massratio)/Mach;
+	//if (r<1.){
+	//	cs = 1./Mach;
+	//}else{
+	//	cs = sqrt(1./r)/Mach;
+	//}
 	double xbh0 = r0;
 	double xbh1 = -r1;
 	double ybh0 = 0.0;
@@ -65,23 +65,26 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 	omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
 	double O2 = omega*omega; //+ cs*cs/r/r*( 2.*rs*rs/r/r - 3. ); Add Deriv of Pressure term
 	double vr;
-	if (r<sep){
-		omega = sqrt(O2)*pow(r,2.);
-		vr = 0.0;
-		//vr = scaled SS;
-	}else{
-		omega = sqrt(O2);
-		vr = 0.0;
-		//vr = scaled SS;
-	}		  
+	omega = sqrt(O2);
+	vr = 0.0;
+
+	//if (r<sep){
+	//  omega = sqrt(O2);//*pow(r,2.);
+	//	vr = 0.0;
+	//	//vr = scaled SS;
+	//}else{
+	//	omega = sqrt(O2);
+	//	vr = 0.0;
+	//	//vr = scaled SS;
+	//}		  
 	
 	if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
 				
 	double Pp = cs*cs*rho/Gam;	
 	
 	
-	theCell->prim[RHO] = rho*exp(fac*(Pot1+Pot2)/cp/cp);;
-	theCell->prim[PPP] = Pp*exp(fac*(Pot1+Pot2)/cp/cp);
+	theCell->prim[RHO] = rho*exp(fac*(Pot1+Pot2)/cs/cs);;
+	theCell->prim[PPP] = Pp*exp(fac*(Pot1+Pot2)/cs/cs);
 	theCell->prim[URR] = vr;
 	theCell->prim[UPP] = omega;
 	theCell->prim[UZZ] = 0.0;
@@ -95,10 +98,9 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 	
   double rho0   = 1.0;
-  double Mach   = 20.0;
+  double Mach   = 10.0;
 
   double Gam = sim_GAMMALAW(theSim);
-  double cp = 1./Mach;
   double fac = 0.0001;
 
   //printf("rbh1: %e, rbh2: %e, mbh1: %e, mbh2: %e\n",gravMass_r(theGravMasses,0),gravMass_r(theGravMasses,1),gravMass_M(theGravMasses,0),gravMass_M(theGravMasses,1));
@@ -124,11 +126,14 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
       double r = 0.5*(rm+rp);
 
       double cs;
-      if (r<1.){
-        cs = 1./Mach;
-      }else{
-        cs = sqrt(1./r)/Mach;
-      }
+      cs = pow(sep,(-0.5))/(1.+massratio)/Mach;
+
+//      if (r<1.){
+ //       cs = 1./Mach;
+  //    }else{
+   //     cs = sqrt(1./r)/Mach;
+    //  }
+
       double xbh0 = r0;
       double xbh1 = -r1;
       double ybh0 = 0.0;
@@ -150,21 +155,25 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
 	    //---------------------------Shakura Sunyaev---------------------------//
 		  //(7.21337*10^23 (1 - 0.0129692 Sqrt[1/R])^(7/10))/R^(3/4)  From Mathematica ".nb" 
 		  // For 10^7Msun q=0.01 such that at r_sim=10 Mdisk = Msec 
-		double f = pow(1. - 0.0129692*sqrt(1./r),1./4.);
-		double rho = rho0; //pow(r,(-3./4.)) * pow(f,(14./5.));
+	//double f = pow(1. - 0.0129692*sqrt(1./r),1./4.);
+	double rho = rho0; //pow(r,(-3./4.)) * pow(f,(14./5.));
         double omega = 1./pow(r,1.5);
         omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
-		  double O2 = omega*omega; //+ cs*cs/r/r*( 2.*rs*rs/r/r - 3. ); Add Deriv of Pressure term
+	double O2 = omega*omega; //+ cs*cs/r/r*( 2.*rs*rs/r/r - 3. ); Add Deriv of Pressure term
         double vr;
-        if (r<sep){
-			omega = sqrt(O2)*pow(r,2.);
-          vr = 0.0;
-          //vr = scaled SS;
-        }else{
-          omega = sqrt(O2);
-          vr = 0.0;
-          //vr = scaled SS;
-        }		  
+	omega = sqrt(O2);//*pow(r,2.);
+	vr = 0.0;
+
+//        if (r<sep){
+//	  omega = sqrt(O2);//*pow(r,2.);
+//         vr = 0.0;
+//          //vr = scaled SS;
+//       }else{
+//          omega = sqrt(O2);
+//          vr = 0.0;
+//          //vr = scaled SS;
+//        }		  
+
 		//---------------------------Shakura Sunyaev---------------------------//
         /* 
         if (r<3.){
@@ -175,8 +184,8 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
         
         double Pp = cs*cs*rho/Gam;
 
-        theCells[k][i][j].prim[RHO] = rho*exp(fac*(Pot1+Pot2)/cp/cp);
-        theCells[k][i][j].prim[PPP] = Pp*exp(fac*(Pot1+Pot2)/cp/cp);
+        theCells[k][i][j].prim[RHO] = rho*exp(fac*(Pot1+Pot2)/cs/cs);
+        theCells[k][i][j].prim[PPP] = Pp*exp(fac*(Pot1+Pot2)/cs/cs);
         theCells[k][i][j].prim[URR] = vr;
         theCells[k][i][j].prim[UPP] = omega;
         theCells[k][i][j].prim[UZZ] = 0.0;
