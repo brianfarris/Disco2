@@ -21,6 +21,7 @@ void io_allocbuf(struct IO *theIO,struct Sim *theSim){
 void io_deallocbuf(struct IO *theIO){
   free(theIO->buffer[0]);
   free(theIO->buffer);
+  theIO->buffer = NULL;
 }
 
 void io_setbuf(struct IO *theIO,struct Cell ***theCells,struct Sim *theSim,struct GravMass * theGravMasses){
