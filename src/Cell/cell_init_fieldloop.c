@@ -10,7 +10,7 @@
 
 void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
 
-  double omega = 20.0;
+  double omega = 10000.0;
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
   double r_coord = 0.5*(rm+rp);
@@ -22,7 +22,8 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
 
   double Pp  = 1.0;
   double rho = 1.0;
-  double B02 = 0.3*1e-3;
+  double B02 = 10.0;
+  //double B02 = 0.3*1e-3;
 
   double R = 0.25;
 
@@ -44,7 +45,7 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
   theCell->prim[RHO] = rho;
   theCell->prim[PPP] = Pp;
   theCell->prim[URR] = 0.0;
-  theCell->prim[UPP] = omega;
+  theCell->prim[UPP] = 0.0;//omega;
   theCell->prim[UZZ] = 0.0;
   /*
   theCell->prim[BRR] =  Bx*cos(phi) + By*sin(phi);
@@ -61,16 +62,20 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
   theCell->GradPsi[0] = 0.0;
   theCell->GradPsi[1] = 0.0;
   theCell->GradPsi[2] = 0.0;
+
+  theCell->wiph = omega*r;
 }
+
 
 void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 
   double R = 0.25;
-  double B02 = 0.3*1e-3;
+ // double B02 = 0.3*1e-3;
+  double B02 = 10.0;
   double RHO0 = 1.0;
   double P0 = 1.0;
   double x0 = 0.3;
-  double omega = 20.0;
+  double omega = 10000.0;
 
   int i, j,k;
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
@@ -105,7 +110,7 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = Pp;
         theCells[k][i][j].prim[URR] = 0.0;
-        theCells[k][i][j].prim[UPP] = omega;
+        theCells[k][i][j].prim[UPP] = 0.0;//omega;
         theCells[k][i][j].prim[UZZ] = 0.0;
         /*
         theCells[k][i][j].prim[BRR] =  Bx*cos(phi) + By*sin(phi);
@@ -122,6 +127,7 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
         theCells[k][i][j].GradPsi[0] = 0.0;
         theCells[k][i][j].GradPsi[1] = 0.0;
         theCells[k][i][j].GradPsi[2] = 0.0;
+        theCells[k][i][j].wiph = omega*r;
       }
     }
   }

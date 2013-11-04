@@ -13,7 +13,7 @@ double fgrav( double M , double r , double eps, double n ){
 }
 
 double fgrav_neg_centrifugal( double M , double r , double eps, double n ){
-  double Om = 100.0;
+  double Om = 10000.0;
   return( M*r*Om*Om );
 }
 
@@ -107,6 +107,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         struct Cell * c = &(theCells[k][i][j]);
         double phi = c->tiph-.5*c->dphi;
         double dphi = c->dphi;
+          //printf("1 i: %d, j: %d, k: %d, cons[RHO]: %e,cons[SRR]: %e, cons[LLL]: %e, cons[SZZ]: %e, cons[TAU]: %e\n",i,j,k,c->cons[RHO],c->cons[SRR],c->cons[LLL],c->cons[SZZ],c->cons[TAU]);
 
         double rho = c->prim[RHO];
         double Pp  = c->prim[PPP];
@@ -140,11 +141,19 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           Fr += fr;
           Fp += fp;
         }
+
+        double F_centrifugal_r = cell_wiph(c)*cell_wiph(c)/r;
+        double F_coriolis_r =  2.*cell_wiph(c)*vp/r;
+        double F_coriolis_phi = -2.*cell_wiph(c)*vr/r;
+        double F_euler_phi = 0.0; // ONLY TRUE FOR cell_wiph = const !!!!
+
+        //printf("vr: %e\n",vr);
+        //printf("F_coriolis_r: %e, F_coriolis_phi: %e\n",F_coriolis_r,F_coriolis_phi);
         c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;
-        c->cons[SRR] += dt*dV*rho*Fr*sint;
-        c->cons[LLL] += dt*dV*rho*Fp*r;
+        c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r/*+F_coriolis_r*/);
+        c->cons[LLL] += dt*dV*rho*(Fp/*+F_coriolis_phi+F_euler_phi*/)*r;
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
-        c->cons[TAU] += dt*dV*rho*( Fr*(vr*sint+vz*cost) + Fp*vp );
+        c->cons[TAU] += dt*dV*rho*( (Fr*sint+F_centrifugal_r)*vr+Fr*vz*cost + (Fp+F_euler_phi)*vp);
 
         if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
           total_torque_temp += Fp*r;
@@ -191,6 +200,10 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[LLL] -= POWELL*dt*divB*Bp*r;
           c->cons[TAU] -= POWELL*dt*(divB*vdotB+BdotGradPsi);
 
+          double drW = 0.0; // TEMPORARY, ONLY TRUE FOR cell_wiph = const !!!!
+
+          c->cons[TAU] += dt*dV*r*Br*Bp*drW;
+
           //double psi = c->prim[PSI];
           //cons[BRR] += dt*dV*( psi )/r;
           //cons[PSI] -= dt*dV*psi*DIVB_CH/DIVB_L;//DIVB_CH2/DIVB_CP2;
@@ -202,16 +215,18 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
 
 
-          c->cons[ARR] += ((vp-cell_wiph(c))*Bz-vz*Bp)*dV*dt;
+          //c->cons[ARR] += ((vp-cell_wiph(c))*Bz-vz*Bp)*dV*dt;
+          c->cons[ARR] += ((vp)*Bz-vz*Bp)*dV*dt;
           c->cons[APP] += (vz*Br-vr*Bz)*dV*dt;
-          //printf("vr: %e, vp: %e, Br: %e, Bp: %e\n",vr,vp,Br,Bp);
-          c->cons[AZZ] += (vr*Bp-(vp-cell_wiph(c))*Br)*dV*dt;
-          //printf("vr*Bp-vp*Br: %e, dV: %e, dt: %e,cons[AZZ]: %e\n",vr*Bp-vp*Br,dV,dt,c->cons[AZZ]);
+          //c->cons[AZZ] += (vr*Bp-(vp-cell_wiph(c))*Br)*dV*dt;
+          c->cons[AZZ] += (vr*Bp-vp*Br)*dV*dt;
+          //printf("2 i: %d, j: %d, k: %d, cons[RHO]: %e,cons[SRR]: %e, cons[LLL]: %e, cons[SZZ]: %e, cons[TAU]: %e\n",i,j,k,c->cons[RHO],c->cons[SRR],c->cons[LLL],c->cons[SZZ],c->cons[TAU]);
 
 
         }
       }
     }
+    //exit(1);
   }
 
   double Mdot_reduce[2];

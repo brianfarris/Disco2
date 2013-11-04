@@ -89,6 +89,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     }
   }
 
+
   //Bookkeeping
   cell_update_phi( theCells ,theSim, theTimeStep->RK , dt ); // allow the cells to move in phi direction
   cell_update_dphi( theCells ,theSim); // all the cells to change size
@@ -134,7 +135,10 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   //re-calculate conserved quantities. 
   //things may have changed due to syncing and/or caps/floors applied in primitive solver.
   cell_calc_cons( theCells,theSim );
-
+  
+  cell_add_split_fictitious(theCells,theSim,dt);
+  cell_calc_prim( theCells ,theSim); // calculate primitives
+  
 
 }
 
