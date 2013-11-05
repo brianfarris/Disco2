@@ -96,7 +96,7 @@ void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         double Bz = 0.0;
         Ap = Bz3/2.*(3.*3.)/r;
       }
-      double delta = 0.0;//.001*( (double)rand()/(double)RAND_MAX - .5 );
+      double delta = .001*( (double)rand()/(double)RAND_MAX - .5 );
 
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         theCells[k][i][j].prim[RHO] = rho;
