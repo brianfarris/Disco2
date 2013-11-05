@@ -303,6 +303,17 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     F[BPP] =(Bp*vn - vp*Bn)/r;// + wp_a*Bn + psi*theRiemann->n[1])/r;
     F[BZZ] = Bz*vn - vz*Bn;// + psi*theRiemann->n[2];
     F[PSI] = pow(DIVB_CH,2.)*Bn + wp_a*psi*theRiemann->n[1];
+
+    F[ARR] = prim[ARR]*theRiemann->n[0];
+    F[APP] = prim[ARR]*theRiemann->n[1];
+    F[AZZ] = prim[ARR]*theRiemann->n[2];
+    double An  = prim[ARR]*theRiemann->n[0] 
+      + prim[APP]*theRiemann->n[1]
+      + prim[AZZ]*theRiemann->n[2];
+    double cg2 = 0.1;
+
+    F[PHI] = cg2*An;
+
   }
 
   int q;
@@ -596,7 +607,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   double w;
   if (theRiemann->n[PDIRECTION]){
     if( sim_MOVE_CELLS(theSim) == C_WRIEMANN ) cell_add_wiph(theRiemann->cL,theRiemann->Ss);
-   // w = cell_wiph(theRiemann->cL);
+    // w = cell_wiph(theRiemann->cL);
     w=0.0;
   } else{
     w = 0.0;
@@ -604,7 +615,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   // which state of the riemann problem are we in?
   riemann_set_state(theRiemann,w);
 
-//printf("state: %d\n",theRiemann->state);
+  //printf("state: %d\n",theRiemann->state);
   if (theRiemann->state==LEFT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,LEFT);//in this case, we only need FL
     cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
@@ -641,11 +652,11 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
       exit(0);
     }
     int q;
-    
+
     for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
       theRiemann->F[q] = theRiemann->Fstar[q];// - w*theRiemann->Ustar[q];// w is only nonzero when we are in phi direction
     }
-    
+
     //printf("theRiemann->Ustar[LLL]/theRiemann->cL.cons[LLL]: %e\n",theRiemann->Ustar[LLL]/(theRiemann->r*theRiemann->r*theRiemann->cL->prim[LLL]));
   }
 
