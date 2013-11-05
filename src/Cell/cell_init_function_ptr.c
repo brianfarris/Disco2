@@ -10,6 +10,8 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_torus);
   } else if (sim_InitialDataType(theSim)==BONDI){
     return(&cell_init_bondi);
+  } else if (sim_InitialDataType(theSim)==SHOCK1){
+    return(&cell_init_shock1);
    } else{
     printf("ERROR\n");
     exit(0);
@@ -23,6 +25,8 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_torus);
    } else if (sim_InitialDataType(theSim)==BONDI){
     return(&cell_single_init_bondi);
+   } else if (sim_InitialDataType(theSim)==SHOCK1){
+    return(&cell_single_init_shock1);
   } else{
     printf("ERROR\n");
     exit(0);
