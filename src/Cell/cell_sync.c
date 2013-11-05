@@ -71,6 +71,46 @@ void set_cells(int imin, int imax, int kmin, int kmax, struct Sim * theSim, stru
   }
 }
 
+/*
+void add_net_z_flux(int imin, int imax, int kmin, int kmax, struct Sim * theSim, struct Cell *** theCells){
+  int NUM_Q= sim_NUM_Q(theSim);
+  int count=0;
+  int i,j,k,q;
+  for (k=kmin;k<kmax;++k){
+    for (i=imin;i<imax;++i){
+      for(j = 0; j < sim_N_p(theSim,i); j++){
+        theCells[k][i][j].prim[ARR] += 10.0;
+        theCells[k][i][j].prim[APP] += 10.0;
+        theCells[k][i][j].prim[AZZ] += 10.0;
+        theCells[k][i][j].RKcons[ARR] += 10.0;
+        theCells[k][i][j].RKcons[APP] += 10.0;
+        theCells[k][i][j].RKcons[AZZ] += 10.0;
+      }  
+    }
+  }
+
+}
+void subtract_net_z_flux(int imin, int imax, int kmin, int kmax, struct Sim * theSim, struct Cell *** theCells){
+  int NUM_Q= sim_NUM_Q(theSim);
+  int count=0;
+  int i,j,k,q;
+  for (k=kmin;k<kmax;++k){
+    for (i=imin;i<imax;++i){
+      for(j = 0; j < sim_N_p(theSim,i); j++){
+        theCells[k][i][j].prim[ARR] -= 10.0;
+        theCells[k][i][j].prim[APP] -= 10.0;
+        theCells[k][i][j].prim[AZZ] -= 10.0;
+        theCells[k][i][j].RKcons[ARR] -= 10.0;
+        theCells[k][i][j].RKcons[APP] -= 10.0;
+        theCells[k][i][j].RKcons[AZZ] -= 10.0;
+      }  
+    }
+  }
+
+}
+*/
+
+
 void cell_syncproc_r( struct Cell *** theCells , struct Sim *theSim,struct MPIsetup * theMPIsetup){
 
   //set indices for convenience
@@ -195,6 +235,19 @@ void cell_syncproc_z( struct Cell *** theCells , struct Sim *theSim,struct MPIse
     set_cells(i0,iN,kNmg,kN,theSim,theCells,buffer_z_hi_recv);
     // fill your lower ghost zones with the buffer you recieved
     set_cells(i0,iN,k0,kg,theSim,theCells,buffer_z_low_recv);
+
+
+    /*
+       if (mpisetup_check_ztop_bndry(theMPIsetup)){
+       add_net_z_flux(i0,iN,kNmg,kN,theSim,theCells);
+       }
+
+       if (mpisetup_check_zbot_bndry(theMPIsetup)){
+       subtract_net_z_flux(i0,iN,kNmg,kN,theSim,theCells);
+       }
+       */
+
+
 
     //cleanup
     free(buffer_z_low_send);

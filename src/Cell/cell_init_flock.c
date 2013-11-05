@@ -20,27 +20,52 @@ void cell_single_init_flock(struct Cell *theCell, struct Sim *theSim,int i,int j
   double rho = 1.0;
   double Pp = cs*cs*rho/GAMMALAW;
 
+  double Bz,Ap;
+  if ((r>2.)&&(r<3.)){
+    double n=4.0;
+    Bz = 0.05513/n;
+    Ap = 0.5*Bz*r;
+    //Bz = 0.0;
+  } else if (r<2.){
+    double n=4.0;
+    double Bz2 = 0.05513/n;
+    Bz = 0.0;
+    Ap = Bz2/2.*(2.*2.)/r;
+  } else if (r>3.){
+    double n=4.0;
+    double Bz3 = 0.05513/n;
+    double Bz = 0.0;
+    Ap = Bz3/2.*(3.*3.)/r;
+  }
+
   theCell->prim[RHO] = 1.0;
   theCell->prim[PPP] = Pp;
   theCell->prim[URR] = 0.0;
-  theCell->prim[UPP] = omega;
+  theCell->prim[UPP] = 0.0;//omega;
   theCell->prim[UZZ] = 0.0;
   theCell->prim[BRR] = 0.0;
   theCell->prim[BPP] = 0.0;
-  theCell->prim[BZZ] = 0.0;
+  theCell->prim[BZZ] = 0.0;//Bz;
   theCell->prim[PSI] = 0.0;
   theCell->wiph = omega*r;
   theCell->divB = 0.0;
   theCell->GradPsi[0] = 0.0;
   theCell->GradPsi[1] = 0.0;
   theCell->GradPsi[2] = 0.0;
+  theCell->prim[ARR] = 0.0;
+  theCell->prim[APP] = Ap;
+  theCell->prim[AZZ] = 0.0;
+  theCell->prim[PHI] = 0.0;
+
+  //  printf("This Should Not Be Called\n");
+  //  exit(1);
 }
 
 void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 
   double DISK_MACH = 10.;
   double GAMMALAW = sim_GAMMALAW(theSim);
-  
+
   srand(666 + mpisetup_MyProc(theMPIsetup));
   double rho0 = 1.0;
   int i, j,k;
@@ -54,30 +79,44 @@ void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
       double rho = rho0;
       double Pp = cs*cs*rho/GAMMALAW;
 
-      double Bz;
+      double Bz,Ap;
       if ((r>2.)&&(r<3.)){
         double n=4.0;
         Bz = 0.05513/n;
-      } else{
+        Ap = 0.5*Bz*r;
+        //Bz = 0.0;
+      } else if (r<2.){
+        double n=4.0;
+        double Bz2 = 0.05513/n;
         Bz = 0.0;
+        Ap = Bz2/2.*(2.*2.)/r;
+      } else if (r>3.){
+        double n=4.0;
+        double Bz3 = 0.05513/n;
+        double Bz = 0.0;
+        Ap = Bz3/2.*(3.*3.)/r;
       }
-      double delta = .001*( (double)rand()/(double)RAND_MAX - .5 );
+      double delta = 0.0;//.001*( (double)rand()/(double)RAND_MAX - .5 );
 
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = Pp;
         theCells[k][i][j].prim[URR] = 0.0;
-        theCells[k][i][j].prim[UPP] = omega*(1.+delta);
+        theCells[k][i][j].prim[UPP] = 1./pow(r,1.5)*delta;//omega*(1.+delta);
         theCells[k][i][j].prim[UZZ] = delta;
         theCells[k][i][j].prim[BRR] = 0.0;
         theCells[k][i][j].prim[BPP] = 0.0;
         theCells[k][i][j].prim[BZZ] = Bz;
         theCells[k][i][j].prim[PSI] = 0.0;
-        theCells[k][i][j].wiph = omega*r;
+        theCells[k][i][j].wiph = r/pow(r,1.5);//omega*r;
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;
         theCells[k][i][j].GradPsi[1] = 0.0;
         theCells[k][i][j].GradPsi[2] = 0.0;
+        theCells[k][i][j].prim[ARR] = 0.0;
+        theCells[k][i][j].prim[APP] = Ap;
+        theCells[k][i][j].prim[AZZ] = 0.0;
+        theCells[k][i][j].prim[PHI] = 0.0;
       }
     }
   }

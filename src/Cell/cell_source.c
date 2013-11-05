@@ -146,7 +146,11 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double F_coriolis_r =  2.*cell_wiph(c)*vp/r;
         double F_coriolis_phi = -2.*cell_wiph(c)*vr/r;
         double F_euler_phi = 0.0; // ONLY TRUE FOR cell_wiph = const !!!!
-
+        double drOm = 0.0;
+        if (sim_InitialDataType(theSim)==FLOCK){
+          drOm = -1.5*cell_wiph(c)/r/r;
+          F_euler_phi =  -vr*r*drOm;
+        }
         //printf("vr: %e\n",vr);
         //printf("F_coriolis_r: %e, F_coriolis_phi: %e\n",F_coriolis_r,F_coriolis_phi);
         c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;
@@ -200,9 +204,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[LLL] -= POWELL*dt*divB*Bp*r;
           c->cons[TAU] -= POWELL*dt*(divB*vdotB+BdotGradPsi);
 
-          double drW = 0.0; // TEMPORARY, ONLY TRUE FOR cell_wiph = const !!!!
 
-          c->cons[TAU] += dt*dV*r*Br*Bp*drW;
+          c->cons[TAU] += dt*dV*r*Br*Bp*drOm;
 
           //double psi = c->prim[PSI];
           //cons[BRR] += dt*dV*( psi )/r;
