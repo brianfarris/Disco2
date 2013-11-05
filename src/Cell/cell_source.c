@@ -219,7 +219,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
 
           //c->cons[ARR] += ((vp-cell_wiph(c))*Bz-vz*Bp)*dV*dt;
-          c->cons[ARR] += ((vp)*Bz-vz*Bp)*dV*dt;
+          c->cons[ARR] += (vp*Bz-vz*Bp - r*c->prim[APP]*drOm)*dV*dt;
           c->cons[APP] += (vz*Br-vr*Bz)*dV*dt;
           //c->cons[AZZ] += (vr*Bp-(vp-cell_wiph(c))*Br)*dV*dt;
           c->cons[AZZ] += (vr*Bp-vp*Br)*dV*dt;
