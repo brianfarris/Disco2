@@ -225,7 +225,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[AZZ] += (vr*Bp-vp*Br)*dV*dt;
           //printf("2 i: %d, j: %d, k: %d, cons[RHO]: %e,cons[SRR]: %e, cons[LLL]: %e, cons[SZZ]: %e, cons[TAU]: %e\n",i,j,k,c->cons[RHO],c->cons[SRR],c->cons[LLL],c->cons[SZZ],c->cons[TAU]);
 
-          double xi = 0.01/dt;
+          c->cons[ARR] += dt*dV*c->prim[PHI]/r;
+          double xi = 0.1/dt;
           c->cons[PHI] -= xi*c->prim[PHI] * dV*dt;
 
 

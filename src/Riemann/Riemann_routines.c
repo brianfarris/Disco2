@@ -310,7 +310,8 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     double An  = prim[ARR]*theRiemann->n[0] 
       + prim[APP]*theRiemann->n[1]
       + prim[AZZ]*theRiemann->n[2];
-    double cg2 = 0.1;
+   
+    double cg2 = 0.0;
 
     F[PHI] = cg2*An;
 
@@ -673,6 +674,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   theRiemann->F[BPP] = 0.0;
   theRiemann->F[BZZ] = 0.0;
 
+  
   theRiemann->F[ARR] = 0.0;
   theRiemann->F[APP] = 0.0;
   theRiemann->F[AZZ] = 0.0;
