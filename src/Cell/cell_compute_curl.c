@@ -53,6 +53,10 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       double rp = sim_FacePos(theSim,i,R_DIR);
       double r = 0.5*(rm+rp);
+      double rmm = sim_FacePos(theSim,i-2,R_DIR);
+      double rpp = sim_FacePos(theSim,i+1,R_DIR);
+      double r_plus = 0.5*(rp+rpp);
+      double r_mins = 0.5*(rm+rmm);
       double * phi_plus = malloc((sim_N_p(theSim,i+1)+4)*sizeof(double));
       double * Ar_plus = malloc((sim_N_p(theSim,i+1)+4)*sizeof(double));
       double * Ap_plus = malloc((sim_N_p(theSim,i+1)+4)*sizeof(double));
@@ -170,7 +174,7 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
         while (phi<phi_mins[0]) phi += 2.*M_PI;
         double Ap_interp_r_mins = gsl_interp_eval(interp_Ap_mins,phi_mins, Ap_mins,phi,acc_mins); 
         double Az_interp_r_mins = gsl_interp_eval(interp_Az_mins,phi_mins, Az_mins,phi,acc_mins);
-        double dAp_dr = (Ap_interp_r_plus - Ap_interp_r_mins)/two_dr;
+        double one_o_r_drAp_dr = (Ap_interp_r_plus*r_plus - Ap_interp_r_mins*r_mins)/two_dr/r;
         double dAz_dr = (Az_interp_r_plus - Az_interp_r_mins)/two_dr;
 
         //get phi derivatives of Ar and Az
@@ -213,7 +217,7 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
 
         theCells[k][i][j].prim[BRR] = dAz_dp/r - dAp_dz;
         theCells[k][i][j].prim[BPP] = dAr_dz - dAz_dr;
-        theCells[k][i][j].prim[BZZ] = dAp_dr - dAr_dp/r + theCells[k][i][j].prim[APP]/r;
+        theCells[k][i][j].prim[BZZ] = one_o_r_drAp_dr - dAr_dp/r;// + theCells[k][i][j].prim[APP]/r;
 
       }
       gsl_interp_free (interp_Ap_mins);
