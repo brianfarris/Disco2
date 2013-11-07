@@ -107,7 +107,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_syncproc_z(theCells,theSim,theMPIsetup);
 
   // take curl to get B
-  cell_compute_curl(theCells,theSim);
+  cell_compute_curl(theCells,theSim,theMPIsetup);
 
   //Boundary Data
   if (sim_BoundTypeR(theSim)==BOUND_OUTFLOW){

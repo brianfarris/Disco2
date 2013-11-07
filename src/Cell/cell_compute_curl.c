@@ -4,6 +4,7 @@
 #include <math.h>
 #include "../Headers/Cell.h"
 #include "../Headers/Sim.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_spline.h>
@@ -36,7 +37,7 @@ void set_plus_mins(double * phi_pm, double * Ap_pm, double * Az_pm, struct Cell 
 
 }
 
-void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
+void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim , struct MPIsetup * theMPIsetup){
   double Mtotal = 1.0;
   double sep = 1.0;
 
@@ -175,16 +176,18 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
         while (phi<phi_mins[0]) phi += 2.*M_PI;
         double Ap_interp_r_mins = gsl_interp_eval(interp_Ap_mins,phi_mins, Ap_mins,phi,acc_mins); 
         double Az_interp_r_mins = gsl_interp_eval(interp_Az_mins,phi_mins, Az_mins,phi,acc_mins);
-       
+      
+        double one_o_r_drAp_dr;
+        double dAz_dr;
         if (i==imin && mpisetup_check_rin_bndry(theMPIsetup)){
-          double one_o_r_drAp_dr = (Ap_interp_r_plus*r_plus - c->prim[APP]*r)/dr/r;
-          double dAz_dr = (Az_interp_r_plus - c->prim[AZZ])/dr;
+          one_o_r_drAp_dr = (Ap_interp_r_plus*r_plus - c->prim[APP]*r)/dr/r;
+          dAz_dr = (Az_interp_r_plus - c->prim[AZZ])/dr;
         } else if (i==imax-1 && mpisetup_check_rout_bndry(theMPIsetup)){
-          double one_o_r_drAp_dr = (c->prim[APP]*r - Ap_interp_r_mins*r_mins)/dr/r;
-          double dAz_dr = (c->prim[AZZ] - Az_interp_r_mins)/dr;
+          one_o_r_drAp_dr = (c->prim[APP]*r - Ap_interp_r_mins*r_mins)/dr/r;
+          dAz_dr = (c->prim[AZZ] - Az_interp_r_mins)/dr;
         } else{
-          double one_o_r_drAp_dr = (Ap_interp_r_plus*r_plus - Ap_interp_r_mins*r_mins)/two_dr/r;
-          double dAz_dr = (Az_interp_r_plus - Az_interp_r_mins)/two_dr;
+          one_o_r_drAp_dr = (Ap_interp_r_plus*r_plus - Ap_interp_r_mins*r_mins)/two_dr/r;
+          dAz_dr = (Az_interp_r_plus - Az_interp_r_mins)/two_dr;
         }
         //get phi derivatives of Ar and Az
         double Ar_interp_p_mins;
