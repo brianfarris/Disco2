@@ -78,7 +78,6 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
       int next_to_last_mins = sim_N_p(theSim,i-1)-2;
       int last_mins = sim_N_p(theSim,i-1)-1;
 
-
       if (1==0){
         phi_plus[0] = theCells[k][i+1][next_to_last_plus].tiph - 0.5*theCells[k][i+1][next_to_last_plus].dphi;
         phi_plus[1] = theCells[k][i+1][last_plus].tiph - 0.5*theCells[k][i+1][next_to_last_plus].dphi;
@@ -163,7 +162,9 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
 
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         double two_dphi = 2.*theCells[k][i][j].dphi;
+        double dr = rp-rm;
         double two_dr = 2.*(rp-rm);
+        double dz = zp-zm;
         double two_dz = 2.*(zp-zm);
         struct Cell * c = &(theCells[k][i][j]);
         double phi = c->tiph - 0.5*c->dphi;
@@ -174,9 +175,17 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
         while (phi<phi_mins[0]) phi += 2.*M_PI;
         double Ap_interp_r_mins = gsl_interp_eval(interp_Ap_mins,phi_mins, Ap_mins,phi,acc_mins); 
         double Az_interp_r_mins = gsl_interp_eval(interp_Az_mins,phi_mins, Az_mins,phi,acc_mins);
-        double one_o_r_drAp_dr = (Ap_interp_r_plus*r_plus - Ap_interp_r_mins*r_mins)/two_dr/r;
-        double dAz_dr = (Az_interp_r_plus - Az_interp_r_mins)/two_dr;
-
+       
+        if (i==imin && mpisetup_check_rin_bndry(theMPIsetup)){
+          double one_o_r_drAp_dr = (Ap_interp_r_plus*r_plus - c->prim[APP]*r)/dr/r;
+          double dAz_dr = (Az_interp_r_plus - c->prim[AZZ])/dr;
+        } else if (i==imax-1 && mpisetup_check_rout_bndry(theMPIsetup)){
+          double one_o_r_drAp_dr = (c->prim[APP]*r - Ap_interp_r_mins*r_mins)/dr/r;
+          double dAz_dr = (c->prim[AZZ] - Az_interp_r_mins)/dr;
+        } else{
+          double one_o_r_drAp_dr = (Ap_interp_r_plus*r_plus - Ap_interp_r_mins*r_mins)/two_dr/r;
+          double dAz_dr = (Az_interp_r_plus - Az_interp_r_mins)/two_dr;
+        }
         //get phi derivatives of Ar and Az
         double Ar_interp_p_mins;
         double Ar_interp_p_plus;

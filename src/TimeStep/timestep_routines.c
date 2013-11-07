@@ -89,6 +89,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     }
   }
 
+  cell_add_split_fictitious(theCells,theSim,dt);
 
   //Bookkeeping
   cell_update_phi( theCells ,theSim, theTimeStep->RK , dt ); // allow the cells to move in phi direction
@@ -100,6 +101,13 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   if (sim_SET_T(theSim)==1){
     cell_setT(theCells,theSim,theGravMasses); 
   }
+ 
+  //inter-processor syncs
+  cell_syncproc_r(theCells,theSim,theMPIsetup);
+  cell_syncproc_z(theCells,theSim,theMPIsetup);
+
+  // take curl to get B
+  cell_compute_curl(theCells,theSim);
 
   //Boundary Data
   if (sim_BoundTypeR(theSim)==BOUND_OUTFLOW){
@@ -126,19 +134,14 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   // if DAMP_TIME is set to a positive number, apply damping near boundary
   if (sim_DAMP_TIME(theSim)>0.0) cell_bc_damp( theCells , theSim, dt,(*cell_single_init_ptr(theSim)) );
 
-  //inter-processor syncs
+  //inter-processor syncs again to be safe
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);
 
-  cell_compute_curl(theCells,theSim);
-
   //re-calculate conserved quantities. 
-  //things may have changed due to syncing and/or caps/floors applied in primitive solver.
   cell_calc_cons( theCells,theSim );
   
-  cell_add_split_fictitious(theCells,theSim,dt);
-  cell_calc_prim( theCells ,theSim); // calculate primitives
-  
+ 
 
 }
 
