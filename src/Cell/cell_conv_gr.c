@@ -27,14 +27,14 @@ void cell_prim2cons_gr( double * prim , double * cons , double r , double dV ,st
     v[2]  = prim[UZZ];
 
     //Get needed metric values
-    g = metric_create(theSim, 0, r, 0, 0);
+    g = metric_create(theSim, time_global, r, 0, 0);
     a = metric_lapse(g);
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g, i);
     sqrtg = metric_sqrtgamma(g);
 
     //Calculate 4-velocity, u0 = u^0, u[i] = u_i
-    u0 = 1.0 / sqrt(a*a - metric_square3_u(g, b));
+    u0 = (-1.0 - 2*metric_dot3_u(g, b, v) - metric_square3_u(g,v)) / metric_g_dd(g,0,0);
     for(i=0; i<3; i++)
     {
         u[i] = 0;
