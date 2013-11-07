@@ -45,7 +45,10 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
   double dt_m = 1.e100;//HUGE_VAL;
   double a_m,r_m,dx_m;
   double mag_vel_m;
+  double Br_m,Bp_m,Bz_m;
+  double rho_m;
   int i,j,k;
+  //printf("sim_Nghost_min(theSim,R_DIR): %d\n",sim_Nghost_min(theSim,R_DIR));
   for( k=sim_Nghost_min(theSim,Z_DIR) ; k<sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     double zp = sim_FacePos(theSim,k,Z_DIR);
@@ -104,11 +107,15 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
           j_m = j;
           k_m = k;
           r_m = r;
+          Br_m = Br;
+          Bp_m = Bp;
+          Bz_m = Bz;
+          rho_m = rho;
         }
       } 
     }
   }
-  //printf("r_m: %e, i_m: %d, j_m: %d, k_m: %d, a_m: %e, dx_m: %e, mag_vel_m: %e\n",r_m,i_m,j_m,k_m,a_m,dx_m,mag_vel_m);
+  //printf("r_m: %e, i_m: %d, j_m: %d, k_m: %d, a_m: %e, mag_vel_m: %e, Br_m: %e, Bp_m: %e, Bz_m: %e, rho_m: %e\n",r_m,i_m,j_m,k_m,a_m,mag_vel_m,Br_m,Bp_m,Bz_m,rho_m);
   double dt2;
   MPI_Allreduce( &dt_m , &dt2 , 1 , MPI_DOUBLE , MPI_MIN , sim_comm );
   return( dt2 );

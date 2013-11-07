@@ -216,10 +216,19 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[PSI] -= POWELL*dt*vdotGradPsi;
 
           c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
+        
+          double Ap0;
+          if ((r>2.)&&(r<3.)){
+            Ap0 = 0.5*0.05513/4.*r;
+          } else if (r<2.){
+            Ap0 = 0.05513/4./2.*(2.*2.)/r;
+          } else if (r>3.){
+            Ap0 = 0.05513/4./2.*(3.*3.)/r;
+          }
 
 
           //c->cons[ARR] += ((vp-cell_wiph(c))*Bz-vz*Bp)*dV*dt;
-          c->cons[ARR] += (vp*Bz-vz*Bp - r*c->prim[APP]*drOm)*dV*dt;
+          c->cons[ARR] += (vp*Bz-vz*Bp)*dV*dt;// - r*(c->prim[APP]-Ap0)*drOm)*dV*dt;
           c->cons[APP] += (vz*Br-vr*Bz)*dV*dt;
           //c->cons[AZZ] += (vr*Bp-(vp-cell_wiph(c))*Br)*dV*dt;
           c->cons[AZZ] += (vr*Bp-vp*Br)*dV*dt;
