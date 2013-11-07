@@ -77,7 +77,7 @@ void cell_init_shock1(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
           theCells[k][i][j].prim[RHO] = rhoL;
           theCells[k][i][j].prim[PPP] = pL;
           theCells[k][i][j].prim[URR] = cos(t)*vL;
-          theCells[k][i][j].prim[UPP] = -sin(t)*vL;
+          theCells[k][i][j].prim[UPP] = -sin(t)*vL/r;
           theCells[k][i][j].prim[UZZ] = 0.0;
           theCells[k][i][j].divB = 0.0;
           theCells[k][i][j].GradPsi[0] = 0.0;
@@ -87,7 +87,7 @@ void cell_init_shock1(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
           theCells[k][i][j].prim[RHO] = rhoR;
           theCells[k][i][j].prim[PPP] = pR;
           theCells[k][i][j].prim[URR] = cos(t)*vR;
-          theCells[k][i][j].prim[UPP] = -sin(t)*vR;
+          theCells[k][i][j].prim[UPP] = -sin(t)*vR/r;
           theCells[k][i][j].prim[UZZ] = 0.0;
           theCells[k][i][j].divB = 0.0;
           theCells[k][i][j].GradPsi[0] = 0.0;
