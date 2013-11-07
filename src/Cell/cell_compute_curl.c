@@ -9,10 +9,35 @@
 #include <gsl/gsl_spline.h>
 
 
+void set_plus_mins(double * phi_pm, double * Ap_pm, double * Az_pm, struct Cell *** theCells, struct Sim * theSim,int next_to_last_pm, int last_pm,int i,int j,int k){
+  phi_pm[0] = theCells[k][i+1][next_to_last_pm].tiph - 0.5*theCells[k][i+1][next_to_last_pm].dphi;
+  phi_pm[1] = theCells[k][i+1][last_pm].tiph - 0.5*theCells[k][i+1][next_to_last_pm].dphi;
+  Ap_pm[0] = theCells[k][i+1][next_to_last_pm].prim[APP];
+  Ap_pm[1] = theCells[k][i+1][last_pm].prim[APP];
+  Az_pm[0] = theCells[k][i+1][next_to_last_pm].prim[AZZ];
+  Az_pm[1] = theCells[k][i+1][last_pm].prim[AZZ];
+  for( j=0 ; j<sim_N_p(theSim,i+1) ; ++j ){
+    phi_pm[j+2] = theCells[k][i+1][j].tiph - 0.5*theCells[k][i+1][j].dphi;
+    Ap_pm[j+2] = theCells[k][i+1][j].prim[APP];
+    Az_pm[j+2] = theCells[k][i+1][j].prim[AZZ];
+  }
+  phi_pm[sim_N_p(theSim,i+1)+2] = theCells[k][i+1][0].tiph - 0.5*theCells[k][i+1][0].dphi;
+  phi_pm[sim_N_p(theSim,i+1)+3] = theCells[k][i+1][1].tiph - 0.5*theCells[k][i+1][1].dphi;
+  Ap_pm[sim_N_p(theSim,i+1)+2] = theCells[k][i+1][0].prim[APP];
+  Ap_pm[sim_N_p(theSim,i+1)+3] = theCells[k][i+1][1].prim[APP];
+  Az_pm[sim_N_p(theSim,i+1)+2] = theCells[k][i+1][0].prim[AZZ];
+  Az_pm[sim_N_p(theSim,i+1)+3] = theCells[k][i+1][1].prim[AZZ];
+
+  for ( j=1 ; j<sim_N_p(theSim,i+1)+4 ; ++j ){
+    while (phi_pm[j]<phi_pm[j-1]) phi_pm[j] += 2.*M_PI;
+  }
+
+}
+
 void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
   double Mtotal = 1.0;
   double sep = 1.0;
-  
+
   int imin = sim_Nghost_min(theSim,R_DIR);
   int kmin = sim_Nghost_min(theSim,Z_DIR);
   int imax = sim_N(theSim,R_DIR) - sim_Nghost_max(theSim,R_DIR);
@@ -47,6 +72,7 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
       int next_to_last_mins = sim_N_p(theSim,i-1)-2;
       int last_mins = sim_N_p(theSim,i-1)-1;
 
+      /*
       phi_plus[0] = theCells[k][i+1][next_to_last_plus].tiph - 0.5*theCells[k][i+1][next_to_last_plus].dphi;
       phi_plus[1] = theCells[k][i+1][last_plus].tiph - 0.5*theCells[k][i+1][next_to_last_plus].dphi;
       Ap_plus[0] = theCells[k][i+1][next_to_last_plus].prim[APP];
@@ -68,38 +94,46 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
       for ( j=1 ; j<sim_N_p(theSim,i+1)+4 ; ++j ){
         while (phi_plus[j]<phi_plus[j-1]) phi_plus[j] += 2.*M_PI;
       }
+      */
+      set_plus_mins(phi_plus, Ap_plus, Az_plus, theCells, theSim,next_to_last_plus, last_plus,i,j,k);
 
-      phi_mins[0] = theCells[k][i-1][next_to_last_mins].tiph - 0.5*theCells[k][i-1][next_to_last_mins].dphi;
-      phi_mins[1] = theCells[k][i-1][last_mins].tiph - 0.5*theCells[k][i-1][next_to_last_mins].dphi;
-      Ap_mins[0] = theCells[k][i-1][next_to_last_mins].prim[APP];
-      Ap_mins[1] = theCells[k][i-1][last_mins].prim[APP];
-      Az_mins[0] = theCells[k][i-1][next_to_last_mins].prim[AZZ];
-      Az_mins[1] = theCells[k][i-1][last_mins].prim[AZZ];
-      for( j=0 ; j<sim_N_p(theSim,i-1) ; ++j ){
-        phi_mins[j+2] = theCells[k][i-1][j].tiph - 0.5*theCells[k][i-1][j].dphi;
-        Ap_mins[j+2] = theCells[k][i-1][j].prim[APP];
-        Az_mins[j+2] = theCells[k][i-1][j].prim[AZZ];
-      }
-      phi_mins[sim_N_p(theSim,i-1)+2] = theCells[k][i-1][0].tiph - 0.5*theCells[k][i-1][0].dphi;
-      phi_mins[sim_N_p(theSim,i-1)+3] = theCells[k][i-1][1].tiph - 0.5*theCells[k][i-1][1].dphi;
-      Ap_mins[sim_N_p(theSim,i-1)+2] = theCells[k][i-1][0].prim[APP];
-      Ap_mins[sim_N_p(theSim,i-1)+3] = theCells[k][i-1][1].prim[APP];
-      Az_mins[sim_N_p(theSim,i-1)+2] = theCells[k][i-1][0].prim[AZZ];
-      Az_mins[sim_N_p(theSim,i-1)+3] = theCells[k][i-1][1].prim[AZZ];
 
-      for ( j=1 ; j<sim_N_p(theSim,i-1)+4 ; ++j ){
-        while (phi_mins[j]<phi_mins[j-1]) phi_mins[j] += 2.*M_PI;
-      }
+      /*
+         phi_mins[0] = theCells[k][i-1][next_to_last_mins].tiph - 0.5*theCells[k][i-1][next_to_last_mins].dphi;
+         phi_mins[1] = theCells[k][i-1][last_mins].tiph - 0.5*theCells[k][i-1][next_to_last_mins].dphi;
+         Ap_mins[0] = theCells[k][i-1][next_to_last_mins].prim[APP];
+         Ap_mins[1] = theCells[k][i-1][last_mins].prim[APP];
+         Az_mins[0] = theCells[k][i-1][next_to_last_mins].prim[AZZ];
+         Az_mins[1] = theCells[k][i-1][last_mins].prim[AZZ];
+         for( j=0 ; j<sim_N_p(theSim,i-1) ; ++j ){
+         phi_mins[j+2] = theCells[k][i-1][j].tiph - 0.5*theCells[k][i-1][j].dphi;
+         Ap_mins[j+2] = theCells[k][i-1][j].prim[APP];
+         Az_mins[j+2] = theCells[k][i-1][j].prim[AZZ];
+         }
+         phi_mins[sim_N_p(theSim,i-1)+2] = theCells[k][i-1][0].tiph - 0.5*theCells[k][i-1][0].dphi;
+         phi_mins[sim_N_p(theSim,i-1)+3] = theCells[k][i-1][1].tiph - 0.5*theCells[k][i-1][1].dphi;
+         Ap_mins[sim_N_p(theSim,i-1)+2] = theCells[k][i-1][0].prim[APP];
+         Ap_mins[sim_N_p(theSim,i-1)+3] = theCells[k][i-1][1].prim[APP];
+         Az_mins[sim_N_p(theSim,i-1)+2] = theCells[k][i-1][0].prim[AZZ];
+         Az_mins[sim_N_p(theSim,i-1)+3] = theCells[k][i-1][1].prim[AZZ];
+
+         for ( j=1 ; j<sim_N_p(theSim,i-1)+4 ; ++j ){
+         while (phi_mins[j]<phi_mins[j-1]) phi_mins[j] += 2.*M_PI;
+         }
+         */
+      set_plus_mins(phi_mins, Ap_plus, Az_mins, theCells, theSim,next_to_last_mins, last_mins,i,j,k);
+      
 
       gsl_interp_accel *acc_plus = gsl_interp_accel_alloc ();
-      gsl_spline *spline_Ap_plus = gsl_spline_alloc (gsl_interp_cspline_periodic, sim_N_p(theSim,i+1)+4);
-      gsl_spline *spline_Az_plus = gsl_spline_alloc (gsl_interp_cspline_periodic, sim_N_p(theSim,i+1)+4);
+      gsl_interp_accel *acc_mins = gsl_interp_accel_alloc ();
+
+      gsl_spline *spline_Ap_plus = gsl_spline_alloc (gsl_interp_cspline/*_periodic*/, sim_N_p(theSim,i+1)+4);
+      gsl_spline *spline_Az_plus = gsl_spline_alloc (gsl_interp_cspline/*_periodic*/, sim_N_p(theSim,i+1)+4);
       gsl_spline_init (spline_Ap_plus, phi_plus, Ap_plus, sim_N_p(theSim,i+1)+4);
       gsl_spline_init (spline_Az_plus, phi_plus, Az_plus, sim_N_p(theSim,i+1)+4);
 
-      gsl_interp_accel *acc_mins = gsl_interp_accel_alloc ();
-      gsl_spline *spline_Ap_mins = gsl_spline_alloc (gsl_interp_cspline_periodic, sim_N_p(theSim,i-1)+4);
-      gsl_spline *spline_Az_mins = gsl_spline_alloc (gsl_interp_cspline_periodic, sim_N_p(theSim,i-1)+4);
+      gsl_spline *spline_Ap_mins = gsl_spline_alloc (gsl_interp_cspline/*_periodic*/, sim_N_p(theSim,i-1)+4);
+      gsl_spline *spline_Az_mins = gsl_spline_alloc (gsl_interp_cspline/*_periodic*/, sim_N_p(theSim,i-1)+4);
       gsl_spline_init (spline_Ap_mins, phi_mins, Ap_mins, sim_N_p(theSim,i-1)+4);
       gsl_spline_init (spline_Az_mins, phi_mins, Az_mins, sim_N_p(theSim,i-1)+4);
 
@@ -117,10 +151,9 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
         double Ap_interp_r_mins = gsl_spline_eval(spline_Ap_mins,phi,acc_mins); 
         double Az_interp_r_mins = gsl_spline_eval(spline_Az_mins,phi,acc_mins);
         double dAp_dr = (Ap_interp_r_plus - Ap_interp_r_mins)/two_dr;
-        //printf("Ap_interp_r_plus: %e, Ap_interp_r_mins: %e, dAp_dr: %e\n",Ap_interp_r_plus,Ap_interp_r_mins,dAp_dr);
         double dAz_dr = (Az_interp_r_plus - Az_interp_r_mins)/two_dr;
-        //printf("Az_interp_r_plus: %e, Az_interp_r_mins: %e, dAz_dr: %e\n",Az_interp_r_plus,Az_interp_r_mins,dAz_dr);
 
+        //get phi derivatives of Ar and Az
         double Ar_interp_p_mins;
         double Ar_interp_p_plus;
         double Az_interp_p_mins;
@@ -141,6 +174,9 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
         }
         double dAr_dp = (Ar_interp_p_plus - Ar_interp_p_mins)/two_dphi;
         double dAz_dp = (Az_interp_p_plus - Az_interp_p_mins)/two_dphi;
+
+        //get z derivatives of Ar and Ap. 
+        //Assume that cells at different heights with same j lie on top of each other
         double dAr_dz;
         double dAp_dz;
         if (sim_N(theSim,Z_DIR)>1){
@@ -155,20 +191,9 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim ){
           dAp_dz = 0.0;
         }
 
-//        theCells[k][i][j].prim[BRR] = dAz_dp/r - dAp_dz;
-//        theCells[k][i][j].prim[BPP] = dAr_dz - dAz_dr;
-//        theCells[k][i][j].prim[BZZ] = dAp_dr - dAr_dp/r + theCells[k][i][j].prim[APP];
-
         theCells[k][i][j].prim[BRR] = dAz_dp/r - dAp_dz;
         theCells[k][i][j].prim[BPP] = dAr_dz - dAz_dr;
         theCells[k][i][j].prim[BZZ] = dAp_dr - dAr_dp/r + theCells[k][i][j].prim[APP]/r;
-
-        //printf("i: %d, j: %d, k: %d, dAz_dp: %e, dAp_dz: %e, dAr_dz: %e, dAz_dr: %e, dAp_dr: %e, dAr_dp: %e, A_phi: %e\n",i,j,k,dAz_dp,dAp_dz,dAr_dz,dAz_dr,dAp_dr,dAr_dp,theCells[k][i][j].prim[APP]);
-        //printf("i: %d, j: %d, k: %d, r: %e, Bz: %e\n",i,j,k,r,theCells[k][i][j].prim[BZZ]);
-       // theCells[k][i][j].cons[BRR] = theCells[k][i][j].prim[BRR]*dV/r;
-       // theCells[k][i][j].cons[BPP] = theCells[k][i][j].prim[BPP]*dV/r;
-       // theCells[k][i][j].cons[BZZ] = theCells[k][i][j].prim[BZZ]*dV;
-        
 
       }
       gsl_spline_free (spline_Ap_mins);

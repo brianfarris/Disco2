@@ -226,13 +226,9 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             Ap0 = 0.05513/4./2.*(3.*3.)/r;
           }
 
-
-          //c->cons[ARR] += ((vp-cell_wiph(c))*Bz-vz*Bp)*dV*dt;
-          c->cons[ARR] += (vp*Bz-vz*Bp)*dV*dt;// - r*(c->prim[APP]-Ap0)*drOm)*dV*dt;
+          c->cons[ARR] += (vp*Bz-vz*Bp)*dV*dt;
           c->cons[APP] += (vz*Br-vr*Bz)*dV*dt;
-          //c->cons[AZZ] += (vr*Bp-(vp-cell_wiph(c))*Br)*dV*dt;
           c->cons[AZZ] += (vr*Bp-vp*Br)*dV*dt;
-          //printf("2 i: %d, j: %d, k: %d, cons[RHO]: %e,cons[SRR]: %e, cons[LLL]: %e, cons[SZZ]: %e, cons[TAU]: %e\n",i,j,k,c->cons[RHO],c->cons[SRR],c->cons[LLL],c->cons[SZZ],c->cons[TAU]);
 
           c->cons[ARR] += dt*dV*c->prim[PHI]/r;
           double xi = 0.1/dt;
