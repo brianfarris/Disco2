@@ -238,7 +238,9 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim , struct M
       gsl_interp_free (interp_Az_plus);
       gsl_interp_accel_free (acc_mins);
       gsl_interp_accel_free (acc_plus);
-
+      //if(k==4){
+      //  printf("%e %e\n",r,theCells[k][i][0].prim[BZZ]);
+      //}
     }
   } 
 }

@@ -20,10 +20,10 @@ void cell_single_init_stone(struct Cell *theCell, struct Sim *theSim,int i,int j
   double rho = 100.0;
   double Pp = cs*cs*rho/GAMMALAW;
 
-  theCell->prim[RHO] = 1.0;
+  theCell->prim[RHO] = rho;
   theCell->prim[PPP] = Pp;
   theCell->prim[URR] = 0.0;
-  theCell->prim[UPP] = omega;
+  theCell->prim[UPP] = 0.0;//omega;
   theCell->prim[UZZ] = 0.0;
   theCell->prim[BRR] = 0.0;
   theCell->prim[BPP] = 0.0;
@@ -34,6 +34,8 @@ void cell_single_init_stone(struct Cell *theCell, struct Sim *theSim,int i,int j
   theCell->GradPsi[0] = 0.0;
   theCell->GradPsi[1] = 0.0;
   theCell->GradPsi[2] = 0.0;
+  printf("you shouldn't need to call this\n");
+  exit(1);
 }
 
 void cell_init_stone(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
@@ -42,7 +44,8 @@ void cell_init_stone(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
   double DISK_MACH = 20.;
   double GAMMALAW = sim_GAMMALAW(theSim);
   double H0     = 0.2;
-  double A_N    = H0*sqrt(rho0)*sqrt(15./16.)/(2.*M_PI);
+  //double A_N    = H0*sqrt(rho0)*sqrt(15./16.)/(2.*M_PI);
+  double A_N    = 0.01;
 
   srand(666 + mpisetup_MyProc(theMPIsetup));
   int i, j,k;
@@ -62,9 +65,9 @@ void cell_init_stone(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
       double Bz = A_N*IR*omega;
       if (BzZ==1) Bz *= sin(2*M_PI*(r-2.)/.2);
 
-      double Ap = -A0*pow(r,-0.5)*cos(2*M_PI * (r-2.)/H0);
+      double Ap = -A_N*IR*pow(r,-1.5)*cos(2*M_PI * (r-2.)/H0);
 
-      printf("r: %e, Ap: %e\n",r,Ap);
+      //printf("r: %e, Ap: %e\n",r,Ap);
 
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         double delta = .02*( (double)rand()/(double)RAND_MAX - .5 );
@@ -72,7 +75,7 @@ void cell_init_stone(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = Pp;
         theCells[k][i][j].prim[URR] = 0.0;
-        theCells[k][i][j].prim[UPP] = omega*(1.+delta);
+        theCells[k][i][j].prim[UPP] = omega*delta;
         theCells[k][i][j].prim[UZZ] = delta;
         theCells[k][i][j].prim[BRR] = 0.0;
         theCells[k][i][j].prim[BPP] = 0.0;
