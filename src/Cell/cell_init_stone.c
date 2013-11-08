@@ -62,6 +62,10 @@ void cell_init_stone(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
       double Bz = A_N*IR*omega;
       if (BzZ==1) Bz *= sin(2*M_PI*(r-2.)/.2);
 
+      double Ap = -A0*pow(r,-0.5)*cos(2*M_PI * (r-2.)/H0);
+
+      printf("r: %e, Ap: %e\n",r,Ap);
+
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         double delta = .02*( (double)rand()/(double)RAND_MAX - .5 );
 
@@ -72,8 +76,11 @@ void cell_init_stone(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         theCells[k][i][j].prim[UZZ] = delta;
         theCells[k][i][j].prim[BRR] = 0.0;
         theCells[k][i][j].prim[BPP] = 0.0;
-        theCells[k][i][j].prim[BZZ] = Bz;
+        theCells[k][i][j].prim[BZZ] = 0.0;//Bz;
         theCells[k][i][j].prim[PSI] = 0.0;
+        theCells[k][i][j].prim[ARR] = 0.0;
+        theCells[k][i][j].prim[APP] = Ap;
+        theCells[k][i][j].prim[AZZ] = 0.0;
         theCells[k][i][j].wiph = omega*r;
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;
