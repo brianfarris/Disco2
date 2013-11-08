@@ -147,7 +147,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double F_coriolis_phi = -2.*cell_wiph(c)*vr/r;
         double F_euler_phi = 0.0; // ONLY TRUE FOR cell_wiph = const !!!!
         double drOm = 0.0;
-        if (sim_InitialDataType(theSim)==FLOCK){
+        if (sim_InitialDataType(theSim)==FLOCK || sim_InitialDataType(theSim)==STONE ){
           drOm = -1.5*cell_wiph(c)/r/r;
           F_euler_phi =  -vr*r*drOm;
         }
