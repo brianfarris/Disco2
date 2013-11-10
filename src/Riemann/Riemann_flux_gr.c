@@ -25,7 +25,8 @@ void LR_speed_gr(double *prim,double r,int * n,double GAMMALAW,double * p_vn,dou
   double vp  = r*prim[UPP];
   double vz  =   prim[UZZ];
   double vn  = vr*n[0] + vp*n[1] + vz*n[2];
-  double cf2  = GAMMALAW*(P/rho);
+  double rhoh = rho + GAMMALAW*P/(GAMMALAW-1);
+  double cf2  = GAMMALAW*(P/rhoh);
   double mr = rho*vr;
   double mp = rho*vp;
   double mz = rho*vz;
@@ -46,14 +47,14 @@ void riemann_set_vel_gr(struct Riemann * theRiemann,struct Sim * theSim,double r
 
   double vnL,cf21,mnL,BnL,B2L;
   double FL[3], FmL[3];
-  LR_speed(theRiemann->primL,r,theRiemann->n,GAMMALAW,&vnL,&cf21,FmL,&mnL);
+  LR_speed_gr(theRiemann->primL,r,theRiemann->n,GAMMALAW,&vnL,&cf21,FmL,&mnL);
 
   Sl = vnL - sqrt( cf21 );
   Sr = vnL + sqrt( cf21 );
 
   double vnR,cf22,mnR,BnR,B2R;
   double FR[3],FmR[3];
-  LR_speed(theRiemann->primR,r,theRiemann->n,GAMMALAW,&vnR,&cf22,FmR,&mnR);
+  LR_speed_gr(theRiemann->primR,r,theRiemann->n,GAMMALAW,&vnR,&cf22,FmR,&mnR);
  
   if( Sl > vnR - sqrt( cf22 ) ) Sl = vnR - sqrt( cf22 );
   if( Sr < vnR + sqrt( cf22 ) ) Sr = vnR + sqrt( cf22 );
@@ -119,7 +120,7 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
     sqrtg = metric_sqrtgamma(g);
 
     //Calculate 4-velocity
-    u0 = (-1.0 - 2*metric_dot3_u(g, b, v) - metric_square3_u(g,v)) / metric_g_dd(g,0,0);
+    u0 = sqrt((-1.0 - 2*metric_dot3_u(g, b, v) - metric_square3_u(g,v)) / metric_g_dd(g,0,0));
     for(i=0; i<3; i++)
     {
         u[i] = 0;
@@ -128,18 +129,23 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
         u[i] *= u0;
     }
 
+    //Calculate beta & v normal to face.
     vn = v[0]*theRiemann->n[0] + v[1]*theRiemann->n[1] + v[2]*theRiemann->n[2];
     bn = b[0]*theRiemann->n[0] + b[1]*theRiemann->n[1] + b[2]*theRiemann->n[2];
     rhoh = rho+GAMMALAW*Pp/(GAMMALAW-1.);
     
+    //Fluxes
     F[DDD] = sqrtg*a*u0 * rho*vn;
     F[SRR] = sqrtg*a*(u0*rhoh * u[0]*vn + Pp*theRiemann->n[0]);
     F[LLL] = sqrtg*a*(u0*rhoh * u[1]*vn + Pp*theRiemann->n[1]);
     F[SZZ] = sqrtg*a*(u0*rhoh * u[2]*vn + Pp*theRiemann->n[2]);
     F[TAU] = sqrtg*(a*u0*(a*u0*rhoh - rho)*vn + Pp*bn);
 
+    //Passive Fluxes
     int q;
     for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q )
         F[q] = prim[q]*F[DDD];
+
+    metric_destroy(g);
 }
 

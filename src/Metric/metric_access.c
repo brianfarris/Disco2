@@ -47,3 +47,23 @@ double metric_sqrtg(struct Metric *g)
 {
     return 0;
 }
+
+double metric_dg_dd(struct Metric *g, int k, int i, int j)
+{
+    return 0;
+}
+
+double metric_dg_uu(struct Metric *g, int k, int i, int j)
+{
+    return 0;
+}
+
+double metric_dlapse(struct Metric *g, int k)
+{
+    return 0;
+}
+
+int metric_killcoord(struct Metric *g, int k)
+{
+    return 0;
+}

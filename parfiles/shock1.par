@@ -3,6 +3,8 @@
 
 InitialDataType         3              
 GravMassType            0               // 0 none, 1 single, 2 binary
+Background              0
+Metric                  0
 Restart			0		//If this=1 restart using input.h5
 
 //Computational Grid

@@ -6,6 +6,7 @@
 #include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
+#include "../Headers/Metric.h"
 #include "../Headers/header.h"
 
 double fgrav( double M , double r , double eps, double n ){
@@ -93,15 +94,96 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           Fr += fr;
           Fp += fp;
         }
-        c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;
-        c->cons[SRR] += dt*dV*rho*Fr*sint;
-        c->cons[LLL] += dt*dV*rho*Fp*r;
-        c->cons[SZZ] += dt*dV*rho*Fr*cost;
-        c->cons[TAU] += dt*dV*rho*( Fr*(vr*sint+vz*cost) + Fp*vp );
 
+        if(sim_Background(theSim) == NEWTON)
+        {
+            c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;
+            c->cons[SRR] += dt*dV*rho*Fr*sint;
+            c->cons[LLL] += dt*dV*rho*Fp*r;
+            c->cons[SZZ] += dt*dV*rho*Fr*cost;
+            c->cons[TAU] += dt*dV*rho*( Fr*(vr*sint+vz*cost) + Fp*vp );
+        }
+        else if(sim_Background(theSim) == GR)
+        {
+            int i,j,k;
+            double a, b[3], sqrtg, n[4], u[4], u_d[4], s, sk, rhoh, GAMMALAW;
+            double v[3];
+            struct Metric *g;
+            
+            g = metric_create(theSim, time_global, r, phi, z);
+            a = metric_lapse(g);
+            for(i=0; i<3; i++)
+                b[i] = metric_shift_u(g,i);
+            sqrtg = metric_sqrtgamma(g);
+
+            v[0] = c->prim[URR];
+            v[1] = c->prim[UPP];
+            v[2] = c->prim[UZZ];
+            //Contravariant Four-Velocity u[i] = u^i
+            u[0] = (-1.0 - 2*metric_dot3_u(g, b, v) - metric_square3_u(g,v)) / metric_g_dd(g,0,0);
+            u[1] = u[0] * c->prim[URR];
+            u[2] = u[0] * c->prim[UPP];
+            u[3] = u[0] * c->prim[UZZ];
+            //Covariant Four-Velocity u_d[i] = u_i
+            for(i=0; i<4; i++)
+                for(j=0; j<4; j++)
+                    u_d[i] = metric_g_uu(g,i,j) * u[j];
+            //Normal vector n[i] = n^i
+            n[0] = 1.0/a;
+            n[1] = -n[0]*b[0];
+            n[2] = -n[0]*b[1];
+            n[3] = -n[0]*b[2];
+
+            GAMMALAW = sim_GAMMALAW(theSim);
+            rhoh = rho + GAMMALAW*Pp/(GAMMALAW-1);
+
+            //Momentum sources and contribution to energy source
+            s = 0;
+            for(k=0; k<4; k++)
+                if(!metric_killcoord(g,k))
+                {
+                    sk = 0;
+                    for(i=0; i<4; i++)
+                    {
+                        sk += 0.5*(rhoh*u[i]*u[i]+Pp*metric_g_uu(g,i,i)) * metric_dg_dd(g,k,i,i);
+                        for(j=i+1; j<4; j++)
+                            sk += (rhoh*u[i]*u[j]+Pp*metric_g_uu(g,i,j)) * metric_dg_dd(g,k,i,j);
+                    }
+                    if(k == 1)
+                        c->cons[SRR] += dt*dV*sqrtg*a * sk;
+                    else if(k == 2)
+                        c->cons[LLL] += dt*dV*sqrtg*a * sk;
+                    else if(k == 3)
+                        c->cons[SZZ] += dt*dV*sqrtg*a * sk;
+                    s -= n[k]*sk;
+                }
+            //Remaining energy sources
+            for(k=0; k<4; k++)
+                if(!metric_killcoord(g,k))
+                {
+                    sk = (rhoh*u[0]*u[k] + Pp*metric_g_uu(g,0,k))*metric_dlapse(g,k);
+                    for(i=0; i<4; i++)
+                    {
+                        if(i == k)
+                            sk += a*(rhoh*u[0]*u_d[i]+Pp)*metric_dg_uu(g,k,0,i);
+                        else
+                            sk += a*rhoh*u[0]*u_d[i]*metric_dg_uu(g,k,0,i);
+
+                    }
+                }
+            s += sk;
+
+            c->cons[TAU] += dt*dV*sqrtg*a * s;
+
+            metric_destroy(g);
+        }
+        else
+        {
+            printf("ERROR: Unknown Background in cell_add_src().\n");
+            exit(0);
+        }
       }
     }
   }
-
 }
 

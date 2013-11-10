@@ -52,6 +52,12 @@ int sim_NoInnerBC(struct Sim *theSim){
 int sim_Restart(struct Sim *theSim){
   return(theSim->Restart);
 }
+int sim_Background(struct Sim *theSim){
+  return(theSim->Background);
+}
+int sim_Metric(struct Sim *theSim){
+  return(theSim->Metric);
+}
 int sim_Ncells_global(struct Sim *theSim){
   return(theSim->Ncells_global);
 }

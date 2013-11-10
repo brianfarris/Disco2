@@ -17,6 +17,7 @@ struct Metric
 //create and destroy
 struct Metric* metric_create(struct Sim *, double t, double r, double p, double z);
 void metric_destroy(struct Metric *g);
+
 //access
 double metric_lapse(struct Metric *g);
 double metric_shift_u(struct Metric *g, int i);
@@ -27,6 +28,10 @@ double metric_g_dd(struct Metric *g, int i, int j);
 double metric_g_uu(struct Metric *g, int i, int j);
 double metric_sqrtgamma(struct Metric *g);
 double metric_sqrtg(struct Metric *g);
+double metric_dg_dd(struct Metric *g, int k, int i, int j);
+double metric_dg_uu(struct Metric *g, int k, int i, int j);
+double metric_dlapse(struct Metric *g, int k);
+int metric_killcoord(struct Metric *g, int i);
 
 //routines
 double metric_square3_u(struct Metric *g, double *vec);

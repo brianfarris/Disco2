@@ -11,6 +11,10 @@ enum{NONE,SINGLE,BINARY};
 enum{R_DIR,Z_DIR};
 enum{RDIRECTION,PDIRECTION,ZDIRECTION};
 enum{HLLC,HLL};
+//Background Types
+enum{NEWTON,GR};
+//Metric Types
+enum{SR,SCHWARZSCHILD,KERR};
 #include "mpi.h"
 MPI_Comm sim_comm;
 #define farris_mpi_factorization 0

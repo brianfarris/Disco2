@@ -23,6 +23,8 @@ struct Sim {
   int BoundTypeZ;
   int NoInnerBC;
   int Restart;
+  int Background;
+  int Metric;
   int N_global[2];
   int NP_CONST;
   double aspect;
