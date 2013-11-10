@@ -17,7 +17,7 @@
 
 // this routine is only called by riemann_set_vel.
 // It is used to find various L/R quantities. 
-void LR_speed(double *prim,double r,int * n,double GAMMALAW,double * p_vn,double * p_cf2,double *Fm,double * p_mn){
+void LR_speed_newt(double *prim,double r,int * n,double GAMMALAW,double * p_vn,double * p_cf2,double *Fm,double * p_mn){
   double P   = prim[PPP];
   double rho = prim[RHO];
   double vr  =   prim[URR];
@@ -40,19 +40,19 @@ void LR_speed(double *prim,double r,int * n,double GAMMALAW,double * p_vn,double
 }
 
 // Find velocities needed for the Riemann problem
-void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,double GAMMALAW){
+void riemann_set_vel_newt(struct Riemann * theRiemann,struct Sim * theSim,double r,double GAMMALAW){
   double Sl, Sr, Ss;
 
   double vnL,cf21,mnL,BnL,B2L;
   double FL[3], FmL[3];
-  LR_speed(theRiemann->primL,r,theRiemann->n,GAMMALAW,&vnL,&cf21,FmL,&mnL);
+  LR_speed_newt(theRiemann->primL,r,theRiemann->n,GAMMALAW,&vnL,&cf21,FmL,&mnL);
 
   Sl = vnL - sqrt( cf21 );
   Sr = vnL + sqrt( cf21 );
 
   double vnR,cf22,mnR,BnR,B2R;
   double FR[3],FmR[3];
-  LR_speed(theRiemann->primR,r,theRiemann->n,GAMMALAW,&vnR,&cf22,FmR,&mnR);
+  LR_speed_newt(theRiemann->primR,r,theRiemann->n,GAMMALAW,&vnR,&cf22,FmR,&mnR);
  
   if( Sl > vnR - sqrt( cf22 ) ) Sl = vnR - sqrt( cf22 );
   if( Sr < vnR + sqrt( cf22 ) ) Sr = vnR + sqrt( cf22 );
@@ -71,7 +71,7 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
 
 }
 
-void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GAMMALAW,int SetState){
+void riemann_set_flux_newt(struct Riemann * theRiemann, struct Sim * theSim,double GAMMALAW,int SetState){
   double r = theRiemann->r;
   double *prim;
   double *F;

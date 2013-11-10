@@ -71,9 +71,13 @@ void cell_boundary_fixed_z( struct Cell ***, struct Sim *,struct MPIsetup *,void
 void cell_bc_damp( struct Cell *** , struct Sim * , double ,void (*)(struct Cell *,struct Sim *,int,int,int));
 //primitive-conservative conversion routines
 void cell_calc_prim( struct Cell ***,struct Sim *);
-void cell_prim2cons( double * , double * , double , double ,struct Sim *);
 void cell_calc_cons(struct Cell ***,struct Sim *); 
-void cell_cons2prim( double * , double * , double , double ,struct Sim *);
+void (*cell_prim2cons)( double * , double * , double , double ,struct Sim *);
+void (*cell_cons2prim)( double * , double * , double , double ,struct Sim *);
+void cell_prim2cons_newt( double * , double * , double , double ,struct Sim *);
+void cell_cons2prim_newt( double * , double * , double , double ,struct Sim *);
+void cell_prim2cons_gr( double * , double * , double , double ,struct Sim *);
+void cell_cons2prim_gr( double * , double * , double , double ,struct Sim *);
 //miscellaneous
 double cell_mindt( struct Cell *** , struct Sim * );
 void cell_copy(struct Cell ***,struct Sim * );

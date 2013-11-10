@@ -75,6 +75,8 @@ double sim_FacePos(struct Sim *,int,int);
 int sim_N(struct Sim *,int );
 int sim_NoInnerBC(struct Sim *);
 int sim_Restart(struct Sim *);
+int sim_Background(struct Sim *);
+int sim_Metric(struct Sim *);
 int sim_BoundTypeR(struct Sim *);
 int sim_BoundTypeZ(struct Sim *);
 int sim_N_global(struct Sim *,int);

@@ -8,7 +8,7 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_prim2cons( double * prim , double * cons , double r , double dV ,struct Sim * theSim){
+void cell_prim2cons_newt( double * prim , double * cons , double r , double dV ,struct Sim * theSim){
   double GAMMALAW = sim_GAMMALAW(theSim);
 
   double rho = prim[RHO];
@@ -32,7 +32,7 @@ void cell_prim2cons( double * prim , double * cons , double r , double dV ,struc
 
 }
 
-void cell_cons2prim( double * cons , double * prim , double r , double dV ,struct Sim * theSim){
+void cell_cons2prim_newt( double * cons , double * prim , double r , double dV ,struct Sim * theSim){
   double CS_FLOOR = sim_CS_FLOOR(theSim);
   double CS_CAP = sim_CS_CAP(theSim);
   double RHO_FLOOR = sim_RHO_FLOOR(theSim);

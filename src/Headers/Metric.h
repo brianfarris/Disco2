@@ -18,6 +18,10 @@ struct Metric
 struct Metric* metric_create(struct Sim *, double t, double r, double p, double z);
 void metric_destroy(struct Metric *g);
 
+//Initialize
+void metric_init_background(struct Sim *);
+void metric_init_metric(struct Sim *);
+
 //access
 double metric_lapse(struct Metric *g);
 double metric_shift_u(struct Metric *g, int i);

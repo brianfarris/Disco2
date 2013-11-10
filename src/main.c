@@ -90,6 +90,12 @@ int main(int argc, char **argv) {
   // create IO struct
   struct IO *theIO = io_create(theSim);
 
+  //Point Cell & Riemann to Newtonian/GR versions
+  metric_init_background(theSim);
+
+  //Set Exact metric.
+  metric_init_metric(theSim);
+
   // set initial data 
   if (sim_Restart(theSim)==1){ // getting initial data from checkpoint file
     io_allocbuf(theIO,theSim); // allocate memory for a buffer to store checkpoint data
