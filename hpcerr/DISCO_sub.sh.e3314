@@ -1,0 +1,5 @@
+mpirun: killing job...
+
+[brisbane.cc.columbia.edu][[322,1],31][btl_tcp_frag.c:215:mca_btl_tcp_frag_recv] mca_btl_tcp_frag_recv: readv failed: Connection reset by peer (104)
+mpirun: abort is already in progress...hit ctrl-c again to forcibly terminate
+

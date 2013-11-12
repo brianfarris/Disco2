@@ -9,7 +9,7 @@
 
 void cell_setT( struct Cell *** theCells ,struct Sim * theSim ){
   int i,j,k;
-  double HoR = 0.1;
+  double HoR = 0.05;
   double T0 = 0.02;
   double r_a = sqrt(1./log(T0*sim_GAMMALAW(theSim)/(HoR*HoR)));
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -21,19 +21,34 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim ){
       double r = 0.5*(rm+rp);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
-        double HoR = 0.1;
-	double Omega_K;
+        double HoR = 0.05;
+	//double Omega_K;
 	double cs;
         double PoRho;
-        if (r>1.){
-		Omega_K = pow(r,-1.5);
-        	cs = HoR*Omega_K*r;
-                PoRho = cs*cs/sim_GAMMALAW(theSim);
-        } else{
-		Omega_K = 1.;
-		cs = HoR;
-                PoRho = T0 * exp(-r*r/(r_a*r_a)); 
-	}
+
+	double sep = sim_sep0(theSim);
+	double massratio = sim_MassRatio(theSim);
+
+	double omega = 1./pow(r,1.5);
+	omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
+	double O2 = omega*omega; //+ cs*cs/r/r*( 2.*rs*rs/r/r - 3. ); Add Deriv of Pressure term
+	omega = sqrt(O2);
+	cs = HoR*omega*r;
+
+	//Omega_K = pow(r,-1.5);
+	//cs = HoR*Omega_K*r;
+
+	PoRho = cs*cs/sim_GAMMALAW(theSim);
+	//        if (r>1.){
+	//		Omega_K = pow(r,-1.5);
+	//        	cs = HoR*Omega_K*r;
+	//                PoRho = cs*cs/sim_GAMMALAW(theSim);
+	//        } else{
+	//		Omega_K = 1.;
+		//		cs = HoR;
+		//                PoRho = T0 * exp(-r*r/(r_a*r_a)); 
+		//	}
+	
         double rho = c->prim[RHO];
         c->prim[PPP] = PoRho * rho;
       }

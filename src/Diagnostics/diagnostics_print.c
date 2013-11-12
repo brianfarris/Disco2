@@ -11,7 +11,11 @@
 
 void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * theTimeStep,struct Sim * theSim,struct MPIsetup * theMPIsetup){
   if (timestep_get_t(theTimeStep)>diagnostics_tdiag_dump(theDiagnostics)){
+    //double Diag_tavg = 1;
+    //double dt_dump = 1.0;
+    //if (Diag_tavg == 1){
     double dt_dump = timestep_get_t(theTimeStep) - theDiagnostics->toutprev_dump;
+    //}
     if(mpisetup_MyProc(theMPIsetup)==0){
       int NUM_EQ = theDiagnostics->NUM_DIAG+2;
       char DiagEquatFilename[256];
@@ -25,13 +29,21 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
       int i,n;
       for (i=0;i<sim_N_global(theSim,R_DIR);++i){
         for (n=0;n<theDiagnostics->NUM_DIAG+1;++n){
-          fprintf(DiagVectorFile,"%e ",theDiagnostics->VectorDiag[i][n]/dt_dump);       
+	  if (n!=11){
+	    fprintf(DiagVectorFile,"%e ",theDiagnostics->VectorDiag[i][n]/dt_dump);   
+	  }else{
+	    fprintf(DiagVectorFile,"%e ",theDiagnostics->VectorDiag[i][n]);//no time avg on n=10Trq 
+	  }
         }
         fprintf(DiagVectorFile,"\n");
       }
       fprintf(DiagScalarFile,"%e ",timestep_get_t(theTimeStep));       
       for (n=0;n<theDiagnostics->NUM_DIAG;++n){
-        fprintf(DiagScalarFile,"%e ",theDiagnostics->ScalarDiag[n]/dt_dump);       
+	if (n!=10){
+	  fprintf(DiagScalarFile,"%e ",theDiagnostics->ScalarDiag[n]/dt_dump);     
+	}else{
+	  fprintf(DiagScalarFile,"%e ",theDiagnostics->ScalarDiag[n]); //no time avg on n=10Trq 
+	}  
       }
       fprintf(DiagScalarFile,"\n");
 

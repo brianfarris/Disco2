@@ -25,8 +25,11 @@ void get_rho_sink( struct GravMass * theGravMasses, double RhoSinkTimescale, int
   double dx = r*cosp-rp*cos(pp);
   double dy = r*sinp-rp*sin(pp);
   double script_r = sqrt(dx*dx+dy*dy);
+  double qq = gravMass_M(theGravMasses,1)/gravMass_M(theGravMasses,0);
+  double ab = gravMass_r(theGravMasses,0) + gravMass_r(theGravMasses,1);
+  double Racc = ab*pow((qq/3.),(1./3.)) * 0.5; //Racc = 0.1RHill
 
-  *rho_sink = rho / (RhoSinkTimescale*2.0*M_PI) * exp(-script_r*script_r/(0.25*0.25));
+  *rho_sink = rho / (RhoSinkTimescale*2.0*M_PI) * exp(-script_r*script_r/(Racc*Racc));  //was sigma=0.25
 
 }
 
@@ -50,9 +53,9 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
 
   double f1;
   if (sim_InitialDataType(theSim)==FIELDLOOP){
-    f1 = -fgrav_neg_centrifugal( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );
+    f1 = -fgrav_neg_centrifugal( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );//+2 for 4th order potential
   } else{
-    f1 = -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );
+    f1 = -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER ); //+2 for 4th order potential
   }
   //double rH = theGravMasses[p].r*pow(theGravMasses[p].M/theGravMasses[0].M/3.,1./3.);
   //double pd = 0.8;
@@ -71,6 +74,7 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
 void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, struct GravMass * theGravMasses ){
 	///Set a density scale for feedback to holes
 	double dens_scale = (sim_Mdisk_ovr_Ms(theSim)/(1.+1./sim_MassRatio(theSim)))/(M_PI*sim_sep0(theSim)*sim_sep0(theSim)); //set density scale by frac of secondary mass within a_0
+	double Rhill = ( gravMass_r(theGravMasses, 0) + gravMass_r(theGravMasses, 1) ) * pow((sim_MassRatio(theSim)/3.),(1./3.)); 
 	int i,j,k,p;
 	int Np = sim_NumGravMass(theSim);
 	int kmin = sim_ng(theSim);  // ng = number of ghost zones (=2 usually)
@@ -122,12 +126,23 @@ void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, str
 					
 					double cosa = dx/script_r;  // a is the angle between script_r and x axis
 					double sina = dy/script_r;
+					
+					if (p==0){
+						// Fx is total force between hole and density patch * cos(a)
+                                                Fx[p] +=  -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER )*cosa*dm; //Newtons 3rd law so -- = +
+                                                // Fy is total force between hole and density patch * sin(a)
+                                                Fy[p] +=  -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER )*sina*dm; //Newtons 3rd law so -- = +
+						}
 
-					// Fx is total force between hole and density patch * cos(a)
-					Fx[p] +=  -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER )*cosa*dm; //Newtons 3rd law so -- = +
-					// Fy is total force between hole and density patch * sin(a)
-					Fy[p] +=  -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER )*sina*dm; //Newtons 3rd law so -- = +
-
+					if (p==1 && script_r > 0.5*Rhill){ //Only sum forces outside the secondary Hill radius defined above
+						// Fx is total force between hole and density patch * cos(a)
+						Fx[p] +=  -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER )*cosa*dm; //Newtons 3rd law so -- = +
+						// Fy is total force between hole and density patch * sin(a)
+						Fy[p] +=  -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER )*sina*dm; //Newtons 3rd law so -- = +
+					}else{
+						Fx[p] += 0.0;
+						Fy[p] += 0.0;
+					}
 				}
 			}
 		}

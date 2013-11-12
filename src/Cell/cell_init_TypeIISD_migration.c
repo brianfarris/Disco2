@@ -11,7 +11,6 @@
 void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
 
 	double rho   = 1.0;
-	double Mach   = 10.0;
 	
 	
 	double Gam = sim_GAMMALAW(theSim);
@@ -24,7 +23,10 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 	double M1 = Mtotal/(1.+1./massratio);
 	double r0 = M1/Mtotal*sep;
 	double r1 = M0/Mtotal*sep;
-	
+
+	//double Mach   = 10.0 *pow(sep,(-0.5)) ; //For uniform cs
+	double Mach   = 20.0;                   //For uniform Mach	
+
 	double eps0 = sim_G_EPS(theSim)*r0;
 	double eps1 = sim_G_EPS(theSim)*r1;
 	
@@ -34,9 +36,9 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 	double rp = sim_FacePos(theSim,i,R_DIR);
 	double r = 0.5*(rm+rp);
 
-			
-	double cs;
-	cs = pow(sep,(-0.5))/(1.+massratio)/Mach;
+	// see below		
+	//double cs;
+	//cs = pow(r,(-0.5))/Mach;
 	//if (r<1.){
 	//	cs = 1./Mach;
 	//}else{
@@ -64,8 +66,10 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 	double omega = 1./pow(r,1.5);
 	omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
 	double O2 = omega*omega; //+ cs*cs/r/r*( 2.*rs*rs/r/r - 3. ); Add Deriv of Pressure term
-	double vr;
 	omega = sqrt(O2);
+   
+	double cs = r*omega/Mach;
+	double vr;
 	vr = 0.0;
 
 	//if (r<sep){
@@ -98,7 +102,6 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 	
   double rho0   = 1.0;
-  double Mach   = 10.0;
 
   double Gam = sim_GAMMALAW(theSim);
   double fac = 0.0001;
@@ -113,6 +116,9 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
   double r0 = M1/Mtotal*sep;
   double r1 = M0/Mtotal*sep;
 
+ // double Mach   =  10.0 *pow(sep,(-0.5)) ; //For uniform cs
+  double Mach   =  20.0;                   //For unifrom Mach
+
   double eps0 = sim_G_EPS(theSim)*r0;
   double eps1 = sim_G_EPS(theSim)*r1;
   
@@ -125,8 +131,10 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
       double rp = sim_FacePos(theSim,i,R_DIR);
       double r = 0.5*(rm+rp);
 
-      double cs;
-      cs = pow(sep,(-0.5))/(1.+massratio)/Mach;
+
+      // See below
+      //double cs;
+      //cs = pow(r,(-0.5))/Mach;
 
 //      if (r<1.){
  //       cs = 1./Mach;
@@ -162,6 +170,8 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
 	double O2 = omega*omega; //+ cs*cs/r/r*( 2.*rs*rs/r/r - 3. ); Add Deriv of Pressure term
         double vr;
 	omega = sqrt(O2);//*pow(r,2.);
+
+	double cs = r*omega/Mach;
 	vr = 0.0;
 
 //        if (r<sep){

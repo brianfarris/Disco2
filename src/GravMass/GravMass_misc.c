@@ -26,9 +26,9 @@ void gravMass_copy(struct GravMass * theGravMasses,struct Sim * theSim){
     theGravMasses[p].RK_phi = theGravMasses[p].phi;
     theGravMasses[p].RK_M   = theGravMasses[p].M;
     theGravMasses[p].RK_omega   = theGravMasses[p].omega;
-	theGravMasses[p].RK_E   = theGravMasses[p].E;
-	theGravMasses[p].RK_L   = theGravMasses[p].L;
-	theGravMasses[p].RK_vr  = theGravMasses[p].vr;
+    theGravMasses[p].RK_E   = theGravMasses[p].E;
+    theGravMasses[p].RK_L   = theGravMasses[p].L;
+    theGravMasses[p].RK_vr  = theGravMasses[p].vr;
   }
 }
 
@@ -196,7 +196,7 @@ void gravMass_move( struct Sim * theSim, struct GravMass * theGravMasses, double
 	
 		//theGravMasses[0].phi = theGravMasses[1].phi + M_PI;
 		theGravMasses[0].r   = theGravMasses[1].r*Ms/Mp;
-	    theGravMasses[0].vr  = theGravMasses[1].vr*Ms/Mp;
+	        theGravMasses[0].vr  = theGravMasses[1].vr*Ms/Mp;
 		theGravMasses[0].omega  = theGravMasses[1].omega;
 		
 		theGravMasses[1].phi += theGravMasses[1].omega*dt; //Instead of updating in adv_anly  
@@ -294,13 +294,13 @@ void gravMass_update_RK( struct Cell *** theCells, struct GravMass * theGravMass
     theGravMasses[i].r     = (1.0-RK)*theGravMasses[i].r   + RK*theGravMasses[i].RK_r;
     theGravMasses[i].phi   = (1.0-RK)*theGravMasses[i].phi + RK*theGravMasses[i].RK_phi;
     theGravMasses[i].M     = (1.0-RK)*theGravMasses[i].M   + RK*theGravMasses[i].RK_M;
-	theGravMasses[i].omega = (1.0-RK)*theGravMasses[i].omega  + RK*theGravMasses[i].RK_omega;
-	theGravMasses[i].L     = (1.0-RK)*theGravMasses[i].L   + RK*theGravMasses[i].RK_L;
-	theGravMasses[i].E     = (1.0-RK)*theGravMasses[i].E   + RK*theGravMasses[i].RK_E;
-	theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr  + RK*theGravMasses[i].RK_vr; 
-	if ( (sim_GravMassType(theSim)==LIVEBINARY) && (time_global > sim_tmig_on(theSim)) ){
+    theGravMasses[i].omega = (1.0-RK)*theGravMasses[i].omega  + RK*theGravMasses[i].RK_omega;
+    theGravMasses[i].L     = (1.0-RK)*theGravMasses[i].L   + RK*theGravMasses[i].RK_L;
+    theGravMasses[i].E     = (1.0-RK)*theGravMasses[i].E   + RK*theGravMasses[i].RK_E;
+    theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr  + RK*theGravMasses[i].RK_vr; 
+    if ( (sim_GravMassType(theSim)==LIVEBINARY) && (time_global > sim_tmig_on(theSim)) ){
 		// calculate forces and velocities at given position and time in RK timestep  (for direct orbit integration)
-		//if (RK==0.5){  
+      //if (RK==0.5){  // to do an Euler Step only in gravmass update
 		//	cell_gravMassForcePlanets( theSim, theCells, theGravMasses ); // calculate forces on each planet from back reaction of disk (gravMass_update_RK() uses these)
 		//}
 		cell_gravMassForcePlanets( theSim, theCells, theGravMasses );
@@ -311,16 +311,17 @@ void gravMass_update_RK( struct Cell *** theCells, struct GravMass * theGravMass
 		//double vp = theGravMasses[i].L/M/r;
 		double vp = theGravMasses[i].omega*r;
 				
-		double Fr = 0.0;//theGravMasses[i].Fr; 
+		double Fr = theGravMasses[i].Fr; 
 		double Fp = theGravMasses[i].Fp;
 		
 		
-		theGravMasses[i].L      += r*Fp*dt;// * (4.0*RK);            // first step RK=0.0 and no update (for direct orbit integration)
+		theGravMasses[i].L      += r*Fp*dt; 
 		//Keep track of a total E use 0 arbitrarily
-		theGravMasses[0].E      += (Fp*vp + Fr*vr)*dt;// * (4.0*RK); // on second step RK=0.5 and the velocities will be the midpoint value (for direct orbit integration)
+		theGravMasses[0].E      += (Fp*vp + Fr*vr)*dt;
 		theGravMasses[1].E      += (Fp*vp + Fr*vr)*dt; // Keep E as the total ENERGY
-		//theGravMasses[i].vr     += (Fr/M)*dt * (2.0*RK);
-		//theGravMasses[i].omega  += (Fp/(r*M))*dt * (2.0*RK);
+		//theGravMasses[i].vr     += (Fr/M)*dt 
+		//theGravMasses[i].omega  += (Fp/(r*M))*dt 
+		//}
     
     }
 
