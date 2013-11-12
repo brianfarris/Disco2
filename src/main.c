@@ -92,9 +92,8 @@ int main(int argc, char **argv) {
 
   //Point Cell & Riemann to Newtonian/GR versions
   metric_init_background(theSim);
-
-  //Set Exact metric.
-  metric_init_metric(theSim);
+  if(sim_Background(theSim)==GR)
+    metric_init_metric(theSim);
 
   // set initial data 
   if (sim_Restart(theSim)==1){ // getting initial data from checkpoint file
@@ -121,6 +120,7 @@ int main(int argc, char **argv) {
   // set up diagnostics struct
   struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep,theMPIsetup);
 
+  printf("Starting Loop.\n");
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
     // here the actual timestep is taken
     timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);

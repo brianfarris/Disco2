@@ -3,15 +3,15 @@
 
 InitialDataType         3              
 GravMassType            0               // 0 none, 1 single, 2 binary
-Background              0
-Metric                  0
+Background              1       //0 Newtonian, 1 GR
+Metric                  0       //0 Flat, 1 Schwarzschild, 2 Kerr
 Restart			0		//If this=1 restart using input.h5
 
 //Computational Grid
-NumR			64			//Radial Zones
+NumR			32			//Radial Zones
 NumZ			1			//Vertical Zones
 ng                      2
-R_Min		        0.0	
+R_Min		        0.01	
 R_Max			1.0
 Z_Min			-1.0
 Z_Max			1.0
@@ -26,13 +26,13 @@ Num_Diag_Dump           20
 Num_Diag_Measure        20
 
 
-NoInnerBC           0
+NoInnerBC           1
 BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry          1
 
 Move_Cells              3
-RiemannSolver           0           // 0 hllc, 1 hll
+RiemannSolver           1           // 0 hllc, 1 hll
 Adiabatic_Index		1.6666666666
 
 //Numerical Parameters

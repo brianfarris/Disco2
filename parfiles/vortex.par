@@ -4,6 +4,8 @@
 InitialDataType         0              
 GravMassType            0               // 0 none, 1 single, 2 binary
 Restart			0		//If this=1 restart using input.h5
+Background              0
+Metric                  0
 
 //Computational Grid
 NumR			64			//Radial Zones
@@ -18,7 +20,7 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                0.02
+Time_Max                1.0
 Num_Checkpoints	        2	
 Num_Diag_Dump           20
 Num_Diag_Measure        20

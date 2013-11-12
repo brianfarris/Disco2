@@ -24,13 +24,13 @@ void cell_single_init_shock1(struct Cell *theCell, struct Sim *theSim,int i,int 
   double z = 0.5*(zm+zp);
   double t = theCell->tiph-.5*theCell->dphi;
 
-  if(cos(t) < 0)
+  if(z < 0)
   {
     theCell->prim[RHO] = rhoL;
     theCell->prim[PPP] = pL;
-    theCell->prim[URR] = cos(t)*vL;
-    theCell->prim[UPP] = -sin(t)*vL;
-    theCell->prim[UZZ] = 0.0;
+    theCell->prim[URR] = 0.0;
+    theCell->prim[UPP] = 0.0;
+    theCell->prim[UZZ] = vL;
     theCell->divB = 0.0;
     theCell->GradPsi[0] = 0.0;
     theCell->GradPsi[1] = 0.0;
@@ -40,9 +40,9 @@ void cell_single_init_shock1(struct Cell *theCell, struct Sim *theSim,int i,int 
   {
     theCell->prim[RHO] = rhoR;
     theCell->prim[PPP] = pR;
-    theCell->prim[URR] = cos(t)*vR;
-    theCell->prim[UPP] = -sin(t)*vR;
-    theCell->prim[UZZ] = 0.0;
+    theCell->prim[URR] = 0.0;
+    theCell->prim[UPP] = 0.0;
+    theCell->prim[UZZ] = vR;
     theCell->divB = 0.0;
     theCell->GradPsi[0] = 0.0;
     theCell->GradPsi[1] = 0.0;
@@ -73,12 +73,12 @@ void cell_init_shock1(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
       double z = 0.5*(zm+zp);
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
-        if(cos(t) < 0) {
+        if(z < 0) {
           theCells[k][i][j].prim[RHO] = rhoL;
           theCells[k][i][j].prim[PPP] = pL;
-          theCells[k][i][j].prim[URR] = cos(t)*vL;
-          theCells[k][i][j].prim[UPP] = -sin(t)*vL/r;
-          theCells[k][i][j].prim[UZZ] = 0.0;
+          theCells[k][i][j].prim[URR] = 0.0;
+          theCells[k][i][j].prim[UPP] = 0.0;
+          theCells[k][i][j].prim[UZZ] = vL;
           theCells[k][i][j].divB = 0.0;
           theCells[k][i][j].GradPsi[0] = 0.0;
           theCells[k][i][j].GradPsi[1] = 0.0;
@@ -86,9 +86,9 @@ void cell_init_shock1(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
         } else {
           theCells[k][i][j].prim[RHO] = rhoR;
           theCells[k][i][j].prim[PPP] = pR;
-          theCells[k][i][j].prim[URR] = cos(t)*vR;
-          theCells[k][i][j].prim[UPP] = -sin(t)*vR/r;
-          theCells[k][i][j].prim[UZZ] = 0.0;
+          theCells[k][i][j].prim[URR] = 0.0;
+          theCells[k][i][j].prim[UPP] = 0.0;
+          theCells[k][i][j].prim[UZZ] = vR;
           theCells[k][i][j].divB = 0.0;
           theCells[k][i][j].GradPsi[0] = 0.0;
           theCells[k][i][j].GradPsi[1] = 0.0;

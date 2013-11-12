@@ -1,4 +1,6 @@
 #define METRIC_PRIVATE_DEFS
+#include <stdio.h>
+#include <stdlib.h>
 #include "../Headers/header.h"
 #include "../Headers/Cell.h"
 #include "../Headers/Riemann.h"
@@ -27,7 +29,15 @@ void metric_init_metric(struct Sim *theSim)
 {
     if(sim_Metric(theSim) == SR)
     {
-
+        metric_g_dd_exact = &metric_g_dd_exact_sr;
+        metric_g_uu_exact = &metric_g_uu_exact_sr;
+        metric_dg_dd_exact = &metric_dg_dd_exact_sr;
+        metric_dg_uu_exact = &metric_dg_uu_exact_sr;
+        metric_killing_exact = &metric_killing_exact_sr;
     }
-
+    else
+    {
+        printf("ERROR: Trying to initialize with an unknown metric: %d\n", sim_Metric(theSim));
+        exit(0);
+    }
 }

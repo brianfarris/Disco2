@@ -27,14 +27,14 @@ void cell_prim2cons_gr( double * prim , double * cons , double r , double dV ,st
     v[2]  = prim[UZZ];
 
     //Get needed metric values
-    g = metric_create(theSim, time_global, r, 0, 0);
+    g = metric_create(time_global, r, 0, 0);
     a = metric_lapse(g);
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g, i);
-    sqrtg = metric_sqrtgamma(g);
+    sqrtg = metric_sqrtgamma(g)/r;
 
     //Calculate 4-velocity, u0 = u^0, u[i] = u_i
-    u0 = sqrt((-1.0 - 2*metric_dot3_u(g, b, v) - metric_square3_u(g,v)) / metric_g_dd(g,0,0));
+    u0 = 1.0 / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
     for(i=0; i<3; i++)
     {
         u[i] = 0;
@@ -60,7 +60,6 @@ void cell_prim2cons_gr( double * prim , double * cons , double r , double dV ,st
     metric_destroy(g);
 }
 
-
 void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct Sim *theSim)
 {
     int i,j;
@@ -75,13 +74,13 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
     double eps = 1.0e-10;
     double CS_FLOOR, CS_CAP, RHO_FLOOR;
 
-    metric_create(theSim, time_global, r, 0, 0);
+    g = metric_create(time_global, r, 0, 0);
 
     //Metric quantities needed later
     a = metric_lapse(g);
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g,i);
-    sqrtg = metric_sqrtgamma(g);
+    sqrtg = metric_sqrtgamma(g)/r;
 
     //Conserved Quantities
     rhostar = cons[DDD]/dV;
@@ -102,30 +101,41 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
     c[2] = gam*gam - e*e + 2*gam*s2;
     c[3] = -2*gam*e;
     c[4] = e*e-s2;
+    if(c[4] <= 0)
+        printf("e2 <= s2!: e^2 = %lg, s^2 = %lg\n",e*e,s2);
 
     //Inital guess: previous value of prim
     v[0] = prim[URR];
     v[1] = prim[UPP];
     v[2] = prim[UZZ];
-    w0 = a * sqrt((-1.0 - 2*metric_dot3_u(g, b, v) - metric_square3_u(g,v)) / metric_g_dd(g,0,0));
-    
+    w0 = a / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
     //Newton-Raphson to find w.
     w1 = w0;
+    i = 0;
     do
     {
         w = w1;
         w1 = w - (c[0] + c[1]*w + c[2]*w*w + c[3]*w*w*w + c[4]*w*w*w*w)
                     / (c[1] + 2*c[2]*w + 3*c[3]*w*w + 4*c[4]*w*w*w);
+        i++;
     }
-    while(fabs(w-w1) > eps);
+    while(fabs(w-w1) > eps && i < 10000);
+    if(i == 10000)
+    {
+        printf("NR failed to converge: w0 = %lg, w = %lg, w1 = %lg\n", w0,w,w1);
+        printf("Poly coeffs: c[0]=%lg, c[1]=%lg, c[2]=%lg, c[3]=%lg, c[4]=%lg\n",c[0],c[1],c[2],c[3],c[4]);
+    }
     w = w1;
 
     if(w < 1.0)
+    {
         printf("ERROR: w < 1 in cons2prim_gr. (w = %lg)\n", w);
+        w = 1.0;
+    }
     
     //Prim recovery
     u0 = w/a;
-    hmo = w*(e-w)/(w*w-gam*gam);
+    hmo = w*(e-w)/(w*w-gam);
     if(hmo < -1.0)
         printf("ERROR: h < 0 in cons2prim_gr (h-1 = %lg)\n", hmo);
     else if(hmo < 0.0)
@@ -135,13 +145,13 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
     CS_FLOOR = sim_CS_FLOOR(theSim);
     CS_CAP = sim_CS_CAP(theSim);
 
-    rho = rhostar*rhostar/(sqrtg*w);
+    rho = rhostar/(sqrtg*w);
     if(rho < RHO_FLOOR)
         rho = RHO_FLOOR;
     Pp = gam * rho * hmo;
     if(Pp < CS_FLOOR*CS_FLOOR*rho*(hmo+1)/GAMMALAW)
         Pp = CS_FLOOR*CS_FLOOR*rho*(hmo+1)/GAMMALAW;
-    if(Pp < CS_CAP*CS_CAP*rho*(hmo+1)/GAMMALAW)
+    if(Pp > CS_CAP*CS_CAP*rho*(hmo+1)/GAMMALAW)
         Pp = CS_CAP*CS_CAP*rho*(hmo+1)/GAMMALAW;
 
     for(i=0; i<3; i++)
@@ -158,7 +168,6 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
     prim[UPP] = v[1];
     prim[UZZ] = v[2];
     prim[PPP] = Pp;
-
     
     for(i = sim_NUM_C(theSim); i < sim_NUM_Q(theSim); i++)
         prim[i] = cons[i]/cons[DDD];

@@ -72,6 +72,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_update_phi( theCells ,theSim, theTimeStep->RK , dt ); // allow the cells to move in phi direction
   cell_update_dphi( theCells ,theSim); // all the cells to change size
   gravMass_update_RK( theGravMasses ,theSim, theTimeStep->RK ); // allow the GravMasses to move
+  printf("All updated, calcing prims!\n");
   cell_calc_prim( theCells ,theSim); // calculate primitives
   //Boundary Data
   if (sim_BoundTypeR(theSim)==BOUND_OUTFLOW){

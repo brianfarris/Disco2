@@ -7,15 +7,18 @@ struct Sim;
 #ifdef METRIC_PRIVATE_DEFS
 struct Metric
 {
-    double lapse;
-    double shift[3]; //Contravariant shift \beta^i
-    double gamma_dd[6]; //Spatial Metric tensor \gamma_{ij}
-    double gamma_uu[6]; //Inverse spatial metric \gamma^{ij}
+    double x[4];
+    double g_dd[10];
+    double g_uu[10];
+    double *dg_dd;
+    double *dg_uu;
+    int killing[4];
+    int length_dg;
 };
 #endif
 
 //create and destroy
-struct Metric* metric_create(struct Sim *, double t, double r, double p, double z);
+struct Metric* metric_create(double t, double r, double p, double z);
 void metric_destroy(struct Metric *g);
 
 //Initialize
@@ -47,4 +50,17 @@ double metric_dot3_d(struct Metric *g, double *a, double *b);
 double metric_dot4_u(struct Metric *g, double *a, double *b);
 double metric_dot4_d(struct Metric *g, double *a, double *b);
 
+//Exact Metrics
+double (*metric_g_dd_exact)(int i, int j, double t, double r, double p, double z);
+double (*metric_g_uu_exact)(int i, int j, double t, double r, double p, double z);
+double (*metric_dg_dd_exact)(int k, int i, int j, double t, double r, double p, double z);
+double (*metric_dg_uu_exact)(int k, int i, int j, double t, double r, double p, double z);
+void (*metric_killing_exact)(int *k);
+
+//SR
+double metric_g_dd_exact_sr(int mu, int nu, double t, double r, double p, double z);
+double metric_g_uu_exact_sr(int mu, int nu, double t, double r, double p, double z);
+double metric_dg_dd_exact_sr(int k, int mu, int nu, double t, double r, double p, double z);
+double metric_dg_uu_exact_sr(int k, int mu, int nu, double t, double r, double p, double z);
+void metric_killing_exact_sr(int *k);
 #endif

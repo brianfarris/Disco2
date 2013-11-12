@@ -110,11 +110,11 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             double v[3];
             struct Metric *g;
             
-            g = metric_create(theSim, time_global, r, phi, z);
+            g = metric_create(time_global, r, phi, z);
             a = metric_lapse(g);
             for(i=0; i<3; i++)
                 b[i] = metric_shift_u(g,i);
-            sqrtg = metric_sqrtgamma(g);
+            sqrtg = metric_sqrtgamma(g)/r;
 
             v[0] = c->prim[URR];
             v[1] = c->prim[UPP];
