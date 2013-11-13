@@ -19,12 +19,12 @@ void cell_single_init_shock1(struct Cell *theCell, struct Sim *theSim,int i,int 
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
   double r = 0.5*(rm+rp);
-  double zm = sim_FacePos(theSim,i-1,Z_DIR);
-  double zp = sim_FacePos(theSim,i,Z_DIR);
+  double zm = sim_FacePos(theSim,k-1,Z_DIR);
+  double zp = sim_FacePos(theSim,k,Z_DIR);
   double z = 0.5*(zm+zp);
   double t = theCell->tiph-.5*theCell->dphi;
 
-  if(z < 0)
+  if(z < 0.0)
   {
     theCell->prim[RHO] = rhoL;
     theCell->prim[PPP] = pL;
@@ -68,12 +68,12 @@ void cell_init_shock1(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       double rp = sim_FacePos(theSim,i,R_DIR);
       double r = 0.5*(rm+rp);
-      double zm = sim_FacePos(theSim,i-1,Z_DIR);
-      double zp = sim_FacePos(theSim,i,Z_DIR);
+      double zm = sim_FacePos(theSim,k-1,Z_DIR);
+      double zp = sim_FacePos(theSim,k,Z_DIR);
       double z = 0.5*(zm+zp);
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
-        if(z < 0) {
+        if(z < 0.0) {
           theCells[k][i][j].prim[RHO] = rhoL;
           theCells[k][i][j].prim[PPP] = pL;
           theCells[k][i][j].prim[URR] = 0.0;

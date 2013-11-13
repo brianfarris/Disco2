@@ -36,6 +36,8 @@ void cell_init_bondi(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_bondi(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_shock1(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_shock1(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_uniform(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_uniform(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data

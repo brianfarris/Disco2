@@ -5,44 +5,66 @@ import sys
 import h5py
 import numpy as np
 
+equat = False
 if(len(sys.argv) < 3):
-    print("\nGive me a snapshot (.h5) file and a parameter to plot.\n")
+    print("\nGive me a checkpoint (.h5) file and a parameter to plot.\n")
     sys.exit()
 
 filename = sys.argv[1]
 diagnum = int(sys.argv[2])
 
+if(len(sys.argv) > 3):
+    if(sys.argv[3] == 'e'):
+        equat = True
+
 #open hdf5 file
 f = h5py.File(filename,'r')
-Data = f['EQUAT']
+Data = f['Data']
 
-#read in radius and phi
-Radius_arr = array(Data[:,0])
-Phi_arr = array(Data[:,1])
+#read in coords
+phi = array(Data[:,0])
+r = np.array(Data[:,1])
+z = np.array(Data[:,2])
 
-#convert to cartesian
-xpoints_arr = np.multiply(Radius_arr,np.cos(Phi_arr)) 
-ypoints_arr = np.multiply(Radius_arr,np.sin(Phi_arr))
-
-data_arr = array(Data[:,diagnum])
+#Get Data
+data = array(Data[:,diagnum])
 
 #close file
 f.close()
 
-# Create the Triangulation; no triangles so Delaunay triangulation created.                  
-triang = tri.Triangulation(xpoints_arr, ypoints_arr)
+#convert to cartesian
+x = r * np.cos(phi)
+y = r * np.sin(phi)
 
-#set plot range
-spread = data_arr.max() - data_arr.min()
-v = np.linspace(data_arr.min()-0.1*spread,data_arr.max()+0.1*spread, 200, endpoint=True)
+# Create the Triangulation; no triangles so Delaunay triangulation created.     
+if(equat):
+    inds = z==z[len(z)/2]
+    triang = tri.Triangulation(x[inds], y[inds])
 
-# plot.                                                                               
-plt.figure(1)
-plt.xlim(-1.0,1.0)
-plt.ylim(-1.0,1.0)
-plt.gca().set_aspect('equal')
-plt.tricontourf(triang, data_arr,v,cmap=plt.cm.afmhot_r)
-plt.colorbar()
+    #set plot range
+    spread = data[inds].max() - data[inds].min()
+    v = np.linspace(data[inds].min()-0.1*spread,data[inds].max()+0.1*spread, 200, endpoint=True)
 
+#Plot.
+plt.figure()
+plt.subplot(221)
+plt.plot(x, data, 'k.')
+plt.xlabel("x")
+plt.subplot(222)
+plt.plot(y, data, 'k.')
+plt.xlabel("y")
+plt.subplot(223)
+plt.plot(z, data, 'k.')
+plt.xlabel("z")
+
+if(equat):
+    plt.subplot(224)
+    plt.xlim(x.min(),x.max())
+    plt.ylim(y.min(),y.max())
+    plt.gca().set_aspect('equal')
+    plt.tricontourf(triang, data[inds],v,cmap=plt.cm.afmhot_r)
+    plt.colorbar()
+
+plt.savefig("prim_plot.png")
 plt.show()
 
