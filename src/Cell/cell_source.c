@@ -148,7 +148,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double F_euler_phi = 0.0; // ONLY TRUE FOR cell_wiph = const !!!!
         double drOm = 0.0;
         if (sim_InitialDataType(theSim)==FLOCK || sim_InitialDataType(theSim)==STONE ){
-          drOm = -1.5*cell_wiph(c)/r/r;
+          drOm = 0.0;//-1.5*cell_wiph(c)/r/r;
           F_euler_phi =  -vr*r*drOm;
         }
         //printf("vr: %e\n",vr);
@@ -230,7 +230,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[APP] += (vz*Br-vr*Bz)*dV*dt;
           c->cons[AZZ] += (vr*Bp-vp*Br)*dV*dt;
 
-          c->cons[ARR] += dt*dV*c->prim[PHI]/r;
+          //c->cons[ARR] += dt*dV*c->prim[PHI]/r;
           double xi = 0.1/dt;
           c->cons[PHI] -= xi*c->prim[PHI] * dV*dt;
 

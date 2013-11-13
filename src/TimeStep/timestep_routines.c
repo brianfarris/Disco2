@@ -89,7 +89,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     }
   }
 
-  cell_add_split_fictitious(theCells,theSim,dt);
+  //cell_add_split_fictitious(theCells,theSim,dt);
 
   //Bookkeeping
   cell_update_phi( theCells ,theSim, theTimeStep->RK , dt ); // allow the cells to move in phi direction
@@ -102,13 +102,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     cell_setT(theCells,theSim,theGravMasses); 
   }
  
-  //inter-processor syncs
-  cell_syncproc_r(theCells,theSim,theMPIsetup);
-  cell_syncproc_z(theCells,theSim,theMPIsetup);
-
-  // take curl to get B
-  cell_compute_curl(theCells,theSim,theMPIsetup);
-
   //Boundary Data
   if (sim_BoundTypeR(theSim)==BOUND_OUTFLOW){
     cell_boundary_outflow_r( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
@@ -125,6 +118,14 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     }
   } 
 
+  //inter-processor syncs
+  cell_syncproc_r(theCells,theSim,theMPIsetup);
+  cell_syncproc_z(theCells,theSim,theMPIsetup);
+
+  // take curl to get B
+  cell_compute_curl(theCells,theSim,theMPIsetup);
+
+
   //clean up
   face_destroy(theFaces_r);
   if (sim_N_global(theSim,Z_DIR)>1){
@@ -140,8 +141,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
 
   //re-calculate conserved quantities. 
   cell_calc_cons( theCells,theSim );
-  
- 
+
+
 
 }
 
