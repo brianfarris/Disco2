@@ -130,7 +130,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);
 
-  cell_compute_curl(theCells,theSim);
+  cell_compute_curl(theCells,theSim,theMPIsetup);
 
   //re-calculate conserved quantities. 
   //things may have changed due to syncing and/or caps/floors applied in primitive solver.

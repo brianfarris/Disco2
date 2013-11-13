@@ -75,7 +75,7 @@ void cell_mult_psi(struct Cell *, double);
 void cell_clean_pi(struct Cell *** ,struct Sim *);
 void cell_update_phi( struct Cell *** , struct Sim * , double , double );
 void cell_update_dphi( struct Cell *** ,struct Sim * );
-void cell_compute_curl( struct Cell *** ,struct Sim * );
+void cell_compute_curl( struct Cell *** ,struct Sim * ,struct MPIsetup *);
 void cell_add_split_fictitious( struct Cell *** ,struct Sim * ,double );
 //clear
 void cell_clear_w(struct Cell ***,struct Sim * );

@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
   io_setup(theIO,theSim,theTimeStep);
 #endif
 
-  cell_compute_curl(theCells,theSim);
+  cell_compute_curl(theCells,theSim,theMPIsetup);
 
   // inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
