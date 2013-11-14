@@ -151,6 +151,14 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           drOm = -1.5*cell_wiph(c)/r/r;
           F_euler_phi =  -vr*r*drOm;
         }
+
+        if (cell_nomove){
+          F_centrifugal_r = 0.0;
+          F_coriolis_r = 0.0;
+          F_coriolis_phi = 0.0;
+          F_euler_phi = 0.0;
+          drOm = 0.0;
+        }
         //printf("vr: %e\n",vr);
         //printf("F_coriolis_r: %e, F_coriolis_phi: %e\n",F_coriolis_r,F_coriolis_phi);
         c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;

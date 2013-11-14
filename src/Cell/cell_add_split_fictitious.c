@@ -37,9 +37,10 @@ void cell_add_split_fictitious( struct Cell *** theCells ,struct Sim * theSim,do
 
         double drOm = -1.5*cell_wiph(c)/r/r;
 
+        if (!cell_nomove){
         c->cons[LLL] = l;
         c->cons[SRR] = rhov;
-
+        }
         double Ap0;
         if ((r>2.)&&(r<3.)){
           Ap0 = 0.5*0.05513/4.*r;
@@ -48,8 +49,9 @@ void cell_add_split_fictitious( struct Cell *** theCells ,struct Sim * theSim,do
         } else if (r>3.){
           Ap0 = 0.05513/4./2.*(3.*3.)/r;
         }
-
-        c->cons[ARR] -= r*(c->cons[APP]-Ap0*dV)*drOm*dt;
+        if (!cell_nomove){
+          c->cons[ARR] -= r*(c->cons[APP]-Ap0*dV)*drOm*dt;
+        }
       }
     }
   }

@@ -93,6 +93,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double Br = cell_prim(cell_single(theCells,i,j,k),BRR);
           double Bp = cell_prim(cell_single(theCells,i,j,k),BPP);
           double Bz = cell_prim(cell_single(theCells,i,j,k),BZZ);
+          double Ar = cell_prim(cell_single(theCells,i,j,k),ARR);
+          double Ap = cell_prim(cell_single(theCells,i,j,k),APP);
           double Az = cell_prim(cell_single(theCells,i,j,k),AZZ);
           double v2   = vr*vr + vp*vp + vz*vz;
           double B2   = Br*Br + Bp*Bp + Bz*Bz;
@@ -152,19 +154,19 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+1] = phi;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+2] = rho;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+3] = press;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+4] = vr;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+5] = vp;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+6] = vz;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+7] = Br;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+8] = Bp;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+9] = Bz;            
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+4] = fabs(vr);
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+5] = fabs(vp);
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+6] = fabs(vz);
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+7] = fabs(Br);            
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+8] = fabs(Bp);            
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+9] = fabs(Bz);            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+10] = 0.5*rho*vr*vr;            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+11] = Br*Br;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = Bp*Bp;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+13] = B2;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = Az;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = psi;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+16] = 180./M_PI*0.5*asin(-Br*Bp/(0.5*B2));
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = fabs(Ar);
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = fabs(Ap);
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+16] = fabs(Az);
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+17] = passive_scalar;
             ++position;
           }
@@ -172,19 +174,19 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+0] += (r/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1] += (rho/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+2] += (press/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+3] += (vr/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+4] += (vp/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+5] += (vz/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+6] += (Br/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+7] += (Bp/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+8] += (Bz/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+3] += fabs(vr/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+4] += fabs(vp/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+5] += fabs(vz/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+6] += fabs(Br/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+7] += fabs(Bp/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+8] += fabs(Bz/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (0.5*rho*vr*vr/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (Br*Br/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (Bp*Bp/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (B2/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (psi/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += (180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += fabs(Ar/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += fabs(Ap/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += fabs(Az/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (passive_scalar/sim_N_p(theSim,i)*dz) ; 
           // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
@@ -262,13 +264,13 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
       fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_inside_1_reduce,mass_inner_wedge_reduce,gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),mass_near_bh0_r0p1_reduce,mass_near_bh1_r0p1_reduce,mass_near_bh0_r0p2_reduce,mass_near_bh1_r0p2_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_r0p4_reduce);       
       fclose(DiagMdotFile);
-    
+
       char DiagTorqueFilename[256];
       sprintf(DiagTorqueFilename,"DiagTorque.dat");
       FILE * DiagTorqueFile = fopen(DiagTorqueFilename,"a");
       fprintf(DiagTorqueFile,"%e %e\n",timestep_get_t(theTimeStep), gravMass_total_torque(theGravMasses,0));       
       fclose(DiagTorqueFile);
-      
+
     }
 
     //We are doing time averaged diagnostics, so mult by delta t and add it

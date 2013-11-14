@@ -25,4 +25,5 @@ MPI_Comm sim_comm;
 #define INCLUDE_ALL_VISC_TERMS 0
 #define CHECKPOINTING 
 #define TVISC_FAC 1.0
+#define cell_nomove 1
 double time_global;
