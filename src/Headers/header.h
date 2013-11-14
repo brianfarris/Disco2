@@ -17,7 +17,7 @@ enum{HLLC,HLL};
 MPI_Comm sim_comm;
 #define farris_mpi_factorization 0
 #define NO_W_IN_CFL 1
-#define KEP_BNDRY 0
+#define KEP_BNDRY 1
 #define BzZ 0
 #define BNORM_AVG 0
 #define VISC_CONST 0
@@ -25,5 +25,5 @@ MPI_Comm sim_comm;
 #define INCLUDE_ALL_VISC_TERMS 0
 #define CHECKPOINTING 
 #define TVISC_FAC 1.0
-#define cell_nomove 1
+#define cell_nomove 0
 double time_global;

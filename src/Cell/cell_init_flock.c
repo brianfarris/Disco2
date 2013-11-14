@@ -118,7 +118,7 @@ void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         theCells[k][i][j].prim[UZZ] = delta;
         theCells[k][i][j].prim[BRR] = 0.0;
         theCells[k][i][j].prim[BPP] = 0.0;
-        theCells[k][i][j].prim[BZZ] = Bz;
+        theCells[k][i][j].prim[BZZ] = 0.0;
         theCells[k][i][j].prim[PSI] = 0.0;
         if (cell_nomove){
           theCells[k][i][j].wiph = 0.0;

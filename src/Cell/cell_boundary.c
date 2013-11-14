@@ -52,7 +52,11 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
             }
             if( theCells[k][i][j].prim[URR] > 0.0 ) theCells[k][i][j].prim[URR] = 0.0;
             if (KEP_BNDRY==1){
-              theCells[k][i][j].prim[UPP] = pow(r_cell,-1.5);          
+              if (cell_nomove==1){
+                theCells[k][i][j].prim[UPP] = pow(r_cell,-1.5);
+              } else{
+                theCells[k][i][j].prim[UPP] = 0.0;
+              }
             }
           }
         }
@@ -93,7 +97,11 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         //theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] *= -1.;
         if( theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] < 0.0 ) theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] = 0.0;
         if (KEP_BNDRY==1){
-          theCells[k][sim_N(theSim,R_DIR)-1][j].prim[UPP] = pow(r_cell,-1.5);
+          if (cell_nomove==1){
+            theCells[k][sim_N(theSim,R_DIR)-1][j].prim[UPP] = pow(r_cell,-1.5);
+          } else{
+            theCells[k][sim_N(theSim,R_DIR)-1][j].prim[UPP] = 0.0;
+          }
         }
       }
     }
