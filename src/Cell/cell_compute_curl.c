@@ -241,6 +241,21 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim , struct M
       //if(k==4){
       //  printf("%e %e\n",r,theCells[k][i][0].prim[BZZ]);
       //}
+      free(phi_plus);
+      free(Ar_plus);
+      free(Ap_plus);
+      free(Az_plus);
+      free(phi_mins);
+      free(Ar_mins);
+      free(Ap_mins);
+      free(Az_mins);
+      free(phi_interp);
+      free(Ar_plus_interp);
+      free(Ap_plus_interp);
+      free(Az_plus_interp);
+      free(Ar_mins_interp);
+      free(Ap_mins_interp);
+      free(Az_mins_interp);
     }
   } 
 }
