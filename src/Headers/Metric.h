@@ -19,6 +19,7 @@ struct Metric
 
 //create and destroy
 struct Metric* metric_create(double t, double r, double p, double z);
+void metric_create_der(struct Metric *g);
 void metric_destroy(struct Metric *g);
 
 //Initialize

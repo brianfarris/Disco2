@@ -49,6 +49,8 @@ void cell_single_init_shock1(struct Cell *theCell, struct Sim *theSim,int i,int 
     theCell->GradPsi[2] = 0.0;
   }
 
+  printf("Setting single cell: (zm, z, zp) = (%lg, %lg, %lg)\n", zm,z,zp);
+
   //TODO: Not sure what this is for.  Ask someone if important.
   //if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = Qq;
 }

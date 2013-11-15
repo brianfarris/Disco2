@@ -26,11 +26,11 @@ struct Metric* metric_create(double t, double r, double p, double z)
     return g;
 }
 
-void metric_create_der(struct Metric *g, double t, double r, double p, double z)
+void metric_create_der(struct Metric *g)
 {
     if(g->length_dg == 0)
     {
-        int a,b,c;
+        int a,b,c,k;
         for(a=0; a<4; a++)
             if(!g->killing[a])
                 (g->length_dg)++;
@@ -39,14 +39,18 @@ void metric_create_der(struct Metric *g, double t, double r, double p, double z)
         g->dg_dd = malloc(10*(g->length_dg)*sizeof(double));
         g->dg_uu = malloc(10*(g->length_dg)*sizeof(double));
         
-        for(a=0; a<g->length_dg; a++)
+        k = 0;
+        for(a=0; a<4; a++)
             if(!g->killing[a])
+            {
                 for(b=0; b<4; b++)
                     for(c=b; c<4; c++)
                     {
-                        g->dg_dd[a*10 + c+4*b-b*(b+1)/2] = metric_dg_dd_exact(a,b,c, t,r,p,z);
-                        g->dg_uu[a*10 + c+4*b-b*(b+1)/2] = metric_dg_uu_exact(a,b,c, t,r,p,z);
+                        g->dg_dd[k*10 + c+4*b-b*(b+1)/2] = metric_dg_dd_exact(a,b,c, g->x[0],g->x[1],g->x[2],g->x[3]);
+                        g->dg_uu[k*10 + c+4*b-b*(b+1)/2] = metric_dg_uu_exact(a,b,c, g->x[0],g->x[1],g->x[2],g->x[3]);
                     }
+                k++;
+            }
     }
 }
 

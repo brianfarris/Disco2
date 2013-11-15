@@ -10,7 +10,7 @@
 
 void cell_single_init_uniform(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
     double rho  = 1.0;
-    double Pp  = 1.0;
+    double Pp  = 0.1;
     double vr = 0.0;
     double vp = 0.0;
     double vz = 0.0;
@@ -40,7 +40,7 @@ void cell_init_uniform(struct Cell ***theCells,struct Sim *theSim,struct MPIsetu
 {
 
     double rho  = 1.0;
-    double Pp  = 1.0;
+    double Pp  = 0.1;
     double vr = 0.0;
     double vp = 0.0;
     double vz = 0.0;

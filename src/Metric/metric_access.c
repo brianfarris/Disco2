@@ -73,11 +73,11 @@ double metric_dg_dd(struct Metric *g, int k, int i, int j)
     if(g->killing[k])
         return 0.0;
     if(g->length_dg == 0)
-        metric_create_der(g, g->x[0], g->x[1], g->x[2], g->x[3]);
+        metric_create_der(g);
     int a, b;
     a = 0;
     for(b = 0; b<k; b++)
-        if(!g->killing[b])
+        if(!(g->killing[b]))
             a++;
     if(i <= j)
         return g->dg_dd[10*a + j+4*i-i*(i+1)/2];
@@ -89,7 +89,7 @@ double metric_dg_uu(struct Metric *g, int k, int i, int j)
     if(g->killing[k])
         return 0.0;
     if(g->length_dg == 0)
-        metric_create_der(g, g->x[0], g->x[1], g->x[2], g->x[3]);
+        metric_create_der(g);
     int a, b;
     a = 0;
     for(b = 0; b<k; b++)

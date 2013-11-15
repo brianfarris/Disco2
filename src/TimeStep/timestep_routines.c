@@ -74,6 +74,11 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   gravMass_update_RK( theGravMasses ,theSim, theTimeStep->RK ); // allow the GravMasses to move
   printf("All updated, calcing prims!\n");
   cell_calc_prim( theCells ,theSim); // calculate primitives
+  
+  //inter-processor syncs
+  cell_syncproc_r(theCells,theSim,theMPIsetup);
+  cell_syncproc_z(theCells,theSim,theMPIsetup);
+
   //Boundary Data
   if (sim_BoundTypeR(theSim)==BOUND_OUTFLOW){
     cell_boundary_outflow_r( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
@@ -82,10 +87,13 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   }
   if (sim_N_global(theSim,Z_DIR)>1){
     if (sim_BoundTypeZ(theSim)==BOUND_OUTFLOW){
+        printf("Applying Outflow-Z BCs\n");
       cell_boundary_outflow_z( theCells , theFaces_z ,theSim,theMPIsetup, theTimeStep );
     }else if (sim_BoundTypeZ(theSim)==BOUND_FIXED){
+        printf("Applying Fixed-Z BCs\n");
       cell_boundary_fixed_z(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
     } else if (sim_BoundTypeZ(theSim)==BOUND_PERIODIC){
+        printf("Applying Periodic-Z BCs\n");
       //do nothing, this is already handled by the syncing routine
     }
   } 
@@ -97,10 +105,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
 
   // if DAMP_TIME is set to a positive number, apply damping near boundary
   if (sim_DAMP_TIME(theSim)>0.0) cell_bc_damp( theCells , theSim, dt,(*cell_single_init_ptr(theSim)) );
-
-  //inter-processor syncs
-  cell_syncproc_r(theCells,theSim,theMPIsetup);
-  cell_syncproc_z(theCells,theSim,theMPIsetup);
 
   //re-calculate conserved quantities. 
   //things may have changed due to syncing and/or caps/floors applied in primitive solver.

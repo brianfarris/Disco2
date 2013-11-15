@@ -120,7 +120,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             v[1] = c->prim[UPP];
             v[2] = c->prim[UZZ];
             //Contravariant Four-Velocity u[i] = u^i
-            u[0] = (-1.0 - 2*metric_dot3_u(g, b, v) - metric_square3_u(g,v)) / metric_g_dd(g,0,0);
+            u[0] = 1.0 / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
             u[1] = u[0] * c->prim[URR];
             u[2] = u[0] * c->prim[UPP];
             u[3] = u[0] * c->prim[UZZ];
@@ -136,6 +136,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
             GAMMALAW = sim_GAMMALAW(theSim);
             rhoh = rho + GAMMALAW*Pp/(GAMMALAW-1);
+            
 
             //Momentum sources and contribution to energy source
             s = 0;
@@ -150,11 +151,32 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                             sk += (rhoh*u[i]*u[j]+Pp*metric_g_uu(g,i,j)) * metric_dg_dd(g,k,i,j);
                     }
                     if(k == 1)
+                    {
                         c->cons[SRR] += dt*dV*sqrtg*a * sk;
+                        /*
+                        printf("sqrtg = %lg, a = %lg, rhoh = %lg\n", sqrtg, a, rhoh);
+                        printf("u0 = %lg, ur = %lg, up = %lg, uz = %lg\n", u[0], u[1], u[2], u[3]);
+                        printf("    (%lg %lg %lg %lg)\n", metric_g_uu(g,0,0), metric_g_uu(g,0,1), metric_g_uu(g,0,2), metric_g_uu(g,0,3));
+                        printf("g = (%lg %lg %lg %lg)\n", metric_g_uu(g,1,0), metric_g_uu(g,1,1), metric_g_uu(g,1,2), metric_g_uu(g,1,3));
+                        printf("    (%lg %lg %lg %lg)\n", metric_g_uu(g,2,0), metric_g_uu(g,2,1), metric_g_uu(g,2,2), metric_g_uu(g,2,3));
+                        printf("    (%lg %lg %lg %lg)\n", metric_g_uu(g,3,0), metric_g_uu(g,3,1), metric_g_uu(g,3,2), metric_g_uu(g,3,3));
+                        printf("     (%lg %lg %lg %lg)\n", metric_dg_dd(g,1,0,0), metric_dg_dd(g,1,0,1), metric_dg_dd(g,1,0,2), metric_dg_dd(g,1,0,3));
+                        printf("dg = (%lg %lg %lg %lg)\n", metric_dg_dd(g,1,1,0), metric_dg_dd(g,1,1,1), metric_dg_dd(g,1,1,2), metric_dg_dd(g,1,1,3));
+                        printf("     (%lg %lg %lg %lg)\n", metric_dg_dd(g,1,2,0), metric_dg_dd(g,1,2,1), metric_dg_dd(g,1,2,2), metric_dg_dd(g,1,2,3));
+                        printf("     (%lg %lg %lg %lg)\n", metric_dg_dd(g,1,3,0), metric_dg_dd(g,1,3,1), metric_dg_dd(g,1,3,2), metric_dg_dd(g,1,3,3));
+                        printf("Source Sr (r=%lg, rho=%lg, Pp=%lg, vr=%lg, vp=%lg): %lg\n", r, rho, Pp, v[0], v[1], sqrtg*a*sk);
+                        */
+                    }
                     else if(k == 2)
+                    {
                         c->cons[LLL] += dt*dV*sqrtg*a * sk;
+                        printf("Source Sp: %lg\n", sqrtg*a*sk);
+                    }
                     else if(k == 3)
+                    {
                         c->cons[SZZ] += dt*dV*sqrtg*a * sk;
+                        printf("Source Sz: %lg\n", sqrtg*a*sk);
+                    }
                     s -= n[k]*sk;
                 }
             //Remaining energy sources
