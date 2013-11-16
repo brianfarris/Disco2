@@ -162,8 +162,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         //printf("vr: %e\n",vr);
         //printf("F_coriolis_r: %e, F_coriolis_phi: %e\n",F_coriolis_r,F_coriolis_phi);
         c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;
-        c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r/*+F_coriolis_r*/);
-        c->cons[LLL] += dt*dV*rho*(Fp/*+F_coriolis_phi+F_euler_phi*/)*r;
+        c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r+F_coriolis_r);
+        c->cons[LLL] += dt*dV*rho*(Fp+F_coriolis_phi+F_euler_phi)*r;
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( (Fr*sint+F_centrifugal_r)*vr+Fr*vz*cost + (Fp+F_euler_phi)*vp);
 
@@ -224,7 +224,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[PSI] -= POWELL*dt*vdotGradPsi;
 
           c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
-        
+          /* 
           double Ap0;
           if ((r>2.)&&(r<3.)){
             Ap0 = 0.5*0.05513/4.*r;
@@ -233,7 +233,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           } else if (r>3.){
             Ap0 = 0.05513/4./2.*(3.*3.)/r;
           }
-
+          */
           c->cons[ARR] += (vp*Bz-vz*Bp)*dV*dt;
           c->cons[APP] += (vz*Br-vr*Bz)*dV*dt;
           c->cons[AZZ] += (vr*Bp-vp*Br)*dV*dt;

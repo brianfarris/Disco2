@@ -23,16 +23,19 @@ void cell_single_init_flock(struct Cell *theCell, struct Sim *theSim,int i,int j
   double Bz,Ap;
   if ((r>2.)&&(r<3.)){
     double n=4.0;
+    //Bz = 0.05513/n;
     Bz = 0.05513/n;
     Ap = 0.5*Bz*r;
     //Bz = 0.0;
   } else if (r<2.){
     double n=4.0;
+    //double Bz2 = 0.05513/n;
     double Bz2 = 0.05513/n;
     Bz = 0.0;
     Ap = Bz2/2.*(2.*2.)/r;
   } else if (r>3.){
     double n=4.0;
+    //double Bz3 = 0.05513/n;
     double Bz3 = 0.05513/n;
     double Bz = 0.0;
     Ap = Bz3/2.*(3.*3.)/r;
@@ -90,16 +93,19 @@ void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
       double Bz,Ap;
       if ((r>2.)&&(r<3.)){
         double n=4.0;
+        //Bz = 0.05513/n;
         Bz = 0.05513/n;
         Ap = 0.5*Bz*r;
         //Bz = 0.0;
       } else if (r<2.){
         double n=4.0;
+        //double Bz2 = 0.05513/n;
         double Bz2 = 0.05513/n;
         Bz = 0.0;
         Ap = Bz2/2.*(2.*2.)/r;
       } else if (r>3.){
         double n=4.0;
+        //double Bz3 = 0.05513/n;
         double Bz3 = 0.05513/n;
         double Bz = 0.0;
         Ap = Bz3/2.*(3.*3.)/r;
