@@ -136,7 +136,7 @@ void cell_compute_curl( struct Cell *** theCells ,struct Sim * theSim , struct M
       gsl_interp *interp_Ap_mins;
       gsl_interp *interp_Az_mins;
 
-      int interp_method=SPLINE;
+      int interp_method=LINEAR;
 
       if (interp_method==LINEAR){
         interp_Ap_plus = gsl_interp_alloc(gsl_interp_linear,sim_N_p(theSim,i+1)+4);
