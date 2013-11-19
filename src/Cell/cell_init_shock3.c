@@ -8,13 +8,13 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_single_init_shock1(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
-  double rhoL  = 1.0;
-  double rhoR  = 0.125;
+void cell_single_init_shock3(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
+  double rhoL  = 10.0;
+  double rhoR  = 1.0;
   double vL = 0.0;
   double vR = 0.0;
-  double pL = 1.0;
-  double pR = 0.1;
+  double pL = 13.33;
+  double pR = 1.0e-8;
 
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
@@ -53,14 +53,14 @@ void cell_single_init_shock1(struct Cell *theCell, struct Sim *theSim,int i,int 
   //if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = Qq;
 }
 
-void cell_init_shock1(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
+void cell_init_shock3(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 
-  double rhoL  = 1.0;
-  double rhoR  = 0.125;
+  double rhoL  = 10.0;
+  double rhoR  = 1.0;
   double vL = 0.0;
   double vR = 0.0;
-  double pL = 1.0;
-  double pR = 0.1;
+  double pL = 13.33;
+  double pR = 1.0e-8;
 
   int i, j, k;
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {

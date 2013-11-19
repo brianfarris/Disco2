@@ -14,7 +14,7 @@ double metric_square3_u(struct Metric *g, double *vec)
 double metric_square3_d(struct Metric *g, double *vec)
 {
     int i,j;
-    double v2 = 0;
+    double v2 = 0.0;
     for(i=0; i<3; i++)
         for(j=0; j<3; j++)
             v2 += metric_gamma_uu(g,i,j)*vec[i]*vec[j];

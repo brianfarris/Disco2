@@ -56,11 +56,15 @@
 int main(int argc, char **argv) {
   char* inputfilename = argv[1];
 
+  printf("\nWelcome to Disco!\n\nInitializing MPI.\n");
+
   // start MPI 
   struct MPIsetup * theMPIsetup = mpisetup_create(argc,argv);
   mpisetup_setprocs(theMPIsetup,inputfilename);
   mpisetup_cart_create(theMPIsetup);
   mpisetup_left_right(theMPIsetup);
+
+  printf("Setting user parameters.\n");
 
   // Set up everything that will not change throughout the simulation
   struct Sim * theSim = sim_create(theMPIsetup);
@@ -70,6 +74,7 @@ int main(int argc, char **argv) {
   sim_set_N_p(theSim);
   sim_set_misc(theSim,theMPIsetup);
 
+  printf("Building simulation structures.\n");
   //allocate memory for gravitating masses
   struct GravMass *theGravMasses = gravMass_create(sim_NumGravMass(theSim));
 
@@ -79,11 +84,13 @@ int main(int argc, char **argv) {
   // make sure that phi is between 0 and 2 pi. I'm not sure why this matters.
   cell_clean_pi(theCells,theSim);
 
+  printf("Performing initial sync.\n");
   // inter-processor syncs. cell_create currently sets up tiph_0 randomly, 
   // so we need to make sure ghost-zones are set appropriately
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);
 
+  printf("Building more structures.\n");
   // create TimeStep struct
   struct TimeStep * theTimeStep = timestep_create(theSim);
 
@@ -95,6 +102,7 @@ int main(int argc, char **argv) {
   if(sim_Background(theSim)==GR)
     metric_init_metric(theSim);
 
+  printf("Setting initial conditions.\n");
   // set initial data 
   if (sim_Restart(theSim)==1){ // getting initial data from checkpoint file
     io_allocbuf(theIO,theSim); // allocate memory for a buffer to store checkpoint data
@@ -107,20 +115,25 @@ int main(int argc, char **argv) {
   }
   gravMass_clean_pi(theGravMasses,theSim); // make sure GravMasses have phi between 0 and 2 pi.
 
+  printf("Setting up I/O.\n");
   // set tcheck, dtcheck, and nfile. Needs to be done after ID because it depends on current time.
   io_setup(theIO,theSim,theTimeStep);
 
+  printf("Last sync.\n");
   // inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);
 
+  printf("Calculating initial conserved quantities.\n");
+  // inter-processor syncs
   // set conserved quantities
   cell_calc_cons(theCells,theSim);
   
+  printf("Setting up diagnostics.\n");
   // set up diagnostics struct
   struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep,theMPIsetup);
 
-  printf("Starting Loop.\n");
+  printf("let's go!\nStarting Loop.\n");
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
     // here the actual timestep is taken
     timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);

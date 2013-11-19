@@ -192,7 +192,6 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   // which state of the riemann problem are we in?
   riemann_set_state(theRiemann,w);
 
-
   if (theRiemann->state==LEFT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,LEFT);//in this case, we only need FL
     cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
@@ -238,7 +237,17 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   for( q=0 ; q<NUM_Q ; ++q ){
     cell_add_cons(theRiemann->cL,q,-dt*theRiemann->dA*theRiemann->F[q]);
     cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->F[q]);
+
   }
+
+  if(theRiemann->r > 9.0e-9 && theRiemann->r < 2.1e-8)
+  {
+    printf("Face: r=%.12g, n=(%d,%d,%d) w=%.12g\n", theRiemann->r, theRiemann->n[0],theRiemann->n[1],theRiemann->n[2], w);
+    printf("   added: %.12g Sr to R cell\n", dt*theRiemann->dA*theRiemann->F[SRR]);
+  }
+  //printf("FL[DDD]=%lg, FL[SRR]=%lg, FL[LLL]=%lg, FL[TAU]=%lg\n", theRiemann->FL[DDD], theRiemann->FL[SRR], theRiemann->FL[LLL], theRiemann->FL[TAU]);
+  //printf("FR[DDD]=%lg, FR[SRR]=%lg, FR[LLL]=%lg, FR[TAU]=%lg\n", theRiemann->FR[DDD], theRiemann->FR[SRR], theRiemann->FR[LLL], theRiemann->FR[TAU]);
+  
 }
 
 

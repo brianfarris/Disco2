@@ -8,13 +8,15 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_single_init_shock1(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
-  double rhoL  = 1.0;
-  double rhoR  = 0.125;
+//Relativistic shock in x-direction.
+
+void cell_single_init_shock4(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
+  double rhoL  = 10.0;
+  double rhoR  = 1.0;
   double vL = 0.0;
   double vR = 0.0;
-  double pL = 1.0;
-  double pR = 0.1;
+  double pL = 13.33;
+  double pR = 1.0e-8;
 
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
@@ -24,13 +26,13 @@ void cell_single_init_shock1(struct Cell *theCell, struct Sim *theSim,int i,int 
   double z = 0.5*(zm+zp);
   double t = theCell->tiph-.5*theCell->dphi;
 
-  if(z < 0.0)
+  if(r*cos(t) < 0.0)
   {
     theCell->prim[RHO] = rhoL;
     theCell->prim[PPP] = pL;
-    theCell->prim[URR] = 0.0;
-    theCell->prim[UPP] = 0.0;
-    theCell->prim[UZZ] = vL;
+    theCell->prim[URR] = vL * cos(t);
+    theCell->prim[UPP] = -vL * sin(t) / r;
+    theCell->prim[UZZ] = 0.0;
     theCell->divB = 0.0;
     theCell->GradPsi[0] = 0.0;
     theCell->GradPsi[1] = 0.0;
@@ -40,9 +42,9 @@ void cell_single_init_shock1(struct Cell *theCell, struct Sim *theSim,int i,int 
   {
     theCell->prim[RHO] = rhoR;
     theCell->prim[PPP] = pR;
-    theCell->prim[URR] = 0.0;
-    theCell->prim[UPP] = 0.0;
-    theCell->prim[UZZ] = vR;
+    theCell->prim[URR] = vR * cos(t);
+    theCell->prim[UPP] = -vR * sin(t) / r;
+    theCell->prim[UZZ] = 0.0;
     theCell->divB = 0.0;
     theCell->GradPsi[0] = 0.0;
     theCell->GradPsi[1] = 0.0;
@@ -53,14 +55,14 @@ void cell_single_init_shock1(struct Cell *theCell, struct Sim *theSim,int i,int 
   //if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = Qq;
 }
 
-void cell_init_shock1(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
+void cell_init_shock4(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 
-  double rhoL  = 1.0;
-  double rhoR  = 0.125;
+  double rhoL  = 10.0;
+  double rhoR  = 1.0;
   double vL = 0.0;
   double vR = 0.0;
-  double pL = 1.0;
-  double pR = 0.1;
+  double pL = 13.33;
+  double pR = 1.0e-8;
 
   int i, j, k;
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
@@ -73,12 +75,12 @@ void cell_init_shock1(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
       double z = 0.5*(zm+zp);
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
-        if(z < 0.0) {
+        if(r*cos(t) < 0.0) {
           theCells[k][i][j].prim[RHO] = rhoL;
           theCells[k][i][j].prim[PPP] = pL;
-          theCells[k][i][j].prim[URR] = 0.0;
-          theCells[k][i][j].prim[UPP] = 0.0;
-          theCells[k][i][j].prim[UZZ] = vL;
+          theCells[k][i][j].prim[URR] = vL * cos(t);
+          theCells[k][i][j].prim[UPP] = -vL * sin(t) / r;
+          theCells[k][i][j].prim[UZZ] = 0.0;
           theCells[k][i][j].divB = 0.0;
           theCells[k][i][j].GradPsi[0] = 0.0;
           theCells[k][i][j].GradPsi[1] = 0.0;
@@ -86,9 +88,9 @@ void cell_init_shock1(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
         } else {
           theCells[k][i][j].prim[RHO] = rhoR;
           theCells[k][i][j].prim[PPP] = pR;
-          theCells[k][i][j].prim[URR] = 0.0;
-          theCells[k][i][j].prim[UPP] = 0.0;
-          theCells[k][i][j].prim[UZZ] = vR;
+          theCells[k][i][j].prim[URR] = vR * cos(t);
+          theCells[k][i][j].prim[UPP] = -vR * sin(t) / r;
+          theCells[k][i][j].prim[UZZ] = 0.0;
           theCells[k][i][j].divB = 0.0;
           theCells[k][i][j].GradPsi[0] = 0.0;
           theCells[k][i][j].GradPsi[1] = 0.0;

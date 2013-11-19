@@ -68,11 +68,17 @@ void riemann_set_vel_gr(struct Riemann *theRiemann, struct Sim *theSim, double r
     v[1] = theRiemann->primL[UPP];
     v[2] = theRiemann->primL[UZZ];
     w = a / sqrt(-metric_g_dd(g,0,0)-2.0*metric_dot3_u(g,b,v)-metric_square3_u(g,v));
-    sig = cf21*cf21/(w*w*(1.0-cf21*cf21));
+    sig = cf21/(w*w*(1.0-cf21));
     dv = sqrt(sig*(1.0+sig)*a*a*gam - sig*(vnL+bn)*(vnL+bn));
     
     Sl1 = (vnL - sig*bn - dv) / (1.0+sig);
     Sr1 = (vnL - sig*bn + dv) / (1.0+sig);
+
+    //TODO: Remove: Lax-Friedrichs
+    Sl1 = -a*sqrt(gam) - bn;
+    Sr1 = a*sqrt(gam) - bn;
+    Sl1 = -1.0;
+    Sr1 = 1.0;
 
     double vnR,cf22,mnR;
     double FR[3],FmR[3];
@@ -82,11 +88,17 @@ void riemann_set_vel_gr(struct Riemann *theRiemann, struct Sim *theSim, double r
     v[1] = theRiemann->primR[UPP];
     v[2] = theRiemann->primR[UZZ];
     w = a / sqrt(-metric_g_dd(g,0,0)-2.0*metric_dot3_u(g,b,v)-metric_square3_u(g,v));
-    sig = cf22*cf22/(w*w*(1.0-cf22*cf22));
+    sig = cf22/(w*w*(1.0-cf22));
     dv = sqrt(sig*(1.0+sig)*a*a*gam - sig*(vnL+bn)*(vnL+bn));
 
     Sl2 = (vnR - sig*bn - dv) / (1.0+sig);
     Sr2 = (vnR - sig*bn + dv) / (1.0+sig);
+
+    //Lax-Friedrichs
+    Sl2 = -a*sqrt(gam) - bn;
+    Sr2 = a*sqrt(gam) - bn;
+    Sl2 = -1.0;
+    Sr2 = 1.0;
 
     if(Sl1 > Sl2)
         Sl = Sl2;
@@ -99,6 +111,8 @@ void riemann_set_vel_gr(struct Riemann *theRiemann, struct Sim *theSim, double r
 
   theRiemann->Sl = Sl;
   theRiemann->Sr = Sr;
+//  theRiemann->Sl = -1.0;
+//  theRiemann->Sr = 1.0;
 
   //TODO: This is only used for HLLC and is WRONG.
   theRiemann->Ss = (Sl+Sr)/2;
@@ -135,7 +149,7 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
     double a, b[3], sqrtg;
     double u0, u[3]; //u0 = u^0, u[i] = u_i
     double rho, Pp, v[3];
-    double rhoh, vn, bn;
+    double rhoh, vn, bn, hn;
 
     //Get hydro primitives
     rho = prim[RHO];
@@ -164,14 +178,18 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
     //Calculate beta & v normal to face.
     vn = v[0]*theRiemann->n[0] + v[1]*theRiemann->n[1] + v[2]*theRiemann->n[2];
     bn = b[0]*theRiemann->n[0] + b[1]*theRiemann->n[1] + b[2]*theRiemann->n[2];
+    if(theRiemann->n[1] == 1)
+        hn = r;
+    else
+        hn = 1.0;
     rhoh = rho+GAMMALAW*Pp/(GAMMALAW-1.);
     
     //Fluxes
-    F[DDD] = sqrtg*a*u0 * rho*vn;
-    F[SRR] = sqrtg*a*(u0*rhoh * u[0]*vn + Pp*theRiemann->n[0]);
-    F[LLL] = sqrtg*a*(u0*rhoh * u[1]*vn + Pp*theRiemann->n[1]);
-    F[SZZ] = sqrtg*a*(u0*rhoh * u[2]*vn + Pp*theRiemann->n[2]);
-    F[TAU] = sqrtg*(a*u0*(a*u0*rhoh - rho)*vn + Pp*bn);
+    F[DDD] = hn*sqrtg*a*u0 * rho*vn;
+    F[SRR] = hn*sqrtg*a*(u0*rhoh * u[0]*vn + Pp*theRiemann->n[0]);
+    F[LLL] = hn*sqrtg*a*(u0*rhoh * u[1]*vn + Pp*theRiemann->n[1]);
+    F[SZZ] = hn*sqrtg*a*(u0*rhoh * u[2]*vn + Pp*theRiemann->n[2]);
+    F[TAU] = hn*sqrtg*(a*u0*(a*u0*rhoh - rho)*vn + Pp*bn);
 
     //Passive Fluxes
     int q;

@@ -34,10 +34,18 @@ void cell_init_torus(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_torus(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_bondi(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_bondi(struct Cell *, struct Sim *,int ,int ,int );
-void cell_init_shock1(struct Cell ***,struct Sim *, struct MPIsetup *);
-void cell_single_init_shock1(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_uniform(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_uniform(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_shock1(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_shock1(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_shock2(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_shock2(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_shock3(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_shock3(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_shock4(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_shock4(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_isentrope(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_isentrope(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
@@ -81,7 +89,9 @@ void cell_cons2prim_newt( double * , double * , double , double ,struct Sim *);
 void cell_prim2cons_gr( double * , double * , double , double ,struct Sim *);
 void cell_cons2prim_gr( double * , double * , double , double ,struct Sim *);
 //miscellaneous
-double cell_mindt( struct Cell *** , struct Sim * );
+double (*cell_mindt)( struct Cell *** , struct Sim * );
+double cell_mindt_newt( struct Cell *** , struct Sim * );
+double cell_mindt_gr( struct Cell *** , struct Sim * );
 void cell_copy(struct Cell ***,struct Sim * );
 void cell_adjust_RK_cons( struct Cell *** , struct Sim * , double );
 void cell_set_prim(struct Cell ***,int,int,int,int,double);//this will morph into a checkpoint restart routine

@@ -1,37 +1,39 @@
 
 //Disco Parameter File//
 
-InitialDataType         4       // 0 Torus, 1 Bondi, 2 Vortex, 3 Shock1, 4 Uniform
+InitialDataType         3       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform, 
+                                // 4 Shock1, 5 Shock2, 6 Shock3, 7 Shock4,
+                                // 8 Isentrope
 GravMassType            0       // 0 none, 1 single, 2 binary
 Background              1       // 0 Newtonian, 1 GR
 Metric                  0       // 0 Flat, 1 Schwarzschild, 2 Kerr
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR			32			//Radial Zones
+NumR			8			//Radial Zones
 NumZ			1			//Vertical Zones
-ng                      2
-R_Min		        0.1	
+ng              2
+R_Min		    0.15	
 R_Max			1.0
-Z_Min			-1.0
-Z_Max			1.0
-NP_CONST                -1
+Z_Min			-0.5
+Z_Max			0.5
+NP_CONST        2
 aspect                  1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                1.0
+Time_Max                100.0
 Num_Checkpoints	        5	
 Num_Diag_Dump           20
 Num_Diag_Measure        20
 
 
-NoInnerBC            0
+NoInnerBC            1
 BoundTypeR           0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ           0               // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry          1
 
-Move_Cells              3
+Move_Cells       `       0
 RiemannSolver           1           // 0 hllc, 1 hll
 Adiabatic_Index		1.6666666666
 

@@ -1,4 +1,6 @@
 #define TIMESTEP_PRIVATE_DEFS
+#define RIEMANN_PRIVATE_DEFS
+#define CELL_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -17,6 +19,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     struct Sim * theSim,struct GravMass * theGravMasses,
     struct MPIsetup * theMPIsetup,double timestep_fac){
 
+  int i,j,k,q;
   double dt = timestep_fac*theTimeStep->dt;
 
   // figure out what all the faces need to be and set them up
@@ -31,10 +34,40 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_clear_w(theCells,theSim);
   cell_set_w( theCells ,theSim);
 
-  // this is part of the runge-kutta method
+  //TODO: Remove these dumb print statements
+  if(PRINTTOOMUCH)
+  {
+  printf("\n");
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+            struct Cell * c = &(theCells[k][i][j]);
+            printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g)\n",i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[PPP],c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[TAU]);
+        }
+    }
+  }
+  }
+  
+  
+          // this is part of the runge-kutta method
   cell_adjust_RK_cons( theCells, theSim, theTimeStep->RK);
+  
+  //TODO: Remove these dumb print statements
+  
+  if(PRINTTOOMUCH){
+    printf("\n");
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+        
+            struct Cell * c = &(theCells[k][i][j]);
+            printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g)\n",i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[PPP],c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[TAU]);
+        }
+    }
+  }
+    }
+  
 
-  int i,j,k,q;
   //Phi Flux
   cell_plm_p(theCells,theSim);//piecewise-linear reconstruction
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -43,7 +76,23 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
         struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem 
         riemann_setup_p(theRiemann,theCells,theSim,i,j,k,PDIRECTION); // set various quantities in theRiemann
         riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS
+       
+        if(PRINTTOOMUCH)
+        {
+            double *pL = theRiemann->primL;
+            double *pR = theRiemann->primR;
+            double *FL = theRiemann->FL;
+            double *FR = theRiemann->FR;
+            double *us = theRiemann->Ustar;
+            double *fs = theRiemann->Fstar;
+            printf("Face: r=%.12g, phi=%.12g\n",theRiemann->r,0.5*(cell_tiph(theRiemann->cL)-cell_dphi(theRiemann->cL)+cell_tiph(theRiemann->cR)-cell_dphi(theRiemann->cR)));
+            printf("Flux Phi L (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", pL[RHO], pL[PPP], pL[URR], pL[UPP],FL[DDD],FL[SRR],FL[LLL],FL[TAU]);
+            printf("Flux Phi R (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", pR[RHO], pR[PPP], pR[URR], pR[UPP],FR[DDD],FR[SRR],FR[LLL],FR[TAU]);
+            printf("Flux Phi * (rhostar=%.12g, Sr=%.12g, Sp=%.12g, tau=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", us[DDD], us[SRR], us[LLL], us[TAU],fs[DDD],fs[SRR],fs[LLL],fs[TAU]);
+        }
+        
         riemann_destroy(theRiemann); // clean up
+
       }
     }
   }
@@ -54,6 +103,18 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     struct Riemann * theRiemann = riemann_create(theSim); //struct to contain everything we need to solve Riemann problem
     riemann_setup_rz(theRiemann,theFaces_r,theSim,n,RDIRECTION);  //set various quantities in theRiemann
     riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS
+    
+    if(PRINTTOOMUCH)
+    {
+        double *pL = theRiemann->primL;
+        double *pR = theRiemann->primR;
+        double *FL = theRiemann->FL;
+        double *FR = theRiemann->FR;
+        printf("Face: r=%.12g, phi=%.12g, dA=%.12g, cm=%.12g\n",theRiemann->r,0.5*(cell_tiph(theRiemann->cL)-cell_dphi(theRiemann->cL)+cell_tiph(theRiemann->cR)-cell_dphi(theRiemann->cR)), face_dA(theFaces_r,n), face_cm(theFaces_r, n));
+        printf("Flux Rad L (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", pL[RHO], pL[PPP], pL[URR], pL[UPP],FL[DDD],FL[SRR],FL[LLL],FL[TAU]);
+        printf("Flux Rad R (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", pR[RHO], pR[PPP], pR[URR], pR[UPP],FR[DDD],FR[SRR],FR[LLL],FR[TAU]);
+    }
+    
     riemann_destroy(theRiemann); // clean up
   }
   //Z Flux
@@ -68,11 +129,28 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   }
   //Source Terms
   cell_add_src( theCells ,theSim, theGravMasses , dt ); // add source terms
+
+    
+  //TODO: Remove these dumb print statements
+  if(PRINTTOOMUCH)
+  {
+  printf("\n");
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+        
+            struct Cell * c = &(theCells[k][i][j]);
+            printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g)\n",i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[PPP],c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[TAU]);
+        }
+    }
+  }
+  }
+  
+
   //Bookkeeping
   cell_update_phi( theCells ,theSim, theTimeStep->RK , dt ); // allow the cells to move in phi direction
   cell_update_dphi( theCells ,theSim); // all the cells to change size
   gravMass_update_RK( theGravMasses ,theSim, theTimeStep->RK ); // allow the GravMasses to move
-  printf("All updated, calcing prims!\n");
   cell_calc_prim( theCells ,theSim); // calculate primitives
   
   //inter-processor syncs
@@ -87,13 +165,10 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   }
   if (sim_N_global(theSim,Z_DIR)>1){
     if (sim_BoundTypeZ(theSim)==BOUND_OUTFLOW){
-        printf("Applying Outflow-Z BCs\n");
       cell_boundary_outflow_z( theCells , theFaces_z ,theSim,theMPIsetup, theTimeStep );
     }else if (sim_BoundTypeZ(theSim)==BOUND_FIXED){
-        printf("Applying Fixed-Z BCs\n");
       cell_boundary_fixed_z(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
     } else if (sim_BoundTypeZ(theSim)==BOUND_PERIODIC){
-        printf("Applying Periodic-Z BCs\n");
       //do nothing, this is already handled by the syncing routine
     }
   } 

@@ -105,15 +105,15 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         }
         else if(sim_Background(theSim) == GR)
         {
-            int i,j,k;
+            int mu, nu, la;
             double a, b[3], sqrtg, n[4], u[4], u_d[4], s, sk, rhoh, GAMMALAW;
             double v[3];
             struct Metric *g;
             
             g = metric_create(time_global, r, phi, z);
             a = metric_lapse(g);
-            for(i=0; i<3; i++)
-                b[i] = metric_shift_u(g,i);
+            for(mu=0; mu<3; mu++)
+                b[mu] = metric_shift_u(g,mu);
             sqrtg = metric_sqrtgamma(g)/r;
 
             v[0] = c->prim[URR];
@@ -125,9 +125,12 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             u[2] = u[0] * c->prim[UPP];
             u[3] = u[0] * c->prim[UZZ];
             //Covariant Four-Velocity u_d[i] = u_i
-            for(i=0; i<4; i++)
-                for(j=0; j<4; j++)
-                    u_d[i] = metric_g_uu(g,i,j) * u[j];
+            for(mu=0; mu<4; mu++)
+            {
+                u_d[mu] = 0.0;
+                for(nu=0; nu<4; nu++)
+                    u_d[mu] += metric_g_dd(g,mu,nu) * u[nu];
+            }
             //Normal vector n[i] = n^i
             n[0] = 1.0/a;
             n[1] = -n[0]*b[0];
@@ -140,62 +143,56 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
             //Momentum sources and contribution to energy source
             s = 0;
-            for(k=0; k<4; k++)
-                if(!metric_killcoord(g,k))
+            for(la=0; la<4; la++)
+                if(!metric_killcoord(g,la))
                 {
                     sk = 0;
-                    for(i=0; i<4; i++)
+                    for(mu=0; mu<4; mu++)
                     {
-                        sk += 0.5*(rhoh*u[i]*u[i]+Pp*metric_g_uu(g,i,i)) * metric_dg_dd(g,k,i,i);
-                        for(j=i+1; j<4; j++)
-                            sk += (rhoh*u[i]*u[j]+Pp*metric_g_uu(g,i,j)) * metric_dg_dd(g,k,i,j);
+                        sk += 0.5*(rhoh*u[mu]*u[mu]+Pp*metric_g_uu(g,mu,mu)) * metric_dg_dd(g,la,mu,mu);
+                        for(nu=mu+1; nu<4; nu++)
+                            sk += (rhoh*u[mu]*u[nu]+Pp*metric_g_uu(g,mu,nu)) * metric_dg_dd(g,la,mu,nu);
                     }
-                    if(k == 1)
+                    if(la == 1)
                     {
                         c->cons[SRR] += dt*dV*sqrtg*a * sk;
-                        /*
-                        printf("sqrtg = %lg, a = %lg, rhoh = %lg\n", sqrtg, a, rhoh);
-                        printf("u0 = %lg, ur = %lg, up = %lg, uz = %lg\n", u[0], u[1], u[2], u[3]);
-                        printf("    (%lg %lg %lg %lg)\n", metric_g_uu(g,0,0), metric_g_uu(g,0,1), metric_g_uu(g,0,2), metric_g_uu(g,0,3));
-                        printf("g = (%lg %lg %lg %lg)\n", metric_g_uu(g,1,0), metric_g_uu(g,1,1), metric_g_uu(g,1,2), metric_g_uu(g,1,3));
-                        printf("    (%lg %lg %lg %lg)\n", metric_g_uu(g,2,0), metric_g_uu(g,2,1), metric_g_uu(g,2,2), metric_g_uu(g,2,3));
-                        printf("    (%lg %lg %lg %lg)\n", metric_g_uu(g,3,0), metric_g_uu(g,3,1), metric_g_uu(g,3,2), metric_g_uu(g,3,3));
-                        printf("     (%lg %lg %lg %lg)\n", metric_dg_dd(g,1,0,0), metric_dg_dd(g,1,0,1), metric_dg_dd(g,1,0,2), metric_dg_dd(g,1,0,3));
-                        printf("dg = (%lg %lg %lg %lg)\n", metric_dg_dd(g,1,1,0), metric_dg_dd(g,1,1,1), metric_dg_dd(g,1,1,2), metric_dg_dd(g,1,1,3));
-                        printf("     (%lg %lg %lg %lg)\n", metric_dg_dd(g,1,2,0), metric_dg_dd(g,1,2,1), metric_dg_dd(g,1,2,2), metric_dg_dd(g,1,2,3));
-                        printf("     (%lg %lg %lg %lg)\n", metric_dg_dd(g,1,3,0), metric_dg_dd(g,1,3,1), metric_dg_dd(g,1,3,2), metric_dg_dd(g,1,3,3));
-                        printf("Source Sr (r=%lg, rho=%lg, Pp=%lg, vr=%lg, vp=%lg): %lg\n", r, rho, Pp, v[0], v[1], sqrtg*a*sk);
-                        */
+                        if(r > 9.0e-9 && r < 2.1e-8)
+                            printf("Source Sr (r=%.12g, dV=%.12g, rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): %.12g, %.12g\n", r, dV, rho, Pp, v[0], v[1], sqrtg*a*sk, dt*dV*sqrtg*a * sk);
                     }
-                    else if(k == 2)
+                    else if(la == 2)
                     {
                         c->cons[LLL] += dt*dV*sqrtg*a * sk;
-                        printf("Source Sp: %lg\n", sqrtg*a*sk);
+                        if(r > 9.0e-9 && r < 2.1e-8)
+                            printf("Source Sp (r=%.12g, dV=%.12g, rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): %.12g\n", r, dV, rho, Pp, v[0], v[1], sqrtg*a*sk);
                     }
-                    else if(k == 3)
+                    else if(la == 3)
                     {
                         c->cons[SZZ] += dt*dV*sqrtg*a * sk;
-                        printf("Source Sz: %lg\n", sqrtg*a*sk);
+    //                    if(j==0)
+      //                      printf("Source Sz (r=%.12g, rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): %.12g\n", r, rho, Pp, v[0], v[1], sqrtg*a*sk);
                     }
-                    s -= n[k]*sk;
+                    s -= n[la]*sk;
                 }
             //Remaining energy sources
-            for(k=0; k<4; k++)
-                if(!metric_killcoord(g,k))
+            for(la=0; la<4; la++)
+                if(!metric_killcoord(g,la))
                 {
-                    sk = (rhoh*u[0]*u[k] + Pp*metric_g_uu(g,0,k))*metric_dlapse(g,k);
-                    for(i=0; i<4; i++)
+                    sk = (rhoh*u[0]*u[la] + Pp*metric_g_uu(g,0,la))*metric_dlapse(g,la);
+                    for(mu=0; mu<4; mu++)
                     {
-                        if(i == k)
-                            sk += a*(rhoh*u[0]*u_d[i]+Pp)*metric_dg_uu(g,k,0,i);
+                        if(mu == la)
+                            sk += a*(rhoh*u[0]*u_d[mu]+Pp)*metric_dg_uu(g,la,0,mu);
                         else
-                            sk += a*rhoh*u[0]*u_d[i]*metric_dg_uu(g,k,0,i);
+                            sk += a*rhoh*u[0]*u_d[mu]*metric_dg_uu(g,la,0,mu);
 
                     }
                 }
             s += sk;
 
             c->cons[TAU] += dt*dV*sqrtg*a * s;
+        //                if(j==0)
+            if(r > 9.0e-9 && r < 2.1e-8)
+                printf("Source Tau (r=%.12g, dV=%.12g, rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): %.12g\n", r, dV, rho, Pp, v[0], v[1], sqrtg*a*s);
 
             metric_destroy(g);
         }

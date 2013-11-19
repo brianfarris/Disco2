@@ -21,13 +21,11 @@ void timestep_rk2(struct TimeStep * theTimeStep, struct Sim * theSim,
   gravMass_copy(theGravMasses,theSim);
   timestep_set_RK(theTimeStep,0.0);
   // 1st step of RK2
-  printf("hip ");
   timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,1.0);
   gravMass_move(theGravMasses,1.0*timestep_dt(theTimeStep));
   timestep_set_RK(theTimeStep,0.5);
 
   // 2nd step of RK2
-  printf("hop\n");
   timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,0.5);
   gravMass_move(theGravMasses,0.5*timestep_dt(theTimeStep));
   

@@ -68,7 +68,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
     double GAMMALAW, rhoh, u0, hmo;
     double rho, v[3], Pp;
     double rhostar, S[3], tau;
-    double w, wmo, wmo0, wmo1; //w = lapse * u^0, wmo = w-1
+    double w, w0, w1; //w = lapse * u^0
     double e, s2, gam; //e = (tau+rhostar)/rhostar, s2 = S_i*S^i/rhostar^2, gam = (GAMMALAW-1)/GAMMALAW
     double c[5];
     double eps = 1.0e-10;
@@ -96,51 +96,44 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
     gam = (GAMMALAW-1.0)/GAMMALAW;
 
     //Coefficients of polynomial to solve for w
-    c[0] = -s2*(gam-1)*(gam-1);
-    c[1] = 2*((e-gam)*(e-gam)+2*(gam-1)*s2);
-    c[2] = (5*e-gam)*(e-gam)-2*(3-gam)*s2;
-    c[3] = 4*e*e-4*s2-2*gam*e;
+    c[0] = -(s2+1)*gam*gam;
+    c[1] = 2*gam*e;
+    c[2] = gam*gam - e*e + 2*gam*s2;
+    c[3] = -2*gam*e;
     c[4] = e*e-s2;
     if(c[4] <= 0)
-    {
-        printf("ERROR: e2 <= s2!: e^2 = %lg, s^2 = %lg\n",e*e,s2);
-        printf("r = %lg, dV = %lg\n", r, dV);
-        printf("rho = %lg, P = %lg, vr = %lg, vp = %lg, vz = %lg\n",prim[RHO],prim[PPP],prim[URR],prim[UPP],prim[UZZ]);
-        printf("rhostar = %lg, tau = %lg, Sr = %lg, Sp = %lg, Sz = %lg\n",cons[DDD],cons[TAU],cons[SRR],cons[LLL],cons[SZZ]);
-        exit(0);
-    }
+        printf("e2 <= s2!: e^2 = %lg, s^2 = %lg\n",e*e,s2);
 
     //Inital guess: previous value of prim
     v[0] = prim[URR];
     v[1] = prim[UPP];
     v[2] = prim[UZZ];
-    wmo0 = a / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v)) - 1.0;
+    w0 = a / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
     //Newton-Raphson to find w.
-    wmo1 = wmo0;
+    w1 = w0;
     i = 0;
     do
     {
-        wmo = wmo1;
-        wmo1 = wmo - (c[0] + c[1]*wmo + c[2]*wmo*wmo + c[3]*wmo*wmo*wmo + c[4]*wmo*wmo*wmo*wmo)
-                    / (c[1] + 2*c[2]*wmo + 3*c[3]*wmo*wmo + 4*c[4]*wmo*wmo*wmo);
+        w = w1;
+        w1 = w - (c[0] + c[1]*w + c[2]*w*w + c[3]*w*w*w + c[4]*w*w*w*w)
+                    / (c[1] + 2*c[2]*w + 3*c[3]*w*w + 4*c[4]*w*w*w);
         i++;
     }
-    while(fabs(wmo-wmo1) > eps && i < 10000);
+    while(fabs(w-w1) > eps && i < 10000);
     if(i == 10000)
     {
-        printf("NR failed to converge: wmo0 = %lg, wmo = %lg, wmo1 = %lg\n", wmo0,wmo,wmo1);
+        printf("NR failed to converge: w0 = %lg, w = %lg, w1 = %lg\n", w0,w,w1);
         printf("Poly coeffs: c[0]=%lg, c[1]=%lg, c[2]=%lg, c[3]=%lg, c[4]=%lg\n",c[0],c[1],c[2],c[3],c[4]);
     }
-    wmo = wmo1;
+    w = w1;
 
-    if(wmo < 0.0)
+    if(w < 1.0)
     {
-        printf("ERROR: w-1 < 0 in cons2prim_gr. (wmo = %lg)\n", wmo);
-        wmo = 0.0;
+        printf("ERROR: w < 1 in cons2prim_gr. (w = %lg)\n", w);
+        w = 1.0;
     }
     
     //Prim recovery
-    w = wmo + 1.0;
     u0 = w/a;
     hmo = w*(e-w)/(w*w-gam);
     if(hmo < -1.0)
@@ -180,15 +173,5 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
         prim[i] = cons[i]/cons[DDD];
 
     metric_destroy(g);
-
-    if(r > 9.0e-9 && r < 2.1e-8)
-    {
-        double cons2[sim_NUM_Q(theSim)];
-        cell_prim2cons(prim,cons2,r,dV,theSim);
-        printf("cons2prim: r=%lg, dV = %lg\n", r, dV);
-        printf("cons: rhostar=%lg, Sr=%lg, Sp=%lg, tau=%lg\n", cons[DDD],cons[SRR],cons[LLL],cons[TAU]);
-        printf("prim: rho=%lg, vr=%lg, vp=%lg, P=%lg\n", prim[RHO],prim[URR],prim[UPP],prim[PPP]);
-        printf("cons2: rhostar=%lg, Sr=%lg, Sp=%lg, tau=%lg\n", cons2[DDD],cons2[SRR],cons2[LLL],cons2[TAU]);
-    }
 }
 
