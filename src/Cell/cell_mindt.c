@@ -62,6 +62,8 @@ double cell_maxvel_gr(double *prim, int dir, double w, double r, struct Sim *the
     else
         maxv = vm;
 
+    metric_destroy(g);
+
     return maxv;
 }
 

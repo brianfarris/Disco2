@@ -11,11 +11,10 @@
 void cell_single_init_isentrope(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
     double rho_ref  = 1.0;
     double P_ref  = 100.0;
+    double v_ref = 0.0;
     double GAMMALAW = sim_GAMMALAW(theSim);
     double L = 0.3;
     double a = 0.1;
-    double Jm = 1.0;
-    double K = P_ref / pow(rho_ref, GAMMALAW);
     double rho, P, v;
 
     double rm = sim_FacePos(theSim,i-1,R_DIR);
@@ -28,14 +27,23 @@ void cell_single_init_isentrope(struct Cell *theCell, struct Sim *theSim,int i,i
     double x = r * cos(t) / L;
 
     if(fabs(x) < 1.0)
+    {
+        double cs, Jm, Js;
         rho = rho_ref*(1.0 + a*(x*x-1.0)*(x*x-1.0)*(x*x-1.0)*(x*x-1.0));
+        P = P_ref * pow(rho / rho_ref, GAMMALAW);
+        
+        cs = sqrt(GAMMALAW * P / (rho + GAMMALAW * P /(GAMMALAW-1.0)));
+        Jm = 0.5 * log((1+v_ref)/(1-v_ref)) - log((sqrt(GAMMALAW-1)+cs)/(sqrt(GAMMALAW-1)-cs)) / sqrt(GAMMALAW-1);
+        Js = exp(2*Jm + log((sqrt(GAMMALAW-1)+cs)/(sqrt(GAMMALAW-1)-cs))/sqrt(GAMMALAW-1));
+        
+        v = (Js - 1.0) / (Js + 1.0);
+    }
     else
+    {
         rho = rho_ref;
-
-    P = K * pow(rho, GAMMALAW);
-    double cs = sqrt(GAMMALAW * P / (rho + GAMMALAW * P /(GAMMALAW-1.0)));
-    double Js = exp(2*Jm + log((sqrt(GAMMALAW-1)+cs)/(sqrt(GAMMALAW-1)-cs))/sqrt(GAMMALAW-1));
-    v = (Js - 1.0) / (Js + 1.0);
+        P = P_ref;
+        v = v_ref;
+    }
 
     theCell->prim[RHO] = rho;
     theCell->prim[PPP] = P;
@@ -54,10 +62,10 @@ void cell_init_isentrope(struct Cell ***theCells,struct Sim *theSim,struct MPIse
 {
     double rho_ref  = 1.0;
     double P_ref  = 100.0;
+    double v_ref  = 0.0;
     double GAMMALAW = sim_GAMMALAW(theSim);
     double L = 0.3;
     double a = 0.1;
-    double Jm = 1.0;
     double K = P_ref / pow(rho_ref, GAMMALAW);
     double rho, P, v;
 
@@ -78,13 +86,23 @@ void cell_init_isentrope(struct Cell ***theCells,struct Sim *theSim,struct MPIse
                 double x = r * cos(t) / L;
 
                 if(fabs(x) < 1.0)
+                {
+                    double cs, Jm, Js;
                     rho = rho_ref*(1.0 + a*(x*x-1.0)*(x*x-1.0)*(x*x-1.0)*(x*x-1.0));
+                    P = P_ref * pow(rho / rho_ref, GAMMALAW);
+                    
+                    cs = sqrt(GAMMALAW * P / (rho + GAMMALAW * P /(GAMMALAW-1.0)));
+                    Jm = 0.5 * log((1+v_ref)/(1-v_ref)) - log((sqrt(GAMMALAW-1)+cs)/(sqrt(GAMMALAW-1)-cs)) / sqrt(GAMMALAW-1);
+                    Js = exp(2*Jm + log((sqrt(GAMMALAW-1)+cs)/(sqrt(GAMMALAW-1)-cs))/sqrt(GAMMALAW-1));
+                    
+                    v = (Js - 1.0) / (Js + 1.0);
+                }
                 else
+                {
                     rho = rho_ref;
-                P = K * pow(rho, GAMMALAW);
-                double cs = sqrt(GAMMALAW * P / (rho + GAMMALAW * P /(GAMMALAW-1.0)));
-                double Js = exp(2*Jm + log((sqrt(GAMMALAW-1)+cs)/(sqrt(GAMMALAW-1)-cs))/sqrt(GAMMALAW-1));
-                v = (Js - 1.0) / (Js + 1.0);
+                    P = P_ref;
+                    v = v_ref;
+                }
 
                 theCells[k][i][j].prim[RHO] = rho;
                 theCells[k][i][j].prim[PPP] = P;
