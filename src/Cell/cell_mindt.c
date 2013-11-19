@@ -57,11 +57,6 @@ double cell_maxvel_gr(double *prim, int dir, double w, double r, struct Sim *the
     vm = fabs((vn - sig*bn - dv) / (1.0+sig));
     vp = fabs((vn - sig*bn + dv) / (1.0+sig));
 
-    vm = fabs(-a*sqrt(gam)-bn);
-    vp = fabs( a*sqrt(gam)-bn);
-
-//    printf("MaxVel: r = %lg, |vm| = %lg, |vp| = %lg\n", r, vm, vp);
-
     if(vm < vp)
         maxv = vp;
     else
