@@ -154,12 +154,21 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
 
     rho = rhostar/(sqrtg*w);
     if(rho < RHO_FLOOR)
+    {
         rho = RHO_FLOOR;
+        printf("Whoa, not enough density pal!\n");
+    }
     Pp = gam * rho * hmo;
     if(Pp < CS_FLOOR*CS_FLOOR*rho*(hmo+1)/GAMMALAW)
+    {
         Pp = CS_FLOOR*CS_FLOOR*rho*(hmo+1)/GAMMALAW;
+        printf("Whoa, that's a pretty low pressure bub!\n");
+    }
     if(Pp > CS_CAP*CS_CAP*rho*(hmo+1)/GAMMALAW)
+    {
         Pp = CS_CAP*CS_CAP*rho*(hmo+1)/GAMMALAW;
+        printf("Whoa, that's a really high pressure chum!\n");
+    }
 
     for(i=0; i<3; i++)
     {
@@ -181,7 +190,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
 
     metric_destroy(g);
 
-    if(r > 9.0e-9 && r < 2.1e-8)
+    if(PRINTTOOMUCH)
     {
         double cons2[sim_NUM_Q(theSim)];
         cell_prim2cons(prim,cons2,r,dV,theSim);

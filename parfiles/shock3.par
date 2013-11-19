@@ -10,7 +10,7 @@ Metric                  0       //0 Flat, 1 Schwarzschild, 2 Kerr
 Restart                 0       //If this=1 restart using input.h5
 
 //Computational Grid
-NumR			8			//Radial Zones
+NumR			4			//Radial Zones
 NumZ			128			//Vertical Zones
 ng              2
 R_Min		    0.2	
@@ -48,7 +48,7 @@ PHI_ORDER               2
 
 //Atmosphere Parameters
 Rho_Floor		0.00001
-Cs_Floor		0.0001		
+Cs_Floor		0.00001		
 Cs_Cap			100.0
 Vel_Cap			100.0
 

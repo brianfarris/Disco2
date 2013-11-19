@@ -75,10 +75,10 @@ void riemann_set_vel_gr(struct Riemann *theRiemann, struct Sim *theSim, double r
     Sr1 = (vnL - sig*bn + dv) / (1.0+sig);
 
     //TODO: Remove: Lax-Friedrichs
-    Sl1 = -a*sqrt(gam) - bn;
-    Sr1 = a*sqrt(gam) - bn;
-    Sl1 = -1.0;
-    Sr1 = 1.0;
+//    Sl1 = -a*sqrt(gam) - bn;
+//    Sr1 = a*sqrt(gam) - bn;
+//    Sl1 = -1.0;
+//    Sr1 = 1.0;
 
     double vnR,cf22,mnR;
     double FR[3],FmR[3];
@@ -95,10 +95,10 @@ void riemann_set_vel_gr(struct Riemann *theRiemann, struct Sim *theSim, double r
     Sr2 = (vnR - sig*bn + dv) / (1.0+sig);
 
     //Lax-Friedrichs
-    Sl2 = -a*sqrt(gam) - bn;
-    Sr2 = a*sqrt(gam) - bn;
-    Sl2 = -1.0;
-    Sr2 = 1.0;
+//    Sl2 = -a*sqrt(gam) - bn;
+//    Sr2 = a*sqrt(gam) - bn;
+//    Sl2 = -1.0;
+//    Sr2 = 1.0;
 
     if(Sl1 > Sl2)
         Sl = Sl2;
@@ -109,10 +109,15 @@ void riemann_set_vel_gr(struct Riemann *theRiemann, struct Sim *theSim, double r
     else
         Sr = Sr1;
 
+    //Fluxes in orthonormal basis
+    if(dir == 1)
+    {
+        Sl *= r;
+        Sr *= r;
+    }
+
   theRiemann->Sl = Sl;
   theRiemann->Sr = Sr;
-//  theRiemann->Sl = -1.0;
-//  theRiemann->Sr = 1.0;
 
   //TODO: This is only used for HLLC and is WRONG.
   theRiemann->Ss = (Sl+Sr)/2;
