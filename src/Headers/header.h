@@ -16,11 +16,11 @@ enum{HLLC,HLL};
 MPI_Comm sim_comm;
 #define farris_mpi_factorization 0
 #define NO_W_IN_CFL 0
-#define KEP_BNDRY 0
+#define KEP_BNDRY 1
 #define BzZ 0
 #define BNORM_AVG 1
 #define VISC_CONST -1   //if ==1 then nu=cst else alpha law unless IC=shear - see Riemann_routines.c
 #define VISC_OLD 0     // 0 off 1 on
 #define INCLUDE_ALL_VISC_TERMS 1  // 0 -> only rphi terms 1 all terms
-//#define CHECKPOINTING 
+//#define CHECKPOINTING //Uncomment to use checkpointing in hdf5 parallel installed!
 double time_global;

@@ -27,8 +27,8 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 	//double Mach   = 10.0 *pow(sep,(-0.5)) ; //For uniform cs
 	double Mach   = 20.0;                   //For uniform Mach	
 
-	double eps0 = sim_G_EPS(theSim)*r0;
-	double eps1 = sim_G_EPS(theSim)*r1;
+	double eps0 = sim_G_EPS(theSim); //*r0;
+	double eps1 = sim_G_EPS(theSim); //*r1;
 	
 	double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
 	
@@ -69,6 +69,7 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 	omega = sqrt(O2);
    
 	double cs = r*omega/Mach;
+	//	double cs = pow(r,-0.5)/Mach;
 	double vr;
 	vr = 0.0;
 
@@ -119,8 +120,8 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
  // double Mach   =  10.0 *pow(sep,(-0.5)) ; //For uniform cs
   double Mach   =  20.0;                   //For unifrom Mach
 
-  double eps0 = sim_G_EPS(theSim)*r0;
-  double eps1 = sim_G_EPS(theSim)*r1;
+  double eps0 = sim_G_EPS(theSim);  //*r0;
+  double eps1 = sim_G_EPS(theSim);  //*r1;
   
   double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
 
@@ -171,7 +172,8 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
         double vr;
 	omega = sqrt(O2);//*pow(r,2.);
 
-	double cs = r*omega/Mach;
+      	double cs = r*omega/Mach;
+	//        double cs = pow(r,-0.5)/Mach;
 	vr = 0.0;
 
 //        if (r<sep){
