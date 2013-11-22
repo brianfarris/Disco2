@@ -14,7 +14,8 @@ void cell_single_init_isentrope(struct Cell *theCell, struct Sim *theSim,int i,i
     double v_ref = 0.0;
     double GAMMALAW = sim_GAMMALAW(theSim);
     double L = 0.3;
-    double a = 0.1;
+    double a = 1.0;
+    double x0 = 0.0;
     double rho, P, v;
 
     double rm = sim_FacePos(theSim,i-1,R_DIR);
@@ -24,17 +25,19 @@ void cell_single_init_isentrope(struct Cell *theCell, struct Sim *theSim,int i,i
     double zp = sim_FacePos(theSim,k,Z_DIR);
     double z = 0.5*(zm+zp);
     double t = theCell->tiph-.5*theCell->dphi;
-    double x = r * cos(t) / L;
+    double x = (r*cos(t) - x0) / L;
+    //x = z / L;
 
     if(fabs(x) < 1.0)
     {
-        double cs, Jm, Js;
+        double cs, cs_ref, Jm, Js;
         rho = rho_ref*(1.0 + a*(x*x-1.0)*(x*x-1.0)*(x*x-1.0)*(x*x-1.0));
         P = P_ref * pow(rho / rho_ref, GAMMALAW);
         
         cs = sqrt(GAMMALAW * P / (rho + GAMMALAW * P /(GAMMALAW-1.0)));
-        Jm = 0.5 * log((1+v_ref)/(1-v_ref)) - log((sqrt(GAMMALAW-1)+cs)/(sqrt(GAMMALAW-1)-cs)) / sqrt(GAMMALAW-1);
-        Js = exp(2*Jm + log((sqrt(GAMMALAW-1)+cs)/(sqrt(GAMMALAW-1)-cs))/sqrt(GAMMALAW-1));
+        cs_ref = sqrt(GAMMALAW * P_ref / (rho_ref + GAMMALAW * P_ref /(GAMMALAW-1.0)));
+        Jm = 0.5 * log((1.0+v_ref)/(1.0-v_ref)) - log((sqrt(GAMMALAW-1)+cs_ref)/(sqrt(GAMMALAW-1)-cs_ref)) / sqrt(GAMMALAW-1);
+        Js = exp(2*Jm + 2*log((sqrt(GAMMALAW-1)+cs)/(sqrt(GAMMALAW-1)-cs))/sqrt(GAMMALAW-1));
         
         v = (Js - 1.0) / (Js + 1.0);
     }
@@ -47,8 +50,8 @@ void cell_single_init_isentrope(struct Cell *theCell, struct Sim *theSim,int i,i
 
     theCell->prim[RHO] = rho;
     theCell->prim[PPP] = P;
-    theCell->prim[URR] = v*cos(t);
-    theCell->prim[UPP] = -v*sin(t) / r;
+    theCell->prim[URR] = v * cos(t);
+    theCell->prim[UPP] = -v * sin(t) / r;
     theCell->prim[UZZ] = 0.0;
     theCell->divB = 0.0;
     theCell->GradPsi[0] = 0.0;
@@ -65,7 +68,8 @@ void cell_init_isentrope(struct Cell ***theCells,struct Sim *theSim,struct MPIse
     double v_ref  = 0.0;
     double GAMMALAW = sim_GAMMALAW(theSim);
     double L = 0.3;
-    double a = 0.1;
+    double a = 1.0;
+    double x0 = 0.0;
     double K = P_ref / pow(rho_ref, GAMMALAW);
     double rho, P, v;
 
@@ -83,17 +87,19 @@ void cell_init_isentrope(struct Cell ***theCells,struct Sim *theSim,struct MPIse
             for (j = 0; j < sim_N_p(theSim,i); j++) 
             {
                 double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
-                double x = r * cos(t) / L;
+                double x = (r*cos(t) - x0) / L;
+                //x = z / L;
 
                 if(fabs(x) < 1.0)
                 {
-                    double cs, Jm, Js;
+                    double cs, cs_ref, Jm, Js;
                     rho = rho_ref*(1.0 + a*(x*x-1.0)*(x*x-1.0)*(x*x-1.0)*(x*x-1.0));
                     P = P_ref * pow(rho / rho_ref, GAMMALAW);
                     
                     cs = sqrt(GAMMALAW * P / (rho + GAMMALAW * P /(GAMMALAW-1.0)));
-                    Jm = 0.5 * log((1+v_ref)/(1-v_ref)) - log((sqrt(GAMMALAW-1)+cs)/(sqrt(GAMMALAW-1)-cs)) / sqrt(GAMMALAW-1);
-                    Js = exp(2*Jm + log((sqrt(GAMMALAW-1)+cs)/(sqrt(GAMMALAW-1)-cs))/sqrt(GAMMALAW-1));
+                    cs_ref = sqrt(GAMMALAW * P_ref / (rho_ref + GAMMALAW * P_ref /(GAMMALAW-1.0)));
+                    Jm = 0.5 * log((1.0+v_ref)/(1.0-v_ref)) - log((sqrt(GAMMALAW-1)+cs_ref)/(sqrt(GAMMALAW-1)-cs_ref)) / sqrt(GAMMALAW-1);
+                    Js = exp(2*Jm + 2*log((sqrt(GAMMALAW-1)+cs)/(sqrt(GAMMALAW-1)-cs))/sqrt(GAMMALAW-1));
                     
                     v = (Js - 1.0) / (Js + 1.0);
                 }
@@ -113,6 +119,7 @@ void cell_init_isentrope(struct Cell ***theCells,struct Sim *theSim,struct MPIse
                 theCells[k][i][j].GradPsi[0] = 0.0;
                 theCells[k][i][j].GradPsi[1] = 0.0;
                 theCells[k][i][j].GradPsi[2] = 0.0;
+
             }
         }
     }
