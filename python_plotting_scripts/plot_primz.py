@@ -33,8 +33,8 @@ f.close()
 #convert to cartesian
 x = r * np.cos(phi)
 y = r * np.sin(phi)
-vx = vr * cos(phi) - r * vphi * sin(phi) 
-vy = vr * sin(phi) + r * vphi * cos(phi) 
+vx = vr * np.cos(phi) - r * vphi * np.sin(phi) 
+vy = vr * np.sin(phi) + r * vphi * np.cos(phi) 
 
 
 # plot.                                                                               

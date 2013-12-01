@@ -54,8 +54,16 @@ double cell_maxvel_gr(double *prim, int dir, double w, double r, struct Sim *the
     sig = cs2 / ((1-cs2)*u02*a*a);
     dv = sqrt(sig*(1.0+sig)*a*a*gam - sig*(vn+bn)*(vn+bn));
 
-    vm = fabs((vn - sig*bn - dv) / (1.0+sig));
-    vp = fabs((vn - sig*bn + dv) / (1.0+sig));
+    if(dir == PDIRECTION)
+    {
+        vm = fabs((vn - sig*bn - dv) / (1.0+sig) - w);
+        vp = fabs((vn - sig*bn + dv) / (1.0+sig) - w);
+    }
+    else
+    {
+        vm = fabs((vn - sig*bn - dv) / (1.0+sig));
+        vp = fabs((vn - sig*bn + dv) / (1.0+sig));
+    }
 
     if(vm < vp)
         maxv = vp;
@@ -152,11 +160,8 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
     MPI_Allreduce( &dt_m , &dt2 , 1 , MPI_DOUBLE , MPI_MIN , sim_comm );
 
     double dt_newt = cell_mindt_newt(theCells, theSim);
-    printf("\nNewtonian dt: %lg, GR dt: %lg\n", dt_newt, dt2);
+    //printf("\nNewtonian dt: %lg, GR dt: %lg\n", dt_newt, dt2);
 
     return dt2;
 }
-
-
-
 

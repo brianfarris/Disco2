@@ -15,7 +15,7 @@ void cell_single_init_isentrope(struct Cell *theCell, struct Sim *theSim,int i,i
     double GAMMALAW = sim_GAMMALAW(theSim);
     double L = 0.3;
     double a = 1.0;
-    double x0 = 0.0;
+    double x0 = 0.5;
     double rho, P, v;
 
     double rm = sim_FacePos(theSim,i-1,R_DIR);
@@ -26,7 +26,7 @@ void cell_single_init_isentrope(struct Cell *theCell, struct Sim *theSim,int i,i
     double z = 0.5*(zm+zp);
     double t = theCell->tiph-.5*theCell->dphi;
     double x = (r*cos(t) - x0) / L;
-    //x = z / L;
+    //x = (z-x0) / L;
 
     if(fabs(x) < 1.0)
     {
@@ -69,7 +69,7 @@ void cell_init_isentrope(struct Cell ***theCells,struct Sim *theSim,struct MPIse
     double GAMMALAW = sim_GAMMALAW(theSim);
     double L = 0.3;
     double a = 1.0;
-    double x0 = 0.0;
+    double x0 = 0.5;
     double K = P_ref / pow(rho_ref, GAMMALAW);
     double rho, P, v;
 
@@ -88,7 +88,7 @@ void cell_init_isentrope(struct Cell ***theCells,struct Sim *theSim,struct MPIse
             {
                 double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
                 double x = (r*cos(t) - x0) / L;
-                //x = z / L;
+                //x = (z-x0) / L;
 
                 if(fabs(x) < 1.0)
                 {
