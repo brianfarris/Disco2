@@ -19,6 +19,8 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         double r = 0.5*(rm+rp);
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           int jp = j+1;
+          if(jp == sim_N_p(theSim,i))
+            jp = 0;
           double w  = theCells[k][i][j ].prim[UPP];
           double wp = theCells[k][i][jp].prim[UPP];
           theCells[k][i][j].wiph = .5*r*(w+wp);
