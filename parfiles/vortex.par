@@ -18,7 +18,7 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                0.02
+Time_Max                20.0
 Num_Checkpoints	        2	
 Num_Diag_Dump           20
 Num_Diag_Measure        20
