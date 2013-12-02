@@ -31,7 +31,7 @@ ZeroPsiBndry          1
 
 Move_Cells              3
 RiemannSolver           0           // 0 hllc, 1 hll
-Adiabatic_Index		1.6666666666
+Adiabatic_Index		1.4
 
 //Numerical Parameters
 CFL			0.5
