@@ -208,7 +208,7 @@ void cell_syncproc_z( struct Cell *** theCells , struct Sim *theSim,struct MPIse
 
     //cleanup
     free(buffer_z_low_send);
-    free(buffer_z_low_recv);    
+    free(buffer_z_low_recv);
     free(buffer_z_hi_send);
     free(buffer_z_hi_recv);
   }
