@@ -159,7 +159,6 @@ void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCell
   if (sim_N_global(theSim,Z_DIR)>1){
     cell_syncproc_z(theCells,theSim,theMPIsetup);
   }
-  printf("hello 6\n");
 }
 
 
