@@ -5,7 +5,7 @@
 #Torque directives
 #PBS -N Big_DISCO_sub.sh
 #PBS -W group_list=yetiastro
-#PBS -l nodes=8:ppn=8,walltime=00:36:00:00,mem=128000mb
+#PBS -l nodes=8:ppn=8,walltime=00:36:00:00,mem=64000mb
 #PBS -M djd2134@columbia.edu
 #PBS -m abe
 #PBS -V

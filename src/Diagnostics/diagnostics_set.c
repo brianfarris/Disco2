@@ -201,7 +201,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (rho*vr*cos(2.*phi)/sim_N_p(theSim,i)*dz) ;
 	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (rho*vr*sin(2.*phi)/sim_N_p(theSim,i)*dz) ;
           // Don't count torques within a certain radius from secondary add r and 2pi for integration
-	  if (dist_bh1 > 1.0*Rhill && r>0.4){
+	  if (dist_bh1 > Rhill && r>0.4){
 	          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (2.*M_PI*r*rho*dPhi_dphi_S/sim_N_p(theSim,i)*dz); //2pi/Nphi = dphi
 		  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+20] += (2.*M_PI*r*rho*dPhi_dphi_S/sim_N_p(theSim,i)*dz); //DD added only secondary Pot 
 	  }else{
@@ -234,12 +234,12 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       double rp = sim_FacePos(theSim,i,R_DIR);
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       for (n=0;n<NUM_SCAL;++n){
-	if (n==10 || n==19){// || n==17){ //Sum (don't average) total torque)
-	    ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp-rm);
-	}else{
+	//if (n==10 || n==19){// || n==17){ //Sum (don't average) total torque)
+	//    ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp-rm);
+	//}else{
 	    // mult by delta r^2 because we are doing an r integration 
-	    ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp*rp-rm*rm); 
-	}
+	ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp*rp-rm*rm); 
+	    //}
 	       
       }
     }
@@ -328,9 +328,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 
 
     // Torques at each measure - not averaged - pipe to Binary Params output file
-    double Tr =   ScalarDiag_reduce[10]/(ZMAX-ZMIN);; 
-    double Tr2p = ScalarDiag_reduce[19]/(ZMAX-ZMIN);;
-    double dSTr = ScalarDiag_reduce[18]/(ZMAX-ZMIN);;
+    double Tr =   ScalarDiag_reduce[10] /(ZMAX-ZMIN);; 
+    double Tr2p = ScalarDiag_reduce[19] /(ZMAX-ZMIN);;
+    double dSTr = ScalarDiag_reduce[18] /(ZMAX-ZMIN);;
 
    
     for (n=0;n<NUM_SCAL;++n){
@@ -397,7 +397,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 		char DiagBPFilename[256];
 		sprintf(DiagBPFilename,"BinaryParams.dat");
 		FILE * DiagBpFile = fopen(DiagBPFilename,"a");
-		fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, L0, L1, vr0, Om, Fr1, Fp1,Tr,dSTr, Tr2p );       
+		fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, L0, L1, vr0, Om, Fr1, Fp1,Tr, dSTr, Tr2p );       
 		fclose(DiagBpFile);
 	}	
 

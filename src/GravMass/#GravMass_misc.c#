@@ -230,8 +230,7 @@ void gravMass_update_RK( struct Cell *** theCells, struct GravMass * theGravMass
     theGravMasses[i].E     = (1.0-RK)*theGravMasses[i].E   + RK*theGravMasses[i].RK_E;
     theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr  + RK*theGravMasses[i].RK_vr; 
     if ( (sim_GravMassType(theSim)==LIVEBINARY) && (time_global > sim_tmig_on(theSim)) ){
-                GravMass_set_Fr(theGravMasses, i, 0.0);
-		GravMass_set_Fp(theGravMasses, i, 0.0);
+                set_
 		cell_gravMassForcePlanets( theSim, theCells, theGravMasses );
 		
 

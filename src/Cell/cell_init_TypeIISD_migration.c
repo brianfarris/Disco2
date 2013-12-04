@@ -71,7 +71,8 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 	double cs = r*omega/Mach;
 	//	double cs = pow(r,-0.5)/Mach;
 	double vr;
-	vr = 0.0;
+	//vr = 0.0;
+	vr = -3./2.*DISK_ALPHA/r;
 
 	//if (r<sep){
 	//  omega = sqrt(O2);//*pow(r,2.);
@@ -174,7 +175,7 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
 
       	double cs = r*omega/Mach;
 	//        double cs = pow(r,-0.5)/Mach;
-	vr = 0.0;
+	vr = -3./2.*DISK_ALPHA/r;
 
 //        if (r<sep){
 //	  omega = sqrt(O2);//*pow(r,2.);
