@@ -1,7 +1,7 @@
 
 //Disco Parameter File//
 
-InitialDataType         3              
+InitialDataType        -1 //DELIBERATELY SET TO -1, ADD SHOCK1 to "headers.h" to use              
 GravMassType            0               // 0 none, 1 single, 2 binary
 Restart			0		//If this=1 restart using input.h5
 
