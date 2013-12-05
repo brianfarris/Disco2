@@ -35,11 +35,11 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
     double pL = cL->tiph - .5*cL->dphi;
     double pR = cR->tiph - .5*cR->dphi;
     double dpL = face_cm(theFaces,n) - pL;
-    while( dpL >  M_PI ) dpL -= 2.*M_PI;
-    while( dpL < -M_PI ) dpL += 2.*M_PI;
+    while( dpL >  PHIMAX/2. ) dpL -= PHIMAX;
+    while( dpL < -PHIMAX/2. ) dpL += PHIMAX;
     double dpR = pR - face_cm(theFaces,n);
-    while( dpR >  M_PI ) dpR -= 2.*M_PI;
-    while( dpR < -M_PI ) dpR += 2.*M_PI;
+    while( dpR >  PHIMAX/2. ) dpR -= PHIMAX;
+    while( dpR < -PHIMAX/2. ) dpR += PHIMAX;
     double dA  = face_dA(theFaces,n);
     for( q=0 ; q<NUM_Q ; ++q ){
       double WL = cL->prim[q] + dpL*cL->gradp[q];
@@ -74,11 +74,11 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
     double pL = cL->tiph - .5*cL->dphi;
     double pR = cR->tiph - .5*cR->dphi;
     double dpL = face_cm(theFaces,n) - pL;
-    while( dpL >  M_PI ) dpL -= 2.*M_PI;
-    while( dpL < -M_PI ) dpL += 2.*M_PI;
+    while( dpL >  PHIMAX/2. ) dpL -= PHIMAX;
+    while( dpL < -PHIMAX/2. ) dpL += PHIMAX;
     double dpR = pR - face_cm(theFaces,n);
-    while( dpR >  M_PI ) dpR -= 2.*M_PI;
-    while( dpR < -M_PI ) dpR += 2.*M_PI;
+    while( dpR >  PHIMAX/2. ) dpR -= PHIMAX;
+    while( dpR < -PHIMAX/2. ) dpR += PHIMAX;
 
     for( q=0 ; q<NUM_Q ; ++q ){
       double WL = cL->prim[q] + dpL*cL->gradp[q];

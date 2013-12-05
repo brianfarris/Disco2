@@ -18,7 +18,7 @@ struct IO *io_create(struct Sim *theSim) {
 }
 
 void io_destroy(struct IO *theIO){
-  free(theIO->buffer[0]);
-  free(theIO->buffer);
+//  free(theIO->buffer[0]);
+//  free(theIO->buffer);
   free(theIO);
 }

@@ -20,7 +20,7 @@ void cell_single_init_stone(struct Cell *theCell, struct Sim *theSim,int i,int j
   double rho = 100.0;
   double Pp = cs*cs*rho/GAMMALAW;
 
-  theCell->prim[RHO] = 1.0;
+  theCell->prim[RHO] = rho;
   theCell->prim[PPP] = Pp;
   theCell->prim[URR] = 0.0;
   theCell->prim[UPP] = omega;
@@ -34,6 +34,8 @@ void cell_single_init_stone(struct Cell *theCell, struct Sim *theSim,int i,int j
   theCell->GradPsi[0] = 0.0;
   theCell->GradPsi[1] = 0.0;
   theCell->GradPsi[2] = 0.0;
+  printf("you shouldn't need to call this\n");
+  exit(1);
 }
 
 void cell_init_stone(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
@@ -42,7 +44,13 @@ void cell_init_stone(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
   double DISK_MACH = 20.;
   double GAMMALAW = sim_GAMMALAW(theSim);
   double H0     = 0.2;
-  double A_N    = H0*sqrt(rho0)*sqrt(15./16.)/(2.*M_PI);
+  //double A_N    = H0*sqrt(rho0)*sqrt(15./16.)/(2.*M_PI);
+  double A_N;
+  if (zero_bfields==1){
+    A_N = 0.0;
+  } else{
+    A_N = 0.1;
+  }
 
   srand(666 + mpisetup_MyProc(theMPIsetup));
   int i, j,k;

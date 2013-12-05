@@ -45,11 +45,11 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
   int j,jp;
   double p0 = cell_tiph(cell_single(theCells,i,sim_N_p(theSim,i)-1,k));
   int jpmin=0;
-  double dpmin=2.*M_PI;
+  double dpmin=PHIMAX;
   for( jp=0 ; jp<sim_N_p(theSim,i+rDir) ; ++jp ){
     double dp = cell_tiph(cell_single(theCells,i+rDir,jp,k+zDir))-p0;
-    while( dp > 2.*M_PI ) dp -= 2.*M_PI;
-    while( dp < 0.0 ) dp += 2.*M_PI;
+    while( dp > PHIMAX ) dp -= PHIMAX;
+    while( dp < 0.0 ) dp += PHIMAX;
     if( dpmin > dp ){
       dpmin = dp;
       jpmin = jp;
@@ -60,8 +60,8 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
     int jm = j-1;
     if(jm<0) jm = sim_N_p(theSim,i)-1;
     double dp  = cell_tiph(cell_single(theCells,i+rDir,jp,k+zDir))-cell_tiph(cell_single(theCells,i,jm,k));
-    while( dp > 2.*M_PI ) dp -= 2.*M_PI;
-    while( dp < 0.0 ) dp += 2.*M_PI;
+    while( dp > PHIMAX ) dp -= PHIMAX;
+    while( dp < 0.0 ) dp += PHIMAX;
     //First figure out if cell+ covers all of cell-, 
     //if so create one face out of cell-.
     if( cell_dphi(cell_single(theCells,i,j,k)) < dp ){
@@ -83,8 +83,8 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
         jp = 0;
       }
       dp  = cell_tiph(cell_single(theCells,i,j,k))-cell_tiph(cell_single(theCells,i+rDir,jp,k+zDir));
-      while( dp > M_PI ) dp -= 2.*M_PI;
-      while( dp < -M_PI ) dp += 2.*M_PI;
+      while( dp > PHIMAX/2. ) dp -= PHIMAX;
+      while( dp < -PHIMAX/2. ) dp += PHIMAX;
       while( dp > 0.0 ){
         //Step B: (optional) all faces formed out of part of cell- and all of cell+. ++jp;
         if ( mode==1 ){
@@ -95,8 +95,8 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
         ++jp;
         if( jp == sim_N_p(theSim,i+rDir) ) jp = 0;
         dp = cell_tiph(cell_single(theCells,i,j,k))-cell_tiph(cell_single(theCells,i+rDir,jp,k+zDir));
-        while( dp > M_PI ) dp -= 2.*M_PI;
-        while( dp < -M_PI ) dp += 2.*M_PI;
+        while( dp > PHIMAX/2. ) dp -= PHIMAX;
+        while( dp < -PHIMAX/2. ) dp += PHIMAX;
       }
       dp = cell_dphi(cell_single(theCells,i+rDir,jp,k+zDir))+dp;
       //Step C: face formed out of end of cell- and beginning of cell+.

@@ -17,7 +17,7 @@ void sim_set_N_p(struct Sim * theSim){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       double r = sim_FacePos(theSim,i,R_DIR);
       double dr = sim_FacePos(theSim,i,R_DIR)-sim_FacePos(theSim,i-1,R_DIR);
-      theSim->N_p[i] = (int)( 2.*M_PI*( 1. + (r/dr-1.)/theSim->aspect ) ) ;
+      theSim->N_p[i] = (int)( PHIMAX*( 1. + (r/dr-1.)/theSim->aspect ) ) ;
       if (theSim->NPCAP>0){
         if (theSim->N_p[i]>theSim->NPCAP) theSim->N_p[i] = theSim->NPCAP;
       }

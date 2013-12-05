@@ -121,13 +121,11 @@ int main(int argc, char **argv) {
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
     // here the actual timestep is taken
     timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
-
     // calculate diagnostics
     diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep,theMPIsetup,theGravMasses);
-    //write diagnostics to file
+  //write diagnostics to file
     MPI_Barrier(sim_comm);    
     diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
-
 #ifdef CHECKPOINTING
     // checkpointing
     if( timestep_get_t(theTimeStep)>io_tcheck(theIO)){ // time to write checkpoint file
@@ -138,17 +136,14 @@ int main(int argc, char **argv) {
     }
 #endif
   }
-
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);
-
   // clean up
   diagnostics_destroy(theDiagnostics,theSim);
   cell_destroy(theCells,theSim);
   sim_destroy(theSim);
   gravMass_destroy(theGravMasses);
-
 #ifdef CHECKPOINTING
   io_destroy(theIO);
 #endif

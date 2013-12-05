@@ -17,8 +17,8 @@ void cell_clean_pi(struct Cell *** theCells,struct Sim *theSim){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         double phi = theCells[k][i][j].tiph;
-        while( phi > 2.*M_PI ) phi -= 2.*M_PI;
-        while( phi < 0.0 ) phi += 2.*M_PI;
+        while( phi > PHIMAX ) phi -= PHIMAX;
+        while( phi < 0.0 ) phi += PHIMAX;
         theCells[k][i][j].tiph = phi;
       }
     }
@@ -66,8 +66,8 @@ void cell_update_phi( struct Cell *** theCells , struct Sim * theSim, double RK 
       double r = .5*(rm+rp);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
-        while( c->tiph - c->RKtiph >  M_PI ) c->RKtiph += 2.*M_PI;
-        while( c->tiph - c->RKtiph < -M_PI ) c->RKtiph -= 2.*M_PI;
+        while( c->tiph - c->RKtiph >  PHIMAX/2. ) c->RKtiph += PHIMAX;
+        while( c->tiph - c->RKtiph < -PHIMAX/2. ) c->RKtiph -= PHIMAX;
         c->tiph = (1.0-RK)*c->tiph + RK*c->RKtiph;
         double w = theCells[k][i][j].wiph;
         theCells[k][i][j].tiph += w*dt/r;
@@ -85,8 +85,8 @@ void cell_update_dphi( struct Cell *** theCells,struct Sim * theSim ){
         int jm = j-1;
         if( jm==-1 ) jm = sim_N_p(theSim,i)-1;
         double dphi = theCells[k][i][j].tiph - theCells[k][i][jm].tiph;
-        while( dphi > 2.*M_PI ) dphi -= 2.*M_PI;
-        while( dphi < 0.0 ) dphi += 2.*M_PI;
+        while( dphi > PHIMAX ) dphi -= PHIMAX;
+        while( dphi < 0.0 ) dphi += PHIMAX;
         theCells[k][i][j].dphi = dphi;
       }
     }

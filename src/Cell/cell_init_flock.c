@@ -16,7 +16,7 @@ void cell_single_init_flock(struct Cell *theCell, struct Sim *theSim,int i,int j
   double rp =  sim_FacePos(theSim,i,R_DIR);
   double r = .5*(rm+rp);
   double omega = 1./pow(r,1.5);
-  double cs = 1.0/DISK_MACH*omega*r;
+  double cs = 1.0/DISK_MACH;//*omega*r;
   double rho = 1.0;
   double Pp = cs*cs*rho/GAMMALAW;
 
@@ -49,19 +49,21 @@ void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       double rp = sim_FacePos(theSim,i,R_DIR);
       double r = 0.5*(rm+rp);
+      
       double omega = 1./pow(r,1.5);
-      double cs = 1.0/DISK_MACH*omega*r;
+      double cs = 1.0/DISK_MACH;//*omega*r;
       double rho = rho0;
       double Pp = cs*cs*rho/GAMMALAW;
 
       double Bz;
+      double delta=0.0;
       if ((r>2.)&&(r<3.)){
         double n=4.0;
         Bz = 0.05513/n;
+        delta = .001*( (double)rand()/(double)RAND_MAX - .5 );
       } else{
         Bz = 0.0;
       }
-      double delta = .001*( (double)rand()/(double)RAND_MAX - .5 );
 
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         theCells[k][i][j].prim[RHO] = rho;

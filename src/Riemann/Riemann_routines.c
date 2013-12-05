@@ -94,7 +94,8 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
   if( Sr < vnR + sqrt( cf22 ) ) Sr = vnR + sqrt( cf22 );
  
   double wp_a = theRiemann->n[1]*sim_W_A(theSim,r);
-  if (sim_runtype(theSim)==MHD){
+
+  if (sim_runtype(theSim)==MHD && DIVB_CH>0.00000001){
     if( Sl - wp_a > -DIVB_CH ) Sl = -DIVB_CH + wp_a;
     if( Sr - wp_a <  DIVB_CH ) Sr =  DIVB_CH + wp_a;
   }
@@ -485,10 +486,10 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
   double pR = cell_tiph(theRiemann->cR) - .5*cell_dphi(theRiemann->cR);   
   double dpL =  face_cm(theFaces,FaceNumber) - pL;
   double dpR = -face_cm(theFaces,FaceNumber) + pR;
-  while( dpL >  M_PI ) dpL -= 2.*M_PI;
-  while( dpL < -M_PI ) dpL += 2.*M_PI;
-  while( dpR >  M_PI ) dpR -= 2.*M_PI;
-  while( dpR < -M_PI ) dpR += 2.*M_PI;
+  while( dpL >  PHIMAX/2. ) dpL -= PHIMAX;
+  while( dpL < -PHIMAX/2. ) dpL += PHIMAX;
+  while( dpR >  PHIMAX/2. ) dpR -= PHIMAX;
+  while( dpR < -PHIMAX/2. ) dpR += PHIMAX;
   dpL = dpL;
   dpR = dpR;
   theRiemann->r = face_r(theFaces,FaceNumber);
@@ -670,7 +671,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   cell_add_cons(theRiemann->cR,LLL, dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
 
   //printf("n[0]: %d, n[1]: %d, r_cell_L: %e, r_cell_R: %e\n",theRiemann->n[0],theRiemann->n[1],theRiemann->r_cell_L,theRiemann->r_cell_R);
-
+/*
   if (sim_runtype(theSim)==1){
     int direction;
     if (theRiemann->n[RDIRECTION]==1){
@@ -686,6 +687,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     cell_add_GradPsi(theRiemann->cL,direction,Psi_face*theRiemann->dA/theRiemann->r);
     cell_add_GradPsi(theRiemann->cR,direction,-Psi_face*theRiemann->dA/theRiemann->r);
   }
+  */
 }
 
 
