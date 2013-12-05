@@ -2,7 +2,7 @@
 //Disco Parameter File//
 
 InitialDataType         10               // 0 Flock, 1 Shear 7 MM08 10 SSmigration
-GravMassType            3               // 0 none, 1 single, 2 binary, 3 live binary
+GravMassType            2               // 0 none, 1 single, 2 binary, 3 live binary
 MassRatio               0.0000209    // 0.0209M_{Th} for Mach=10
 sep0                    1.0            // starting binary separation 
                                         //(or permanent separations if GravMassType is not 3)
@@ -40,7 +40,7 @@ Explicit_Viscosity      -0.000025  // if nu cst in header.h then this should be 
 RhoSinkTimescale        -1.0   //BONDI ~number orbits needed to accrete local density -  negative means no sink
 
 Mdisk_ovr_Ms            15.0   //Fraction of secondary mass in disk r<a
-tmig_on                 25.0 //87.9646 //62.83138  // time when live binary turns on
+tmig_on                 0.0 //87.9646 //62.83138  // time when live binary turns on
 
 DivB_Ch			0.06		//Dedner divergence cleaning
 DivB_l			0.1

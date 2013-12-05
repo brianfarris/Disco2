@@ -235,11 +235,11 @@ void gravMass_update_RK( struct Cell *** theCells, struct GravMass * theGravMass
 		cell_gravMassForcePlanets( theSim, theCells, theGravMasses );
 		
 
-		//double r  = theGravMasses[i].r;
+		double r  = theGravMasses[i].r;
 		double Fp = theGravMasses[i].Fp;  //Right now this is the total torque
 		
 		
-		theGravMasses[i].L      += Fp*dt;  //Fp is total Torque in cell_source 
+		theGravMasses[i].L      += r*Fp*dt;  //Fp is total Torque in cell_source 
 		//theGravMasses[0].L      += 0.0; // For now only evolve secondary Angular momwntum
 		
 		//Keep track of a total E use 0 arbitrarily

@@ -17,7 +17,7 @@ double fgrav_neg_centrifugal( double M , double r , double eps, double n ){
   return( M*r*Om*Om );
 }
 
-void get_rho_sink( struct GravMass * theGravMasses, double RhoSinkTimescale, int p, double r, double phi, double rho, double * rho_sink){
+void get_rho_sink( struct GravMass * theGravMasses, double RhoSinkTimescale, int p, double r, double phi, double rho, double dt, double * rho_sink){
   double rp = gravMass_r(theGravMasses,p);
   double pp = gravMass_phi(theGravMasses,p);
   double cosp = cos(phi);
@@ -44,11 +44,11 @@ void get_rho_sink( struct GravMass * theGravMasses, double RhoSinkTimescale, int
   // From D'Angelo and Lubow - get q and Mach and MdoMs here!!!
   // if MdoMsec then q^2, if MdoMprim then q
   //double TBondi = 1.0;//1./(2.6*(10.0)/M_PI * 0.00209 *0.00209 * pow(20.,7.));
-
-  if (rho>0.00001){
-    *rho_sink = rho / (RhoSinkTimescale*2.0*M_PI)* exp(-script_r*script_r/(Racc*Racc));  //was sigma=0.25
+  
+  if (script_r > Racc){
+    *rho_sink = rho / (fmax(RhoSinkTimescale, dt*2.)); //* exp(-script_r*script_r/(Racc*Racc));  //was sigma=0.25
   }else{
-    *rho_sink=0.0;
+    *rho_sink = 0.0;
   }
     //}
 }
@@ -93,8 +93,8 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
 ///FOR LIVE BINARY UPDATE FORCES ON HOLES
 void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, struct GravMass * theGravMasses ){
 	///Set a density scale for feedback to holes
-        double dens_scale = (sim_Mdisk_ovr_Ms(theSim)/(1.+1./sim_MassRatio(theSim)))/(M_PI*sim_sep0(theSim)*sim_sep0(theSim)) 
-	  * exp(-sim_tmig_on(theSim)/( time_global+0.001 - sim_tmig_on(theSim) ));; //set density scale by frac of primary mass within a_0
+        double dens_scale = (sim_Mdisk_ovr_Ms(theSim)/(1.+1./sim_MassRatio(theSim)))/(M_PI*sim_sep0(theSim)*sim_sep0(theSim));// 
+  //* exp(-sim_tmig_on(theSim)/( time_global+0.001 - sim_tmig_on(theSim) ));; //set density scale by frac of primary mass within a_0
         // ABOVE^ Allow migration to turn on slowly
 	
 	double Rhill = ( gravMass_r(theGravMasses, 0) + gravMass_r(theGravMasses, 1) ) * pow((sim_MassRatio(theSim)/3.),(1./3.)); 
@@ -156,16 +156,16 @@ void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, str
                                                 // Fy is total force between hole and density patch * sin(a)
                                         //        Fy[p] += fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER )*sina*dm; //Newtons 3rd law so -- = +
 					    }else{
-					        Fr[0] -= 0.0;
-					        Fp[0] -= 0.0;
+					         Fr[0] -= 0.0;
+					         Fp[0] -= 0.0;
 					    }
 					}
 				// only applying force to secondary for now
 					if (p==1){
-					    if (script_r > Rhill && r>0.4){ //Only sum forces outside the secondary Hill radius & Damping Region
+					    if (script_r > 0.005 && r>0.4){ //Only sum forces outside the secondary Hill radius & Damping Region
 				         	gravMassForce(theGravMasses , theSim , p , r , phi , &ffr , &ffp );
 					        Fr[1] -= ffr*dm; //try Torque 
-					        Fp[1] -= r*ffp*dm;
+					        Fp[1] -= ffp*dm;
 
 						// Fx is total force between hole and density patch * cos(a)
 				  //	Fx[p] +=  fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER )*cosa*dm; //Newtons 3rd law so -- = +
@@ -273,7 +273,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         if (sim_RhoSinkTimescale(theSim)>0.0){
           double rho_sink;
           for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
-	      get_rho_sink(theGravMasses,sim_RhoSinkTimescale(theSim),p,gravdist,phi,rho, &rho_sink);
+	      get_rho_sink(theGravMasses,sim_RhoSinkTimescale(theSim),p,gravdist,phi,rho, dt, &rho_sink);
 	      c->cons[RHO] -= rho_sink * dt * dV;
           }
         }

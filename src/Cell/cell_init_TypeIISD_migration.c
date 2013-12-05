@@ -71,8 +71,11 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 	double cs = r*omega/Mach;
 	//	double cs = pow(r,-0.5)/Mach;
 	double vr;
-	//vr = 0.0;
-	vr = -3./2.*DISK_ALPHA/r;
+	if (DISK_ALPHA > 0.0){
+	  vr = -3./2.*DISK_ALPHA/r;
+	}else{
+	  vr =0.0;
+	}
 
 	//if (r<sep){
 	//  omega = sqrt(O2);//*pow(r,2.);
@@ -170,12 +173,18 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
         double omega = 1./pow(r,1.5);
         omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
 	double O2 = omega*omega; //+ cs*cs/r/r*( 2.*rs*rs/r/r - 3. ); Add Deriv of Pressure term
-        double vr;
+
 	omega = sqrt(O2);//*pow(r,2.);
 
       	double cs = r*omega/Mach;
 	//        double cs = pow(r,-0.5)/Mach;
-	vr = -3./2.*DISK_ALPHA/r;
+
+        double vr;
+        if (DISK_ALPHA > 0.0){
+          vr = -3./2.*DISK_ALPHA/r;
+	}else{
+          vr =0.0;
+	}
 
 //        if (r<sep){
 //	  omega = sqrt(O2);//*pow(r,2.);
