@@ -9,15 +9,15 @@ sep0                    1.0            // starting binary separation
 Restart			0		//If this=1 restart using input.h5
 
 //Computational Grid
-NumR			256			//Radial Zones
+NumR			1024			//Radial Zones
 NumZ			1			//Vertical Zones
 ng                      2
-R_Min			0.25   //was 0.05
+R_Min			0.1   //was 0.05
 R_Max			4.0
 Z_Min			-1.0
 Z_Max			1.0
 NP_CONST                -1 
-NPCAP                   1024 //aspect 1 out to >~2.3
+NPCAP                   4096 //aspect 1 out to >~2.3
 aspect                  1.0
 
 NUM_C                   5
@@ -27,7 +27,7 @@ Num_Checkpoints	        4.
 Num_Diag_Dump           100000.0
 Num_Diag_Measure        50000000.0
 
-NoInnerBC               0
+NoInnerBC               1
 BoundTypeR           	1               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ           	2               // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry          	1
@@ -64,12 +64,12 @@ SET_T                   1
 
 runtype                 0
 
-DAMP_TIME               1000.0        // Set negative to turn off
-RDAMP_INNER             0.4
+DAMP_TIME               1000000.0       // Set negative to turn off
+RDAMP_INNER             0.3
 RDAMP_OUTER             3.5
 
-RLogScale               1000.0//13.14   // Large numbers gives uniform spacing
-ZLogScale               1000.0
+RLogScale               10000.0//13.14   // Large numbers gives uniform spacing
+ZLogScale               10000.0
 HiResSigma              0.3    // SET IN sim_set.c
 HiResR0                 0.99    //SET IN sim_set.c
 HiResFac                5.0 //changes by factor of 1+HiResFac at r0.

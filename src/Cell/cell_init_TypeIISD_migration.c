@@ -64,17 +64,20 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 				
 
 	double omega = 1./pow(r,1.5);
+
+        double cs = r*omega/Mach;
+        //      double cs = pow(r,-0.5)/Mach; 
+
 	omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
-	double O2 = omega*omega; //+ cs*cs/r/r*( 2.*rs*rs/r/r - 3. ); Add Deriv of Pressure term
+	double O2 = omega*omega - omega*omega/Mach/Mach/Gam; // add 1/(sigma r) * dP/dr term
 	omega = sqrt(O2);
    
-	double cs = r*omega/Mach;
-	//	double cs = pow(r,-0.5)/Mach;
+
 	double vr;
 	if (DISK_ALPHA > 0.0){
 	  vr = -3./2.*DISK_ALPHA/r;
 	}else{
-	  vr =0.0;
+	  vr = 0.0;
 	}
 
 	//if (r<sep){
@@ -89,8 +92,8 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 	
 	if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
 				
-	double Pp = cs*cs*rho/Gam;	
-	
+	//double Pp = 1./20.*1./20.*rho/Gam; //cs*cs*rho/Gam * r;	//mult by r to get cst Pressure
+	double Pp = cs*cs*rho/Gam;
 	
 	theCell->prim[RHO] = rho*exp(fac*(Pot1+Pot2)/cs/cs);;
 	theCell->prim[PPP] = Pp*exp(fac*(Pot1+Pot2)/cs/cs);
@@ -171,13 +174,14 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
 	//double f = pow(1. - 0.0129692*sqrt(1./r),1./4.);
 	double rho = rho0; //pow(r,(-3./4.)) * pow(f,(14./5.));
         double omega = 1./pow(r,1.5);
+        double cs = r*omega/Mach;
+        //        double cs = pow(r,-0.5)/Mach; 
+
         omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
-	double O2 = omega*omega; //+ cs*cs/r/r*( 2.*rs*rs/r/r - 3. ); Add Deriv of Pressure term
+	double O2 = omega*omega - omega*omega/Mach/Mach/Gam; // 1/(r Sig)* dP/dr term
 
-	omega = sqrt(O2);//*pow(r,2.);
+	omega = sqrt(O2);
 
-      	double cs = r*omega/Mach;
-	//        double cs = pow(r,-0.5)/Mach;
 
         double vr;
         if (DISK_ALPHA > 0.0){
@@ -204,7 +208,9 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
         */
         if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
         
-        double Pp = cs*cs*rho/Gam;
+        //double Pp = 1/20.*1/20.*rho/Gam; //cs*cs*rho/Gam * r; //mult by r to get cst P
+	double Pp = cs*cs*rho/Gam; 
+	
 
         theCells[k][i][j].prim[RHO] = rho*exp(fac*(Pot1+Pot2)/cs/cs);
         theCells[k][i][j].prim[PPP] = Pp*exp(fac*(Pot1+Pot2)/cs/cs);

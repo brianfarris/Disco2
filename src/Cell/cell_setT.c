@@ -30,15 +30,20 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim ){
 	double massratio = sim_MassRatio(theSim);
 
 	double omega = 1./pow(r,1.5);
-	omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
-	double O2 = omega*omega; //+ cs*cs/r/r*( 2.*rs*rs/r/r - 3. ); Add Deriv of Pressure term
-	omega = sqrt(O2);
+
 	cs = HoR*omega*r;
+
+	omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
+	double O2 = omega*omega - omega*omega*HoR*HoR/sim_GAMMALAW(theSim);
+	omega = sqrt(O2);
+
 
 	//Omega_K = pow(r,-1.5);
 	//cs = HoR*Omega_K*r;
 
-	PoRho = cs*cs/sim_GAMMALAW(theSim);
+	//PoRho = 1./20.*1./20 / sim_GAMMALAW(theSim); //cs*cs/sim_GAMMALAW(theSim);
+        PoRho = cs*cs/sim_GAMMALAW(theSim);
+
 	//        if (r>1.){
 	//		Omega_K = pow(r,-1.5);
 	//        	cs = HoR*Omega_K*r;

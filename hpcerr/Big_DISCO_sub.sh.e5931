@@ -1,0 +1,5 @@
+=>> PBS: job killed: mem job total 158992856 kb exceeded limit 131072000 kb
+mpirun: killing job...
+
+mpirun: abort is already in progress...hit ctrl-c again to forcibly terminate
+

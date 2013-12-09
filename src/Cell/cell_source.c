@@ -33,7 +33,7 @@ void get_rho_sink( struct GravMass * theGravMasses, double RhoSinkTimescale, int
   double Rbondi = gravMass_M(theGravMasses,1) * 20.*20./( gravMass_r(theGravMasses,1)*gravMass_r(theGravMasses,1) *gravMass_omega(theGravMasses,1)*gravMass_omega(theGravMasses,1) ); //20 is the Mach number
   double Hscl = 1/20. * gravMass_r(theGravMasses,1);
   double Racc = fmin(Rhill, Rbondi);
-  Racc = fmin(Racc, Hscl);
+  //Racc = fmin(Racc, Hscl);
   // if (script_r > Racc) {
     //*rho_sink = 0.0;
     //}else{
@@ -45,7 +45,7 @@ void get_rho_sink( struct GravMass * theGravMasses, double RhoSinkTimescale, int
   // if MdoMsec then q^2, if MdoMprim then q
   //double TBondi = 1.0;//1./(2.6*(10.0)/M_PI * 0.00209 *0.00209 * pow(20.,7.));
   
-  if (script_r > Racc){
+  if (script_r < Racc){
     *rho_sink = rho / (fmax(RhoSinkTimescale, dt*2.)); //* exp(-script_r*script_r/(Racc*Racc));  //was sigma=0.25
   }else{
     *rho_sink = 0.0;
@@ -147,7 +147,7 @@ void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, str
 					double ffr;
 					double ffp;
 					if (p==0){
-					    if (r > 0.4){
+					    if (r > 0.3){
 					         gravMassForce( theGravMasses , theSim , p , r , phi , &ffr , &ffp );
 						 Fr[0] -= 0.0;//ffr*dm;
 						 Fp[0] -= 0.0;//ffp*dm;
@@ -162,7 +162,7 @@ void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, str
 					}
 				// only applying force to secondary for now
 					if (p==1){
-					    if (script_r > 0.005 && r>0.4){ //Only sum forces outside the secondary Hill radius & Damping Region
+					    if (script_r > Rhill && r>0.3){ //Only sum forces outside the secondary Hill radius & Damping Region
 				         	gravMassForce(theGravMasses , theSim , p , r , phi , &ffr , &ffp );
 					        Fr[1] -= ffr*dm; //try Torque 
 					        Fp[1] -= ffp*dm;
