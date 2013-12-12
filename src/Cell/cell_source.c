@@ -200,6 +200,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[LLL] -= POWELL*dt*divB*Bp*r;
           c->cons[TAU] -= POWELL*dt*(divB*vdotB+BdotGradPsi);
 
+          c->cons[TAU] += dt*dV*r*Br*Bp*drOm;
+
           //double psi = c->prim[PSI];
           //cons[BRR] += dt*dV*( psi )/r;
           //cons[PSI] -= dt*dV*psi*DIVB_CH/DIVB_L;//DIVB_CH2/DIVB_CP2;
@@ -208,7 +210,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           c->cons[BZZ] -= POWELL*dt*divB*vz;
           c->cons[PSI] -= POWELL*dt*vdotGradPsi;
 
-          c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
+          //c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
+          c->cons[BPP] += dt*dV*Br*drOm;
         }
       }
     }
