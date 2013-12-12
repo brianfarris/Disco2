@@ -140,11 +140,20 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           Fr += fr;
           Fp += fp;
         }
+        double F_centrifugal_r = cell_wiph(c)*cell_wiph(c)/r;
+        double F_coriolis_r =  2.*cell_wiph(c)*vp/r;
+        double F_coriolis_phi = -2.*cell_wiph(c)*vr/r;
+        double F_euler_phi = 0.0; // ONLY TRUE FOR cell_wiph = const !!!!
+        double drOm = 0.0;
+        if ((sim_InitialDataType(theSim)==FLOCK)||(sim_InitialDataType(theSim)==STONE)){
+          drOm = -1.5*cell_wiph(c)/r/r;
+          F_euler_phi =  -vr*r*drOm;
+        }
         c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;
-        c->cons[SRR] += dt*dV*rho*Fr*sint;
-        c->cons[LLL] += dt*dV*rho*Fp*r;
+        c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r+F_coriolis_r);
+        c->cons[LLL] += dt*dV*rho*(Fp+F_coriolis_phi+F_euler_phi)*r;
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
-        c->cons[TAU] += dt*dV*rho*( Fr*(vr*sint+vz*cost) + Fp*vp );
+        c->cons[TAU] += dt*dV*rho*( (Fr*sint+F_centrifugal_r)*vr+Fr*vz*cost + (Fp+F_euler_phi)*vp);
 
         if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
           total_torque_temp += Fp*r;
