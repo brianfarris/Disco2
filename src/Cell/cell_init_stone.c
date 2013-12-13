@@ -16,14 +16,14 @@ void cell_single_init_stone(struct Cell *theCell, struct Sim *theSim,int i,int j
   double rp =  sim_FacePos(theSim,i,R_DIR);
   double r = .5*(rm+rp);
   double omega = 1./pow(r,1.5);
-  double cs = 1.0/DISK_MACH*omega*r;
+  double cs = 1.0/DISK_MACH;//*omega*r;
   double rho = 100.0;
   double Pp = cs*cs*rho/GAMMALAW;
 
   theCell->prim[RHO] = rho;
   theCell->prim[PPP] = Pp;
   theCell->prim[URR] = 0.0;
-  theCell->prim[UPP] = omega;
+  theCell->prim[UPP] = 0.0;//omega;
   theCell->prim[UZZ] = 0.0;
   theCell->prim[BRR] = 0.0;
   theCell->prim[BPP] = 0.0;
@@ -34,8 +34,6 @@ void cell_single_init_stone(struct Cell *theCell, struct Sim *theSim,int i,int j
   theCell->GradPsi[0] = 0.0;
   theCell->GradPsi[1] = 0.0;
   theCell->GradPsi[2] = 0.0;
-  printf("you shouldn't need to call this\n");
-  exit(1);
 }
 
 void cell_init_stone(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
@@ -76,7 +74,7 @@ void cell_init_stone(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = Pp;
         theCells[k][i][j].prim[URR] = 0.0;
-        theCells[k][i][j].prim[UPP] = omega*(1.+delta);
+        theCells[k][i][j].prim[UPP] = omega*(/*1.+*/delta);
         theCells[k][i][j].prim[UZZ] = delta;
         theCells[k][i][j].prim[BRR] = 0.0;
         theCells[k][i][j].prim[BPP] = 0.0;

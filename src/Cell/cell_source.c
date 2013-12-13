@@ -13,7 +13,7 @@ double fgrav( double M , double r , double eps, double n ){
 }
 
 double fgrav_neg_centrifugal( double M , double r , double eps, double n ){
-  double Om = 20.0;
+  double Om = 0.0;
   return( M*r*Om*Om );
 }
 
@@ -148,7 +148,11 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         if ((sim_InitialDataType(theSim)==FLOCK)||(sim_InitialDataType(theSim)==STONE)){
           drOm = -1.5*cell_wiph(c)/r/r;
           F_euler_phi =  -vr*r*drOm;
+        } else if (sim_InitialDataType(theSim)==FIELDLOOP){
+          drOm = 0.0;
+          F_euler_phi = -vr*r*drOm;
         }
+        
         c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;
         c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r+F_coriolis_r);
         c->cons[LLL] += dt*dV*rho*(Fp+F_coriolis_phi+F_euler_phi)*r;

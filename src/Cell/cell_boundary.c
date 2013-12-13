@@ -53,7 +53,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
             }
             if( theCells[k][i][j].prim[URR] > 0.0 && diode==1) theCells[k][i][j].prim[URR] = 0.0;
             if (KEP_BNDRY==1){
-              theCells[k][i][j].prim[UPP] = /*0.0;*/ pow(r_cell,-1.5);          
+              theCells[k][i][j].prim[UPP] = 0.0;// pow(r_cell,-1.5);          
               //printf("hello rin. r_cell: %e\n",r_cell);
             }
           }
@@ -98,7 +98,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         }
         if( theCells[k][sim_N(theSim,R_DIR)-2][j].prim[URR] < 0.0 && diode==1 ) theCells[k][sim_N(theSim,R_DIR)-2][j].prim[URR] = 0.0;
         if (KEP_BNDRY==1){
-          theCells[k][sim_N(theSim,R_DIR)-2][j].prim[UPP] = /*0.0;*/ pow(r_cell,-1.5);
+          theCells[k][sim_N(theSim,R_DIR)-2][j].prim[UPP] = 0.0;// pow(r_cell,-1.5);
         }
       }
     }
@@ -135,7 +135,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         //theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] *= -1.; 
         if( theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] < 0.0 ) theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] = 0.0;
         if (KEP_BNDRY==1){
-          theCells[k][sim_N(theSim,R_DIR)-1][j].prim[UPP] = /*0.0;*/ pow(r_cell,-1.5);
+          theCells[k][sim_N(theSim,R_DIR)-1][j].prim[UPP] = 0.0;// pow(r_cell,-1.5);
         }
       }
 

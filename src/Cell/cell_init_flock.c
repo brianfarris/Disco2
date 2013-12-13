@@ -23,7 +23,7 @@ void cell_single_init_flock(struct Cell *theCell, struct Sim *theSim,int i,int j
   theCell->prim[RHO] = 1.0;
   theCell->prim[PPP] = Pp;
   theCell->prim[URR] = 0.0;
-  theCell->prim[UPP] = omega;
+  theCell->prim[UPP] = 0.0;//omega;
   theCell->prim[UZZ] = 0.0;
   theCell->prim[BRR] = 0.0;
   theCell->prim[BPP] = 0.0;
@@ -69,7 +69,7 @@ void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = Pp;
         theCells[k][i][j].prim[URR] = 0.0;
-        theCells[k][i][j].prim[UPP] = omega*(1.+delta);
+        theCells[k][i][j].prim[UPP] = omega*(/*1.+*/delta);
         theCells[k][i][j].prim[UZZ] = delta;
         theCells[k][i][j].prim[BRR] = 0.0;
         theCells[k][i][j].prim[BPP] = 0.0;

@@ -99,6 +99,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double psi = cell_prim(cell_single(theCells,i,j,k),PSI);
 
           double dV = 0.5*(rp*rp-rm*rm)*dphi;
+          double divB = fabs(cell_divB(theCells,i,j,k)/dV);
+          double GradPsi_r = cell_GradPsi(theCells,i,j,k,0)/dV;
+
           if (rp<=1.0){
             mass_inside_1_temp += rho*dV;
           }
@@ -162,9 +165,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = Bp*Bp;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+13] = 0.5*B2;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = Br*Bp;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = psi;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = divB;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+16] = 180./M_PI*0.5*asin(-Br*Bp/(0.5*B2));
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+17] = passive_scalar;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+17] = GradPsi_r;
             ++position;
           }
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
@@ -182,9 +185,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (Bp*Bp/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (psi/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (divB/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += (180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (passive_scalar/sim_N_p(theSim,i)*dz) ; 
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (GradPsi_r/sim_N_p(theSim,i)*dz) ; 
           // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }

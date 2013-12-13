@@ -594,7 +594,8 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   double w;
   if (theRiemann->n[PDIRECTION]){
     if( sim_MOVE_CELLS(theSim) == C_WRIEMANN ) cell_add_wiph(theRiemann->cL,theRiemann->Ss);
-    w = cell_wiph(theRiemann->cL);
+    //w = cell_wiph(theRiemann->cL);
+    w = 0.0;
   } else{
     w = 0.0;
   }
@@ -607,14 +608,14 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
     int q;
     for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
-      theRiemann->F[q] = theRiemann->FL[q] - w*theRiemann->UL[q];// w is only nonzero when we are in phi direction
+      theRiemann->F[q] = theRiemann->FL[q];// - w*theRiemann->UL[q];// w is only nonzero when we are in phi direction
     }
   } else if (theRiemann->state==RIGHT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,DIVB_CH,RIGHT);//in this case, we only need FR
     cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
     int q;
     for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
-      theRiemann->F[q] = theRiemann->FR[q] - w*theRiemann->UR[q];// w is only nonzero when we are in phi direction
+      theRiemann->F[q] = theRiemann->FR[q];// - w*theRiemann->UR[q];// w is only nonzero when we are in phi direction
     }
   } else{
     if (sim_Riemann(theSim)==HLL){
@@ -639,7 +640,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     }
     int q;
     for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
-      theRiemann->F[q] = theRiemann->Fstar[q] - w*theRiemann->Ustar[q];// w is only nonzero when we are in phi direction
+      theRiemann->F[q] = theRiemann->Fstar[q];// - w*theRiemann->Ustar[q];// w is only nonzero when we are in phi direction
     }
   }
 
@@ -671,7 +672,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   cell_add_cons(theRiemann->cR,LLL, dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
 
   //printf("n[0]: %d, n[1]: %d, r_cell_L: %e, r_cell_R: %e\n",theRiemann->n[0],theRiemann->n[1],theRiemann->r_cell_L,theRiemann->r_cell_R);
-/*
+
   if (sim_runtype(theSim)==1){
     int direction;
     if (theRiemann->n[RDIRECTION]==1){
@@ -687,7 +688,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     cell_add_GradPsi(theRiemann->cL,direction,Psi_face*theRiemann->dA/theRiemann->r);
     cell_add_GradPsi(theRiemann->cR,direction,-Psi_face*theRiemann->dA/theRiemann->r);
   }
-  */
+  
 }
 
 

@@ -12,7 +12,7 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
 
   double Rl = 0.15;
   double B0 = 0.01;
-  double Om = 20.0;
+  double Om = 0.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
   double xinner = 1.0;
@@ -45,7 +45,7 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
   theCell->prim[RHO] = Rho0;
   theCell->prim[PPP] = Pp+dP;
   theCell->prim[URR] = Vx*cos(phi);
-  theCell->prim[UPP] = omega-Vx*sin(phi);
+  theCell->prim[UPP] = 0.0;//omega-Vx*sin(phi);
   theCell->prim[UZZ] = 0.0;
   theCell->prim[BRR] =  Bx*cos(phi) + By*sin(phi);
   theCell->prim[BPP] = -Bx*sin(phi) + By*cos(phi);
@@ -62,7 +62,7 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
 
   double Rl = 0.15;
   double B0 = 0.01;
-  double Om = 20.0;
+  double Om = 0.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
   double xinner = 1.0;
@@ -99,7 +99,7 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
         theCells[k][i][j].prim[RHO] = Rho0;
         theCells[k][i][j].prim[PPP] = Pp+dP;
         theCells[k][i][j].prim[URR] = Vx*cos(phi);
-        theCells[k][i][j].prim[UPP] = omega-Vx*sin(phi);
+        theCells[k][i][j].prim[UPP] = 0.0;//omega-Vx*sin(phi);
         theCells[k][i][j].prim[UZZ] = 0.0;
         theCells[k][i][j].prim[BRR] =  Bx*cos(phi) + By*sin(phi);
         theCells[k][i][j].prim[BPP] = -Bx*sin(phi) + By*cos(phi);

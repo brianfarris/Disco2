@@ -35,7 +35,6 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim){
     double ch = sim_DIVB_CH(theSim); 
     if( maxv < ch ) maxv = ch;
   }
-
   return(maxv);
 
 }

@@ -6,7 +6,7 @@ enum{LEFT,LEFTSTAR,RIGHTSTAR,RIGHT};
 enum{EULER,MHD};
 enum{VAR_INT,VAR_DOUB,VAR_STR};
 enum{BOUND_FIXED,BOUND_OUTFLOW,BOUND_PERIODIC};
-enum{FLOCK,SHEAR,VORTEX,STONE,FIELDLOOP,PSIGRAD,TORUS,MILOS_MACFADYEN,MHDEXP,VISCRING,TESTING};
+enum{FLOCK,SHEAR,VORTEX,STONE,FIELDLOOP,PSIGRAD,TORUS,MILOS_MACFADYEN,MHDEXP,VISCRING,TESTING,DIVERGENCE};
 enum{NONE,SINGLE,BINARY};
 //unify the 2 below at some point
 enum{R_DIR,Z_DIR};
@@ -15,7 +15,7 @@ enum{HLLC,HLL};
 #include "mpi.h"
 MPI_Comm sim_comm;
 #define farris_mpi_factorization 0
-#define NO_W_IN_CFL 0
+#define NO_W_IN_CFL 1
 #define KEP_BNDRY 1
 #define BzZ 0
 #define BNORM_AVG 0
@@ -24,7 +24,7 @@ MPI_Comm sim_comm;
 #define INCLUDE_ALL_VISC_TERMS 1
 #define CHECKPOINTING 
 #define TVISC_FAC 1.0
-#define PHIMAX M_PI/3.
+#define PHIMAX 2.0*M_PI
 #define diode 0
-#define zero_bfields 1
+#define zero_bfields 0
 double time_global;

@@ -26,6 +26,8 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_viscring_cstnu);
   } else if (sim_InitialDataType(theSim)==TESTING){
     return(&cell_init_testing);
+  } else if (sim_InitialDataType(theSim)==DIVERGENCE){ 
+    return(&cell_init_divergence);
   } else{
     printf("ERROR\n");
     exit(0);
@@ -40,7 +42,7 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
   } else if (sim_InitialDataType(theSim)==VORTEX){
     return(&cell_single_init_vortex);
   } else if (sim_InitialDataType(theSim)==STONE){
-    return(&cell_single_init_vortex);
+    return(&cell_single_init_stone);
   } else if (sim_InitialDataType(theSim)==FIELDLOOP){
     return(&cell_single_init_fieldloop);
   } else if (sim_InitialDataType(theSim)==PSIGRAD){
@@ -53,6 +55,8 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_viscring_cstnu);
   } else if (sim_InitialDataType(theSim)==TESTING){
     return(&cell_single_init_testing);
+  } else if (sim_InitialDataType(theSim)==DIVERGENCE){
+    return(&cell_single_init_divergence);
   } else{
     printf("ERROR\n");
     exit(0);
