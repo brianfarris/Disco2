@@ -10,13 +10,13 @@
 
 void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
 
-  double Rl = 0.15;
+  double Rl = 0.25;
   double B0 = 0.01;
   double Om = 0.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
-  double xinner = 1.0;
-  double x0 = 0.3;
+  double xinner = 0.1;
+  double x0 = 0.4;
   double Vx = 0.0;
 
   double rm = sim_FacePos(theSim,i-1,R_DIR);
@@ -51,6 +51,7 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
   theCell->prim[BPP] = -Bx*sin(phi) + By*cos(phi);
   theCell->prim[BZZ] = 0.0;
   theCell->prim[PSI] = 0.0;
+  theCell->wiph = 0.0;
 
   theCell->divB = 0.0;
   theCell->GradPsi[0] = 0.0;
@@ -60,13 +61,13 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
 
 void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 
-  double Rl = 0.15;
+  double Rl = 0.25;
   double B0 = 0.01;
   double Om = 0.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
-  double xinner = 1.0;
-  double x0 = 0.3;
+  double xinner = 0.1;
+  double x0 = 0.4;
   double Vx = 0.0;
 
   int i, j,k;
@@ -105,6 +106,7 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
         theCells[k][i][j].prim[BPP] = -Bx*sin(phi) + By*cos(phi);
         theCells[k][i][j].prim[BZZ] = 0.0;
         theCells[k][i][j].prim[PSI] = 0.0;
+        theCells[k][i][j].wiph = 0.0;
 
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;

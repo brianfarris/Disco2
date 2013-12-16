@@ -24,7 +24,7 @@ MPI_Comm sim_comm;
 #define INCLUDE_ALL_VISC_TERMS 1
 #define CHECKPOINTING 
 #define TVISC_FAC 1.0
-#define PHIMAX 2.0*M_PI
+#define PHIMAX M_PI/3.0
 #define diode 0
 #define zero_bfields 0
 double time_global;

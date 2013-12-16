@@ -33,7 +33,7 @@ void cell_prim2cons( double * prim , double * cons , double r , double dV ,struc
     double B2 = Br*Br + Bp*Bp + Bz*Bz;
 
     cons[TAU] += .5*B2*dV;
-    cons[BRR] = Br*dV/r; // note that the conserved variable is Br/r. This helps us reduce geometric source terms
+    cons[BRR] = Br*dV;
     cons[BPP] = Bp*dV/r; // note that the conserved variable is Bp/r. This helps us reduce geometric source terms
     cons[BZZ] = Bz*dV;
     cons[PSI] = prim[PSI]*dV;
@@ -89,7 +89,7 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
 
   double B2 = 0.0;
   if (runtype==MHD){
-    double Br  = cons[BRR]/dV*r;
+    double Br  = cons[BRR]/dV;
     double Bp  = cons[BPP]/dV*r;
     double Bz  = cons[BZZ]/dV;
     B2 = Br*Br+Bp*Bp+Bz*Bz;
