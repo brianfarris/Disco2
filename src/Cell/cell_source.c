@@ -189,7 +189,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           GradPsi[1] = r*c->GradPsi[1];
           GradPsi[2] = r*c->GradPsi[2];
 
-          double vdotB = vr*Br+vp*Bp+vz*Bz;
+          double vdotB = vr*Br+(vp/*+pow(r,-.5)*/)*Bp+vz*Bz;
           double BdotGradPsi = /*dV**/(Br*GradPsi[0]+Bp*GradPsi[1]+Bz*GradPsi[2]);
           double vdotGradPsi = /*dV**/(vr*GradPsi[0]+(vp-sim_W_A(theSim,r))*GradPsi[1]+vz*GradPsi[2]);
 
@@ -199,23 +199,23 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
              }
              */
           c->cons[SRR] += dt*dV*( .5*B2 - Bp*Bp )/r;
-          c->cons[SRR] -= POWELL*dt*divB*Br;
-          c->cons[SZZ] -= POWELL*dt*divB*Bz;
-          c->cons[LLL] -= POWELL*dt*divB*Bp*r;
-          c->cons[TAU] -= POWELL*dt*(divB*vdotB+BdotGradPsi);
-
           c->cons[TAU] += dt*dV*r*Br*Bp*drOm;
-
-          //double psi = c->prim[PSI];
-          //cons[BRR] += dt*dV*( psi )/r;
+          double psi = c->prim[PSI];
+          c->cons[BRR] += dt*dV*( psi )/r;
           //cons[PSI] -= dt*dV*psi*DIVB_CH/DIVB_L;//DIVB_CH2/DIVB_CP2;
-          c->cons[BRR] -= POWELL*dt*divB*vr;
-          c->cons[BPP] -= POWELL*dt*divB*vp/r;
-          c->cons[BZZ] -= POWELL*dt*divB*vz;
-          c->cons[PSI] -= POWELL*dt*vdotGradPsi;
-
           //c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
           c->cons[BPP] += dt*dV*Br*drOm;
+
+          if (r>1. && r<4.){
+            c->cons[SRR] -= POWELL*dt*divB*Br;
+            c->cons[SZZ] -= POWELL*dt*divB*Bz;
+            c->cons[LLL] -= POWELL*dt*divB*Bp*r;
+            c->cons[TAU] -= POWELL*dt*(divB*vdotB+BdotGradPsi);
+            c->cons[BRR] -= POWELL*dt*divB*vr;
+            c->cons[BPP] -= POWELL*dt*divB*vp/r;
+            c->cons[BZZ] -= POWELL*dt*divB*vz;
+            c->cons[PSI] -= POWELL*dt*vdotGradPsi;
+          }
         }
       }
     }

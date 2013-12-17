@@ -11,12 +11,12 @@
 void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
 
   double Rl = 0.25;
-  double B0 = 0.01;
+  double B0 = 0.1;
   double Om = 0.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
   double xinner = 0.1;
-  double x0 = 0.4;
+  double x0 = 0.45;
   double Vx = 0.0;
 
   double rm = sim_FacePos(theSim,i-1,R_DIR);
@@ -25,7 +25,7 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
   double omega = Om;
   double Pp = P0;// + .5*Rho0*Om*Om*r*r;
 
-  double phi = theCell->tiph - .5*theCell->dphi;
+  double phi = theCell->tiph - .5*theCell->dphi - M_PI/4.0;
 
   double x = r*cos(phi)-x0;
   double y = r*sin(phi);
@@ -62,12 +62,12 @@ void cell_single_init_fieldloop(struct Cell *theCell, struct Sim *theSim,int i,i
 void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 
   double Rl = 0.25;
-  double B0 = 0.01;
+  double B0 = 0.1;
   double Om = 0.0;
   double Rho0 = 1.0;
   double P0 = 1.0;
   double xinner = 0.1;
-  double x0 = 0.4;
+  double x0 = 0.45;
   double Vx = 0.0;
 
   int i, j,k;
@@ -80,7 +80,7 @@ void cell_init_fieldloop(struct Cell ***theCells,struct Sim *theSim,struct MPIse
       double Pp = P0;// + .5*Rho0*Om*Om*r*r;
 
       for (j = 0; j < sim_N_p(theSim,i); j++) {
-        double phi = theCells[k][i][j].tiph - .5*theCells[k][i][j].dphi;
+        double phi = theCells[k][i][j].tiph - .5*theCells[k][i][j].dphi - M_PI/4.0;
 
         double x = r*cos(phi)-x0;
         double y = r*sin(phi);
