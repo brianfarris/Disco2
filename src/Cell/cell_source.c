@@ -151,14 +151,16 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         } else if (sim_InitialDataType(theSim)==FIELDLOOP){
           drOm = 0.0;
           F_euler_phi = -vr*r*drOm;
+        } else if (sim_InitialDataType(theSim)==TORUS){
+          drOm = -2.*cell_wiph(c)/r/r;
+          F_euler_phi =  -vr*r*drOm;
         }
-        
+         
         c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;
         c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r+F_coriolis_r);
         c->cons[LLL] += dt*dV*rho*(Fp+F_coriolis_phi+F_euler_phi)*r;
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( (Fr*sint+F_centrifugal_r)*vr+Fr*vz*cost + (Fp+F_euler_phi)*vp);
-
         if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
           total_torque_temp += Fp*r;
           //total_Fr_temp += Fr;
@@ -206,7 +208,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           //c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
           c->cons[BPP] += dt*dV*Br*drOm;
 
-          if (r>1. && r<4.){
+          //if (r>2. && r<3.){
             c->cons[SRR] -= POWELL*dt*divB*Br;
             c->cons[SZZ] -= POWELL*dt*divB*Bz;
             c->cons[LLL] -= POWELL*dt*divB*Bp*r;
@@ -215,7 +217,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             c->cons[BPP] -= POWELL*dt*divB*vp/r;
             c->cons[BZZ] -= POWELL*dt*divB*vz;
             c->cons[PSI] -= POWELL*dt*vdotGradPsi;
-          }
+          //}
         }
       }
     }

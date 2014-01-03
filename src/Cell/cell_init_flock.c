@@ -59,7 +59,7 @@ void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
       double delta=0.0;
       if ((r>2.)&&(r<3.)){
         double n=4.0;
-        Bz = 0.05513/n;
+        Bz = .054485/n;
         delta = .001*( (double)rand()/(double)RAND_MAX - .5 );
       } else{
         Bz = 0.0;

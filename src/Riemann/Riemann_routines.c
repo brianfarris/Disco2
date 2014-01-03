@@ -121,7 +121,8 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
     Bpack[4] = (mr*Br + mp*Bp + mz*Bz)/rho; // v dot B
     Bpack[5] = psi;
 
-    Ss += ((.5*B2L-BnL*BnL)-.5*B2R+BnR*BnR) / (theRiemann->primR[RHO]*(Sr-vnR)-theRiemann->primL[RHO]*(Sl-vnL));
+    //Ss += ((.5*B2L-BnL*BnL)-.5*B2R+BnR*BnR) / (theRiemann->primR[RHO]*(Sr-vnR)-theRiemann->primL[RHO]*(Sl-vnL));
+    Ss += (.5*B2L-.5*B2R) / (theRiemann->primR[RHO]*(Sr-vnR)-theRiemann->primL[RHO]*(Sl-vnL));
   }
   theRiemann->Sl = Sl;
   theRiemann->Sr = Sr;
@@ -210,11 +211,11 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
     double Bn = Br*theRiemann->n[0] + Bp*theRiemann->n[1] + Bz*theRiemann->n[2];
     double vB = vr*Br   + vp*Bp   + vz*Bz;
     double Bs2 = Bsr*Bsr+Bsp*Bsp+Bsz*Bsz;
-    double Ps_mag = (.5*B2-Bn*Bn) - .5*Bs2 + Bsn*Bsn;
+    //double Ps_mag = (.5*B2-Bn*Bn) - .5*Bs2 + Bsn*Bsn;
     Msr   += ( Br*Bn - Bsr*Bsn ) / ( Sk - Ss );
     Msp   += ( Bp*Bn - Bsp*Bsn ) / ( Sk - Ss );
     Msz   += ( Bz*Bn - Bsz*Bsn ) / ( Sk - Ss );
-    Estar += ( ( Sk - vn )*.5*B2 + (Ps_mag+.5*Bs2)*Ss - .5*B2*vn - vBs*Bsn + vB*Bn ) / ( Sk - Ss );
+    Estar += ( ( Sk - vn )*.5*B2 + (/*Ps_mag+*/.5*Bs2)*Ss - .5*B2*vn - vBs*Bsn + vB*Bn ) / ( Sk - Ss );
 
     double BnL = theRiemann->primL[BRR]*theRiemann->n[0] 
       + theRiemann->primL[BPP]*theRiemann->n[1] 

@@ -1,6 +1,6 @@
 enum{RHO,PPP,URR,UPP,UZZ,BRR,BPP,BZZ,PSI};
 enum{DDD,TAU,SRR,LLL,SZZ};
-enum{C_FIXED,C_WCELL,C_WRIEMANN,C_RIGID,C_KEPLER,C_OMEGA20,C_MILOS};
+enum{C_FIXED,C_WCELL,C_WRIEMANN,C_RIGID,C_KEPLER,C_OMEGA20,C_MILOS,C_POWERLAW};
 enum{A_NONE,A_OMEGA20,A_KEPLER,A_WEIRD};
 enum{LEFT,LEFTSTAR,RIGHTSTAR,RIGHT};
 enum{EULER,MHD};
@@ -16,7 +16,7 @@ enum{HLLC,HLL};
 MPI_Comm sim_comm;
 #define farris_mpi_factorization 0
 #define NO_W_IN_CFL 1
-#define KEP_BNDRY 1
+#define KEP_BNDRY 0
 #define BzZ 0
 #define BNORM_AVG 1
 #define VISC_CONST 0
@@ -24,7 +24,7 @@ MPI_Comm sim_comm;
 #define INCLUDE_ALL_VISC_TERMS 1
 #define CHECKPOINTING 
 #define TVISC_FAC 1.0
-#define PHIMAX M_PI/3.
+#define PHIMAX M_PI/2.0
 #define diode 0
 #define zero_bfields 0
 double time_global;

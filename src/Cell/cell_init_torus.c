@@ -45,23 +45,28 @@ void cell_init_torus(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
       double R = sqrt( r*r + z*z );      
       double Phi = -M/R;
       double omega = pow(r,-q);
-      if (r<r_inner){
-        omega = pow(r_inner,-q)*r/r_inner;
-      }
+      //if (r<r_inner){
+      //  omega = pow(r_inner,-q)*r/r_inner;
+      //}
       double PoRho = GammaFac*(Phi_inner-Phi+pow(r_inner,-s)/s-pow(r,-s)/s);
-      if (PoRho<1.0e-20){
-        PoRho = 1.0e-20;
+      if (PoRho<1.0e-5){
+        PoRho = 1.0e-5;
       }
       double rho = pow(PoRho,1.0/(GAMMALAW-1.0))/Rho_norm;
       double Pp = pow(PoRho,1.0/GammaFac)/Rho_norm;
 
-      if (PoRho<1.0e-20){
+      //if (rho<1.0e-5){
+      //  rho=1.0e-5;
+      //  Pp = pow(PoRho,1.0/GammaFac)/Rho_norm;
+     // }
+
+      if (PoRho<1.0e-5){
         Pp = rho;
       }
-
       double magfac;
       if (rho>0.75){
         magfac = 0.05/PoRho_max;
+        //magfac = 0.0;
       } else{
         magfac = 0.0/PoRho_max;
       }
@@ -75,19 +80,19 @@ void cell_init_torus(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = Pp;
         theCells[k][i][j].prim[URR] = 0.0;
-        theCells[k][i][j].prim[UPP] = omega*(1.+delta);
+        theCells[k][i][j].prim[UPP] = omega*(1.+delta)-pow(r,-2.);
         theCells[k][i][j].prim[UZZ] = 0.0;
         if (sim_runtype(theSim)==MHD){
-        theCells[k][i][j].prim[BRR] = Br;
-        theCells[k][i][j].prim[BPP] = Bp;
-        theCells[k][i][j].prim[BZZ] = Bz;
-        theCells[k][i][j].prim[PSI] = 0.0;
-        theCells[k][i][j].divB = 0.0;
-        theCells[k][i][j].GradPsi[0] = 0.0;
-        theCells[k][i][j].GradPsi[1] = 0.0;
-        theCells[k][i][j].GradPsi[2] = 0.0;
+          theCells[k][i][j].prim[BRR] = Br;
+          theCells[k][i][j].prim[BPP] = Bp;
+          theCells[k][i][j].prim[BZZ] = Bz;
+          theCells[k][i][j].prim[PSI] = 0.0;
+          theCells[k][i][j].divB = 0.0;
+          theCells[k][i][j].GradPsi[0] = 0.0;
+          theCells[k][i][j].GradPsi[1] = 0.0;
+          theCells[k][i][j].GradPsi[2] = 0.0;
         }
-        theCells[k][i][j].wiph = omega*r;
+        theCells[k][i][j].wiph = pow(r,-1.);
       }
     }
   }
