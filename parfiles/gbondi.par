@@ -1,0 +1,67 @@
+//Disco Parameter File//
+
+InitialDataType         9       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform, 
+                                // 4 Shock1, 5 Shock2, 6 Shock3, 7 Shock4,
+                                // 8 Isentrope, 9 GR-Bondi
+GravMassType            0       // 0 none, 1 single, 2 binary
+Background              1       // 0 Newtonian, 1 GR
+Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
+                                // 2 Schwarzschild-KS
+Restart                 0       // If this=1 restart using input.h5
+
+//Computational Grid
+NumR			64			//Radial Zones
+NumZ			1          //Vertical Zones
+ng                      2
+R_Min		    10.0	
+R_Max			100.0
+Z_Min			-0.5
+Z_Max			0.5
+NP_CONST        -1
+aspect                  1.0
+
+NUM_C                   5
+NUM_N                   1
+Time_Max                10.0
+Num_Checkpoints	        10	
+Num_Diag_Dump           20
+Num_Diag_Measure        20
+
+
+NoInnerBC            0
+BoundTypeR           0               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
+ZeroPsiBndry         1
+
+Move_Cells              0
+RiemannSolver           1           // 0 hllc, 1 hll
+Adiabatic_Index		1.6666666666
+
+//Numerical Parameters
+CFL			0.5
+PLM			1.0
+
+Grav_2D			1
+G_EPS			0.0
+
+PHI_ORDER               2
+
+//Atmosphere Parameters
+Rho_Floor		0.00001
+Cs_Floor		0.0001		
+Cs_Cap			100.0
+Vel_Cap			100.0
+
+runtype                 0
+
+//DAMPING
+DAMP_TIME               -1.0        // Set negative to turn off
+RDAMP_INNER             0.0
+RDAMP_OUTER             0.0
+
+RLogScale               1000.0
+ZLogScale               1000.0
+HiResSigma              1000.0
+HiResR0                 1000.0
+HiResFac                0.0
+

@@ -22,6 +22,8 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_shock4);
   } else if (sim_InitialDataType(theSim)==ISENTROPE){
     return(&cell_init_isentrope);
+  } else if (sim_InitialDataType(theSim)==GBONDI){
+    return(&cell_init_gbondi);
    } else{
     printf("ERROR: Do not recognize initial data selection.\n");
     exit(0);
@@ -47,6 +49,8 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_shock4);
    } else if (sim_InitialDataType(theSim)==ISENTROPE){
     return(&cell_single_init_isentrope);
+   } else if (sim_InitialDataType(theSim)==GBONDI){
+    return(&cell_single_init_gbondi);
   } else{
     printf("ERROR: Do not recognize initial data selection.\n");
     exit(0);

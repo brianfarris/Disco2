@@ -64,4 +64,18 @@ double metric_g_uu_exact_sr(int mu, int nu, double t, double r, double p, double
 double metric_dg_dd_exact_sr(int k, int mu, int nu, double t, double r, double p, double z);
 double metric_dg_uu_exact_sr(int k, int mu, int nu, double t, double r, double p, double z);
 void metric_killing_exact_sr(int *k);
+
+//Schwarzschild - Schwarzschild coords
+double metric_g_dd_exact_schw_sc(int mu, int nu, double t, double r, double p, double z);
+double metric_g_uu_exact_schw_sc(int mu, int nu, double t, double r, double p, double z);
+double metric_dg_dd_exact_schw_sc(int k, int mu, int nu, double t, double r, double p, double z);
+double metric_dg_uu_exact_schw_sc(int k, int mu, int nu, double t, double r, double p, double z);
+void metric_killing_exact_schw_sc(int *k);
+
+//Schwarzschild - Kerr-Schild coords
+double metric_g_dd_exact_schw_ks(int mu, int nu, double t, double r, double p, double z);
+double metric_g_uu_exact_schw_ks(int mu, int nu, double t, double r, double p, double z);
+double metric_dg_dd_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z);
+double metric_dg_uu_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z);
+void metric_killing_exact_schw_ks(int *k);
 #endif
