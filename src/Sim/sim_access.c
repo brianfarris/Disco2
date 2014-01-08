@@ -106,6 +106,9 @@ int sim_GRAV2D(struct Sim *theSim){
 double sim_G_EPS(struct Sim *theSim){
   return(theSim->G_EPS);
 }
+double sim_GravRadius(struct Sim *theSim){
+  return(theSim->GravRadius);
+}
 double sim_PHI_ORDER(struct Sim *theSim){
   return(theSim->PHI_ORDER);
 }
@@ -147,5 +150,14 @@ double sim_RDAMP_INNER(struct Sim * theSim){
 }
 double sim_RDAMP_OUTER(struct Sim * theSim){
   return(theSim->RDAMP_OUTER);
+}
+int sim_InitPar0(struct Sim *theSim){
+  return(theSim->InitPar0);
+}
+double sim_InitPar1(struct Sim *theSim){
+  return(theSim->InitPar1);
+}
+double sim_InitPar2(struct Sim *theSim){
+  return(theSim->InitPar2);
 }
 

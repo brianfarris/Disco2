@@ -38,6 +38,12 @@ PLM			1.0
 
 Grav_2D			0
 G_EPS			0.0
+GravRadius          1.0
+
+//Initial Condition Parameters
+InitPar0        0
+InitPar1        0
+InitPar2        0
 
 PHI_ORDER               2
 

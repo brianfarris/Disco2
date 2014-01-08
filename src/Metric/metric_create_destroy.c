@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "../Headers/Metric.h"
 
-struct Metric* metric_create(double t, double r, double p, double z)
+struct Metric* metric_create(double t, double r, double p, double z, struct Sim *theSim)
 {
     int i,j;
     struct Metric *g = malloc(sizeof(struct Metric));
@@ -15,13 +15,14 @@ struct Metric* metric_create(double t, double r, double p, double z)
     for(i=0; i<4; i++)
         for(j=i; j<4; j++)
         {
-            g->g_dd[j+4*i-i*(i+1)/2] = metric_g_dd_exact(i,j,t,r,p,z);
-            g->g_uu[j+4*i-i*(i+1)/2] = metric_g_uu_exact(i,j,t,r,p,z);
+            g->g_dd[j+4*i-i*(i+1)/2] = metric_g_dd_exact(i,j,t,r,p,z,theSim);
+            g->g_uu[j+4*i-i*(i+1)/2] = metric_g_uu_exact(i,j,t,r,p,z,theSim);
         }
     metric_killing_exact(g->killing);
     g->dg_dd = NULL;
     g->dg_uu = NULL;
     g->length_dg = 0;
+    g->theSim = theSim;
 
     return g;
 }
@@ -46,8 +47,8 @@ void metric_create_der(struct Metric *g)
                 for(b=0; b<4; b++)
                     for(c=b; c<4; c++)
                     {
-                        g->dg_dd[k*10 + c+4*b-b*(b+1)/2] = metric_dg_dd_exact(a,b,c, g->x[0],g->x[1],g->x[2],g->x[3]);
-                        g->dg_uu[k*10 + c+4*b-b*(b+1)/2] = metric_dg_uu_exact(a,b,c, g->x[0],g->x[1],g->x[2],g->x[3]);
+                        g->dg_dd[k*10 + c+4*b-b*(b+1)/2] = metric_dg_dd_exact(a,b,c, g->x[0],g->x[1],g->x[2],g->x[3],g->theSim);
+                        g->dg_uu[k*10 + c+4*b-b*(b+1)/2] = metric_dg_uu_exact(a,b,c, g->x[0],g->x[1],g->x[2],g->x[3],g->theSim);
                     }
                 k++;
             }

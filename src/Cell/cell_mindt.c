@@ -42,7 +42,7 @@ double cell_maxvel_gr(double *prim, int dir, double w, double r, struct Sim *the
     GAMMALAW = sim_GAMMALAW(theSim);
     rhoh = rho + GAMMALAW * Pp / (GAMMALAW-1.0);
     
-    g = metric_create(time_global, r, 0, 0);
+    g = metric_create(time_global, r, 0, 0, theSim);
     a = metric_lapse(g);
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g,i);

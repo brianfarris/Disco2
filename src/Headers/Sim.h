@@ -45,6 +45,7 @@ struct Sim {
   double CFL;
   double PLM;
   int GRAV2D;
+  double GravRadius;
   double G_EPS;
   double PHI_ORDER;
   double RHO_FLOOR;
@@ -59,6 +60,9 @@ struct Sim {
   double HiResSigma;
   double HiResR0;
   double HiResFac;
+  int InitPar0;
+  double InitPar1;
+  double InitPar2;
 };
 #endif
 
@@ -96,6 +100,7 @@ int sim_POWELL(struct Sim *);
 int sim_W_A_TYPE(struct Sim *);
 int sim_GRAV2D(struct Sim *);
 double sim_G_EPS(struct Sim *);
+double sim_GravRadius(struct Sim *);
 double sim_PHI_ORDER(struct Sim *);
 double sim_RHO_FLOOR(struct Sim *);
 double sim_CS_FLOOR(struct Sim *);
@@ -111,6 +116,9 @@ int sim_InitialDataType(struct Sim * );
 double sim_DAMP_TIME(struct Sim *);
 double sim_RDAMP_INNER(struct Sim *);
 double sim_RDAMP_OUTER(struct Sim *);
+int sim_InitPar0(struct Sim *);
+double sim_InitPar1(struct Sim *);
+double sim_G_InitPar2(struct Sim *);
 
 int sim_GravMassType(struct Sim * );
 //set Grid data

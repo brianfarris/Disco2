@@ -110,7 +110,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             double v[3];
             struct Metric *g;
             
-            g = metric_create(time_global, r, phi, z);
+            g = metric_create(time_global, r, phi, z, theSim);
             a = metric_lapse(g);
             for(mu=0; mu<3; mu++)
                 b[mu] = metric_shift_u(g,mu);
@@ -156,20 +156,14 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                     if(la == 1)
                     {
                         c->cons[SRR] += dt*dV*sqrtg*a * sk;
-                        if(r > 9.0e-9 && r < 2.1e-8)
-                            printf("Source Sr (r=%.12g, dV=%.12g, rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): %.12g, %.12g\n", r, dV, rho, Pp, v[0], v[1], sqrtg*a*sk, dt*dV*sqrtg*a * sk);
                     }
                     else if(la == 2)
                     {
                         c->cons[LLL] += dt*dV*sqrtg*a * sk;
-                        if(r > 9.0e-9 && r < 2.1e-8)
-                            printf("Source Sp (r=%.12g, dV=%.12g, rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): %.12g\n", r, dV, rho, Pp, v[0], v[1], sqrtg*a*sk);
                     }
                     else if(la == 3)
                     {
                         c->cons[SZZ] += dt*dV*sqrtg*a * sk;
-    //                    if(j==0)
-      //                      printf("Source Sz (r=%.12g, rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): %.12g\n", r, rho, Pp, v[0], v[1], sqrtg*a*sk);
                     }
                     s -= n[la]*sk;
                 }
@@ -184,15 +178,11 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                             sk += a*(rhoh*u[0]*u_d[mu]+Pp)*metric_dg_uu(g,la,0,mu);
                         else
                             sk += a*rhoh*u[0]*u_d[mu]*metric_dg_uu(g,la,0,mu);
-
                     }
                 }
             s += sk;
 
             c->cons[TAU] += dt*dV*sqrtg*a * s;
-        //                if(j==0)
-            if(r > 9.0e-9 && r < 2.1e-8)
-                printf("Source Tau (r=%.12g, dV=%.12g, rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): %.12g\n", r, dV, rho, Pp, v[0], v[1], sqrtg*a*s);
 
             metric_destroy(g);
         }

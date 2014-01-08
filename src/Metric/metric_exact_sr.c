@@ -1,6 +1,8 @@
-//Flat space-time metric in cylindrical coordinates
+#include "../Headers/Metric.h"
 
-double metric_g_dd_exact_sr(int mu, int nu, double t, double r, double p, double z)
+//Flat space-time metric in cylindrical coordinates
+//
+double metric_g_dd_exact_sr(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim)
 {
     if(mu != nu)
         return 0.0;
@@ -15,7 +17,7 @@ double metric_g_dd_exact_sr(int mu, int nu, double t, double r, double p, double
     return 0.0;
 }
 
-double metric_g_uu_exact_sr(int mu, int nu, double t, double r, double p, double z)
+double metric_g_uu_exact_sr(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim)
 {
     if(mu != nu)
         return 0.0;
@@ -30,14 +32,14 @@ double metric_g_uu_exact_sr(int mu, int nu, double t, double r, double p, double
     return 0.0;
 }
 
-double metric_dg_dd_exact_sr(int k, int mu, int nu, double t, double r, double p, double z)
+double metric_dg_dd_exact_sr(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim)
 {
     if(k==1 && mu==2 && nu==2)
         return 2.0*r;
     return 0.0;
 }
 
-double metric_dg_uu_exact_sr(int k, int mu, int nu, double t, double r, double p, double z)
+double metric_dg_uu_exact_sr(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim)
 {
     if(k==1 && mu==2 && nu==2)
         return -2.0/(r*r*r);

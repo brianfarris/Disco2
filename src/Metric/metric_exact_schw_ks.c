@@ -1,10 +1,12 @@
+#include "../Headers/Metric.h"
+#include "../Headers/Sim.h"
 #include <math.h>
 
 //Schwarzschild metric in Kerr-Schild coordinates.
 
 double RG_KS = 1.0;
 
-double metric_g_dd_exact_schw_ks(int mu, int nu, double t, double r, double p, double z)
+double metric_g_dd_exact_schw_ks(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim)
 {
     if(mu == 0 && nu == 0)
         return -1.0+RG_KS/sqrt(r*r+z*z);
@@ -32,7 +34,7 @@ double metric_g_dd_exact_schw_ks(int mu, int nu, double t, double r, double p, d
     return 0.0;
 }
 
-double metric_g_uu_exact_schw_ks(int mu, int nu, double t, double r, double p, double z)
+double metric_g_uu_exact_schw_ks(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim)
 {
     if(mu == 0 && nu == 0)
         return -1.0+RG_KS/sqrt(r*r+z*z);
@@ -59,7 +61,7 @@ double metric_g_uu_exact_schw_ks(int mu, int nu, double t, double r, double p, d
     }
 }
 
-double metric_dg_dd_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z)
+double metric_dg_dd_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim)
 {
     if(k!=1)
         return 0.0;
@@ -74,7 +76,7 @@ double metric_dg_dd_exact_schw_ks(int k, int mu, int nu, double t, double r, dou
     return 0.0;
 }
 
-double metric_dg_uu_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z)
+double metric_dg_uu_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim)
 {
     if(k==1 && mu==2 && nu==2)
         return -2.0/(r*r*r);

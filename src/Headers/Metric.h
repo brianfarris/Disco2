@@ -14,11 +14,12 @@ struct Metric
     double *dg_uu;
     int killing[4];
     int length_dg;
+    struct Sim *theSim;
 };
 #endif
 
 //create and destroy
-struct Metric* metric_create(double t, double r, double p, double z);
+struct Metric* metric_create(double t, double r, double p, double z, struct Sim *theSim);
 void metric_create_der(struct Metric *g);
 void metric_destroy(struct Metric *g);
 
@@ -52,30 +53,30 @@ double metric_dot4_u(struct Metric *g, double *a, double *b);
 double metric_dot4_d(struct Metric *g, double *a, double *b);
 
 //Exact Metrics
-double (*metric_g_dd_exact)(int i, int j, double t, double r, double p, double z);
-double (*metric_g_uu_exact)(int i, int j, double t, double r, double p, double z);
-double (*metric_dg_dd_exact)(int k, int i, int j, double t, double r, double p, double z);
-double (*metric_dg_uu_exact)(int k, int i, int j, double t, double r, double p, double z);
+double (*metric_g_dd_exact)(int i, int j, double t, double r, double p, double z, struct Sim *theSim);
+double (*metric_g_uu_exact)(int i, int j, double t, double r, double p, double z, struct Sim *theSim);
+double (*metric_dg_dd_exact)(int k, int i, int j, double t, double r, double p, double z, struct Sim *theSim);
+double (*metric_dg_uu_exact)(int k, int i, int j, double t, double r, double p, double z, struct Sim *theSim);
 void (*metric_killing_exact)(int *k);
 
 //SR
-double metric_g_dd_exact_sr(int mu, int nu, double t, double r, double p, double z);
-double metric_g_uu_exact_sr(int mu, int nu, double t, double r, double p, double z);
-double metric_dg_dd_exact_sr(int k, int mu, int nu, double t, double r, double p, double z);
-double metric_dg_uu_exact_sr(int k, int mu, int nu, double t, double r, double p, double z);
+double metric_g_dd_exact_sr(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_g_uu_exact_sr(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_dg_dd_exact_sr(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_dg_uu_exact_sr(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 void metric_killing_exact_sr(int *k);
 
 //Schwarzschild - Schwarzschild coords
-double metric_g_dd_exact_schw_sc(int mu, int nu, double t, double r, double p, double z);
-double metric_g_uu_exact_schw_sc(int mu, int nu, double t, double r, double p, double z);
-double metric_dg_dd_exact_schw_sc(int k, int mu, int nu, double t, double r, double p, double z);
-double metric_dg_uu_exact_schw_sc(int k, int mu, int nu, double t, double r, double p, double z);
+double metric_g_dd_exact_schw_sc(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_g_uu_exact_schw_sc(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_dg_dd_exact_schw_sc(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_dg_uu_exact_schw_sc(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 void metric_killing_exact_schw_sc(int *k);
 
 //Schwarzschild - Kerr-Schild coords
-double metric_g_dd_exact_schw_ks(int mu, int nu, double t, double r, double p, double z);
-double metric_g_uu_exact_schw_ks(int mu, int nu, double t, double r, double p, double z);
-double metric_dg_dd_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z);
-double metric_dg_uu_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z);
+double metric_g_dd_exact_schw_ks(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_g_uu_exact_schw_ks(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_dg_dd_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_dg_uu_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 void metric_killing_exact_schw_ks(int *k);
 #endif

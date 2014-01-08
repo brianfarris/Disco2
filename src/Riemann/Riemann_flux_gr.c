@@ -47,7 +47,7 @@ void riemann_set_vel_gr(struct Riemann *theRiemann, struct Sim *theSim, double r
     double a, b[3], bn, sig, gam, w, v[3], dv;
     struct Metric *g;
 
-    g = metric_create(time_global, r, 0, 0);
+    g = metric_create(time_global, r, 0, 0, theSim);
 
     dir = -1;
     for(i=0; i<3; i++)
@@ -164,7 +164,7 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
     v[2]  = prim[UZZ];
 
     //Get needed metric values
-    g = metric_create(time_global, r, 0, 0);
+    g = metric_create(time_global, r, 0, 0, theSim);
     a = metric_lapse(g);
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g, i);

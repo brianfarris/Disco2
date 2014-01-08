@@ -27,7 +27,7 @@ void cell_prim2cons_gr( double * prim , double * cons , double r , double dV ,st
     v[2]  = prim[UZZ];
 
     //Get needed metric values
-    g = metric_create(time_global, r, 0, 0);
+    g = metric_create(time_global, r, 0, 0, theSim);
     a = metric_lapse(g);
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g, i);
@@ -74,7 +74,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
     double eps = 1.0e-10;
     double CS_FLOOR, CS_CAP, RHO_FLOOR;
 
-    g = metric_create(time_global, r, 0, 0);
+    g = metric_create(time_global, r, 0, 0, theSim);
 
     //Metric quantities needed later
     a = metric_lapse(g);
