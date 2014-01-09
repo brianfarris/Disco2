@@ -52,6 +52,8 @@ void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIs
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 void cell_init_TypeIISD_migration(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_TypeIISD_migration(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_SSCoolTest(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_SSCoolTest(struct Cell *, struct Sim *,int ,int ,int );
 ///retrieve data
 double cell_prim(struct Cell *, int);
 double cell_grad(struct Cell *, int);

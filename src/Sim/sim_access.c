@@ -182,4 +182,12 @@ double sim_sep0(struct Sim *theSim){
 double sim_tmig_on(struct Sim *theSim){
 	return(theSim->tmig_on);
 }
-
+double sim_RadCool(struct Sim *theSim){
+	return(theSim->RadCool);
+}
+double sim_ViscHeat(struct Sim *theSim){
+	return(theSim->ViscHeat);
+}
+double sim_Mach(struct Sim *theSim){
+	return(theSim->Mach);
+}

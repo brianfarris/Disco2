@@ -362,6 +362,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
     }
   }
   //printf ( " nu = %f \n\n", nu ); //CHECK -DD
+  double Pp  = AvgPrim[PPP];  // For Cooling Term
   double rho = AvgPrim[RHO];
   double vr  = AvgPrim[URR];
   double om  = AvgPrim[UPP];
@@ -381,39 +382,62 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   double Gp_vz = Grad_ph_prim[UZZ];
 
 
+  double Frdr = -INCLUDE_ALL_VISC_TERMS*nu*rho*( r*Gr_vr - vr + om*r*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
+  double Fpdr =  -nu*rho*( r*r*Gr_om - INCLUDE_ALL_VISC_TERMS*vr*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
+
   //r direction (r derivatives)
   if (theRiemann->n[0] ==1){
-    //VFlux[SRR] = -nu*rho*( r*Gr_vr - r*r*Gp_om - vr );
-    //VFlux[LLL] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
 	  if (sim_InitialDataType(theSim)==VISCRING){
-		  VFlux[SRR] = 0.0;//-INCLUDE_ALL_VISC_TERMS*nu*rho*( r*Gr_vr - vr + om*r*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) ); // {rr} term
+		  VFlux[SRR] = 0.0; // {rr} term
 		  VFlux[LLL] = -nu*rho*( r*r*Gr_om - INCLUDE_ALL_VISC_TERMS*vr*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) ); //{r\phi} term under r deriv
 	  }else {
-		  VFlux[SRR] = -INCLUDE_ALL_VISC_TERMS*nu*rho*( r*Gr_vr - vr + om*r*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
-		  VFlux[LLL] = -nu*rho*( r*r*Gr_om - INCLUDE_ALL_VISC_TERMS*vr*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
+	          VFlux[SRR] = Frdr; //-INCLUDE_ALL_VISC_TERMS*nu*rho*( r*Gr_vr - vr + om*r*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
+		  VFlux[LLL] = Fpdr; //-nu*rho*( r*r*Gr_om - INCLUDE_ALL_VISC_TERMS*vr*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
 	  }
 
 
     VFlux[SZZ] = 0.0; //deal with this later
   }
+
+
+
+  double Frdp = -INCLUDE_ALL_VISC_TERMS*nu*rho*( -om*r*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r)  + r*Gp_vr );;
+  double Fpdp = -INCLUDE_ALL_VISC_TERMS*nu*rho*( r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r));;
+
   //phi direction (phi derivatives)
   if (theRiemann->n[1] ==1){
-    //VFlux[SRR] = -nu*rho*( r*r*Gr_om + r*Gp_vr );
-    //VFlux[LLL] = -nu*rho*( r*r*Gp_om - r*Gr_vr + vr);
 	  if (sim_InitialDataType(theSim)==VISCRING){
 		  VFlux[SRR] = 0.0; // 0 due to axis-symmetry
 		  VFlux[LLL] = 0.0; // 0 due to axis-symmetry
 	  }else {
-		  VFlux[SRR] = -INCLUDE_ALL_VISC_TERMS*nu*rho*( -om*r*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r)  + r*Gp_vr );
-		  VFlux[LLL] = -INCLUDE_ALL_VISC_TERMS*nu*rho*( r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r));
+	          VFlux[SRR] = Frdp; //-INCLUDE_ALL_VISC_TERMS*nu*rho*( -om*r*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r)  + r*Gp_vr );
+		  VFlux[LLL] = Fpdp; //-INCLUDE_ALL_VISC_TERMS*nu*rho*( r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r));
 	  }
 
 
     VFlux[SZZ] = 0.0; //deal with this later
+    
   }
-
+  
+  VFlux[TAU] = 0.0;
+  //Should this go here? It will get called twice a time step in timestep_substep -> reimann_add_flux ->*
+  if (sim_ViscHeat(theSim) > 0.0 ){
   // add viscous heating properly
-  VFlux[TAU] = 0.0; //-nu*rho*(vr*dnvr+r*r*om*dnom+vz*dnvz);  
+    VFlux[TAU] += (Frdr + Frdp)*vr + (Fpdr + Fpdp)*om;
+  }
+  // Add Cooling term as well (Add it as part of Viscous flux for now)
+  if (sim_RadCool(theSim)> 0.0){
+    double Gam = sim_GAMMALAW(theSim);
+    double cs2 = Gam*Pp/rho;
+    //double Mach_set = sim_Mach(theSim);
+    //double Ms2 = Mach_set*Mach_set;
+    //double rho0 = 1.0; 
+    //double r0 = 1.0;
+    //double v0 = 1.0;
+    //double SigoKap0 = pow(v0*Mach_set, 12.)*rho0*rho0*rho0/r0/r0;
+    VFlux[TAU] -= 3.9 * pow( (cs2*40.*40.),8. )*rho*rho * pow(r,1.5); //normalized for Mach=40.
+  }
+  
 
   //printf ( " VFlux[LLL] = %f \n\n", VFlux[LLL] ); //CHECK -DD
   for (q=0;q<NUM_Q;++q){

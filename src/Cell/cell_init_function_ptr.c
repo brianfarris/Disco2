@@ -25,8 +25,10 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
   } else if (sim_InitialDataType(theSim)==VISCRING){
     return(&cell_init_viscring_cstnu);
   } else if (sim_InitialDataType(theSim)==TYPEIISD_MIGRATION){
-	  return(&cell_init_TypeIISD_migration);
-   } else{
+    return(&cell_init_TypeIISD_migration);
+  } else if (sim_InitialDataType(theSim)==COOLTEST){
+    return(&cell_init_SSCoolTest);
+  } else{
     printf("ERROR - not a valid IC\n");
     exit(0);
   }
@@ -52,8 +54,10 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
   } else if (sim_InitialDataType(theSim)==VISCRING){
     return(&cell_single_init_viscring_cstnu);
   } else if (sim_InitialDataType(theSim)==TYPEIISD_MIGRATION){
-	return(&cell_single_init_TypeIISD_migration);
-   } else{
+    return(&cell_single_init_TypeIISD_migration);
+  } else if (sim_InitialDataType(theSim)==COOLTEST){
+    return(&cell_single_init_SSCoolTest);
+  } else{
     printf("ERROR - not a valid single IC\n");
     exit(0);
   }

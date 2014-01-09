@@ -1,0 +1,80 @@
+//Disco Parameter File//
+
+InitialDataType         11               // 0 Flock, 1 Shear 7 MM08 10 SSmigration, 11 Cooling Tests
+GravMassType            1               // 0 none, 1 single, 2 binary, 3 live binary
+MassRatio               0.0   // 0.0209M_{Th} for Mach=10
+sep0                    0.0            // starting binary separation 
+                                        //(or permanent separations if GravMassType is not 3)
+Restart			0		//If this=1 restart using input.h5
+
+//Computational Grid
+NumR			512			//Radial Zones
+NumZ			1			//Vertical Zones
+ng                      2
+R_Min			0.1   //was 0.05
+R_Max			4.0
+Z_Min			-1.0
+Z_Max			1.0
+NP_CONST                -256 
+NPCAP                   512 
+aspect                  1.0
+
+NUM_C                   5
+NUM_N                   0
+Time_Max                628.3185307
+Num_Checkpoints	        4.	
+Num_Diag_Dump           100.0
+Num_Diag_Measure        2500.0
+
+NoInnerBC               1
+BoundTypeR           	1               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZ           	2               // 0 fixed, 1 outflow, 2 periodic
+ZeroPsiBndry          	1
+
+Move_Cells              4           // 0 DONT 3 Rigid, 4 Kepler
+RiemannSolver           0           // 0 hllc, 1 hll
+Adiabatic_Index         1.666666667
+Explicit_Viscosity      -0.00000625  // if nu cst in header.h then this should be alpha/Mach^2 - also note this must be >0 for visc heat and rad coool to work
+
+
+RhoSinkTimescale        -1.0   //BONDI ~number orbits needed to accrete local density -  negative means no sink
+
+Mdisk_ovr_Ms            15.0   //Fraction of secondary mass in disk r<a
+tmig_on                 0.0 //87.9646 //62.83138  // time when live binary turns on
+
+DivB_Ch			0.06		//Dedner divergence cleaning
+DivB_l			0.1
+//Numerical Parameters
+CFL			0.5
+PLM			1.0
+
+POWELL                  1
+w_a_type                0
+Grav_2D			1
+G_EPS		        0.0  // 1/Mach/100 very small for point mass
+
+PHI_ORDER               2
+
+//Atmosphere Parameters
+Rho_Floor		0.00001
+Cs_Floor		0.0001		
+Cs_Cap			1.0
+Vel_Cap			10.0
+
+Mach                    40.0  // Mach number used in cooling, IC, SetT
+SET_T                   0     // if 1 then isothermal by reset of P/rho each step
+ViscHeat                -1.0  // Visc must be on for VH and RC to work
+RadCool                 -1.0  // If RadCool on (>0), SET_T shoudl be off (<0)
+
+
+runtype                 0
+
+DAMP_TIME               0.01       // Set negative to turn off
+RDAMP_INNER             1.5
+RDAMP_OUTER             3.5
+
+RLogScale               10000.0//13.14   // Large numbers gives uniform spacing
+ZLogScale               10000.0
+HiResSigma              0.4    // SET IN sim_set.c
+HiResR0                 0.1    //SET IN sim_set.c
+HiResFac                0.0 //changes by factor of 1+HiResFac at r0.

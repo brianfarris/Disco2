@@ -71,6 +71,9 @@ struct Sim {
   double Mdisk_ovr_Ms; //For LiveBinary sets Sigma scale
   double sep0;
   double tmig_on;
+  double RadCool;
+  double ViscHeat;
+  double Mach;
 };
 #endif
 
@@ -132,6 +135,9 @@ double sim_RDAMP_OUTER(struct Sim *);
 double sim_Mdisk_ovr_Ms(struct Sim *);
 double sim_sep0(struct Sim *);
 double sim_tmig_on(struct Sim *);
+double sim_RadCool(struct Sim *);
+double sim_ViscHeat(struct Sim *);
+double sim_Mach(struct Sim *);
 
 int sim_GravMassType(struct Sim * );
 //set Grid data

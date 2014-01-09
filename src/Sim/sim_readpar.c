@@ -104,9 +104,12 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "HiResR0"           , VAR_DOUB , &(theSim->HiResR0)  );
       err += readvar( pfile , "HiResFac"           , VAR_DOUB , &(theSim->HiResFac)  );
       err += readvar( pfile , "w_a_type"            , VAR_INT , &(theSim->W_A_TYPE));
-	  err += readvar( pfile , "Mdisk_ovr_Ms"           , VAR_DOUB , &(theSim->Mdisk_ovr_Ms) ); //For Live Binary
-	  err += readvar( pfile , "sep0"             , VAR_DOUB , &(theSim->sep0) );
-	  err += readvar( pfile , "tmig_on"           , VAR_DOUB , &(theSim->tmig_on) ); //For Live Binary
+      err += readvar( pfile , "Mdisk_ovr_Ms"           , VAR_DOUB , &(theSim->Mdisk_ovr_Ms) ); //For Live Binary
+      err += readvar( pfile , "sep0"             , VAR_DOUB , &(theSim->sep0) );
+      err += readvar( pfile , "tmig_on"           , VAR_DOUB , &(theSim->tmig_on) ); //For Live Binary
+      err += readvar( pfile , "RadCool"           , VAR_DOUB , &(theSim->RadCool) ); //For Cooling terms in Riem
+      err += readvar( pfile , "ViscHeat"           , VAR_DOUB , &(theSim->ViscHeat) ); //For Heating terms in Riem
+      err += readvar( pfile , "Mach"             , VAR_DOUB , &(theSim->Mach) ); 
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }
