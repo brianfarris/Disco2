@@ -382,8 +382,8 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   double Gp_vz = Grad_ph_prim[UZZ];
 
 
-  double Frdr = -INCLUDE_ALL_VISC_TERMS*nu*rho*( r*Gr_vr - vr + om*r*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
-  double Fpdr =  -nu*rho*( r*r*Gr_om - INCLUDE_ALL_VISC_TERMS*vr*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) );
+  double Frdr = -INCLUDE_ALL_VISC_TERMS*nu*rho*( r*Gr_vr - vr + om*r*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) ); //r deriv in r direction
+  double Fpdr =  -nu*rho*( r*r*Gr_om - INCLUDE_ALL_VISC_TERMS*vr*r*Gp_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim)) ); //phi deriv in r direction
 
   //r direction (r derivatives)
   if (theRiemann->n[0] ==1){
@@ -401,8 +401,10 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
 
 
 
-  double Frdp = -INCLUDE_ALL_VISC_TERMS*nu*rho*( -om*r*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r)  + r*Gp_vr );;
-  double Fpdp = -INCLUDE_ALL_VISC_TERMS*nu*rho*( r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r));;
+  double Frdp = -INCLUDE_ALL_VISC_TERMS*nu*rho*( -om*r*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r)  + r*Gp_vr );
+  //r deriv in phi direction
+  double Fpdp = -INCLUDE_ALL_VISC_TERMS*nu*rho*( r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r));
+  //phi deriv in phi direction
 
   //phi direction (phi derivatives)
   if (theRiemann->n[1] ==1){
@@ -423,9 +425,19 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   //Should this go here? It will get called twice a time step in timestep_substep -> reimann_add_flux ->*
   if (sim_ViscHeat(theSim) > 0.0 ){
   // add viscous heating properly
-    VFlux[TAU] -= (Frdr + Frdp)*vr + (Fpdr + Fpdp)*om; //NOT CORRECT DNT USE YET
+    if (theRiemann->n[0] ==0){
+      // r-direction argument of divergence
+      double drArg = nu*rho*(vr*(Gr_vr - vr/r - r*Gr_om) + om*(r*r*Gr_om + r*Gp_vr));
+      VFlux[TAU] = - drArg; 
+    }    
+    if (theRiemann->n[1] ==1){
+      // phi-direction argument of divergence
+      double dpArg = nu*rho*(vr*(r*Gp_vr + r*r*Gr_om ) + r*r*om*(r*Gp_om - Gr_vr + vr/r ));
+      VFlux[TAU] = - dpArg;
+    }
+
   }
-  // Add Cooling term as well (Add it as part of Viscous flux for now)
+  // Add Cooling term as well (Add it as part of Viscous flux for now?)
   if (sim_RadCool(theSim)> 0.0){
     double Gam = sim_GAMMALAW(theSim);
     double cs2 = Gam*Pp/rho;
@@ -435,7 +447,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
     //double r0 = 1.0;
     //double v0 = 1.0;
     //double SigoKap0 = pow(v0*Mach_set, 12.)*rho0*rho0*rho0/r0/r0;
-    VFlux[TAU] += - 3.9 * pow( (cs2*40.*40.),8. )*rho*rho * pow(r,1.5); //normalized for Mach=40.
+    VFlux[TAU] = -0.5*3.9 * pow( (cs2*40.*40.),8. )*rho*rho * pow(r,1.5); //added 1/2 since called in each direction(this is really a z flux)
   }
   
 
