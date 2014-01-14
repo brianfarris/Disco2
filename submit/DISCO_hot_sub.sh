@@ -5,7 +5,7 @@
 #Torque directives
 #PBS -N DISCO_hot_sub.sh
 #PBS -W group_list=hpcastro
-#PBS -l nodes=2:ppn=16,walltime=00:04:00:00,mem=8000mb
+#PBS -l nodes=2:ppn=16,walltime=00:04:00:00,mem=2000mb
 #PBS -M djd2134@columbia.edu
 #PBS -m abe
 #PBS -V

@@ -423,7 +423,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   //Should this go here? It will get called twice a time step in timestep_substep -> reimann_add_flux ->*
   if (sim_ViscHeat(theSim) > 0.0 ){
   // add viscous heating properly
-    VFlux[TAU] += (Frdr + Frdp)*vr + (Fpdr + Fpdp)*om;
+    VFlux[TAU] -= (Frdr + Frdp)*vr + (Fpdr + Fpdp)*om; //NOT CORRECT DNT USE YET
   }
   // Add Cooling term as well (Add it as part of Viscous flux for now)
   if (sim_RadCool(theSim)> 0.0){
@@ -435,7 +435,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
     //double r0 = 1.0;
     //double v0 = 1.0;
     //double SigoKap0 = pow(v0*Mach_set, 12.)*rho0*rho0*rho0/r0/r0;
-    VFlux[TAU] -= 3.9 * pow( (cs2*40.*40.),8. )*rho*rho * pow(r,1.5); //normalized for Mach=40.
+    VFlux[TAU] += - 3.9 * pow( (cs2*40.*40.),8. )*rho*rho * pow(r,1.5); //normalized for Mach=40.
   }
   
 
@@ -679,7 +679,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->F[q]);
   }
 
-  
+
   if (VISC_OLD==1){
     cell_add_cons(theRiemann->cL,SRR,-dt*theRiemann->dA*theRiemann->Fvisc[SRR]);
     cell_add_cons(theRiemann->cR,SRR, dt*theRiemann->dA*theRiemann->Fvisc[SRR]);
@@ -690,6 +690,10 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   
   cell_add_cons(theRiemann->cL,LLL,-dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
   cell_add_cons(theRiemann->cR,LLL, dt*theRiemann->dA*theRiemann->Fvisc[LLL]);
+
+  // ADDING THE VISCOUS ENERGY FLUX -DD
+  cell_add_cons(theRiemann->cL,TAU,-dt*theRiemann->dA*theRiemann->Fvisc[TAU]);
+  cell_add_cons(theRiemann->cR,TAU, dt*theRiemann->dA*theRiemann->Fvisc[TAU]);
 
   //printf("n[0]: %d, n[1]: %d, r_cell_L: %e, r_cell_R: %e\n",theRiemann->n[0],theRiemann->n[1],theRiemann->r_cell_L,theRiemann->r_cell_R);
 

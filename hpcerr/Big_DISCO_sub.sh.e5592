@@ -1,9 +1,0 @@
-mpirun: killing job...
-
-mpirun: abort is already in progress...hit ctrl-c again to forcibly terminate
-
-[boston.cc.columbia.edu][[18022,1],47][btl_tcp_frag.c:215:mca_btl_tcp_frag_recv] mca_btl_tcp_frag_recv: readv failed: Connection reset by peer (104)
-[copenhagen.cc.columbia.edu][[18022,1],31][btl_tcp_frag.c:215:mca_btl_tcp_frag_recv] mca_btl_tcp_frag_recv: readv failed: Connection reset by peer (104)
-[damascus.cc.columbia.edu][[18022,1],15][btl_tcp_frag.c:215:mca_btl_tcp_frag_recv] mca_btl_tcp_frag_recv: readv failed: Connection reset by peer (104)
-[brisbane.cc.columbia.edu][[18022,1],63][btl_tcp_frag.c:215:mca_btl_tcp_frag_recv] mca_btl_tcp_frag_recv: readv failed: Connection reset by peer (104)
-[dallas.cc.columbia.edu][[18022,1],23][btl_tcp_frag.c:215:mca_btl_tcp_frag_recv] mca_btl_tcp_frag_recv: readv failed: Connection reset by peer (104)
