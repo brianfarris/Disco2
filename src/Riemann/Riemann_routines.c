@@ -626,6 +626,10 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   if (theRiemann->n[PDIRECTION]){
     if( sim_MOVE_CELLS(theSim) == C_WRIEMANN ) cell_add_wiph(theRiemann->cL,theRiemann->Ss);
     w = cell_wiph(theRiemann->cL);
+    // we dont need this if we are already in the rotating frame
+    if (SUBTRACT_OMEGA){
+      w = 0.0;
+    }
   } else{
     w = 0.0;
   }

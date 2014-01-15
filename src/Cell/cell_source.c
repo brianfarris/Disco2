@@ -270,6 +270,19 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( Fr*(vr*sint+vz*cost) + Fp*vp );
 
+        //NOTE I am not messing with B-fields for now.
+        if (SUBTRACT_OMEGA){
+          //NOTE: HERE I assume that the cells are rotating with Keplerian velocity
+          double drOm = -1.5*cell_wiph(c)/r/r;
+          double F_centrifugal_r = cell_wiph(c)*cell_wiph(c)/r;
+          double F_coriolis_r =  2.*cell_wiph(c)*vp/r;
+          double F_coriolis_phi = -2.*cell_wiph(c)*vr/r;
+          double F_euler_phi =  -vr*r*drOm;
+          c->cons[SRR] += dt*dV*rho*(F_centrifugal_r+F_coriolis_r);
+          c->cons[LLL] += dt*dV*rho*(F_euler_phi+F_coriolis_phi)*r;
+          c->cons[TAU] += dt*dV*rho*( F_centrifugal_r*vr + F_euler_phi*vp);
+        }
+
         if (sim_RhoSinkTimescale(theSim)>0.0){
           double rho_sink;
           for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
