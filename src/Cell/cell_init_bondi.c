@@ -11,10 +11,10 @@
 
 void cell_single_init_bondi(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
   double GAMMALAW = sim_GAMMALAW(theSim);
-  double M = 1.0; 
+  double RG = sim_GravRadius(theSim);
+  double rho = sim_InitPar1(theSim);
+  double P = sim_InitPar2(theSim);
 
-  double rho = 1.0;
-  double P = 1.0;
   theCell->prim[RHO] = rho;
   theCell->prim[PPP] = P;
   theCell->prim[URR] = 0.0;
@@ -26,10 +26,10 @@ void cell_single_init_bondi(struct Cell *theCell, struct Sim *theSim,int i,int j
 
 void cell_init_bondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
   double GAMMALAW = sim_GAMMALAW(theSim);
-  double M = 1.0; 
-
-  double rho = 1.0;
-  double P = 1.0;
+  double RG = sim_GravRadius(theSim);
+  double rho = sim_InitPar1(theSim);
+  double P = sim_InitPar2(theSim);
+  
   int i, j,k;
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
     for (i = 0; i < sim_N(theSim,R_DIR); i++) {

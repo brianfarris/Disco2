@@ -110,9 +110,14 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
         double *pR = theRiemann->primR;
         double *FL = theRiemann->FL;
         double *FR = theRiemann->FR;
-        printf("Face: r=%.12g, phi=%.12g, dA=%.12g, cm=%.12g\n",theRiemann->r,0.5*(cell_tiph(theRiemann->cL)-cell_dphi(theRiemann->cL)+cell_tiph(theRiemann->cR)-cell_dphi(theRiemann->cR)), face_dA(theFaces_r,n), face_cm(theFaces_r, n));
-        printf("Flux Rad L (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", pL[RHO], pL[PPP], pL[URR], pL[UPP],FL[DDD],FL[SRR],FL[LLL],FL[TAU]);
-        printf("Flux Rad R (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", pR[RHO], pR[PPP], pR[URR], pR[UPP],FR[DDD],FR[SRR],FR[LLL],FR[TAU]);
+        double *us = theRiemann->Ustar;
+        double *fs = theRiemann->Fstar;
+        double Sl = theRiemann->Sl;
+        double Sr = theRiemann->Sr;
+        printf("Face: r=%.12g, phi=%.12g, dA=%.12g, cm=%.12g\n",theRiemann->r,0.5*(cell_tiph(theRiemann->cL)-0.5*cell_dphi(theRiemann->cL)+cell_tiph(theRiemann->cR)-0.5*cell_dphi(theRiemann->cR)), face_dA(theFaces_r,n), face_cm(theFaces_r, n));
+        printf("Flux Rad L (Sl=%.12g) (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", Sl, pL[RHO], pL[PPP], pL[URR], pL[UPP],FL[DDD],FL[SRR],FL[LLL],FL[TAU]);
+        printf("Flux Rad R (Sr=%.12g) (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", Sr, pR[RHO], pR[PPP], pR[URR], pR[UPP],FR[DDD],FR[SRR],FR[LLL],FR[TAU]);
+        printf("Flux Rad * (rhostar=%.12g, Sr=%.12g, Sp=%.12g, tau=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", us[DDD], us[SRR], us[LLL], us[TAU],fs[DDD],fs[SRR],fs[LLL],fs[TAU]);
     }
     
     riemann_destroy(theRiemann); // clean up
@@ -127,6 +132,22 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       riemann_destroy(theRiemann); // clean up
     }
   }
+  
+  //TODO: Remove these dumb print statements
+  if(PRINTTOOMUCH)
+  {
+  printf("\n");
+  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+        
+            struct Cell * c = &(theCells[k][i][j]);
+            printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g)\n",i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[PPP],c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[TAU]);
+        }
+    }
+  }
+  }
+  
   //Source Terms
   cell_add_src( theCells ,theSim, theGravMasses , dt ); // add source terms
 
@@ -152,7 +173,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_update_dphi( theCells ,theSim); // all the cells to change size
   gravMass_update_RK( theGravMasses ,theSim, theTimeStep->RK ); // allow the GravMasses to move
   cell_calc_prim( theCells ,theSim); // calculate primitives
-  
+
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);

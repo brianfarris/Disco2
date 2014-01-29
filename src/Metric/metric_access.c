@@ -102,7 +102,14 @@ double metric_dg_uu(struct Metric *g, int k, int i, int j)
 
 double metric_dlapse(struct Metric *g, int k)
 {
-    return -0.5 * metric_dg_uu(g,k,0,0) / sqrt(-g->g_uu[0]*g->g_uu[0]*g->g_uu[0]);
+    return 0.5 * metric_dg_uu(g,k,0,0) / sqrt(-g->g_uu[0]*g->g_uu[0]*g->g_uu[0]);
+}
+
+double metric_dshift_u(struct Metric *g, int k, int i)
+{
+    if(i <= 0 || i > 3)
+        return 0.0;
+    return g->g_uu[i]*metric_dg_uu(g,k,0,0)/(g->g_uu[0]*g->g_uu[0]) - metric_dg_uu(g,k,0,i)/(g->g_uu[0]);
 }
 
 int metric_killcoord(struct Metric *g, int k)

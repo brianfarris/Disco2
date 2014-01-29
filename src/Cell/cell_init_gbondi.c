@@ -8,14 +8,13 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
-    double rho  = 1.0;
-    double Pp  = 0.1;
-    double vr = 0.0;
-    double vp = 0.0;
-    double vz = 0.0;
-    double R = 10.0;
-    double w = 3.0;
+void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int j,int k)
+{
+    double rho, Pp, vr, u, T;
+    double GAMMALAW = sim_GAMMALAW(theSim);
+    double RG = sim_GravRadius(theSim);
+    double rs = sim_InitPar1(theSim);
+    double Mdot = sim_InitPar2(theSim);
 
     double rm = sim_FacePos(theSim,i-1,R_DIR);
     double rp = sim_FacePos(theSim,i,R_DIR);
@@ -25,13 +24,65 @@ void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int 
     double z = 0.5*(zm+zp);
     double t = theCell->tiph-.5*theCell->dphi;
 
-    
+    double n = 1.0/(GAMMALAW-1.0);
+    double us = sqrt(0.25*RG/rs);
+    double Ts = n*us*us / ((1+n)*(1-(n+3)*us*us));
 
-    theCell->prim[RHO] = rho*exp(-(r-R)*(r-R)/(2*w*w));
-    theCell->prim[PPP] = Pp*exp(-(r-R)*(r-R)/(2*w*w));
+    double C1 = us * pow(Ts,n) *rs*rs;
+    double C2 = (1.0+(1.0+n)*Ts)*(1+(1+n)*Ts)*(1-RG/rs+us*us);
+
+    double T0 = (sqrt(C2)-1) / (1+n);
+    double K = pow(4*M_PI*C1/Mdot, GAMMALAW-1);
+
+    double c1 = 1.0 + n;
+    double c2 = 1.0 - RG/r;
+    double c3 = C1*C1/(r*r*r*r);
+
+    double t0 = -10;
+    double t1 = T0;
+
+    double EPS = 0.00001;
+
+    int count = 0;
+    while(fabs((t1-t0)/t0) > EPS)
+    {
+        t0 = t1;
+        double f1 = (1.0+c1*t0)*(1.0+c1*t0);
+        double df1 = 2.0*c1*(1.0+c1*t0);
+        double f2 = c2 + c3*pow(t0,-2.0*n);
+        double df2 = -2.0*n*c3*pow(t0,-2.0*n-1.0);
+        double f = f1*f2 - C2;
+        double df = df1*f2 + df2*f1;
+
+        if(r < rs && df > 0.0)
+            t1 = 0.5*t0;
+        else if(r >= rs && df < 0.0)
+            t1 = 2.0*t0;
+        else
+            t1 -= f/df;
+        
+        if(t1 < 0)
+            t1 = 0.5*t0;
+
+        count++;
+        if(count > 10000)
+        {
+            printf("Bondi BC failed to converge. (r=%lg)\n",r);
+            break;
+        }
+    }
+    T = t1;
+    u = C1/(pow(T,n)*r*r);
+
+    rho = pow(T/K, n);
+    Pp = rho * T;
+    vr = - sqrt((1.0-RG/r) / (1+u*u/(1.0-RG/r))) * u;
+
+    theCell->prim[RHO] = rho;
+    theCell->prim[PPP] = Pp;
     theCell->prim[URR] = vr;
-    theCell->prim[UPP] = vp;
-    theCell->prim[UZZ] = vz;
+    theCell->prim[UPP] = 0.0;
+    theCell->prim[UZZ] = 0.0;
     theCell->divB = 0.0;
     theCell->GradPsi[0] = 0.0;
     theCell->GradPsi[1] = 0.0;
@@ -43,13 +94,27 @@ void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int 
 void cell_init_gbondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup)
 {
 
-    double rho  = 1.0;
-    double Pp  = 0.1;
-    double vr = 0.0;
-    double vp = 0.0;
-    double vz = 0.0;
-    double R = 10.0;
-    double w = 3.0;
+    double rho, Pp, vr, u, T;
+    double GAMMALAW = sim_GAMMALAW(theSim);
+    double RG = sim_GravRadius(theSim);
+    double rs = sim_InitPar1(theSim);
+    double Mdot = sim_InitPar2(theSim);
+
+    double n = 1.0/(GAMMALAW-1.0);
+    double us = sqrt(0.25*RG/rs);
+    double Ts = n*us*us / ((1+n)*(1-(n+3)*us*us));
+
+    double C1 = us * pow(Ts,n) *rs*rs;
+    double C2 = (1.0+(1.0+n)*Ts)*(1+(1+n)*Ts)*(1-RG/rs+us*us);
+            
+    double T0 = (sqrt(C2)-1) / (1+n);
+    double K = pow(4.0*M_PI*C1/Mdot, GAMMALAW-1);
+    T = T0;
+
+    double rho0 = pow(T0/K,n);
+    double Pp0 = rho0 * T0;
+    printf("Setting up Bondi Problem: RG=%lg, rs=%lg, Mdot=%lg\n",RG,rs,Mdot);
+    printf("rho0: %lg, P0: %lg\n", rho0, Pp0);
 
     int i, j, k;
     for (k = 0; k < sim_N(theSim,Z_DIR); k++) 
@@ -62,15 +127,66 @@ void cell_init_gbondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
             double zm = sim_FacePos(theSim,k-1,Z_DIR);
             double zp = sim_FacePos(theSim,k,Z_DIR);
             double z = 0.5*(zm+zp);
+
+            double c1 = 1.0 + n;
+            double c2 = 1.0 - RG/r;
+            double c3 = C1*C1/(r*r*r*r);
+
+            double t0 = -10;
+            double t1;
+            if(r < rs)
+                t1 = 2*Ts;
+            else
+                t1 = 0.5*Ts;
+
+            double EPS = 0.00001;
+
+            double f1,f2,df1,df2,f,df;
+            int count = 0;
+            while(fabs((t1-t0)/t0) > EPS)
+            {
+                t0 = t1;
+
+                f1 = (1.0+c1*t0)*(1.0+c1*t0);
+                df1 = 2.0*c1*(1.0+c1*t0);
+                f2 = c2 + c3*pow(t0,-2.0*n);
+                df2 = -2.0*n*c3*pow(t0,-2.0*n-1.0);
+                f = f1*f2 - C2;
+                df = df1*f2 + df2*f1;
+                
+                if(r < rs && df > 0.0)
+                    t1 = 0.5*t0;
+                else if(r >= rs && df < 0.0)
+                    t1 = 2.0*t0;
+                else
+                    t1 -= f/df;
+                
+                if(t1 < 0)
+                    t1 = 0.5*t0;
+
+                count++;
+                if(count > 100)
+                {
+                    printf("Bondi BC failed to converge. (r=%lg, f=%lg, df=%lg)\n",r,f,df);
+                    break;
+                }
+            }
+            T = t1;
+            u = C1/(pow(T,n)*r*r);
+
+            rho = pow(T/K, n);
+            Pp = rho * T;
+            vr = - sqrt((1.0-RG/r) / (1+u*u/(1.0-RG/r))) * u;
+
             for (j = 0; j < sim_N_p(theSim,i); j++) 
             {
                 double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
              
-                theCells[k][i][j].prim[RHO] = rho*exp(-(r-R)*(r-R)/(2*w*w));
-                theCells[k][i][j].prim[PPP] = Pp*exp(-(r-R)*(r-R)/(2*w*w));
+                theCells[k][i][j].prim[RHO] = rho;
+                theCells[k][i][j].prim[PPP] = Pp;
                 theCells[k][i][j].prim[URR] = vr;
-                theCells[k][i][j].prim[UPP] = vp;
-                theCells[k][i][j].prim[UZZ] = vz;
+                theCells[k][i][j].prim[UPP] = 0.0;
+                theCells[k][i][j].prim[UZZ] = 0.0;
                 theCells[k][i][j].divB = 0.0;
                 theCells[k][i][j].GradPsi[0] = 0.0;
                 theCells[k][i][j].GradPsi[1] = 0.0;

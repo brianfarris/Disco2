@@ -118,7 +118,7 @@ double sim_RDAMP_INNER(struct Sim *);
 double sim_RDAMP_OUTER(struct Sim *);
 int sim_InitPar0(struct Sim *);
 double sim_InitPar1(struct Sim *);
-double sim_G_InitPar2(struct Sim *);
+double sim_InitPar2(struct Sim *);
 
 int sim_GravMassType(struct Sim * );
 //set Grid data

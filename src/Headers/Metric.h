@@ -40,6 +40,7 @@ double metric_sqrtg(struct Metric *g);
 double metric_dg_dd(struct Metric *g, int k, int i, int j);
 double metric_dg_uu(struct Metric *g, int k, int i, int j);
 double metric_dlapse(struct Metric *g, int k);
+double metric_dshift_u(struct Metric *g, int k, int i);
 int metric_killcoord(struct Metric *g, int i);
 
 //routines

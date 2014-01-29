@@ -107,7 +107,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
         printf("r = %lg, dV = %lg\n", r, dV);
         printf("rho = %lg, P = %lg, vr = %lg, vp = %lg, vz = %lg\n",prim[RHO],prim[PPP],prim[URR],prim[UPP],prim[UZZ]);
         printf("rhostar = %lg, tau = %lg, Sr = %lg, Sp = %lg, Sz = %lg\n",cons[DDD],cons[TAU],cons[SRR],cons[LLL],cons[SZZ]);
-        exit(0);
+        //exit(0);
     }
 
     //Inital guess: previous value of prim
@@ -135,7 +135,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
 
     if(wmo < 0.0)
     {
-        printf("ERROR: w-1 < 0 in cons2prim_gr. (wmo = %lg)\n", wmo);
+        printf("ERROR: w-1 < 0 in cons2prim_gr. (r = %lg, wmo = %lg)\n", r, wmo);
         wmo = 0.0;
     }
     
@@ -144,9 +144,12 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
     u0 = w/a;
     hmo = w*(e-w)/(w*w-gam);
     if(hmo < -1.0)
-        printf("ERROR: h < 0 in cons2prim_gr (h-1 = %lg)\n", hmo);
+        printf("ERROR: h < 0 in cons2prim_gr (r = %lg, h-1 = %lg)\n", r, hmo);
     else if(hmo < 0.0)
-        printf("ERROR?: h < 1 in cons2prim_gr (h-1 = %lg)\n", hmo);
+    {
+        printf("ERROR: h < 1 in cons2prim_gr (r = %lg, h-1 = %lg)\n", r, hmo);
+        printf("       e^2 = %lg, s^2 = %lg, w =%lg\n", e*e, s2, w);
+    }
 
     RHO_FLOOR = sim_RHO_FLOOR(theSim);
     CS_FLOOR = sim_CS_FLOOR(theSim);

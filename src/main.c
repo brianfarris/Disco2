@@ -50,6 +50,7 @@
 #include "Headers/IO.h"
 #include "Headers/TimeStep.h"
 #include "Headers/Diagnostics.h"
+#include "Headers/Metric.h"
 #include "Headers/header.h"
 
 
@@ -132,8 +133,8 @@ int main(int argc, char **argv) {
   printf("Setting up diagnostics.\n");
   // set up diagnostics struct
   struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep,theMPIsetup);
+ 
 
-  
   printf("let's go!\nStarting Loop.\n");
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
     // here the actual timestep is taken
