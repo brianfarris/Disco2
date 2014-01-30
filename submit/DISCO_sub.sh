@@ -5,7 +5,7 @@
 #Torque directives
 #PBS -N DISCO_sub.sh
 #PBS -W group_list=yetiastro
-#PBS -l nodes=6:ppn=8,walltime=00:16:00:00,mem=32000mb
+#PBS -l nodes=4:ppn=16:ib,walltime=00:48:00:00,mem=32000mb
 #PBS -M djd2134@columbia.edu
 #PBS -m abe
 #PBS -V
@@ -14,4 +14,6 @@
 #PBS -o /vega/astro/users/djd2134/Disco2/hpcout
 #PBS -e /vega/astro/users/djd2134/Disco2/hpcerr
 
-mpirun -n 48 bin/disco parfiles/milos_macfadyen.par > DISCO_out
+
+
+mpirun -n 64 bin/disco parfiles/milos_macfadyen.par > DISCO_out

@@ -58,8 +58,19 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       double rp = sim_FacePos(theSim,i,R_DIR);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         double dp = theCells[k][i][j].dphi;
-        double dAtot;
-        if( direction==R_DIR ) dAtot = dz*(rp+rm)*dp; else dAtot = 2.*.5*(rp*rp-rm*rm)*dp;
+	//Suggestion by Brian Jan 16 2014
+	double dAtot;
+        if( direction==R_DIR ){
+          if (i==0){
+            dAtot = dz*rp*dp;
+          }else{
+            dAtot = dz*(rp+rm)*dp;
+          }
+        } else{
+          dAtot = 2.*.5*(rp*rp-rm*rm)*dp;
+        }
+	// double dAtot;
+        //if( direction==R_DIR ) dAtot = dz*(rp+rm)*dp; else dAtot = 2.*.5*(rp*rp-rm*rm)*dp;
         for( q=0 ; q<NUM_Q ; ++q ){
           theCells[k][i][j].grad[q] /= dAtot;
         }

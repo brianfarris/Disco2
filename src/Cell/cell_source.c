@@ -27,11 +27,16 @@ void get_rho_sink( struct GravMass * theGravMasses, double RhoSinkTimescale, int
   double script_r = sqrt(dx*dx+dy*dy);
   double qq = gravMass_M(theGravMasses,1)/gravMass_M(theGravMasses,0);
   double ab = gravMass_r(theGravMasses,0) + gravMass_r(theGravMasses,1);
+  // Calculate accretion rate
+  double Mach0 = 20.0;
+  double alph  = 1.0; 
+  // Thin Disk Accretion Farris 2013
+  double tacc = 1./3./M_PI/alph*Mach0*Mach0*pow(script_r,1.5)*pow(1./(1.+1./qq),-0.5) * 2*M_PI*pow(ab,1.5);
 
   // Calculate Bondi accretion for an accretion radius the minimum of Hill, Bondi and 2/3 scale height (~trq cutoff)
   double Rhill  = ab*pow((qq/3.),(1./3.)) * 1.0; //Racc = eta *RHill < R_Bondi < Rhill ~ eps
-  double Rbondi = gravMass_M(theGravMasses,1) * 20.*20./( gravMass_r(theGravMasses,1)*gravMass_r(theGravMasses,1) *gravMass_omega(theGravMasses,1)*gravMass_omega(theGravMasses,1) ); //20 is the Mach number
-  double Hscl = 1/20. * gravMass_r(theGravMasses,1);
+  double Rbondi = gravMass_M(theGravMasses,1) * Mach0*Mach0/( gravMass_r(theGravMasses,1)*gravMass_r(theGravMasses,1) *gravMass_omega(theGravMasses,1)*gravMass_omega(theGravMasses,1) ); //20 is the Mach number
+  double Hscl = 1/Mach0 * gravMass_r(theGravMasses,1);
   double Racc = fmin(Rhill, Rbondi);
   //Racc = fmin(Racc, Hscl);
   // if (script_r > Racc) {
@@ -45,8 +50,8 @@ void get_rho_sink( struct GravMass * theGravMasses, double RhoSinkTimescale, int
   // if MdoMsec then q^2, if MdoMprim then q
   //double TBondi = 1.0;//1./(2.6*(10.0)/M_PI * 0.00209 *0.00209 * pow(20.,7.));
   
-  if (script_r < Racc){
-    *rho_sink = rho / (fmax(RhoSinkTimescale, dt*2.)); //* exp(-script_r*script_r/(Racc*Racc));  //was sigma=0.25
+  if (script_r < Racc && rho > 0.00001){
+    *rho_sink = rho / (fmax(RhoSinkTimescale*tacc, dt*2.)); //* exp(-script_r*script_r/(Racc*Racc));  //was sigma=0.25
   }else{
     *rho_sink = 0.0;
   }
@@ -93,10 +98,12 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
 ///FOR LIVE BINARY UPDATE FORCES ON HOLES
 void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, struct GravMass * theGravMasses ){
 	///Set a density scale for feedback to holes
-        double dens_scale = (sim_Mdisk_ovr_Ms(theSim)/(1.+1./sim_MassRatio(theSim)))/(M_PI*sim_sep0(theSim)*sim_sep0(theSim));// 
-  //* exp(-sim_tmig_on(theSim)/( time_global+0.001 - sim_tmig_on(theSim) ));; //set density scale by frac of primary mass within a_0
-        // ABOVE^ Allow migration to turn on slowly
-	
+        double dens_scale = (sim_Mdisk_ovr_Ms(theSim)/(1.+1./sim_MassRatio(theSim)))/(M_PI*sim_sep0(theSim)*sim_sep0(theSim));
+	if (time_global <= (sim_tmig_on(theSim) + 10.0) ){
+	  dens_scale *= (time_global - sim_tmig_on(theSim))/(10.0 );
+          // ABOVE^ Allow migration to turn on slowly
+	}	
+
 	double Rhill = ( gravMass_r(theGravMasses, 0) + gravMass_r(theGravMasses, 1) ) * pow((sim_MassRatio(theSim)/3.),(1./3.)); 
 	int i,j,k,p;
 	int Np   = sim_NumGravMass(theSim);
@@ -147,7 +154,7 @@ void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, str
 					double ffr;
 					double ffp;
 					if (p==0){
-					    if (r > 0.3){
+					    if (r > 0.15){
 					         gravMassForce( theGravMasses , theSim , p , r , phi , &ffr , &ffp );
 						 Fr[0] -= 0.0;//ffr*dm;
 						 Fp[0] -= 0.0;//ffp*dm;
@@ -162,7 +169,7 @@ void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, str
 					}
 				// only applying force to secondary for now
 					if (p==1){
-					    if (script_r > Rhill && r>0.3){ //Only sum forces outside the secondary Hill radius & Damping Region
+					    if (script_r > 1.*Rhill && r>0.15){ //Only sum forces outside the secondary Hill radius & Damping Region
 				         	gravMassForce(theGravMasses , theSim , p , r , phi , &ffr , &ffp );
 					        Fr[1] -= ffr*dm; //try Torque 
 					        Fp[1] -= ffp*dm;

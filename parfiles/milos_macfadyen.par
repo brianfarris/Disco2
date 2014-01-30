@@ -2,22 +2,22 @@
 //Disco Parameter File//
 
 InitialDataType         10               // 0 Flock, 1 Shear 7 MM08 10 SSmigration
-GravMassType            2               // 0 none, 1 single, 2 binary, 3 live binary
-MassRatio               0.0000209    // 0.0209M_{Th} for Mach=10
+GravMassType            3               // 0 none, 1 single, 2 binary, 3 live binary
+MassRatio               0.02 //0.00000261     // 0.0209M_{Th} for Mach=20
 sep0                    1.0            // starting binary separation 
                                         //(or permanent separations if GravMassType is not 3)
 Restart			0		//If this=1 restart using input.h5
 
 //Computational Grid
-NumR			1024			//Radial Zones
+NumR			512			//Radial Zones
 NumZ			1			//Vertical Zones
 ng                      2
 R_Min			0.1   //was 0.05
 R_Max			4.0
 Z_Min			-1.0
 Z_Max			1.0
-NP_CONST                -1 
-NPCAP                   4096 //aspect 1 out to >~2.3
+NP_CONST                -256 
+NPCAP                   512 //aspect 1 out to >~
 aspect                  1.0
 
 NUM_C                   5
@@ -25,22 +25,22 @@ NUM_N                   0
 Time_Max                628318.5307
 Num_Checkpoints	        4.	
 Num_Diag_Dump           100000.0
-Num_Diag_Measure        50000000.0
+Num_Diag_Measure        20000000.0
 
 NoInnerBC               1
 BoundTypeR           	1               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ           	2               // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry          	1
 
-Move_Cells              3           // 0 DONT 3 Rigid, 4 Kepler
+Move_Cells              4           // 0 DONT 3 Rigid, 4 Kepler
 RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index         1.001
-Explicit_Viscosity      -0.000025  // if nu cst in header.h then this should be alpha/Mach^2
+Explicit_Viscosity      0.00025  // if nu cst in header.h then this should be alpha for IC 10
 
-RhoSinkTimescale        -1.0   //BONDI ~number orbits needed to accrete local density -  negative means no sink
+RhoSinkTimescale        -1.0   // negative means no sink
 
-Mdisk_ovr_Ms            15.0   //Fraction of secondary mass in disk r<a
-tmig_on                 0.0 //87.9646 //62.83138  // time when live binary turns on
+Mdisk_ovr_Ms            0.1   //Fraction of secondary mass in disk r<a
+tmig_on                 25.0 //87.9646 //62.83138  // time when live binary turns on
 
 DivB_Ch			0.06		//Dedner divergence cleaning
 DivB_l			0.1
@@ -51,7 +51,7 @@ PLM			1.0
 POWELL                  1
 w_a_type                0
 Grav_2D			1
-G_EPS		        0.005  //0.16
+G_EPS		        0.01  //0.16
 
 PHI_ORDER               2
 
@@ -64,12 +64,12 @@ SET_T                   1
 
 runtype                 0
 
-DAMP_TIME               1000000.0       // Set negative to turn off
-RDAMP_INNER             0.3
-RDAMP_OUTER             3.5
+DAMP_TIME               -0.001       // Set negative to turn off
+RDAMP_INNER             0.1
+RDAMP_OUTER             3.6
 
 RLogScale               10000.0//13.14   // Large numbers gives uniform spacing
 ZLogScale               10000.0
 HiResSigma              0.3    // SET IN sim_set.c
 HiResR0                 0.99    //SET IN sim_set.c
-HiResFac                5.0 //changes by factor of 1+HiResFac at r0.
+HiResFac                1.0 //changes by factor of 1+HiResFac at r0.
