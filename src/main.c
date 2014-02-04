@@ -147,7 +147,7 @@ int main(int argc, char **argv) {
     diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
 
     // checkpointing
-    if( timestep_get_t(theTimeStep)>io_tcheck(theIO)){ // time to write checkpoint file
+    if( timestep_get_t(theTimeStep)>=io_tcheck(theIO)){ // time to write checkpoint file
       io_allocbuf(theIO,theSim); // allocate memory for a buffer to store simulation data
       io_setbuf(theIO,theCells,theSim,theGravMasses); // fill the buffer
       io_hdf5_out(theIO,theSim,theTimeStep); // write contents to file

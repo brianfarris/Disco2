@@ -10,7 +10,7 @@
 
 
 void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * theTimeStep,struct Sim * theSim,struct MPIsetup * theMPIsetup){
-  if (timestep_get_t(theTimeStep)>diagnostics_tdiag_dump(theDiagnostics)){
+  if (timestep_get_t(theTimeStep)>=diagnostics_tdiag_dump(theDiagnostics)){
     double dt_dump = timestep_get_t(theTimeStep) - theDiagnostics->toutprev_dump;
     if(mpisetup_MyProc(theMPIsetup)==0){
       int NUM_EQ = theDiagnostics->NUM_DIAG+2;

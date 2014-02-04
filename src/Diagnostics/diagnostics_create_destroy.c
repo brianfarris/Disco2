@@ -110,16 +110,16 @@ struct Diagnostics *diagnostics_create(struct Sim * theSim, struct TimeStep * th
   theDiagnostics->toutprev_dump = timestep_get_t(theTimeStep);
 
   // for determining when to measure diagnostics
-  theDiagnostics->dtdiag_measure = sim_get_T_MAX(theSim)/sim_NUM_DIAG_MEASURE(theSim);
-  theDiagnostics->tdiag_measure = theDiagnostics->dtdiag_measure;
+  theDiagnostics->dtdiag_measure = sim_get_T_MAX(theSim)/(sim_NUM_DIAG_MEASURE(theSim)-1);
+  theDiagnostics->tdiag_measure = 0.0;
   // for determining when to dump diagnostics
-  theDiagnostics->dtdiag_dump = sim_get_T_MAX(theSim)/sim_NUM_DIAG_DUMP(theSim);
-  theDiagnostics->tdiag_dump = theDiagnostics->dtdiag_dump;
+  theDiagnostics->dtdiag_dump = sim_get_T_MAX(theSim)/(sim_NUM_DIAG_DUMP(theSim)-1);
+  theDiagnostics->tdiag_dump = 0.0;
 
-  while( theDiagnostics->tdiag_measure< timestep_get_t(theTimeStep)){
+  while( theDiagnostics->tdiag_measure < timestep_get_t(theTimeStep)){
     theDiagnostics->tdiag_measure+=theDiagnostics->dtdiag_measure;
   }
-  while( theDiagnostics->tdiag_dump< timestep_get_t(theTimeStep)){
+  while( theDiagnostics->tdiag_dump < timestep_get_t(theTimeStep)){
     theDiagnostics->tdiag_dump+=theDiagnostics->dtdiag_dump;
   }
 

@@ -50,6 +50,8 @@ void cell_init_gbondi(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_gbondi(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_equil1(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_equil1(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_equil2(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_equil2(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data

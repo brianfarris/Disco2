@@ -187,6 +187,27 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
         hn = r;
     else
         hn = 1.0;
+/*
+    int dir;
+    double gA;
+    if theRiemann->n[0] == 1
+    {
+        dir = 0;
+        gA = r;
+    }
+    else if theRiemann->n[0] == 2
+    {
+        dir = 1;
+        gA = 1.0;
+    }
+    else
+    {
+        dir = 2;
+        gA = r;
+    }
+    hn = 1.0/sqrt(metric_g_uu(g, dir+1,dir+1));
+*/
+    
     rhoh = rho+GAMMALAW*Pp/(GAMMALAW-1.);
     
     //Fluxes

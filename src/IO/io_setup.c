@@ -9,8 +9,11 @@
 
 void io_setup(struct IO * theIO,struct Sim * theSim,struct TimeStep * theTimeStep){
   theIO->nfile=0;
-  theIO->dtcheck = sim_get_T_MAX(theSim)/sim_NUM_CHECKPOINTS(theSim);
-  theIO->tcheck = theIO->dtcheck;
+  if(sim_NUM_CHECKPOINTS(theSim) < 1)
+    theIO->dtcheck = sim_get_T_MAX(theSim);
+  else
+    theIO->dtcheck = sim_get_T_MAX(theSim)/(sim_NUM_CHECKPOINTS(theSim)-1);
+  theIO->tcheck = 0.0;
   while( theIO->tcheck < timestep_get_t(theTimeStep)){
     theIO->tcheck += theIO->dtcheck;
     ++theIO->nfile;

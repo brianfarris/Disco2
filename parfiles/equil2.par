@@ -1,8 +1,9 @@
 //Disco Parameter File//
 
-InitialDataType         10      // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform, 
+InitialDataType         11      // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform, 
                                 // 4 Shock1, 5 Shock2, 6 Shock3, 7 Shock4,
-                                // 8 Isentrope, 9 GR-Bondi, 10 Equilibrium1
+                                // 8 Isentrope, 9 GR-Bondi, 10 Equilibrium1,
+                                // 11 Equilibrium2
 GravMassType            0       // 0 none, 1 single, 2 binary
 Background              1       // 0 Newtonian, 1 GR
 Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
@@ -10,19 +11,19 @@ Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR			256			//Radial Zones
+NumR			64			//Radial Zones
 NumZ			1          //Vertical Zones
 ng              2
 R_Min		    1.0
-R_Max			9.0
+R_Max			10.0
 Z_Min			-0.5
 Z_Max			0.5
-NP_CONST        5
-aspect                  1.0
+NP_CONST        -1
+aspect          1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                100.0
+Time_Max                50.0
 Num_Checkpoints	        5
 Num_Diag_Dump           20
 Num_Diag_Measure        20
@@ -43,7 +44,7 @@ PLM			1.0
 
 Grav_2D			1
 G_EPS			0.0
-GravRadius      0.5
+GravRadius      0.1
 
 //Initial Condition Parameters
 InitPar0        0

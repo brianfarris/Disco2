@@ -11,7 +11,7 @@
 #include "../Headers/header.h"
 
 void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCells,struct Sim * theSim,struct TimeStep * theTimeStep,struct MPIsetup * theMPIsetup,struct GravMass * theGravMasses){
-  if (timestep_get_t(theTimeStep)>diagnostics_tdiag_measure(theDiagnostics)){
+  if (timestep_get_t(theTimeStep)>=diagnostics_tdiag_measure(theDiagnostics)){
     int num_r_points = sim_N(theSim,R_DIR)-sim_Nghost_min(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR);
     int num_r_points_global = sim_N_global(theSim,R_DIR);
 
