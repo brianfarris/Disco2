@@ -7,6 +7,7 @@
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/TimeStep.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
 void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * theFaces , struct TimeStep * theTimeStep , struct MPIsetup * theMPIsetup ,  int direction ){
