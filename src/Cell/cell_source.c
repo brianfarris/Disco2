@@ -50,6 +50,7 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
   double pp = gravMass_phi(theGravMasses,p);
   double cosp = cos(phi);
   double sinp = sin(phi);
+  //printf("rp: %e\n",rp);
   double dx = r*cosp-rp*cos(pp);
   double dy = r*sinp-rp*sin(pp);
   double script_r = sqrt(dx*dx+dy*dy);
@@ -143,24 +144,15 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double F_centrifugal_r = cell_wiph(c)*cell_wiph(c)/r;
         double F_coriolis_r =  2.*cell_wiph(c)*vp/r;
         double F_coriolis_phi = -2.*cell_wiph(c)*vr/r;
-        double F_euler_phi = 0.0; // ONLY TRUE FOR cell_wiph = const !!!!
-        double drOm = 0.0;
-        if ((sim_InitialDataType(theSim)==FLOCK)||(sim_InitialDataType(theSim)==STONE)){
-          drOm = -1.5*cell_wiph(c)/r/r;
-          F_euler_phi =  -vr*r*drOm;
-        } else if (sim_InitialDataType(theSim)==FIELDLOOP){
-          drOm = 0.0;
-          F_euler_phi = -vr*r*drOm;
-        } else if (sim_InitialDataType(theSim)==TORUS){
-          drOm = -2.*cell_wiph(c)/r/r;
-          F_euler_phi =  -vr*r*drOm;
-        }
-         
+        double drOm = c->drOm;
+        double F_euler_phi =  -vr*r*drOm;
+
         c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;
         c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r+F_coriolis_r);
         c->cons[LLL] += dt*dV*rho*(Fp+F_coriolis_phi+F_euler_phi)*r;
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( (Fr*sint+F_centrifugal_r)*vr+Fr*vz*cost + (Fp+F_euler_phi)*vp);
+    
         if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
           total_torque_temp += Fp*r;
           //total_Fr_temp += Fr;
@@ -184,9 +176,6 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           double B2 = Br*Br+Bp*Bp+Bz*Bz;
           double divB = c->divB;
           double GradPsi[3];
-          //GradPsi[0] = 0.0;//r*c->GradPsi[0];
-          //GradPsi[1] = 0.0;//r*c->GradPsi[1];
-          //GradPsi[2] = 0.0;//r*c->GradPsi[2];
           GradPsi[0] = r*c->GradPsi[0];
           GradPsi[1] = r*c->GradPsi[1];
           GradPsi[2] = r*c->GradPsi[2];
@@ -195,11 +184,6 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           double BdotGradPsi = /*dV**/(Br*GradPsi[0]+Bp*GradPsi[1]+Bz*GradPsi[2]);
           double vdotGradPsi = /*dV**/(vr*GradPsi[0]+(vp-sim_W_A(theSim,r))*GradPsi[1]+vz*GradPsi[2]);
 
-          /*
-             if (fabs(z)<0.00001){
-             fprintf(gradpsifile,"%e %e %e %e %e\n",r,phi,dV,GradPsi[0]/dV, c->prim[PSI]);
-             }
-             */
           c->cons[SRR] += dt*dV*( .5*B2 - Bp*Bp )/r;
           c->cons[TAU] += dt*dV*r*Br*Bp*drOm;
           double psi = c->prim[PSI];
@@ -208,16 +192,25 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           //c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
           c->cons[BPP] += dt*dV*Br*drOm;
 
-          //if (r>2. && r<3.){
-            c->cons[SRR] -= POWELL*dt*divB*Br;
-            c->cons[SZZ] -= POWELL*dt*divB*Bz;
-            c->cons[LLL] -= POWELL*dt*divB*Bp*r;
-            c->cons[TAU] -= POWELL*dt*(divB*vdotB+BdotGradPsi);
-            c->cons[BRR] -= POWELL*dt*divB*vr;
-            c->cons[BPP] -= POWELL*dt*divB*vp/r;
-            c->cons[BZZ] -= POWELL*dt*divB*vz;
-            c->cons[PSI] -= POWELL*dt*vdotGradPsi;
-          //}
+          c->cons[SRR] -= POWELL*dt*divB*Br;
+          c->cons[SZZ] -= POWELL*dt*divB*Bz;
+          c->cons[LLL] -= POWELL*dt*divB*Bp*r;
+          c->cons[TAU] -= POWELL*dt*(divB*vdotB+BdotGradPsi);
+          c->cons[BRR] -= POWELL*dt*divB*vr;
+          c->cons[BPP] -= POWELL*dt*divB*vp/r;
+          c->cons[BZZ] -= POWELL*dt*divB*vz;
+          c->cons[PSI] -= POWELL*dt*vdotGradPsi;
+
+        } 
+        //cooling
+        double numfac = 1.;
+        double a_o_M = 100.0;
+        if (cooling==1){
+          double cooling_cap = c->cons[TAU]*1000000000000000.0;
+          //double cooling_term = numfac * pow(Pp/rho,0.5)*pow(r,-1.5)*pow(a_o_M,0.5)*dt*dV;
+          double cooling_term = 9./4.*0.1*5./3.*1.e6/rho*pow(Pp/rho,4.)*dt*dV;
+          if (cooling_term>cooling_cap) cooling_term = cooling_cap;
+          c->cons[TAU] -= cooling_term;
         }
       }
     }
@@ -227,8 +220,6 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
   MPI_Allreduce( Mdot_temp,Mdot_reduce , 2, MPI_DOUBLE, MPI_SUM, sim_comm);
   double total_torque_reduce;
   MPI_Allreduce( &total_torque_temp,&total_torque_reduce, 1, MPI_DOUBLE, MPI_SUM, sim_comm);
-  //double total_Fr_reduce;
-  //MPI_Allreduce( &total_Fr_temp,&total_Fr_reduce, 1, MPI_DOUBLE, MPI_SUM, sim_comm);
   int p;
   for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
     gravMass_set_Mdot(theGravMasses,Mdot_reduce[p],p);
@@ -248,12 +239,16 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, double dt
         struct Cell * c = &(theCells[k][i][j]);
         double dphi = c->dphi;
         double rho = c->prim[RHO];
+        double P = c->prim[PPP];
         double r   = .5*(rp+rm);
+        double om = pow(r,-1.5);
         double vr  = c->prim[URR];
         double dz = zp-zm;
         double dV = dphi*.5*(rp*rp-rm*rm)*dz;
-        double nu = sim_EXPLICIT_VISCOSITY(theSim);
-        // c->cons[SRR] += -dt*dV*nu*rho*vr/r/r;
+        double alpha = sim_EXPLICIT_VISCOSITY(theSim);
+        double r_dr_om = -1.5*om;
+        double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P/om;
+        c->cons[TAU] += dt*dV*Sigma_nu*r_dr_om*(r_dr_om + r*c->grad[UPP] + c->gradp[URR]);
       }
     }
   }

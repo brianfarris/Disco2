@@ -18,6 +18,7 @@ struct Cell{
   double RKtiph;
   double dphi;
   double wiph;
+  double drOm;
   double divB;
   double GradPsi[3];
 };
@@ -52,6 +53,10 @@ void cell_init_testing(struct Cell ***,struct Sim *,struct MPIsetup * ) ;
 void cell_single_init_testing(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_divergence(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_divergence(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_rad_dom(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_rad_dom(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_middle(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_middle(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
@@ -87,7 +92,7 @@ void cell_set_w(struct Cell ***,struct Sim *);
 void cell_syncproc_r( struct Cell *** , struct Sim *,struct MPIsetup *);
 void cell_syncproc_z( struct Cell *** , struct Sim *,struct MPIsetup *);
 //PLM
-void cell_plm_rz( struct Cell *** ,struct Sim *, struct Face * , struct TimeStep * , int );
+void cell_plm_rz( struct Cell *** ,struct Sim *, struct Face * , struct TimeStep * , struct MPIsetup *, int );
 void cell_plm_p( struct Cell *** ,struct Sim * );
 //boundary conditions
 void cell_boundary_outflow_r( struct Cell *** , struct Face * ,struct Sim * ,struct MPIsetup *, struct TimeStep * );

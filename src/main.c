@@ -84,6 +84,8 @@ int main(int argc, char **argv) {
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);
 
+
+
   // create TimeStep struct
   struct TimeStep * theTimeStep = timestep_create(theSim);
 
@@ -108,6 +110,7 @@ int main(int argc, char **argv) {
   io_setup(theIO,theSim,theTimeStep);
 #endif
 
+
   // inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);
@@ -123,7 +126,7 @@ int main(int argc, char **argv) {
     timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
     // calculate diagnostics
     diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep,theMPIsetup,theGravMasses);
-  //write diagnostics to file
+    //write diagnostics to file
     MPI_Barrier(sim_comm);    
     diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
 #ifdef CHECKPOINTING

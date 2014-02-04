@@ -105,6 +105,7 @@ void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,voi
   double R0 = 1./sim_DAMP_TIME(theSim)/2./M_PI;
 
   int i,j,k,q;
+  /*
   for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
     double rp = sim_FacePos(theSim,i,R_DIR);
     double rm = sim_FacePos(theSim,i-1,R_DIR);
@@ -113,6 +114,8 @@ void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,voi
     if( r < sim_RDAMP_INNER(theSim) || r > sim_RDAMP_OUTER(theSim) ){
       double rate = R0*(r-sim_RDAMP_INNER(theSim))/(RMIN-sim_RDAMP_INNER(theSim));
       if( r > sim_RDAMP_OUTER(theSim) ) rate = R0*(r-sim_RDAMP_OUTER(theSim))/(RMAX-sim_RDAMP_OUTER(theSim));
+
+      printf("r: %e, rate: %e\n",r,rate);
 
       (*single_init_ptr)(initialCell,theSim,i,j,k);
       for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -125,15 +128,37 @@ void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,voi
       }
     }
   }
+  */
+  for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+    double rp = sim_FacePos(theSim,i,R_DIR);
+    double rm = sim_FacePos(theSim,i-1,R_DIR);
+    double r = .5*(rp+rm);
+
+    if( r < sim_RDAMP_INNER(theSim) || r > sim_RDAMP_OUTER(theSim) ){
+      double rate = R0*(r-sim_RDAMP_INNER(theSim))/(RMIN-sim_RDAMP_INNER(theSim));
+      if( r > sim_RDAMP_OUTER(theSim) ) rate = R0*(r-sim_RDAMP_OUTER(theSim))/(RMAX-sim_RDAMP_OUTER(theSim));
+
+      for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+          (*single_init_ptr)(initialCell,theSim,i,j,k);
+          //printf("r: %e, initialCell->prim[RHO]: %e\n",r,initialCell->prim[RHO]);
+          for( q=0 ; q<NUM_Q ; ++q ){
+            double dprim = initialCell->prim[q] - theCells[k][i][j].prim[q];
+            theCells[k][i][j].prim[q] += (1.-exp(-rate*dt))*dprim;
+          }
+        }
+      }
+    }
+  }
 }
 
 void cell_print(struct Cell *** theCells,int i,int j,int k){
   /*
-  printf("at i: %d, j: %d, k: %d, DDD: %e\n",i,j,k,theCells[k][i][j].cons[DDD]);
-  printf("at i: %d, j: %d, k: %d, TAU: %e\n",i,j,k,theCells[k][i][j].cons[TAU]);
-  printf("at i: %d, j: %d, k: %d, SRR: %e\n",i,j,k,theCells[k][i][j].cons[SRR]);
-  printf("at i: %d, j: %d, k: %d, LLL: %e\n",i,j,k,theCells[k][i][j].cons[LLL]);
-  printf("at i: %d, j: %d, k: %d, SZZ: %e\n",i,j,k,theCells[k][i][j].cons[SZZ]);
-  */
+     printf("at i: %d, j: %d, k: %d, DDD: %e\n",i,j,k,theCells[k][i][j].cons[DDD]);
+     printf("at i: %d, j: %d, k: %d, TAU: %e\n",i,j,k,theCells[k][i][j].cons[TAU]);
+     printf("at i: %d, j: %d, k: %d, SRR: %e\n",i,j,k,theCells[k][i][j].cons[SRR]);
+     printf("at i: %d, j: %d, k: %d, LLL: %e\n",i,j,k,theCells[k][i][j].cons[LLL]);
+     printf("at i: %d, j: %d, k: %d, SZZ: %e\n",i,j,k,theCells[k][i][j].cons[SZZ]);
+     */
   printf("theCells[%d][%d][%d].cons[BPP]: %e\n",k,i,j,theCells[k][i][j].cons[BPP]);
 }  

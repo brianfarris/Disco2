@@ -15,7 +15,7 @@ void sim_alloc_arr(struct Sim * theSim, struct MPIsetup * theMPIsetup) {
   int Nghost_min[2];
   int Nghost_max[2];
   if (mpisetup_dim_MyProc(theMPIsetup,0)==0){
-    Nghost_min[R_DIR]  = 2;
+    Nghost_min[R_DIR]  = 1;
   }else{
     Nghost_min[R_DIR]  = theSim->ng;
   }

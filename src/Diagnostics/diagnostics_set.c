@@ -96,7 +96,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double v2   = vr*vr + vp*vp + vz*vz;
           double B2   = Br*Br + Bp*Bp + Bz*Bz;
           double rhoe = press/(sim_GAMMALAW(theSim)-1.);
+          double KE = 0.5*rho*v2;
           double psi = cell_prim(cell_single(theCells,i,j,k),PSI);
+          double E_hydro = rhoe + KE;
 
           double dV = 0.5*(rp*rp-rm*rm)*dphi;
           double divB = fabs(cell_divB(theCells,i,j,k)/dV);
@@ -160,9 +162,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+7] = Br;            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+8] = Bp;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+9] = Bz;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+10] = psi;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+11] = Br*Br;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = Bp*Bp;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+10] = E_hydro;            
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+11] = KE;            
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = rhoe;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+13] = 0.5*B2;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = Br*Bp;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = divB;
@@ -180,9 +182,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+6] += (Br/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+7] += (Bp/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+8] += (Bz/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (psi/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (Br*Br/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (Bp*Bp/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (E_hydro/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (KE/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (rhoe/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (divB/sim_N_p(theSim,i)*dz) ;

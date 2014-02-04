@@ -10,15 +10,23 @@
 
 void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
   double rho = 1.0;
-  double Pp  = 0.1;
+  double Pp  = 0.01;
   double v0  = 1.0;
-  double t0  = 0.625+time_global;
+  double t0  = 0.25+time_global;
 
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
   double r = 0.5*(rm+rp);
   double t = theCell->tiph-.5*theCell->dphi;
-  double x  = r*cos(t)-2.;
+  double x  = r*cos(t)-3.;
+  double y = r*sin(t);
+  
+  double nu;
+  if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
+    nu = sim_EXPLICIT_VISCOSITY(theSim);
+  } else{
+    nu = 0.05;
+  }
   /*
   double nu;
   if (VISC_CONST==1){
@@ -30,7 +38,10 @@ void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,int i,int j
   }
   */
 
-  double vy = v0*exp(-x*x/(4.*sim_EXPLICIT_VISCOSITY(theSim)*t0));// /sqrt(2.*M_PI*sim_EXPLICIT_VISCOSITY(theSim)*t0);
+  double vy = 0.0;
+  if (fabs(y)<50.){
+    vy = v0/sqrt(2.*M_PI*nu*t0)*exp(-x*x/(4.*nu*t0));// /sqrt(2.*M_PI*sim_EXPLICIT_VISCOSITY(theSim)*t0);
+  }
 
   double vr    = vy*sin(t);
   double omega = vy*cos(t)/r;
@@ -50,9 +61,9 @@ void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,int i,int j
 void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 
   double rho = 1.0;
-  double Pp  = 0.1;
+  double Pp  = 0.01;
   double v0  = 1.0;
-  double t0  = 0.625;
+  double t0  = 0.25;
 
   int i, j,k;
   printf("sim_EXPLICIT_VISCOSITY(theSim): %e\n",sim_EXPLICIT_VISCOSITY(theSim));
@@ -66,24 +77,31 @@ void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
 
       for (j = 0; j < sim_N_p(theSim,i); j++) {
         double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
-        double x  = r*cos(t)-2.;
-
+        double x  = r*cos(t)-3.;
+        double y = r*sin(t);
         /*
+           double nu;
+           if (VISC_CONST==1){
+           nu = sim_EXPLICIT_VISCOSITY(theSim);
+           } else{
+           nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(fabs((r*cos(t))),1.5);
+           }
+           */
         double nu;
-        if (VISC_CONST==1){
+        if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
           nu = sim_EXPLICIT_VISCOSITY(theSim);
         } else{
-          nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(fabs((r*cos(t))),1.5);
-        }
-        */
+          nu = 0.05;
+        } 
 
-        double vy = v0*exp(-x*x/(4.*sim_EXPLICIT_VISCOSITY(theSim)*t0)); // /sqrt(2.*M_PI*sim_EXPLICIT_VISCOSITY(theSim)*t0);
-
+        double vy=0.0;
+        if (fabs(y)<50.){
+          vy = v0/sqrt(2.*M_PI*nu*t0)*exp(-x*x/(4.*nu*t0)); // /sqrt(2.*M_PI*sim_EXPLICIT_VISCOSITY(theSim)*t0);
+        } //else if (fabs(y)>=5. && fabs(y)<6.){
+        // vy = v0/sqrt(2.*M_PI*nu*t0)*exp(-x*x/(4.*nu*t0)) * (6.-fabs(y));
+        //}
         //printf("x: %e, x*x/(4.*sim_EXPLICIT_VISCOSITY(theSim)*t0): %e\n",x,x*x/(4.*sim_EXPLICIT_VISCOSITY(theSim)*t0));
 
-        if (vy>0.1){
-          //printf("vy: %e\n",vy);
-        }
         double vr    = vy*sin(t);
         double omega = vy*cos(t)/r;
 

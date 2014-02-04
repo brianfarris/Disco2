@@ -9,7 +9,7 @@
 #include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
-void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * theFaces , struct TimeStep * theTimeStep , int direction ){
+void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * theFaces , struct TimeStep * theTimeStep , struct MPIsetup * theMPIsetup ,  int direction ){
   int NUM_Q = sim_NUM_Q(theSim);
   double PLM = sim_PLM(theSim);
 
@@ -41,12 +41,16 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
     while( dpR >  PHIMAX/2. ) dpR -= PHIMAX;
     while( dpR < -PHIMAX/2. ) dpR += PHIMAX;
     double dA  = face_dA(theFaces,n);
+    double face_rad = face_r(theFaces,n);
     for( q=0 ; q<NUM_Q ; ++q ){
       double WL = cL->prim[q] + dpL*cL->gradp[q];
       double WR = cR->prim[q] - dpR*cR->gradp[q];
       double S = (WR-WL)/(deltaR+deltaL);
       cL->grad[q] += S*dA;
       cR->grad[q] += S*dA; 
+    }
+    if (face_rad<1.0){
+      //printf("face_rad: %e, dpL: %e, dpR: %e, WL: %e, WR: %e, deltaL: %e, deltaR: %e, cL->grad[PPP]: %e, cR->grad[PPP]: %e\n",face_rad,dpL,dpR,cL->prim[PPP] + dpL*cL->gradp[PPP],cR->prim[PPP] - dpR*cR->gradp[PPP],deltaL,deltaR,cL->grad[PPP],cR->grad[PPP]);
     }
   }
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -59,9 +63,20 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         double dp = theCells[k][i][j].dphi;
         double dAtot;
-        if( direction==R_DIR ) dAtot = dz*(rp+rm)*dp; else dAtot = 2.*.5*(rp*rp-rm*rm)*dp;
+        if( direction==R_DIR ){
+          if (mpisetup_check_rin_bndry(theMPIsetup) && i==0){
+            dAtot = dz*rp*dp;
+          } else{
+            dAtot = dz*(rp+rm)*dp;
+          }
+        } else{
+          dAtot = 2.*.5*(rp*rp-rm*rm)*dp;
+        }
         for( q=0 ; q<NUM_Q ; ++q ){
           theCells[k][i][j].grad[q] /= dAtot;
+        }
+        if (fabs(rp-1.)<0.000001){
+          //printf("rm: %e, rp: %e, dAtot: %e, gradP: %e\n",rm,rp,dAtot,theCells[k][i][j].grad[PPP]);
         }
       }
     }
@@ -88,7 +103,7 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       double SL = cL->grad[q];
       double SR = cR->grad[q];
       if( S*SL < 0.0 ){
-        cL->grad[q] = 0.0;
+        cL->grad[q] =0.0;
       }else if( fabs(PLM*S) < fabs(SL) ){
         cL->grad[q] = PLM*S;
       }

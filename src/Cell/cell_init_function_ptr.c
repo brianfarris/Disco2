@@ -28,8 +28,12 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_testing);
   } else if (sim_InitialDataType(theSim)==DIVERGENCE){ 
     return(&cell_init_divergence);
+  } else if (sim_InitialDataType(theSim)==RAD_DOM){
+    return(&cell_init_rad_dom);
+  } else if (sim_InitialDataType(theSim)==MIDDLE){
+    return(&cell_init_middle);
   } else{
-    printf("ERROR\n");
+    printf("ERROR, not a valid global initial data routine choice\n");
     exit(0);
   }
 }
@@ -49,6 +53,8 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_psigrad);
   } else if (sim_InitialDataType(theSim)==TORUS){
     return(&cell_single_init_torus);
+  } else if (sim_InitialDataType(theSim)==MILOS_MACFADYEN){
+    return(&cell_single_init_milos_macfadyen);
   } else if (sim_InitialDataType(theSim)==MHDEXP){
     return(&cell_single_init_mhdexp);
   } else if (sim_InitialDataType(theSim)==VISCRING){
@@ -57,8 +63,10 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_testing);
   } else if (sim_InitialDataType(theSim)==DIVERGENCE){
     return(&cell_single_init_divergence);
+  } else if (sim_InitialDataType(theSim)==MIDDLE){
+    return(&cell_single_init_middle);
   } else{
-    printf("ERROR\n");
+    printf("ERROR, not a valid single point initial data routine choice\n");
     exit(0);
   }
 }
