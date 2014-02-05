@@ -17,29 +17,29 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
       char DiagEquatFilename[256];
       char DiagVectorFilename[256];
       char DiagScalarFilename[256];
-      sprintf(DiagEquatFilename,"DiagEquat_%6.4f.h5",timestep_get_t(theTimeStep));
-      sprintf(DiagVectorFilename,"DiagVector_%6.4f.dat",timestep_get_t(theTimeStep));
-      sprintf(DiagScalarFilename,"DiagScalar.dat");
+      sprintf(DiagEquatFilename,"2DiagEquat_%6.4f.h5",timestep_get_t(theTimeStep));
+      sprintf(DiagVectorFilename,"2DiagVector_%6.4f.dat",timestep_get_t(theTimeStep));
+      sprintf(DiagScalarFilename,"2DiagScalar.dat");
       FILE * DiagVectorFile = fopen(DiagVectorFilename,"w");
       FILE * DiagScalarFile = fopen(DiagScalarFilename,"a");
       int i,n;
       for (i=0;i<sim_N_global(theSim,R_DIR);++i){
         for (n=0;n<theDiagnostics->NUM_DIAG+1;++n){
-	  if (n!=11){
-	    fprintf(DiagVectorFile,"%e ",theDiagnostics->VectorDiag[i][n]/dt_dump);   
-	  }else{
-	    fprintf(DiagVectorFile,"%e ",theDiagnostics->VectorDiag[i][n]);//no time avg on n=10Trq 
-	  }
+	  //if (n!=11){ //vec is n+1 from Scal
+	      fprintf(DiagVectorFile,"%e ",theDiagnostics->VectorDiag[i][n]/dt_dump);   
+	      //   }else if (n==11){
+	      // fprintf(DiagVectorFile,"%e ",theDiagnostics->VectorDiag[i][n]);//no time avg on n=10Trq 
+	      //}
         }
         fprintf(DiagVectorFile,"\n");
       }
       fprintf(DiagScalarFile,"%e ",timestep_get_t(theTimeStep));       
       for (n=0;n<theDiagnostics->NUM_DIAG;++n){
-	if (n!=10){
-	  fprintf(DiagScalarFile,"%e ",theDiagnostics->ScalarDiag[n]/dt_dump);     
-	}else{
-	  fprintf(DiagScalarFile,"%e ",theDiagnostics->ScalarDiag[n]); //no time avg on n=10Trq 
-	}  
+	//if (n!=10){
+	 fprintf(DiagScalarFile,"%e ",theDiagnostics->ScalarDiag[n]/dt_dump);     
+	//}else if  (n==10){
+	//  fprintf(DiagScalarFile,"%e ",theDiagnostics->ScalarDiag[n]); //no time avg on n=10Trq 
+	//}  
       }
       fprintf(DiagScalarFile,"\n");
 
@@ -96,6 +96,16 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
     for (n=0;n<theDiagnostics->NUM_DIAG;++n){
       theDiagnostics->ScalarDiag[n]=0.0;
     }
+    
+    //    int ii, nn;
+    // for (ii=0;ii<sim_N_global(theSim,R_DIR);++ii){
+    // for (nn=0;nn<(1+theDiagnostics->NUM_TST);++nn){
+    //    theDiagnostics->TrVec[ii][nn]=0.0;
+    //  }
+    // }
+    //for (nn=0;nn<theDiagnostics->NUM_TST;++nn){
+    //  theDiagnostics->TrScal[nn]=0.0;
+    //}
 
     theDiagnostics->tdiag_dump += theDiagnostics->dtdiag_dump;
   }

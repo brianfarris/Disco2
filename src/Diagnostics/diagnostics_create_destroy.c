@@ -11,8 +11,8 @@
 struct Diagnostics *diagnostics_create(struct Sim * theSim, struct TimeStep * theTimeStep, struct MPIsetup * theMPIsetup) {
   struct Diagnostics * theDiagnostics = (struct Diagnostics *) malloc(sizeof(struct Diagnostics));
 
-  theDiagnostics->NUM_DIAG = 20; //DD added delta Sig (was 16)
-
+  theDiagnostics->NUM_DIAG = 16; //DD added delta Sig (was 16)
+  //int NUM_TST  = 1;
 
   int * N_p_global_temp = malloc(sizeof(int)*sim_N_global(theSim,R_DIR));
   theDiagnostics->N_p_global = malloc(sizeof(int)*sim_N_global(theSim,R_DIR));
@@ -86,6 +86,16 @@ struct Diagnostics *diagnostics_create(struct Sim * theSim, struct TimeStep * th
 
   theDiagnostics->ScalarDiag = malloc(sizeof(double)*theDiagnostics->NUM_DIAG);
 
+  //DD FOR TRQ TST -----
+  //theDiagnostics->TrVec = malloc(sizeof(double *) * sim_N_global(theSim,R_DIR));
+  //theDiagnostics->TrVec[0] = malloc(sizeof(double) * sim_N_global(theSim,R_DIR) * (NUM_TST+1));
+  //for (i=0;i<sim_N_global(theSim,R_DIR);++i){
+  //  theDiagnostics->TrVec[i] = theDiagnostics->TrVec[0]+i*(NUM_TST+1);
+  //}
+
+  //theDiagnostics->TrScal = malloc(sizeof(double)*NUM_TST);
+  //------------------------
+
 
   position = 0;
   for (i=0;i<sim_N_global(theSim,R_DIR);++i){
@@ -133,6 +143,10 @@ void diagnostics_destroy(struct Diagnostics *theDiagnostics,struct Sim * theSim)
   free(theDiagnostics->EquatDiag);
   free(theDiagnostics->N_p_global);
   free(theDiagnostics);
+  //DD
+  //free(theDiagnostics->TrScal);
+  //free(theDiagnostics->TrVec[0]);
+  //free(theDiagnostics->TrVec);
 }
 
 
