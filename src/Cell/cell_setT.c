@@ -9,7 +9,7 @@
 
 void cell_setT( struct Cell *** theCells ,struct Sim * theSim ){
   int i,j,k;
-  double HoR = 0.05;
+  double HoR = 1./sim_Mach(theSim);
   double T0 = 0.02;
   double r_a = sqrt(1./log(T0*sim_GAMMALAW(theSim)/(HoR*HoR)));
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -21,7 +21,7 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim ){
       double r = 0.5*(rm+rp);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
-        double HoR = 0.05;
+        double HoR = 1./sim_Mach(theSim);
 	//double Omega_K;
 	double cs;
         double PoRho;

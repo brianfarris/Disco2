@@ -182,4 +182,9 @@ double sim_sep0(struct Sim *theSim){
 double sim_tmig_on(struct Sim *theSim){
 	return(theSim->tmig_on);
 }
-
+double sim_Mach(struct Sim *theSim){
+  return(theSim->Mach);
+}
+double sim_Rcut(struct Sim *theSim){
+  return(theSim->Rcut);
+}

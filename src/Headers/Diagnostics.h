@@ -12,6 +12,8 @@ struct Diagnostics{
   double **EquatDiag;
   double **VectorDiag;
   double *ScalarDiag;
+  double **TrVec;
+  double *TrScal;
   int offset_eq;
   int N_eq_cells;
   double dtout;
@@ -22,6 +24,7 @@ struct Diagnostics{
   double tdiag_dump;
   double dtdiag_dump;
   int NUM_DIAG;
+  //int NUM_TST;
 };
 #endif
 //create and destroy

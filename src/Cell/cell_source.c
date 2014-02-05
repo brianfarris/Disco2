@@ -98,6 +98,7 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
 ///FOR LIVE BINARY UPDATE FORCES ON HOLES
 void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, struct GravMass * theGravMasses ){
 	///Set a density scale for feedback to holes
+        double Rcut = sim_Rcut(theSim);
         double dens_scale = (sim_Mdisk_ovr_Ms(theSim)/(1.+1./sim_MassRatio(theSim)))/(M_PI*sim_sep0(theSim)*sim_sep0(theSim));
 	if (time_global <= (sim_tmig_on(theSim) + 10.0) ){
 	  dens_scale *= (time_global - sim_tmig_on(theSim))/(10.0 );
@@ -169,7 +170,7 @@ void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, str
 					}
 				// only applying force to secondary for now
 					if (p==1){
-					    if (script_r > 1.*Rhill && r>0.15){ //Only sum forces outside the secondary Hill radius & Damping Region
+					  if (script_r > Rcut*Rhill && r>0.15){ //Only sum forces outside the secondary Hill radius & Damping Region
 				         	gravMassForce(theGravMasses , theSim , p , r , phi , &ffr , &ffp );
 					        Fr[1] -= ffr*dm; //try Torque 
 					        Fp[1] -= ffp*dm;
