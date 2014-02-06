@@ -36,11 +36,14 @@ Move_Cells              4           // 0 DONT 3 Rigid, 4 Kepler
 RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index         1.001
 Explicit_Viscosity      0.00025  // if nu cst in header.h then this should be alpha for IC 10
+Mach                    20.0
 
 RhoSinkTimescale        -1.0   // negative means no sink
+Rcut                    1.0
 
-Mdisk_ovr_Ms            0.1   //Fraction of secondary mass in disk r<a
+Mdisk_ovr_Ms            0.01   //Fraction of secondary mass in disk r<a
 tmig_on                 25.0 //87.9646 //62.83138  // time when live binary turns on
+
 
 DivB_Ch			0.06		//Dedner divergence cleaning
 DivB_l			0.1
