@@ -6,10 +6,11 @@
 #include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
-void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * theFaces , struct TimeStep * theTimeStep , int direction ){
+void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * theFaces , struct TimeStep * theTimeStep , struct MPIsetup *theMPIsetup, int direction ){
   int NUM_Q = sim_NUM_Q(theSim);
   double PLM = sim_PLM(theSim);
 
@@ -63,7 +64,7 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
         {
             //Innermost zone only gets contributions from one side
             //TODO: Add 2 inner ghost zones.
-            if(i==0)
+            if(mpisetup_check_rin_bndry(theMPIsetup) && sim_NoInnerBC(theSim)==1 && i==0)
                 dAtot = dz*rp*dp;
             else
                 dAtot = dz*(rp+rm)*dp; 

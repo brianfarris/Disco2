@@ -8,6 +8,8 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
+//Uniform density and pressure, supported by v^phi in the Schwarzschild metric.
+
 void cell_single_init_equil2(struct Cell *theCell, struct Sim *theSim,int i,int j,int k)
 {
     double rho, Pp, vp;

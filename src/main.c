@@ -134,8 +134,22 @@ int main(int argc, char **argv) {
   // set up diagnostics struct
   struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep,theMPIsetup);
  
+  // Initial Diagnostic dump
+  diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep,theMPIsetup,theGravMasses);
+  MPI_Barrier(sim_comm);    
+  diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
 
-  printf("let's go!\nStarting Loop.\n");
+  // Initial Checkpoint
+  if( timestep_get_t(theTimeStep)>=io_tcheck(theIO))
+  {
+    io_allocbuf(theIO,theSim);
+    io_setbuf(theIO,theCells,theSim,theGravMasses);
+    io_hdf5_out(theIO,theSim,theTimeStep);
+    io_deallocbuf(theIO);
+  }
+
+  //Begin the run
+  printf("Let's go!\nStarting Loop.\n");
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
     // here the actual timestep is taken
     timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
@@ -153,6 +167,15 @@ int main(int argc, char **argv) {
       io_hdf5_out(theIO,theSim,theTimeStep); // write contents to file
       io_deallocbuf(theIO); // get rid of buffer
     }
+  }
+
+  //Make sure final checkpoint exists.
+  if(io_nfile(theIO) < sim_NUM_CHECKPOINTS(theSim))
+  {
+    io_allocbuf(theIO,theSim);
+    io_setbuf(theIO,theCells,theSim,theGravMasses);
+    io_hdf5_out(theIO,theSim,theTimeStep);
+    io_deallocbuf(theIO);
   }
 
   //inter-processor syncs

@@ -8,6 +8,8 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
+//Pressure supported hydrostatic equilibrium for the Schwarzschild Metric.
+
 void cell_single_init_equil1(struct Cell *theCell, struct Sim *theSim,int i,int j,int k)
 {
     double rho, Pp;

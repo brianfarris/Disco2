@@ -114,9 +114,9 @@ void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,voi
       double rate = R0*(r-sim_RDAMP_INNER(theSim))/(RMIN-sim_RDAMP_INNER(theSim));
       if( r > sim_RDAMP_OUTER(theSim) ) rate = R0*(r-sim_RDAMP_OUTER(theSim))/(RMAX-sim_RDAMP_OUTER(theSim));
 
-      (*single_init_ptr)(initialCell,theSim,i,j,k);
       for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+          (*single_init_ptr)(initialCell,theSim,i,j,k);
           for( q=0 ; q<NUM_Q ; ++q ){
             double dprim = initialCell->prim[q] - theCells[k][i][j].prim[q];
             theCells[k][i][j].prim[q] += (1.-exp(-rate*dt))*dprim;

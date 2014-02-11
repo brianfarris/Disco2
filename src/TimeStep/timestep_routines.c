@@ -97,7 +97,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     }
   }
   //R Flux
-  cell_plm_rz(theCells,theSim,theFaces_r,theTimeStep,R_DIR); //piecewise-linear reconstruction
+  cell_plm_rz(theCells,theSim,theFaces_r,theTimeStep,theMPIsetup,R_DIR); //piecewise-linear reconstruction
   int n;
   for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR) ; ++n ){
     struct Riemann * theRiemann = riemann_create(theSim); //struct to contain everything we need to solve Riemann problem
@@ -124,7 +124,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   }
   //Z Flux
   if( sim_N_global(theSim,Z_DIR) != 1 ){
-    cell_plm_rz(theCells,theSim,theFaces_z,theTimeStep,Z_DIR );//piecewise-linear reconstruction
+    cell_plm_rz(theCells,theSim,theFaces_z,theTimeStep,theMPIsetup,Z_DIR );//piecewise-linear reconstruction
     for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-1,Z_DIR); ++n ){
       struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem
       riemann_setup_rz(theRiemann,theFaces_z,theSim,n,ZDIRECTION); // set various quantities in theRiemann

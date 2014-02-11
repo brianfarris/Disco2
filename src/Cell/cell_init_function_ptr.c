@@ -24,6 +24,8 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_isentrope);
   } else if (sim_InitialDataType(theSim)==GBONDI){
     return(&cell_init_gbondi);
+  } else if (sim_InitialDataType(theSim)==GBONDI2){
+    return(&cell_init_gbondi2);
   } else if (sim_InitialDataType(theSim)==EQUIL1){
     return(&cell_init_equil1);
   } else if (sim_InitialDataType(theSim)==EQUIL2){
@@ -55,6 +57,8 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_isentrope);
    } else if (sim_InitialDataType(theSim)==GBONDI){
     return(&cell_single_init_gbondi);
+   } else if (sim_InitialDataType(theSim)==GBONDI2){
+    return(&cell_single_init_gbondi2);
    } else if (sim_InitialDataType(theSim)==EQUIL1){
     return(&cell_single_init_equil1);
    } else if (sim_InitialDataType(theSim)==EQUIL2){

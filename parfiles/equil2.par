@@ -1,9 +1,10 @@
 //Disco Parameter File//
 
-InitialDataType         11      // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform, 
+InitialDataType         12      // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform, 
                                 // 4 Shock1, 5 Shock2, 6 Shock3, 7 Shock4,
-                                // 8 Isentrope, 9 GR-Bondi, 10 Equilibrium1,
-                                // 11 Equilibrium2
+                                // 8 Isentrope, 9 GR-Bondi, 10 GR-Bondi-pulse,
+                                //11 Equilibrium1, 12 Equilibrium2
+                                // 11 Equilibrium1, 12 Equilibrium2
 GravMassType            0       // 0 none, 1 single, 2 binary
 Background              1       // 0 Newtonian, 1 GR
 Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
