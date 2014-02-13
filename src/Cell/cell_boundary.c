@@ -19,14 +19,16 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
 
   int n,q;
   int i,j,k;
-  double r_face,r_face_m1,r_face_p1,r_cell;
+  double r_face,r_face_m1,r_face_p1,r_cell,r_cellR;
 
   if( mpisetup_check_rin_bndry(theMPIsetup) ){
     if (sim_NoInnerBC(theSim)!=1){ // if the global inner radius is set negative, we don't apply an inner BC
       for( i=0 ; i>=0 ; --i ){
         r_face=sim_FacePos(theSim,i,R_DIR);
         r_face_m1=sim_FacePos(theSim,i-1,R_DIR);
+        r_face_p1=sim_FacePos(theSim,i+1,R_DIR);
         r_cell = 0.5*(r_face+r_face_m1);
+        r_cellR = 0.5*(r_face+r_face_p1);
         for( n=timestep_n(theTimeStep,i,R_DIR) ; n<timestep_n(theTimeStep,i+1,R_DIR) ; ++n ){
           for( q=0 ; q<NUM_Q ; ++q ){
             face_L_pointer(theFaces,n)->prim[q] = 0.0;
@@ -35,11 +37,21 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         for( n=timestep_n(theTimeStep,i,R_DIR) ; n<timestep_n(theTimeStep,i+1,R_DIR) ; ++n ){
           struct Cell * cL = face_L_pointer(theFaces,n);
           struct Cell * cR = face_R_pointer(theFaces,n);
-          for( q=0 ; q<NUM_Q ; ++q ){
-            cL->prim[q] += (cR->prim[q]-EXTRAP_BC*cR->grad[q]*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i-1,R_DIR))/2.)*face_dA(theFaces,n);
-          }
-          if (sim_ZeroPsiBndry(theSim)){
-            cL->prim[PSI] = 0.0;
+          if (SS_BCS==1){
+            for( q=4 ; q<NUM_Q ; ++q ){
+              cL->prim[q] += (cR->prim[q]-EXTRAP_BC*cR->grad[q]*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i-1,R_DIR))/2.)*face_dA(theFaces,n);
+            }
+            cL->prim[RHO] += (cR->prim[RHO]/pow(r_cellR,-3./5.)*pow(r_cell,-3./5.))*face_dA(theFaces,n);
+            cL->prim[PPP] += (cR->prim[PPP]/pow(r_cellR,-3./2.)*pow(r_cell,-3./2.))*face_dA(theFaces,n);
+            cL->prim[URR] += (cR->prim[URR]-EXTRAP_BC*cR->grad[URR]*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i-1,R_DIR))/2.)*face_dA(theFaces,n);
+            cL->prim[UPP] += (cR->prim[UPP]/pow(r_cellR,-7./5.)*pow(r_cell,-7./5.))*face_dA(theFaces,n);
+            if (sim_ZeroPsiBndry(theSim)){
+              cL->prim[PSI] = 0.0;
+            }
+          } else{
+            for( q=0 ; q<NUM_Q ; ++q ){
+              cL->prim[q] += (cR->prim[q]-EXTRAP_BC*cR->grad[q]*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i-1,R_DIR))/2.)*face_dA(theFaces,n);
+            }
           }
         }
         for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -64,7 +76,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         }
       }
     }
-  //exit(1);
+    //exit(1);
   }
 
 

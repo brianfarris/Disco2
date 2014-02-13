@@ -88,6 +88,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     }
   }
 
+  //cell_add_split_fictitious(theCells,theSim,dt);
+
   //Bookkeeping
   cell_update_phi( theCells ,theSim, theTimeStep->RK , dt ); // allow the cells to move in phi direction
   cell_update_dphi( theCells ,theSim); // all the cells to change size

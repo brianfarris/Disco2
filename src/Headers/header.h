@@ -19,13 +19,14 @@ MPI_Comm sim_comm;
 #define KEP_BNDRY 0
 #define BzZ 0
 #define BNORM_AVG 0
-#define VISC_CONST 0
+#define VISC_CONST 1
 #define VISC_OLD 0
 #define CHECKPOINTING 
 #define TVISC_FAC 1.0
 #define PHIMAX 2.0*M_PI
 #define diode 0
 #define zero_bfields 0
-#define cooling 1
+#define cooling 0
 #define EXTRAP_BC 0
+#define SS_BCS 0
 double time_global;

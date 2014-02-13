@@ -59,6 +59,8 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           theCells[k][i][j].wiph = pow(r,-0.5);
           theCells[k][i][j].drOm = -1.5*pow(r,-2.5);
+          //theCells[k][i][j].wiph = r/pow(r*r+sim_G_EPS(theSim)*sim_G_EPS(theSim),3./4.);
+          //theCells[k][i][j].drOm = -1.5*r/pow(r*r+sim_G_EPS(theSim)*sim_G_EPS(theSim),7./4.);
         }
       }
     }
@@ -81,8 +83,8 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         double rm = sim_FacePos(theSim,i-1,R_DIR);
         double r = 0.5*(rm+rp);
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-          if (r<1.0){
-            theCells[k][i][j].wiph = 1.0*r;
+          if (r<0.1){
+            theCells[k][i][j].wiph = pow(0.1,-0.5)*r;
             theCells[k][i][j].drOm = 0.0;
           } else{
             theCells[k][i][j].wiph = pow(r,-0.5);

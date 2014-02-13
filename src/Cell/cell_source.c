@@ -17,7 +17,7 @@ double fgrav_neg_centrifugal( double M , double r , double eps, double n ){
   return( M*r*Om*Om );
 }
 
-void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, double dt, int p, double r, double phi, double rho, double * drho_dt_sink){
+void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, double dt, int p, double r, double phi, double rho, double P, double * drho_dt_sink){
 
   double rp = gravMass_r(theGravMasses,p);
   double pp = gravMass_phi(theGravMasses,p);
@@ -30,15 +30,16 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, double 
   double HoR = sim_HoR(theSim);
   double alpha = sim_EXPLICIT_VISCOSITY(theSim);
   double m = gravMass_M(theGravMasses,p);
-  double t_visc = TVISC_FAC * 2./3. * 1./(alpha*HoR*HoR)*pow(script_r,1.5)*pow(m,-.5);
+  double t_visc_sqrtm = TVISC_FAC * 2./3. * 1./(alpha*HoR*HoR)*pow(script_r,1.5);
+  double t_visc = TVISC_FAC * 2./3. * pow(r,0.5)/(alpha*sim_GAMMALAW(theSim)*(P/rho));
   *drho_dt_sink = 0.0;
   double sink_size = 0.5;
 
-  if (t_visc < 10.* dt){
-    t_visc = 10.*dt;
+  if (t_visc_sqrtm < 10.* dt * sqrt(m)){
+    t_visc_sqrtm = 10.*dt*sqrt(m);
   }
   if (script_r<sink_size){
-    *drho_dt_sink = rho / t_visc;
+    *drho_dt_sink = rho * sqrt(m)/ t_visc_sqrtm;
   }
 }
 
@@ -50,7 +51,6 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
   double pp = gravMass_phi(theGravMasses,p);
   double cosp = cos(phi);
   double sinp = sin(phi);
-  //printf("rp: %e\n",rp);
   double dx = r*cosp-rp*cos(pp);
   double dy = r*sinp-rp*sin(pp);
   double script_r = sqrt(dx*dx+dy*dy);
@@ -148,8 +148,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double F_euler_phi =  -vr*r*drOm;
 
         c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;
-        c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r+F_coriolis_r);
-        c->cons[LLL] += dt*dV*rho*(Fp+F_coriolis_phi+F_euler_phi)*r;
+        c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r/*+F_coriolis_r*/);
+        c->cons[LLL] += dt*dV*rho*(Fp/*+F_coriolis_phi+F_euler_phi*/)*r;
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( (Fr*sint+F_centrifugal_r)*vr+Fr*vz*cost + (Fp+F_euler_phi)*vp);
     
@@ -161,7 +161,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         if (sim_RhoSinkOn(theSim)==1){
           double drho_dt_sink;
           for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
-            get_rho_sink( theGravMasses, theSim, dt, p, r, phi, rho, &drho_dt_sink);
+            get_rho_sink( theGravMasses, theSim, dt, p, r, phi, rho,Pp, &drho_dt_sink);
             c->cons[RHO] -= drho_dt_sink * dt * dV;
             if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
               Mdot_temp[p] += drho_dt_sink*dV;
@@ -241,13 +241,12 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, double dt
         double rho = c->prim[RHO];
         double P = c->prim[PPP];
         double r   = .5*(rp+rm);
-        double om = pow(r,-1.5);
         double vr  = c->prim[URR];
         double dz = zp-zm;
         double dV = dphi*.5*(rp*rp-rm*rm)*dz;
         double alpha = sim_EXPLICIT_VISCOSITY(theSim);
-        double r_dr_om = -1.5*om;
-        double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P/om;
+        double r_dr_om = r*cell_drOm(c);
+        double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P*pow(r,1.5);
         c->cons[TAU] += dt*dV*Sigma_nu*r_dr_om*(r_dr_om + r*c->grad[UPP] + c->gradp[URR]);
       }
     }

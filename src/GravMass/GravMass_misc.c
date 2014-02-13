@@ -42,6 +42,7 @@ void gravMass_move(struct Sim * theSim,struct GravMass * theGravMasses,double t,
   double tau_0 = OrbShrinkTscale;
   double a = a_0 * pow((1.0 - (t-OrbShrinkT0)/tau_0),0.25);
   double omega = pow(a/M,-1.5);
+  //printf("a: %e, M: %e, omega: %e\n",a,M,omega);
   double r0,r1;
   if (M<1.e-12){
     r0 = 0.0;

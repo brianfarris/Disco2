@@ -18,20 +18,18 @@ void cell_single_init_milos_macfadyen(struct Cell *theCell, struct Sim *theSim,i
   double rs = 10.;
   double delta_exp   = 3.0;
   double xi_exp = 2.0;
-  //double rho = rho0*( pow(rs/r,delta_exp) )*exp(-pow(rs/r,xi_exp) );
+  double rho = rho0*( pow(rs/r,delta_exp) )*exp(-pow(rs/r,xi_exp) );
   double omega = sqrt(1.)/pow(r,1.5);
   double vr = 0.0;
   double cs = sqrt(1./r)/Mach;
-  //double PoRho = 1./Mach/Mach/Gam;//(cs*cs)/Gam;
-  double PoRho = (cs*cs)/Gam;
-  double rho = rho0*exp(-r*r/30./30.);
+  double PoRho = 1./Mach/Mach/Gam;//(cs*cs)/Gam;
 
   theCell->prim[RHO] = rho;
   theCell->prim[PPP] = PoRho*rho;
   theCell->prim[URR] = vr;
   theCell->prim[UPP] = 0.0;
   theCell->prim[UZZ] = 0.0;
-  theCell->wiph = omega*r;
+  theCell->wiph = 1./sqrt(r);
   theCell->divB = 0.0;
   theCell->GradPsi[0] = 0.0;
   theCell->GradPsi[1] = 0.0;
@@ -51,9 +49,7 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
 
   double Gam = sim_GAMMALAW(theSim);
   double cp = 1./Mach;
-  //double fac = 0.0001;
-  double fac = 0.0;
-  //printf("rbh1: %e, rbh2: %e, mbh1: %e, mbh2: %e\n",gravMass_r(theGravMasses,0),gravMass_r(theGravMasses,1),gravMass_M(theGravMasses,0),gravMass_M(theGravMasses,1));
+  double fac = 0.0001;
 
   double Mtotal = 1.0;
   double sep = 1.0;
@@ -76,7 +72,6 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
   double eps0 = sim_G_EPS(theSim)*r0;
   double eps1 = sim_G_EPS(theSim)*r1;
 
-  //double DISK_ALPHA = 0.01;
   double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
 
   int i, j,k;
@@ -131,7 +126,6 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
         double Pot2 = M1/pow( pow(dist_bh1,n) + pow(eps1,n) , 1./n );
 
         double rho = rho0*( pow(rs/r,delta_exp) )*exp(-pow(rs/r,xi_exp) );
-        //double rho = rho0*exp(-r*r/30./30.);
         double omega = sqrt(1.)/pow(r,1.5);
         omega *= 1.+3./16./r/r;
         double O2 = omega*omega + cs*cs/r/r*( 2.*rs*rs/r/r - 3. );
@@ -145,27 +139,17 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
           //vr = 0.0;
           vr = -3.0/sqrt(r)*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(r/rs,-xi_exp));
         }
-        /*
-           if (vr>0.0){
-           vr=0.0;
-           }
-           */
 
-        /* 
-           if (r<3.){
-           omega = 0.0;//pow(r,-1.5);
-           }
-           */
         if( rho<(100.*sim_RHO_FLOOR(theSim)) ) rho = 100.*sim_RHO_FLOOR(theSim);
 
         double Pp = PoRho * rho;
 
         theCells[k][i][j].prim[RHO] = rho*exp(fac*(Pot1+Pot2)/cp/cp);
         theCells[k][i][j].prim[PPP] = Pp*exp(fac*(Pot1+Pot2)/cp/cp);
-        theCells[k][i][j].prim[URR] = vr-.01/r;
+        theCells[k][i][j].prim[URR] = vr;
         theCells[k][i][j].prim[UPP] = omega-sqrt(1.)/pow(r,1.5);
         theCells[k][i][j].prim[UZZ] = 0.0;
-        theCells[k][i][j].wiph = omega*r;//0.0;
+        theCells[k][i][j].wiph = 1./sqrt(r);
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;
         theCells[k][i][j].GradPsi[1] = 0.0;
