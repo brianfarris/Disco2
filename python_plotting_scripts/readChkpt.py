@@ -1,26 +1,27 @@
+from itertools import imap
 import h5py as h5
 import numpy as np
 
 def readChkpt(filename):
 
     f = h5.File(filename)
-    Data = f['Data']
+    Data = f['Data'][...]
+    t = f['T'][0]
+    f.close()
 
+    #Standard way of removing duplicates
+    Data = np.array(dict(zip(map(hash, map(tuple,Data[:,0:3])), Data)).values())
     #read in coords
     phi = np.array(Data[:,0])
     r = np.array(Data[:,1])
     z = np.array(Data[:,2])
 
     #read in data
-    t = f['T'][0]
     rho = np.array(Data[:,3])
     P = np.array(Data[:,4])
     vr = np.array(Data[:,5])
     vp = np.array(Data[:,6])
     vz = np.array(Data[:,7])
-
-    #close file
-    f.close()
 
     #calculate cell volumes
     z_vals = np.unique(z)
@@ -28,6 +29,7 @@ def readChkpt(filename):
     dV = np.ones(len(r[(r>r_vals[1])*(r<r_vals[-2])]))
     r_less = r[(r>r_vals[1])*(r<r_vals[-2])]
     phi_less = phi[(r>r_vals[1])*(r<r_vals[-2])]
+    z_less = z[(r>r_vals[1])*(r<r_vals[-2])]
 
     #dz
     if len(z_vals) > 1:
@@ -45,8 +47,9 @@ def readChkpt(filename):
     for i in range(2,len(r_vals)-2):
         inds = (r_less==r_vals[i])
         dphi = np.zeros(len(phi[inds]))
-        dphi[1:] = phi[inds][1:] - phi[inds][:-1]
-        dphi[0] = phi[inds][0] - phi[inds][-1]
+        my_phi = np.sort(np.array(phi[inds]))
+        dphi[1:] = my_phi[1:] - my_phi[:-1]
+        dphi[0] = my_phi[0] - my_phi[-1]
         while (dphi<0).any():
             dphi[dphi<0] += 2*np.pi
         dV[inds] *= dphi
