@@ -14,7 +14,7 @@ void cell_single_init_equil1(struct Cell *theCell, struct Sim *theSim,int i,int 
 {
     double rho, Pp;
     double GAMMALAW = sim_GAMMALAW(theSim);
-    double RG = sim_GravRadius(theSim);
+    double RG = 2.0*sim_GravM(theSim);
     double rho0 = sim_InitPar1(theSim);
     double P0 = sim_InitPar2(theSim);
     
@@ -49,7 +49,7 @@ void cell_init_equil1(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
 
     double rho, Pp;
     double GAMMALAW = sim_GAMMALAW(theSim);
-    double RG = sim_GravRadius(theSim);
+    double RG = 2.0*sim_GravM(theSim);
     double rho0 = sim_InitPar1(theSim);
     double P0 = sim_InitPar2(theSim);
 

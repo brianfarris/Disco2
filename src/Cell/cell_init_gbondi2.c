@@ -13,7 +13,7 @@ void cell_single_init_gbondi2(struct Cell *theCell, struct Sim *theSim,int i,int
 {
     double rho, Pp, vr, u, T;
     double GAMMALAW = sim_GAMMALAW(theSim);
-    double RG = sim_GravRadius(theSim);
+    double RG = 2.0*sim_GravM(theSim);
     int dim = sim_InitPar0(theSim)+2;
     double rs = sim_InitPar1(theSim);
     double Mdot = sim_InitPar2(theSim);
@@ -122,7 +122,7 @@ void cell_init_gbondi2(struct Cell ***theCells,struct Sim *theSim,struct MPIsetu
 
     double rho, Pp, vr, u, T;
     double GAMMALAW = sim_GAMMALAW(theSim);
-    double RG = sim_GravRadius(theSim);
+    double RG = 2.0*sim_GravM(theSim);
     int dim = sim_InitPar0(theSim)+2;
     double rs = sim_InitPar1(theSim);
     double Mdot = sim_InitPar2(theSim);

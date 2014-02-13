@@ -43,7 +43,7 @@ PLM			1.0
 
 Grav_2D			1
 G_EPS			0.0
-GravRadius      0.04
+GravM      0.04
 
 //Initial Condition Parameters
 InitPar0        0
