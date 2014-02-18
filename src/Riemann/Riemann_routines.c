@@ -445,61 +445,77 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   double om_cell;
   double dr_om_cell;
   
-  if (sim_InitialDataType(theSim)==SHEAR){
+  if (sim_MOVE_CELLS(theSim)==C_FIXED){
     om_cell = 0.0;
     dr_om_cell = 0.0;
-  } else{
+  } else if (sim_MOVE_CELLS(theSim)==C_MILOS){
+    om_cell = (1.-exp(-pow(r,1.5)))/pow(r,1.5);
+    dr_om_cell = 1.5*pow(r,-2.5)*(-1.+(1.+pow(r,1.5))*exp(-pow(r,1.5)));
+  }else if (sim_MOVE_CELLS(theSim)==C_KEPLER){
     om_cell = pow(r,-1.5);
     dr_om_cell = -1.5*pow(r,-2.5);
+  }else{
+    printf("Problem with setting cell speed in riemann solver\n");
+    exit(1);
   }
- 
-  //r direction
-  if (theRiemann->n[0] ==1){
-    double Gp_r2RhoNu_o_r2RhoNu = Gradient_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim),PDIRECTION);
-    
-    VFlux[SRR] = -nu*rho*( 
-        r*Gr_vr - vr + (om+om_cell)*r*r*Gp_r2RhoNu_o_r2RhoNu
-        );
-    VFlux[LLL] = -nu*rho*( 
-        r*r*Gr_om + r*r*dr_om_cell - vr*r*Gp_r2RhoNu_o_r2RhoNu
-        );
-   /* 
 
-    VFlux[SRR] = -nu*rho*(
-        r*Gr_vr - vr - r*r*Gp_om
-        );
-    VFlux[LLL] = -nu*rho*(
-        r*r*(Gr_om+dr_om_cell) + r*Gp_vr
-        );
-*/
-    VFlux[SZZ] = 0.0; //deal with this later
-    VFlux[TAU] = - nu * rho * (
-        vr*( Gr_vr - vr/r - r*Gp_om ) + r*om*( Gp_vr + r*(dr_om_cell + Gr_om) )
-        );
-  }
-  //phi direction
-  if (theRiemann->n[1] ==1){
-    double Gr_r2RhoNu_o_r2RhoNu = Gradient_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r,tiph,sim_InitialDataType(theSim),RDIRECTION);
-    
-    VFlux[SRR] = -nu*rho*( 
-        -(om+om_cell)*r*r*Gr_r2RhoNu_o_r2RhoNu + r*Gp_vr 
-        );
-    VFlux[LLL] = -nu*rho*( 
-        r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu
-        );
-    /*
+  if (1==1){
+    //r direction
+    if (theRiemann->n[0] ==1){
+      double Gp_r2RhoNu_o_r2RhoNu = Gradient_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim),PDIRECTION);
 
-    VFlux[SRR] = -nu*rho*(
-        r*r*(Gr_om+dr_om_cell) + r*Gp_vr
-        );
-    VFlux[LLL] = -nu*rho*(
-          -r*Gr_vr + vr + r*r*Gp_om
+      if (ALTVISC==1){ 
+        VFlux[SRR] = -nu*rho*( 
+            r*Gr_vr - vr + (om+om_cell)*r*r*Gp_r2RhoNu_o_r2RhoNu
+            );
+        VFlux[LLL] = -nu*rho*( 
+            r*r*Gr_om + r*r*dr_om_cell - vr*r*Gp_r2RhoNu_o_r2RhoNu
+            );
+      } else{
+
+        VFlux[SRR] = -nu*rho*(
+            r*Gr_vr - vr - r*r*Gp_om
+            );
+        VFlux[LLL] = -nu*rho*(
+            r*r*(Gr_om+dr_om_cell) + r*Gp_vr
+            );
+      }
+
+      VFlux[SZZ] = 0.0; //deal with this later
+
+      VFlux[TAU] = - nu * rho * (
+          vr*( Gr_vr - vr/r - r*Gp_om ) + r*om*( Gp_vr + r*(dr_om_cell + Gr_om) )
           );
-*/
-    VFlux[SZZ] = 0.0; //deal with this later
-    VFlux[TAU] = nu * rho * (
-        -r*om*( Gr_vr - vr/r - r*Gp_om ) + vr*(Gp_vr + r*(dr_om_cell + Gr_om ) )
-        );
+
+
+    }
+    //phi direction
+    if (theRiemann->n[1] ==1){
+      double Gr_r2RhoNu_o_r2RhoNu = Gradient_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r,tiph,sim_InitialDataType(theSim),RDIRECTION);
+
+      if (ALTVISC==1){ 
+        VFlux[SRR] = -nu*rho*( 
+            -(om+om_cell)*r*r*Gr_r2RhoNu_o_r2RhoNu + r*Gp_vr 
+            );
+        VFlux[LLL] = -nu*rho*( 
+            r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu
+            );
+      } else{
+        VFlux[SRR] = -nu*rho*(
+            r*r*(Gr_om+dr_om_cell) + r*Gp_vr
+            );
+        VFlux[LLL] = -nu*rho*(
+            -r*Gr_vr + vr + r*r*Gp_om
+            );
+      }
+
+      VFlux[SZZ] = 0.0; //deal with this later
+
+      VFlux[TAU] = -nu * rho * (
+          -r*om*( Gr_vr - vr/r - r*Gp_om ) + vr*(Gp_vr + r*(dr_om_cell + Gr_om ) )
+          );
+
+    }
   }
 
   for (q=0;q<NUM_Q;++q){
@@ -752,7 +768,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
 
   //viscous heating
   cell_add_cons(theRiemann->cL,TAU,-dt*theRiemann->dA*theRiemann->Fvisc[TAU]);
-  cell_add_cons(theRiemann->cR,TAU, dt*theRiemann->dA*theRiemann->Fvisc[TAU]);
+  cell_add_cons(theRiemann->cR,TAU,+dt*theRiemann->dA*theRiemann->Fvisc[TAU]);
 
   if (sim_runtype(theSim)==1){
     int direction;

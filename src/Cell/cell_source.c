@@ -152,7 +152,6 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         c->cons[LLL] += dt*dV*rho*(Fp/*+F_coriolis_phi+F_euler_phi*/)*r;
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( (Fr*sint+F_centrifugal_r)*vr+Fr*vz*cost + (Fp+F_euler_phi)*vp);
-    
         if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
           total_torque_temp += Fp*r;
           //total_Fr_temp += Fr;
