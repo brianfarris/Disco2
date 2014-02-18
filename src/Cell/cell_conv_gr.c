@@ -42,10 +42,19 @@ void cell_prim2cons_gr( double * prim , double * cons , double r , double dV ,st
             u[i] += metric_gamma_dd(g,i,j) * (v[j]+b[j]);
         u[i] *= u0;
     }
-    
+
     GAMMALAW = sim_GAMMALAW(theSim);
     rhoh = rho + GAMMALAW*Pp/(GAMMALAW - 1.);
 
+    if(u0 < 0)
+        printf("whoa, u0 < 0! (r=%.12f)\n", r);
+    if(a < 0)
+        printf("whoa, a < 0! (r=%.12f)\n", r);
+    if(sqrtg < 0)
+        printf("whoa, sqrtg < 0! (r=%.12f)\n", r);
+    if(dV < 0)
+        printf("whoa, dV < 0! (r=%.12f)\n", r);
+    
     cons[DDD] = a*sqrtg*u0 * rho * dV;
     cons[SRR] = a*sqrtg*rhoh*u0 * u[0] * dV;
     cons[LLL] = a*sqrtg*rhoh*u0 * u[1] * dV;
