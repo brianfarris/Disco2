@@ -36,7 +36,7 @@ ZeroPsiBndry          1
 Move_Cells              0
 RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index         1.3333333333333
-Cooling                 1
+Cooling                 0
 Explicit_Viscosity      0.05
 ViscConst               1
 RhoSinkOn               0
