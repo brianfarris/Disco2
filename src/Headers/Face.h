@@ -9,7 +9,7 @@ struct TimeStep;
 struct Face{
   struct Cell * L;
   struct Cell * R;
-  double r;
+  double pos[3];
   double dphi;
   double dA;
   double deltaL;
@@ -29,4 +29,6 @@ double face_deltaR( struct Face *,int);
 double face_cm( struct Face *,int);
 double face_dA( struct Face *,int);
 double face_r( struct Face *,int);
+double face_phi( struct Face *,int);
+double face_z( struct Face *,int);
 #endif

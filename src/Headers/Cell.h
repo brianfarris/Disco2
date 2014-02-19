@@ -90,12 +90,12 @@ void cell_bc_damp( struct Cell *** , struct Sim * , double ,void (*)(struct Cell
 //primitive-conservative conversion routines
 void cell_calc_prim( struct Cell ***,struct Sim *);
 void cell_calc_cons(struct Cell ***,struct Sim *); 
-void (*cell_prim2cons)( double * , double * , double , double ,struct Sim *);
-void (*cell_cons2prim)( double * , double * , double , double ,struct Sim *);
-void cell_prim2cons_newt( double * , double * , double , double ,struct Sim *);
-void cell_cons2prim_newt( double * , double * , double , double ,struct Sim *);
-void cell_prim2cons_gr( double * , double * , double , double ,struct Sim *);
-void cell_cons2prim_gr( double * , double * , double , double ,struct Sim *);
+void (*cell_prim2cons)( double * , double * , double * , double ,struct Sim *);
+void (*cell_cons2prim)( double * , double * , double * , double ,struct Sim *);
+void cell_prim2cons_newt( double * , double * , double * , double ,struct Sim *);
+void cell_cons2prim_newt( double * , double * , double * , double ,struct Sim *);
+void cell_prim2cons_gr( double * , double * , double * , double ,struct Sim *);
+void cell_cons2prim_gr( double * , double * , double * , double ,struct Sim *);
 //miscellaneous
 double (*cell_mindt)( struct Cell *** , struct Sim * );
 double cell_mindt_newt( struct Cell *** , struct Sim * );

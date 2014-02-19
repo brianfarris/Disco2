@@ -18,6 +18,7 @@ void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int 
     double RS = sim_InitPar1(theSim);
     double Mdot = sim_InitPar2(theSim);
     double EPS = 0.00001;
+    double cut = 0.1;
 
     double rm = sim_FacePos(theSim,i-1,R_DIR);
     double rp = sim_FacePos(theSim,i,R_DIR);
@@ -56,8 +57,8 @@ void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int 
     if(dim==2)
     {
         R = r;
-        if(R < 0.5*(RG+RS))
-            R = 0.5*(RG+RS);
+        if(R < (1-cut)*RG+cut*RS)
+            R = (1-cut)*RG+cut*RS;
         c1 = 1.0 + n;
         c2 = 1.0 - RG/R;
         c3 = C1*C1/(R*R);
@@ -65,8 +66,8 @@ void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int 
     else if (dim==3)
     {
         R = sqrt(r*r + z*z);
-        if(R < 0.5*(RG+RS))
-            R = 0.5*(RG+RS);
+        if(R < (1-cut)*RG+cut*RS)
+            R = (1-cut)*RG+cut*RS;
         c1 = 1.0 + n;
         c2 = 1.0 - RG/R;
         c3 = C1*C1/(R*R*R*R);
@@ -151,6 +152,7 @@ void cell_init_gbondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
     double RS = sim_InitPar1(theSim);
     double Mdot = sim_InitPar2(theSim);
     double EPS = 0.00001;
+    double cut = 0.1;
 
     double n = 1.0/(GAMMALAW-1.0);
 
@@ -203,8 +205,8 @@ void cell_init_gbondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
             if(dim == 2)
             {
                 R = r;
-                if(R < 0.5*(RG+RS))
-                    R = 0.5*(RG+RS);
+                if(R < (1-cut)*RG+cut*RS)
+                    R = (1-cut)*RG+cut*RS;
                 c1 = 1.0 + n;
                 c2 = 1.0 - RG/R;
                 c3 = C1*C1/(R*R);
@@ -212,8 +214,8 @@ void cell_init_gbondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
             else if(dim == 3)
             {
                 R = sqrt(r*r+z*z);
-                if(R < 0.5*(RG+RS))
-                    R = 0.5*(RG+RS);
+                if(R < (1-cut)*RG+cut*RS)
+                    R = (1-cut)*RG+cut*RS;
                 c1 = 1.0 + n;
                 c2 = 1.0 - RG/R;
                 c3 = C1*C1/(R*R*R*R);

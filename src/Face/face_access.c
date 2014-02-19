@@ -26,7 +26,13 @@ double face_dA( struct Face * theFaces,int n){
   return(theFaces[n].dA);
 }
 double face_r( struct Face * theFaces,int n){
-  return(theFaces[n].r);
+  return(theFaces[n].pos[R_DIR]);
+}
+double face_phi( struct Face * theFaces,int n){
+  return(theFaces[n].pos[P_DIR]);
+}
+double face_z( struct Face * theFaces,int n){
+  return(theFaces[n].pos[Z_DIR]);
 }
 
 

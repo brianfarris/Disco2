@@ -8,10 +8,12 @@
 #include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
 
-void addFace( struct Face * theFaces , int n , struct Cell * cL , struct Cell * cR , double r , double deltaL , double deltaR , double dphi , double tp , double deltaPerp ){
+void addFace( struct Face * theFaces , int n , struct Cell * cL , struct Cell * cR , double r , double z,  double deltaL , double deltaR , double dphi , double tp , double deltaPerp ){
   theFaces[n].L = cL;
   theFaces[n].R = cR;
-  theFaces[n].r = r;
+  theFaces[n].pos[R_DIR] = r;
+  theFaces[n].pos[P_DIR] = tp - 0.5*dphi;
+  theFaces[n].pos[Z_DIR] = z;
   theFaces[n].deltaL = deltaL;
   theFaces[n].deltaR = deltaR;
   theFaces[n].dphi= dphi;
@@ -22,7 +24,7 @@ void addFace( struct Face * theFaces , int n , struct Cell * cL , struct Cell * 
 void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells,struct Face * theFaces,struct Sim * theSim, int mode){
 
   double deltaL,deltaR,deltaPerp;
-  double r;
+  double r,z;
   if (rDir){
     deltaL = .5*(sim_FacePos(theSim,i,R_DIR)-sim_FacePos(theSim,i-1,R_DIR));
     deltaR = .5*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i,R_DIR));
@@ -31,10 +33,12 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
     double zp = sim_FacePos(theSim,k,Z_DIR);
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     deltaPerp = zp-zm;
+    z = 0.5*(zm+zp);
   }
   if (zDir){
     deltaL = .5*(sim_FacePos(theSim,k,Z_DIR)-sim_FacePos(theSim,k-1,Z_DIR));
     deltaR = .5*(sim_FacePos(theSim,k+1,Z_DIR)-sim_FacePos(theSim,k,Z_DIR));
+    z = sim_FacePos(theSim,k,Z_DIR);
 
     double rp=sim_FacePos(theSim,i,R_DIR);
     double rm = sim_FacePos(theSim,i-1,R_DIR);
@@ -67,7 +71,7 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
     if( cell_dphi(cell_single(theCells,i,j,k)) < dp ){
       if ( mode==1 ){
         addFace(theFaces,*pn,cell_single(theCells,i,j,k),cell_single(theCells,i+rDir,jp,k+zDir),
-            r,deltaL,deltaR,cell_dphi(cell_single(theCells,i,j,k)),cell_tiph(cell_single(theCells,i,j,k)),deltaPerp);
+            r,z,deltaL,deltaR,cell_dphi(cell_single(theCells,i,j,k)),cell_tiph(cell_single(theCells,i,j,k)),deltaPerp);
       }
       ++(*pn);
     }else{
@@ -75,7 +79,7 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
       //Step A: face formed out of beginning of cell- and end of cell+. ++jp;
       if ( mode==1 ){
         addFace(theFaces,*pn,cell_single(theCells,i,j,k),cell_single(theCells,i+rDir,jp,k+zDir),
-            r,deltaL,deltaR,dp,cell_tiph(cell_single(theCells,i+rDir,jp,k+zDir)),deltaPerp);
+            r,z,deltaL,deltaR,dp,cell_tiph(cell_single(theCells,i+rDir,jp,k+zDir)),deltaPerp);
       }
       ++(*pn);
       ++jp;
@@ -89,7 +93,7 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
         //Step B: (optional) all faces formed out of part of cell- and all of cell+. ++jp;
         if ( mode==1 ){
           addFace(theFaces,*pn,cell_single(theCells,i,j,k),cell_single(theCells,i+rDir,jp,k+zDir),
-              r,deltaL,deltaR,cell_dphi(cell_single(theCells,i+rDir,jp,k+zDir)),cell_tiph(cell_single(theCells,i+rDir,jp,k+zDir)),deltaPerp);
+              r,z,deltaL,deltaR,cell_dphi(cell_single(theCells,i+rDir,jp,k+zDir)),cell_tiph(cell_single(theCells,i+rDir,jp,k+zDir)),deltaPerp);
         }
         ++(*pn);
         ++jp;
@@ -102,7 +106,7 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
       //Step C: face formed out of end of cell- and beginning of cell+.
       if ( mode==1 ){
         addFace(theFaces,*pn,cell_single(theCells,i,j,k),cell_single(theCells,i+rDir,jp,k+zDir),
-            r,deltaL,deltaR,dp,cell_tiph(cell_single(theCells,i,j,k)),deltaPerp);
+            r,z,deltaL,deltaR,dp,cell_tiph(cell_single(theCells,i,j,k)),deltaPerp);
       }
       ++(*pn);
     }
