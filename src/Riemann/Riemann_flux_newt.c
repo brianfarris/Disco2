@@ -76,7 +76,7 @@ void riemann_set_vel_newt(struct Riemann * theRiemann,struct Sim * theSim,double
 }
 
 void riemann_set_flux_newt(struct Riemann * theRiemann, struct Sim * theSim,double GAMMALAW,int SetState){
-  double r = theRiemann->r;
+  double r = theRiemann->pos[R_DIR];
   double *prim;
   double *F;
   if (SetState==LEFT){

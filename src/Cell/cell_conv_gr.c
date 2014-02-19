@@ -9,7 +9,7 @@
 #include "../Headers/Metric.h"
 #include "../Headers/header.h"
 
-void cell_prim2cons_gr( double * prim , double * cons , double r , double dV ,struct Sim * theSim)
+void cell_prim2cons_gr( double * prim , double * cons , double *pos , double dV ,struct Sim * theSim)
 {
     int i,j;
 
@@ -18,6 +18,10 @@ void cell_prim2cons_gr( double * prim , double * cons , double r , double dV ,st
     double u0, u[3];
     double rho, Pp, v[3];
     double GAMMALAW, rhoh;
+    double r, phi, z;
+    r = pos[R_DIR];
+    phi = pos[P_DIR];
+    z = pos[Z_DIR];
 
     //Get hydro primitives
     rho = prim[RHO];
@@ -27,7 +31,7 @@ void cell_prim2cons_gr( double * prim , double * cons , double r , double dV ,st
     v[2]  = prim[UZZ];
 
     //Get needed metric values
-    g = metric_create(time_global, r, 0, 0, theSim);
+    g = metric_create(time_global, r, phi, z, theSim);
     a = metric_lapse(g);
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g, i);
@@ -42,10 +46,19 @@ void cell_prim2cons_gr( double * prim , double * cons , double r , double dV ,st
             u[i] += metric_gamma_dd(g,i,j) * (v[j]+b[j]);
         u[i] *= u0;
     }
-    
+
     GAMMALAW = sim_GAMMALAW(theSim);
     rhoh = rho + GAMMALAW*Pp/(GAMMALAW - 1.);
 
+    if(u0 < 0)
+        printf("whoa, u0 < 0! (r=%.12f)\n", r);
+    if(a < 0)
+        printf("whoa, a < 0! (r=%.12f)\n", r);
+    if(sqrtg < 0)
+        printf("whoa, sqrtg < 0! (r=%.12f)\n", r);
+    if(dV < 0)
+        printf("whoa, dV < 0! (r=%.12f)\n", r);
+    
     cons[DDD] = a*sqrtg*u0 * rho * dV;
     cons[SRR] = a*sqrtg*rhoh*u0 * u[0] * dV;
     cons[LLL] = a*sqrtg*rhoh*u0 * u[1] * dV;
@@ -60,7 +73,7 @@ void cell_prim2cons_gr( double * prim , double * cons , double r , double dV ,st
     metric_destroy(g);
 }
 
-void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct Sim *theSim)
+void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struct Sim *theSim)
 {
     int i,j;
     struct Metric *g;
@@ -73,8 +86,13 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
     double c[5];
     double eps = 1.0e-10;
     double CS_FLOOR, CS_CAP, RHO_FLOOR;
+    double r, phi, z;
 
-    g = metric_create(time_global, r, 0, 0, theSim);
+    r = pos[R_DIR];
+    phi = pos[P_DIR];
+    z = pos[Z_DIR];
+
+    g = metric_create(time_global, r, phi, z, theSim);
 
     //Metric quantities needed later
     a = metric_lapse(g);
@@ -196,7 +214,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double r, double dV, struct S
     if(PRINTTOOMUCH)
     {
         double cons2[sim_NUM_Q(theSim)];
-        cell_prim2cons(prim,cons2,r,dV,theSim);
+        cell_prim2cons(prim,cons2,pos,dV,theSim);
         printf("cons2prim: r=%lg, dV = %lg\n", r, dV);
         printf("cons: rhostar=%lg, Sr=%lg, Sp=%lg, tau=%lg\n", cons[DDD],cons[SRR],cons[LLL],cons[TAU]);
         printf("prim: rho=%lg, vr=%lg, vp=%lg, P=%lg\n", prim[RHO],prim[URR],prim[UPP],prim[PPP]);

@@ -13,11 +13,12 @@ void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int 
 {
     double rho, Pp, vr, u, T;
     double GAMMALAW = sim_GAMMALAW(theSim);
-    double RG = sim_GravRadius(theSim);
+    double RG = 2.0*sim_GravM(theSim);
     int dim = sim_InitPar0(theSim)+2;
     double RS = sim_InitPar1(theSim);
     double Mdot = sim_InitPar2(theSim);
     double EPS = 0.00001;
+    double cut = 0.1;
 
     double rm = sim_FacePos(theSim,i-1,R_DIR);
     double rp = sim_FacePos(theSim,i,R_DIR);
@@ -56,6 +57,8 @@ void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int 
     if(dim==2)
     {
         R = r;
+        if(R < (1-cut)*RG+cut*RS)
+            R = (1-cut)*RG+cut*RS;
         c1 = 1.0 + n;
         c2 = 1.0 - RG/R;
         c3 = C1*C1/(R*R);
@@ -63,6 +66,8 @@ void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int 
     else if (dim==3)
     {
         R = sqrt(r*r + z*z);
+        if(R < (1-cut)*RG+cut*RS)
+            R = (1-cut)*RG+cut*RS;
         c1 = 1.0 + n;
         c2 = 1.0 - RG/R;
         c3 = C1*C1/(R*R*R*R);
@@ -109,14 +114,29 @@ void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int 
     Pp = rho * T;
     vr = - sqrt((1.0-RG/R) / (1+u*u/(1.0-RG/R))) * u;
 
+    if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
+    {
+        vr  = vr * (1.0-RG/R) / (1.0-RG/R+RG/R*vr);
+        if(vr > (1.0-RG/R) / (1.0+RG/R))
+            vr = 0.9 * (1.0-RG/R) / (1.0+RG/R) - 0.1*vr;
+    }
+
     theCell->prim[RHO] = rho;
     theCell->prim[PPP] = Pp;
-    theCell->prim[URR] = r/R * vr;
     theCell->prim[UPP] = 0.0;
-    theCell->prim[UZZ] = z/R * vr;
     theCell->divB = 0.0;
     theCell->GradPsi[0] = 0.0;
     theCell->GradPsi[1] = 0.0;
+    if(dim == 2)
+    {
+        theCell->prim[URR] = vr;
+        theCell->prim[UZZ] = 0.0;
+    }
+    if(dim == 3)
+    {
+        theCell->prim[URR] = r/R * vr;
+        theCell->prim[UZZ] = z/R * vr;
+    }
 
   //TODO: Not sure what this is for.  Ask someone if important.
   //if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = Qq;
@@ -127,11 +147,12 @@ void cell_init_gbondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
 
     double rho, Pp, vr, u, T;
     double GAMMALAW = sim_GAMMALAW(theSim);
-    double RG = sim_GravRadius(theSim);
+    double RG = 2.0*sim_GravM(theSim);
     int dim = sim_InitPar0(theSim)+2;
     double RS = sim_InitPar1(theSim);
     double Mdot = sim_InitPar2(theSim);
     double EPS = 0.00001;
+    double cut = 0.1;
 
     double n = 1.0/(GAMMALAW-1.0);
 
@@ -184,6 +205,8 @@ void cell_init_gbondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
             if(dim == 2)
             {
                 R = r;
+                if(R < (1-cut)*RG+cut*RS)
+                    R = (1-cut)*RG+cut*RS;
                 c1 = 1.0 + n;
                 c2 = 1.0 - RG/R;
                 c3 = C1*C1/(R*R);
@@ -191,6 +214,8 @@ void cell_init_gbondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
             else if(dim == 3)
             {
                 R = sqrt(r*r+z*z);
+                if(R < (1-cut)*RG+cut*RS)
+                    R = (1-cut)*RG+cut*RS;
                 c1 = 1.0 + n;
                 c2 = 1.0 - RG/R;
                 c3 = C1*C1/(R*R*R*R);
@@ -242,6 +267,13 @@ void cell_init_gbondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
             rho = pow(T/K, n);
             Pp = rho * T;
             vr = - sqrt((1.0-RG/R) / (1+u*u/(1.0-RG/R))) * u;
+            
+            if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
+            {
+                vr  = vr * (1.0-RG/R) / (1.0-RG/R+RG/R*vr);
+                if(vr > (1.0-RG/R) / (1.0+RG/R))
+                    vr = 0.9 * (1.0-RG/R) / (1.0+RG/R) - 0.1*vr;
+            }
 
             for (j = 0; j < sim_N_p(theSim,i); j++) 
             {
@@ -249,13 +281,21 @@ void cell_init_gbondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
              
                 theCells[k][i][j].prim[RHO] = rho;
                 theCells[k][i][j].prim[PPP] = Pp;
-                theCells[k][i][j].prim[URR] = r/R * vr;
                 theCells[k][i][j].prim[UPP] = 0.0;
-                theCells[k][i][j].prim[UZZ] = z/R * vr;
                 theCells[k][i][j].divB = 0.0;
                 theCells[k][i][j].GradPsi[0] = 0.0;
                 theCells[k][i][j].GradPsi[1] = 0.0;
                 theCells[k][i][j].GradPsi[2] = 0.0;
+                if(dim == 2)
+                {
+                    theCells[k][i][j].prim[URR] = vr;
+                    theCells[k][i][j].prim[UZZ] = 0.0;
+                }
+                if(dim == 3)
+                {
+                    theCells[k][i][j].prim[URR] = r/R * vr;
+                    theCells[k][i][j].prim[UZZ] = z/R * vr;
+                }
             }
         }
     }

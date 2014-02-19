@@ -106,8 +106,8 @@ int sim_GRAV2D(struct Sim *theSim){
 double sim_G_EPS(struct Sim *theSim){
   return(theSim->G_EPS);
 }
-double sim_GravRadius(struct Sim *theSim){
-  return(theSim->GravRadius);
+double sim_GravM(struct Sim *theSim){
+  return(theSim->GravM);
 }
 double sim_PHI_ORDER(struct Sim *theSim){
   return(theSim->PHI_ORDER);

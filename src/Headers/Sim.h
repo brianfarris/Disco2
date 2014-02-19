@@ -45,7 +45,7 @@ struct Sim {
   double CFL;
   double PLM;
   int GRAV2D;
-  double GravRadius;
+  double GravM;
   double G_EPS;
   double PHI_ORDER;
   double RHO_FLOOR;
@@ -100,7 +100,7 @@ int sim_POWELL(struct Sim *);
 int sim_W_A_TYPE(struct Sim *);
 int sim_GRAV2D(struct Sim *);
 double sim_G_EPS(struct Sim *);
-double sim_GravRadius(struct Sim *);
+double sim_GravM(struct Sim *);
 double sim_PHI_ORDER(struct Sim *);
 double sim_RHO_FLOOR(struct Sim *);
 double sim_CS_FLOOR(struct Sim *);

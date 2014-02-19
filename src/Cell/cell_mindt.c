@@ -23,7 +23,7 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim){
     return maxv;
 }
 
-double cell_maxvel_gr(double *prim, int dir, double w, double r, struct Sim *theSim)
+double cell_maxvel_gr(double *prim, int dir, double w, double r, double phi, double z, struct Sim *theSim)
 {
     double maxv;
     double rho, Pp, v[3], GAMMALAW, rhoh, vn;
@@ -42,7 +42,7 @@ double cell_maxvel_gr(double *prim, int dir, double w, double r, struct Sim *the
     GAMMALAW = sim_GAMMALAW(theSim);
     rhoh = rho + GAMMALAW * Pp / (GAMMALAW-1.0);
     
-    g = metric_create(time_global, r, 0, 0, theSim);
+    g = metric_create(time_global, r, phi, z, theSim);
     a = metric_lapse(g);
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g,i);
@@ -123,6 +123,7 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
         double zm = sim_FacePos(theSim,k-1,Z_DIR);
         double zp = sim_FacePos(theSim,k,Z_DIR);
         double dz = zp-zm;
+        double z = 0.5*(zm+zp);
         
         for(i = sim_Nghost_min(theSim,R_DIR); i < sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR); ++i)
         {
@@ -138,11 +139,12 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                     jm = sim_N_p(theSim,i)-1;
                 double w = .5*(theCells[k][i][j].wiph+theCells[k][i][jm].wiph); 
                 double dphi = theCells[k][i][j].dphi;
+                double phi = theCells[k][i][j].tiph - 0.5*dphi;
 
                 double ar, ap, az;
-                ar = cell_maxvel_gr(theCells[k][i][j].prim, 0, w, r, theSim);
-                ap = cell_maxvel_gr(theCells[k][i][j].prim, 1, w, r, theSim);
-                az = cell_maxvel_gr(theCells[k][i][j].prim, 2, w, r, theSim);
+                ar = cell_maxvel_gr(theCells[k][i][j].prim, 0, w, r, phi, z, theSim);
+                ap = cell_maxvel_gr(theCells[k][i][j].prim, 1, w, r, phi, z, theSim);
+                az = cell_maxvel_gr(theCells[k][i][j].prim, 2, w, r, phi, z, theSim);
                 
                 double dt = dr/ar;
                 if(dt > dphi/ap)

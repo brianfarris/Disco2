@@ -42,7 +42,7 @@ void riemann_set_star_hll(struct Riemann * theRiemann,struct Sim * theSim){
 
 
 void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,double GAMMALAW){
-  double r = theRiemann->r;
+  double r = theRiemann->pos[R_DIR];
   double *prim;
   double Sk;
   double *Uk;
@@ -121,16 +121,18 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
   while( dpR < -M_PI ) dpR += 2.*M_PI;
   dpL = dpL;
   dpR = dpR;
-  theRiemann->r = face_r(theFaces,FaceNumber);
+  theRiemann->pos[R_DIR] = face_r(theFaces,FaceNumber);
+  theRiemann->pos[Z_DIR] = face_z(theFaces,FaceNumber);
+  theRiemann->pos[P_DIR] = face_phi(theFaces,FaceNumber);
   theRiemann->dA = face_dA(theFaces,FaceNumber);
   theRiemann->cm = face_cm(theFaces,FaceNumber);
 
   if (direction==0){
-    theRiemann->r_cell_L = theRiemann->r-deltaL;
-    theRiemann->r_cell_R = theRiemann->r+deltaR;
+    theRiemann->r_cell_L = theRiemann->pos[R_DIR]-deltaL;
+    theRiemann->r_cell_R = theRiemann->pos[R_DIR]+deltaR;
   } else{
-    theRiemann->r_cell_L = theRiemann->r;
-    theRiemann->r_cell_R = theRiemann->r;
+    theRiemann->r_cell_L = theRiemann->pos[R_DIR];
+    theRiemann->r_cell_R = theRiemann->pos[R_DIR];
   }
 
   int q;
@@ -157,12 +159,15 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
   double zm = sim_FacePos(theSim,k-1,Z_DIR);
   double zp = sim_FacePos(theSim,k,Z_DIR);
   double dz = zp-zm;
+  double z = 0.5*(zp+zm);
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
   double dr = rp-rm;
   double r = .5*(rp+rm);
   theRiemann->dA = dr*dz;
-  theRiemann->r = r; 
+  theRiemann->pos[R_DIR] = r; 
+  theRiemann->pos[Z_DIR] = z; 
+  theRiemann->pos[P_DIR] = cell_tiph(theRiemann->cL); 
   theRiemann->cm = cell_tiph(theRiemann->cL);
 
   theRiemann->r_cell_L = r;
@@ -180,7 +185,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   int NUM_Q = sim_NUM_Q(theSim);
   double GAMMALAW = sim_GAMMALAW(theSim);
 
-  riemann_set_vel(theRiemann,theSim,theRiemann->r,GAMMALAW);
+  riemann_set_vel(theRiemann,theSim,theRiemann->pos[R_DIR],GAMMALAW);
 
   double w;
   if (theRiemann->n[PDIRECTION]){
@@ -194,14 +199,14 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
 
   if (theRiemann->state==LEFT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,LEFT);//in this case, we only need FL
-    cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
+    cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->pos , 1.0 ,theSim);
     int q;
     for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
       theRiemann->F[q] = theRiemann->FL[q] - w*theRiemann->UL[q];// w is only nonzero when we are in phi direction
     }
   } else if (theRiemann->state==RIGHT){
     riemann_set_flux( theRiemann , theSim, GAMMALAW,RIGHT);//in this case, we only need FR
-    cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
+    cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->pos , 1.0 ,theSim);
     int q;
     for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
       theRiemann->F[q] = theRiemann->FR[q] - w*theRiemann->UR[q];// w is only nonzero when we are in phi direction
@@ -210,17 +215,17 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     if (sim_Riemann(theSim)==HLL){
       riemann_set_flux( theRiemann , theSim, GAMMALAW,LEFT);  //we need both
       riemann_set_flux( theRiemann , theSim, GAMMALAW,RIGHT);    
-      cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);//we need both
-      cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
+      cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->pos , 1.0 ,theSim);//we need both
+      cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->pos , 1.0 ,theSim);
       riemann_set_star_hll(theRiemann,theSim);// get Ustar and Fstar
     } else if (sim_Riemann(theSim)==HLLC){
       if (theRiemann->state==LEFTSTAR){
         riemann_set_flux( theRiemann , theSim, GAMMALAW,LEFT);//in this case, we only need FL
-        cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
+        cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->pos , 1.0 ,theSim);
         riemann_set_star_hllc(theRiemann,theSim,GAMMALAW);// get Ustar and Fstar
       } else if (theRiemann->state==RIGHTSTAR){
         riemann_set_flux( theRiemann , theSim, GAMMALAW,RIGHT);//in this case, we only need FR      
-        cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
+        cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->pos , 1.0 ,theSim);
         riemann_set_star_hllc(theRiemann,theSim,GAMMALAW);// get Ustar and Fstar
       }
     } else{

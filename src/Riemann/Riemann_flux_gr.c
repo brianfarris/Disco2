@@ -47,7 +47,7 @@ void riemann_set_vel_gr(struct Riemann *theRiemann, struct Sim *theSim, double r
     double a, b[3], bn, sig, gam, w, v[3], dv;
     struct Metric *g;
 
-    g = metric_create(time_global, r, 0, 0, theSim);
+    g = metric_create(time_global, theRiemann->pos[R_DIR], theRiemann->pos[P_DIR], theRiemann->pos[Z_DIR], theSim);
 
     dir = -1;
     for(i=0; i<3; i++)
@@ -129,7 +129,7 @@ void riemann_set_vel_gr(struct Riemann *theRiemann, struct Sim *theSim, double r
 //IT WILL NOT WORK FOR ARBITRARY n.
 void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double GAMMALAW, int SetState)
 {
-    double r = theRiemann->r;
+    double r = theRiemann->pos[R_DIR];
     double *prim;
     double *F;
     
@@ -164,7 +164,7 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
     v[2]  = prim[UZZ];
 
     //Get needed metric values
-    g = metric_create(time_global, r, 0, 0, theSim);
+    g = metric_create(time_global, theRiemann->pos[R_DIR], theRiemann->pos[P_DIR], theRiemann->pos[Z_DIR], theSim);
     a = metric_lapse(g);
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g, i);

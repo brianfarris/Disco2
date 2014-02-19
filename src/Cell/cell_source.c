@@ -139,7 +139,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
             GAMMALAW = sim_GAMMALAW(theSim);
             rhoh = rho + GAMMALAW*Pp/(GAMMALAW-1);
-            
+           
             //Momentum sources and contribution to energy source
             s = 0;
             for(la=0; la<4; la++)
@@ -148,18 +148,24 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                     sk = 0;
                     for(mu=0; mu<4; mu++)
                     {
+                        //TODO: REMOVE THIS IMMEDIATELY
+                        if(mu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                            continue;
                         sk += 0.5*(rhoh*u[mu]*u[mu]+Pp*metric_g_uu(g,mu,mu)) * metric_dg_dd(g,la,mu,mu);
-                        //if(la==1 && PRINTTOOMUCH)
-                        //    printf("SRR: sk = %.12f\n", sk);
                         for(nu=mu+1; nu<4; nu++)
+                        {
+                            //TODO: REMOVE THIS IMMEDIATELY
+                            if(nu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                                continue;
                             sk += (rhoh*u[mu]*u[nu]+Pp*metric_g_uu(g,mu,nu)) * metric_dg_dd(g,la,mu,nu);
+                        }
                     }
                     if(la == 1)
                     {
                         c->cons[SRR] += dt*dV*sqrtg*a * sk;
                         if(PRINTTOOMUCH)
                         {
-                            printf("SRR source: (%d,%d,%d): r=%.12f, dV=%.12f, s=%.12f, S = %.12f\n",i,j,k,r,dV,sk,dt*dV*sqrtg*a * sk);
+                            printf("SRR source: (%d,%d,%d): r=%.12f, dV=%.12f, s = %.12f, S = %.12f\n",i,j,k,r,dV,a*sqrtg*sk,dt*dV*sqrtg*a * sk);
                         }
                     }
                     else if(la == 2)
@@ -170,6 +176,9 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                     {
                         c->cons[SZZ] += dt*dV*sqrtg*a * sk;
                     }
+                    //TODO: REMOVE THIS IMMEDIATELY
+                    if(la == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                        continue;
                     s -= n[la]*sk;
                 }
 
@@ -178,19 +187,25 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 if(!metric_killcoord(g,la))
                 {
                     sk = (rhoh*u[0]*u[la] + Pp*metric_g_uu(g,0,la))*metric_dlapse(g,la);
-                    for(mu=1; mu<4; mu++)
+                    for(mu=0; mu<4; mu++)
                     {
+                        //TODO: REMOVE THIS IMMEDIATELY
+                        if(mu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                            continue;
                         if(mu == la)
-                            sk -= (rhoh*u[la]*u_d[mu]+Pp)*metric_dshift_u(g,la,mu)/a;
+                            sk += a*(rhoh*u[la]*u_d[mu]+Pp)*metric_dg_uu(g,la,0,mu);
                         else
-                            sk -= rhoh*u[la]*u_d[mu]*metric_dshift_u(g,la,mu)/a;
+                            sk += a*rhoh*u[la]*u_d[mu]*metric_dg_uu(g,la,0,mu);
                     }
-                    s -= sk;
+                    //TODO: REMOVE THIS IMMEDIATELY
+                    if(la == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                        continue;
+                    s += sk;
                 }
 
             if(PRINTTOOMUCH)
             {
-                printf("TAU source: (%d,%d,%d): r=%.12f, dV=%.12f, s = %.12f\n",i,j,k,r,dV,dt*dV*sqrtg*a * s);
+                printf("TAU source: (%d,%d,%d): r=%.12f, dV=%.12f, s = %.12f, S = %.12f\n",i,j,k,r,dV,a*sqrtg*s,dt*dV*sqrtg*a * s);
             }
 
             c->cons[TAU] += dt*dV*sqrtg*a * s;

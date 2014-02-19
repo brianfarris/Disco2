@@ -9,7 +9,7 @@ struct Face;
 struct Riemann {
   struct Cell * cL;
   struct Cell * cR;
-  double r;
+  double pos[3];
   double r_cell_L;
   double r_cell_R;
   double dA;
