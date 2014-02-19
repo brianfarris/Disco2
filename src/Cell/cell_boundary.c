@@ -181,6 +181,19 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct 
       }
     }
   }
+
+  //TODO: Find a better way of doing this.
+  if(sim_InitialDataType(theSim)==GBONDI && sim_NoInnerBC(theSim))
+      if(mpisetup_check_rin_bndry(theMPIsetup))
+          for(k=0; k<sim_N(theSim,Z_DIR); k++)
+          {
+              double zm = sim_FacePos(theSim,k-1,Z_DIR);
+              double zp = sim_FacePos(theSim,k,Z_DIR);
+              if(zm < 0 && zp > 0)
+                for(j=0; j<sim_N_p(theSim,0); j++)
+                    (*single_init_ptr)(&(theCells[k][0][j]),theSim,0,j,k);
+          }
+
   if( mpisetup_check_rout_bndry(theMPIsetup) ){
     for( i=sim_N(theSim,R_DIR)-1 ; i>sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)-1 ; --i ){
       for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
