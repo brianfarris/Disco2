@@ -11,11 +11,11 @@ Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR			64			//Radial Zones
+NumR			256			//Radial Zones
 NumZ			1          //Vertical Zones
 ng              2
-R_Min		    1.0
-R_Max			20.0
+R_Min		    0.5
+R_Max			30.0
 Z_Min			-0.5
 Z_Max			0.5
 NP_CONST        -1
@@ -23,8 +23,8 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                1000.0
-Num_Checkpoints	        10	
+Time_Max                500.0
+Num_Checkpoints	        100	
 Num_Diag_Dump           20
 Num_Diag_Measure        20
 

@@ -225,15 +225,15 @@ void cell_init_gbondi2(struct Cell ***theCells,struct Sim *theSim,struct MPIsetu
             else if (dim == 3)
                 u = C1/(pow(T,n)*r*r);
 
-            rho = pow(T/K, n);
-            Pp = rho * T;
-            vr = - sqrt((1.0-RG/r) / (1+u*u/(1.0-RG/r))) * u;
-
             for (j = 0; j < sim_N_p(theSim,i); j++) 
             {
                 double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
              
-                theCells[k][i][j].prim[RHO] = rho + 3*rho0*exp(-((r-1.5*rs)*(r-1.5*rs)+r*r*t*t)/(0.01*rs*rs));
+            	rho = pow(T/K, n) + 3*rho0*exp(-((r-2.5*rs)*(r-2.5*rs)+r*r*(t-0.5*M_PI)*(t-0.5*M_PI))/(0.01*rs*rs));
+            	Pp = rho * T;
+            	vr = - sqrt((1.0-RG/r) / (1+u*u/(1.0-RG/r))) * u;
+
+                theCells[k][i][j].prim[RHO] = rho;
                 theCells[k][i][j].prim[PPP] = Pp;
                 theCells[k][i][j].prim[URR] = vr;
                 theCells[k][i][j].prim[UPP] = 0.0;
