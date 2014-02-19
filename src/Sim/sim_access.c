@@ -101,8 +101,14 @@ int sim_Riemann(struct Sim *theSim){
 double sim_GAMMALAW(struct Sim *theSim){
   return(theSim->GAMMALAW);
 }
+int sim_COOLING(struct Sim *theSim){
+  return(theSim->COOLING);
+}
 double sim_EXPLICIT_VISCOSITY(struct Sim *theSim){
   return(theSim->EXPLICIT_VISCOSITY);
+}
+int sim_VISC_CONST(struct Sim *theSim){
+  return(theSim->VISC_CONST);
 }
 double sim_DIVB_CH(struct Sim *theSim){
   return(theSim->DIVB_CH);

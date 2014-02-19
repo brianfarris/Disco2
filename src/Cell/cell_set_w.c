@@ -29,8 +29,8 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
     }
 
   } else if( sim_MOVE_CELLS(theSim) == C_RIGID ) {
-    printf("THIS OPTION SHOULD NOT BE USED RIGHT NOW. WE NEED TO KNOW THE ANALYTIC RADIAL DERIV OF W\n");
-    exit(1);
+    //printf("THIS OPTION SHOULD NOT BE USED RIGHT NOW. WE NEED TO KNOW THE ANALYTIC RADIAL DERIV OF W\n");
+    //exit(1);
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
         double w=0.0;
@@ -47,7 +47,9 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           theCells[k][i][j].wiph = w/Mring;   
         }
+        //printf("%e %e\n",r,w/Mring);
       }
+      //exit(1);
     }
 
   } else if (sim_MOVE_CELLS(theSim) == C_KEPLER ) {
@@ -58,9 +60,6 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         double r = 0.5*(rm+rp);
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           theCells[k][i][j].wiph = pow(r,-0.5);
-          theCells[k][i][j].drOm = -1.5*pow(r,-2.5);
-          //theCells[k][i][j].wiph = r/pow(r*r+sim_G_EPS(theSim)*sim_G_EPS(theSim),3./4.);
-          //theCells[k][i][j].drOm = -1.5*r/pow(r*r+sim_G_EPS(theSim)*sim_G_EPS(theSim),7./4.);
         }
       }
     }
@@ -72,7 +71,6 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         double r = 0.5*(rm+rp);
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           theCells[k][i][j].wiph = r*20.;
-          theCells[k][i][j].drOm = 20.;
         }
       }
     }
@@ -83,17 +81,7 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         double rm = sim_FacePos(theSim,i-1,R_DIR);
         double r = 0.5*(rm+rp);
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-          /*
-          if (r<0.1){
-            theCells[k][i][j].wiph = pow(0.1,-0.5)*r;
-            theCells[k][i][j].drOm = 0.0;
-          } else{
-            theCells[k][i][j].wiph = pow(r,-0.5);
-            theCells[k][i][j].drOm = -1.5*pow(r,-2.5);
-          }
-          */
           theCells[k][i][j].wiph = (1.-exp(-pow(r,1.5)))/sqrt(r);
-          theCells[k][i][j].drOm = 1.5*pow(r,-2.5)*(-1.+(1.+pow(r,1.5))*exp(-pow(r,1.5))); 
         }
       }
     }
@@ -105,7 +93,6 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         double r = 0.5*(rm+rp);
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           theCells[k][i][j].wiph = pow(r,-1.0);
-          theCells[k][i][j].drOm = -2.*pow(r,-3.0);
         }
       }
     }

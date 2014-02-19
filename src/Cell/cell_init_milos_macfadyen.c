@@ -29,7 +29,7 @@ void cell_single_init_milos_macfadyen(struct Cell *theCell, struct Sim *theSim,i
   theCell->prim[URR] = vr;
   theCell->prim[UPP] = 0.0;
   theCell->prim[UZZ] = 0.0;
-  theCell->wiph = 1./sqrt(r);
+  theCell->wiph = 0.0;
   theCell->divB = 0.0;
   theCell->GradPsi[0] = 0.0;
   theCell->GradPsi[1] = 0.0;
@@ -149,7 +149,7 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
         theCells[k][i][j].prim[URR] = vr;
         theCells[k][i][j].prim[UPP] = omega-sqrt(1.)/pow(r,1.5);
         theCells[k][i][j].prim[UZZ] = 0.0;
-        theCells[k][i][j].wiph = 1./sqrt(r);
+        theCells[k][i][j].wiph = 0.0;
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;
         theCells[k][i][j].GradPsi[1] = 0.0;

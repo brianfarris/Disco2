@@ -44,7 +44,9 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
             cL->prim[RHO] += (cR->prim[RHO]/pow(r_cellR,-3./5.)*pow(r_cell,-3./5.))*face_dA(theFaces,n);
             cL->prim[PPP] += (cR->prim[PPP]/pow(r_cellR,-3./2.)*pow(r_cell,-3./2.))*face_dA(theFaces,n);
             cL->prim[URR] += (cR->prim[URR]-EXTRAP_BC*cR->grad[URR]*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i-1,R_DIR))/2.)*face_dA(theFaces,n);
+            //cL->prim[UPP] += (cR->prim[UPP]-EXTRAP_BC*cR->grad[UPP]*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i-1,R_DIR))/2.)*face_dA(theFaces,n);
             cL->prim[UPP] += (cR->prim[UPP]/pow(r_cellR,-7./5.)*pow(r_cell,-7./5.))*face_dA(theFaces,n);
+            //cL->prim[UPP] += ((cR->prim[UPP]-pow(r_cellR,-1.5)*exp(-pow(r_cellR/0.5,1.5)))/pow(r_cellR,-7./5.)*pow(r_cell,-7./5.) + pow(r_cell,-1.5)*exp(-pow(r_cell/0.5,1.5)))*face_dA(theFaces,n);
             if (sim_ZeroPsiBndry(theSim)){
               cL->prim[PSI] = 0.0;
             }

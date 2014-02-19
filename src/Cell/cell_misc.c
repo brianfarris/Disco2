@@ -69,8 +69,8 @@ void cell_update_phi( struct Cell *** theCells , struct Sim * theSim, double RK 
         while( c->tiph - c->RKtiph >  PHIMAX/2. ) c->RKtiph += PHIMAX;
         while( c->tiph - c->RKtiph < -PHIMAX/2. ) c->RKtiph -= PHIMAX;
         c->tiph = (1.0-RK)*c->tiph + RK*c->RKtiph;
-        double w = theCells[k][i][j].wiph;
-        theCells[k][i][j].tiph += w*dt/r;
+        double w_total = theCells[k][i][j].wiph + sim_W_A(theSim,r);
+        theCells[k][i][j].tiph += w_total*dt/r;
       }
     }
   }

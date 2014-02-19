@@ -15,7 +15,6 @@ void cell_clear_w(struct Cell ***theCells,struct Sim * theSim){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         theCells[k][i][j].wiph = 0.0;
-        theCells[k][i][j].drOm = 0.0;
       }
     }
   }

@@ -19,21 +19,22 @@ void cell_single_init_middle(struct Cell *theCell, struct Sim *theSim,int i,int 
   double alpha = sim_EXPLICIT_VISCOSITY(theSim);
   double Gam = sim_GAMMALAW(theSim);
 
-  double rho = pow(r,-3./5.);
-  double   P = 1.e-2*pow(r,-3./2.);
+  double rho = pow(r,-3./5.)*exp(-pow(r/20.,-2.));
+  double   P = 1.e-2*pow(r,-3./2.)*exp(-pow(r/20.,-2.));
 
+  if (rho<1.e-5) rho=1.e-5;
+  if (P<1.e-8) P=1.e-8;
   double o2  = 1./r/r/r;// - 3./2.*P/rho/r/r;
   double omega = sqrt(o2);
   double vr     = 0.0;//-1.5*alpha*Gam*(P/rho)*sqrt(r);
 
 
-  theCell->prim[RHO] = rho;//*exp(-pow(r/20.,-2.));
-  theCell->prim[PPP] = P;//*exp(-pow(r/20.,-2.));
+  theCell->prim[RHO] = rho;
+  theCell->prim[PPP] = P;
   theCell->prim[URR] = vr;
-  theCell->prim[UPP] = omega-1./pow(r,1.5);
+  theCell->prim[UPP] = omega - sim_W_A(theSim,r)/r; //1./pow(r,1.5);
   theCell->prim[UZZ] = 0.0;
-  theCell->wiph = pow(r,-.5);
-  theCell->drOm = -1.5*pow(r,-2.5);
+  theCell->wiph = 0.0;
   theCell->divB = 0.0;
   theCell->GradPsi[0] = 0.0;
   theCell->GradPsi[1] = 0.0;
@@ -56,8 +57,11 @@ void cell_init_middle(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
       for (j = 0; j < sim_N_p(theSim,i); j++) {
 
 
-        double rho = pow(r,-3./5.);//*exp(-pow(r/20.,-2.));
-        double   P = 1.e-2*pow(r,-3./2.);//*exp(-pow(r/20.,-2.));
+        double rho = pow(r,-3./5.)*exp(-pow(r/20.,-2.));
+        double   P = 1.e-2*pow(r,-3./2.)*exp(-pow(r/20.,-2.));
+        if (rho<1.e-5) rho=1.e-5;
+        if (P<1.e-8) P=1.e-8;
+        
         double o2  = 1./r/r/r;// - 3./2.*P/rho/r/r;
         double omega = sqrt(o2);
         double vr     = 0.0;//-1.5*alpha*Gam*(P/rho)*sqrt(r);
@@ -65,10 +69,9 @@ void cell_init_middle(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = P;
         theCells[k][i][j].prim[URR] = vr;
-        theCells[k][i][j].prim[UPP] = omega-sqrt(1.)/pow(r,1.5);
+        theCells[k][i][j].prim[UPP] = omega - sim_W_A(theSim,r)/r; //-sqrt(1.)/pow(r,1.5);
         theCells[k][i][j].prim[UZZ] = 0.0;
-        theCells[k][i][j].wiph = pow(r,-.5);
-        theCells[k][i][j].drOm = -1.5*pow(r,-2.5);
+        theCells[k][i][j].wiph = 0.0;
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;
         theCells[k][i][j].GradPsi[1] = 0.0;

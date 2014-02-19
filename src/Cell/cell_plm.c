@@ -76,9 +76,6 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
         for( q=0 ; q<NUM_Q ; ++q ){
           theCells[k][i][j].grad[q] /= dAtot;
         }
-        if (fabs(rp-1.)<0.000001){
-          //printf("rm: %e, rp: %e, dAtot: %e, gradP: %e\n",rm,rp,dAtot,theCells[k][i][j].grad[PPP]);
-        }
       }
     }
   }

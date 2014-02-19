@@ -29,7 +29,7 @@ void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,int i,int j
   }
   /*
   double nu;
-  if (VISC_CONST==1){
+  if (sim_VISC_CONST(theSim)==1){
     nu = sim_EXPLICIT_VISCOSITY(theSim);
   } else{
   double HoR = 0.1;
@@ -49,10 +49,9 @@ void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,int i,int j
   theCell->prim[RHO] = rho;
   theCell->prim[PPP] = Pp;
   theCell->prim[URR] = vr;
-  theCell->prim[UPP] = omega;
+  theCell->prim[UPP] = omega-sim_W_A(theSim,r)/r;
   theCell->prim[UZZ] = 0.0;
   theCell->wiph = 0.0;
-  theCell->drOm = 0.0;
   theCell->divB = 0.0;
   theCell->GradPsi[0] = 0.0;
   theCell->GradPsi[1] = 0.0;
@@ -69,7 +68,7 @@ void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
   int i, j,k;
   printf("sim_EXPLICIT_VISCOSITY(theSim): %e\n",sim_EXPLICIT_VISCOSITY(theSim));
   printf("sim_GAMMALAW(theSim): %e\n",sim_GAMMALAW(theSim));
-  printf("VISC_CONST: %d\n",VISC_CONST);
+  printf("sim_VISC_CONST(theSim): %d\n",sim_VISC_CONST(theSim));
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
     for (i = 0; i < sim_N(theSim,R_DIR); i++) {
       double rm = sim_FacePos(theSim,i-1,R_DIR);
@@ -82,7 +81,7 @@ void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         double y = r*sin(t);
         /*
            double nu;
-           if (VISC_CONST==1){
+           if (sim_VISC_CONST(theSim)==1){
            nu = sim_EXPLICIT_VISCOSITY(theSim);
            } else{
            nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(fabs((r*cos(t))),1.5);
@@ -109,10 +108,9 @@ void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = Pp;
         theCells[k][i][j].prim[URR] = vr;
-        theCells[k][i][j].prim[UPP] = omega;
+        theCells[k][i][j].prim[UPP] = omega-sim_W_A(theSim,r)/r;
         theCells[k][i][j].prim[UZZ] = 0.0;
         theCells[k][i][j].wiph = 0.0;
-        theCells[k][i][j].drOm = 0.0;
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;
         theCells[k][i][j].GradPsi[1] = 0.0;

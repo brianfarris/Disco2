@@ -18,7 +18,6 @@ struct Cell{
   double RKtiph;
   double dphi;
   double wiph;
-  double drOm;
   double divB;
   double GradPsi[3];
 };
@@ -67,14 +66,13 @@ struct Cell *cell_single(struct Cell ***,int,int,int);
 double cell_tiph(struct Cell *);
 double cell_dphi(struct Cell *);
 double cell_wiph(struct Cell *);
-double cell_drOm(struct Cell *);
 double cell_GradPsi(struct Cell ***,int ,int ,int ,int );
 double cell_divB(struct Cell ***,int,int,int);
 //modify cell data
 void cell_add_cons(struct Cell *, int, double);
 void cell_add_divB(struct Cell *, double);
 void cell_add_GradPsi(struct Cell *, int, double);
-void cell_add_wiph(struct Cell *, double);
+//void cell_add_wiph(struct Cell *, double);
 void cell_add_src( struct Cell *** ,struct Sim * , struct GravMass * , double );
 void cell_add_visc_src( struct Cell *** ,struct Sim * , double );
 void cell_add_visc_src_old( struct Cell *** ,struct Sim * , double );

@@ -78,7 +78,7 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim ){
         double dt = sim_CFL(theSim)*dx/a;
         if( sim_EXPLICIT_VISCOSITY(theSim)>0.0 ){
           double nu;
-          if (VISC_CONST==1){
+          if (sim_VISC_CONST(theSim)==1){
             nu = sim_EXPLICIT_VISCOSITY(theSim);
           } else{
             double tiph = theCells[k][i][j].tiph - 0.5*theCells[k][i][j].dphi;
