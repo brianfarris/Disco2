@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Riemann.h"
+#include "../Headers/GravMass.h"
 #include "../Headers/Sim.h"
 #include "../Headers/Cell.h"
 #include "../Headers/Face.h"
@@ -341,10 +342,34 @@ double Gradient_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_prim, double 
 }
 */
 
-void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
+void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct GravMass * theGravMasses ){
   int NUM_Q = sim_NUM_Q(theSim);
 
   double r = theRiemann->r;
+  double tiph = theRiemann->cm;
+
+  double Mtotal = 1.0;
+  double sep = 1.0;
+  double M0 = gravMass_M(theGravMasses,0);
+  double M1 = gravMass_M(theGravMasses,1);
+
+  double r0 = gravMass_r(theGravMasses,0);
+  double r1 = gravMass_r(theGravMasses,1);
+
+  double phi_bh0 = gravMass_phi(theGravMasses,0);
+  double phi_bh1 = gravMass_phi(theGravMasses,1);
+
+  double xbh0 = r0*cos(phi_bh0);
+  double ybh0 = r0*sin(phi_bh0);
+
+  double xbh1 = r1*cos(phi_bh1);
+  double ybh1 = r1*sin(phi_bh1);
+
+  double xpos = r*cos(tiph);
+  double ypos = r*sin(tiph);
+
+  double dist_bh0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
+  double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
 
   double * VFlux = malloc(NUM_Q*sizeof(double));
   double * AvgPrim = malloc(NUM_Q*sizeof(double));
@@ -358,35 +383,34 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
     Grad_r_prim[q] = .5*(cell_grad(theRiemann->cL,q)+cell_grad(theRiemann->cR,q));
 
     if (1==1){
-    if (theRiemann->n[0]==1){
-      double pL = cell_tiph(theRiemann->cL) - .5*cell_dphi(theRiemann->cL);
-      double pR = cell_tiph(theRiemann->cR) - .5*cell_dphi(theRiemann->cR);   
+      if (theRiemann->n[0]==1){
+        double pL = cell_tiph(theRiemann->cL) - .5*cell_dphi(theRiemann->cL);
+        double pR = cell_tiph(theRiemann->cR) - .5*cell_dphi(theRiemann->cR);   
 
-      double dpL =  theRiemann->cm - pL;
-      double dpR = -theRiemann->cm + pR;
-      while( dpL >  PHIMAX/2. ) dpL -= PHIMAX;
-      while( dpL < -PHIMAX/2. ) dpL += PHIMAX;
-      while( dpR >  PHIMAX/2. ) dpR -= PHIMAX;
-      while( dpR < -PHIMAX/2. ) dpR += PHIMAX;
+        double dpL =  theRiemann->cm - pL;
+        double dpR = -theRiemann->cm + pR;
+        while( dpL >  PHIMAX/2. ) dpL -= PHIMAX;
+        while( dpL < -PHIMAX/2. ) dpL += PHIMAX;
+        while( dpR >  PHIMAX/2. ) dpR -= PHIMAX;
+        while( dpR < -PHIMAX/2. ) dpR += PHIMAX;
 
-      double WL = cell_prim(theRiemann->cL,q) + dpL*cell_gradp(theRiemann->cL,q);
-      double WR = cell_prim(theRiemann->cR,q) - dpR*cell_gradp(theRiemann->cR,q);
+        double WL = cell_prim(theRiemann->cL,q) + dpL*cell_gradp(theRiemann->cL,q);
+        double WR = cell_prim(theRiemann->cR,q) - dpR*cell_gradp(theRiemann->cR,q);
 
-      double deltaL = theRiemann->r-theRiemann->r_cell_L;
-      double deltaR = theRiemann->r_cell_R - theRiemann->r;
-      AvgPrim[q] = 0.5*(WL+WR);
-      Grad_r_prim[q] = (WR-WL)/(deltaR+deltaL);
-    }
-    if (theRiemann->n[1]==1){
-      AvgPrim[q] = 0.5*(cell_prim(theRiemann->cR,q) + cell_prim(theRiemann->cL,q));
-      Grad_ph_prim[q] = (cell_prim(theRiemann->cR,q) - cell_prim(theRiemann->cL,q))/ (cell_tiph(theRiemann->cR)-cell_tiph(theRiemann->cL))/r;
-    }
+        double deltaL = theRiemann->r-theRiemann->r_cell_L;
+        double deltaR = theRiemann->r_cell_R - theRiemann->r;
+        AvgPrim[q] = 0.5*(WL+WR);
+        Grad_r_prim[q] = (WR-WL)/(deltaR+deltaL);
+      }
+      if (theRiemann->n[1]==1){
+        AvgPrim[q] = 0.5*(cell_prim(theRiemann->cR,q) + cell_prim(theRiemann->cL,q));
+        Grad_ph_prim[q] = (cell_prim(theRiemann->cR,q) - cell_prim(theRiemann->cL,q))/ (cell_tiph(theRiemann->cR)-cell_tiph(theRiemann->cL))/r;
+      }
     }
 
     VFlux[q] = 0.0;
   }
 
-  double tiph = theRiemann->cm;
   double nu;
   if (sim_VISC_CONST(theSim)==1){
     nu = sim_EXPLICIT_VISCOSITY(theSim);
@@ -397,7 +421,10 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
       nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(fabs(r*cos(tiph)),2.0);    
       if (r*cos(tiph)>20.) nu=0.0;
     } else{
-      nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
+      //nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
+      nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]
+        *(sqrt(M0)+sqrt(M1))/(sqrt(M0)*pow(dist_bh0,-1.5)+sqrt(M1)*pow(dist_bh1,-1.5));
+     // printf("r: %e, M0: %e, M1: %e, dist_bh0: %e, dist_bh1: %e, nu: %e\n",r,M0,M1,dist_bh0,dist_bh1,nu);
     }
   }
 
@@ -421,26 +448,26 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
 
   double om_cell = sim_W_A(theSim,r)/r;
   double dr_om_cell = sim_OM_A_DERIV(theSim,r);
- 
+
   /*
-  if (sim_MOVE_CELLS(theSim)==C_FIXED){
-    om_cell = 0.0;
-    dr_om_cell = 0.0;
-  } else if (sim_MOVE_CELLS(theSim)==C_MILOS){
-    om_cell = (1.-exp(-pow(r,1.5)))/pow(r,1.5);
-    dr_om_cell = 1.5*pow(r,-2.5)*(-1.+(1.+pow(r,1.5))*exp(-pow(r,1.5)));
-  }else if (sim_MOVE_CELLS(theSim)==C_KEPLER){
-    om_cell = pow(r,-1.5);
-    dr_om_cell = -1.5*pow(r,-2.5);
-  }else{
-    printf("Problem with setting cell speed in riemann solver\n");
-    exit(1);
-  }
-  */
+     if (sim_MOVE_CELLS(theSim)==C_FIXED){
+     om_cell = 0.0;
+     dr_om_cell = 0.0;
+     } else if (sim_MOVE_CELLS(theSim)==C_MILOS){
+     om_cell = (1.-exp(-pow(r,1.5)))/pow(r,1.5);
+     dr_om_cell = 1.5*pow(r,-2.5)*(-1.+(1.+pow(r,1.5))*exp(-pow(r,1.5)));
+     }else if (sim_MOVE_CELLS(theSim)==C_KEPLER){
+     om_cell = pow(r,-1.5);
+     dr_om_cell = -1.5*pow(r,-2.5);
+     }else{
+     printf("Problem with setting cell speed in riemann solver\n");
+     exit(1);
+     }
+     */
 
   //r direction
   if (theRiemann->n[0] ==1){
-  //    double Gp_r2RhoNu_o_r2RhoNu = Gradient_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim),PDIRECTION);
+    //    double Gp_r2RhoNu_o_r2RhoNu = Gradient_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim),PDIRECTION);
 
     /*
        VFlux[SRR] = -nu*rho*( 
@@ -467,7 +494,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim ){
   }
   //phi direction
   if (theRiemann->n[1] ==1){
-//    double Gr_r2RhoNu_o_r2RhoNu = Gradient_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r,tiph,sim_InitialDataType(theSim),RDIRECTION);
+    //    double Gr_r2RhoNu_o_r2RhoNu = Gradient_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r,tiph,sim_InitialDataType(theSim),RDIRECTION);
 
     /*
        VFlux[SRR] = -nu*rho*( 
@@ -639,7 +666,7 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
 }
 
 
-void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt ){
+void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,struct GravMass *theGravMasses,double dt ){
   int NUM_Q = sim_NUM_Q(theSim);
   double GAMMALAW = sim_GAMMALAW(theSim);
   double DIVB_CH = sim_DIVB_CH(theSim);
@@ -717,7 +744,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     if (VISC_OLD==1){
       riemann_visc_flux_old(theRiemann,theSim );
     } else{
-      riemann_visc_flux(theRiemann,theSim );  
+      riemann_visc_flux(theRiemann,theSim,theGravMasses );  
     }
   }
 

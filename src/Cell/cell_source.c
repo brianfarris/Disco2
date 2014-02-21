@@ -227,7 +227,25 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
   }
 }
 
-void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, double dt ){
+void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses, double dt ){
+  double Mtotal = 1.0;
+  double sep = 1.0;
+  double M0 = gravMass_M(theGravMasses,0);
+  double M1 = gravMass_M(theGravMasses,1);
+
+  double r0 = gravMass_r(theGravMasses,0);
+  double r1 = gravMass_r(theGravMasses,1);
+
+  double phi_bh0 = gravMass_phi(theGravMasses,0);
+  double phi_bh1 = gravMass_phi(theGravMasses,1);
+
+  double xbh0 = r0*cos(phi_bh0);
+  double ybh0 = r0*sin(phi_bh0);
+
+  double xbh1 = r1*cos(phi_bh1);
+  double ybh1 = r1*sin(phi_bh1);
+
+ 
   int i,j,k;
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
@@ -244,9 +262,23 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, double dt
         double vr  = c->prim[URR];
         double dz = zp-zm;
         double dV = dphi*.5*(rp*rp-rm*rm)*dz;
+       
+        double phi = c->tiph - 0.5*c->dphi;
+        
+        double xpos = r*cos(phi);
+        double ypos = r*sin(phi);
+
+        double dist_bh0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
+        double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
+
+
+
         double alpha = sim_EXPLICIT_VISCOSITY(theSim);
         double drOm_a = sim_OM_A_DERIV(theSim,r);
-        double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P*pow(r,1.5);
+        //double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P*pow(r,1.5);
+        double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P
+          *(sqrt(M0)+sqrt(M1))/(sqrt(M0)*pow(dist_bh0,-1.5)+sqrt(M1)*pow(dist_bh1,-1.5));
+
         c->cons[TAU] += dt*dV*Sigma_nu*r*drOm_a*(r*drOm_a + r*c->grad[UPP] + c->gradp[URR]);
       }
     }

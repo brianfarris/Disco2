@@ -50,7 +50,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem 
         riemann_setup_p(theRiemann,theCells,theSim,i,j,k,PDIRECTION); // set various quantities in theRiemann
-        riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS
+        riemann_AddFlux(theRiemann,theSim,theGravMasses,dt); // solve Riemann problem and update RHS
         riemann_destroy(theRiemann); // clean up
       }
     }
@@ -63,7 +63,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR) ; ++n ){
     struct Riemann * theRiemann = riemann_create(theSim); //struct to contain everything we need to solve Riemann problem
     riemann_setup_rz(theRiemann,theFaces_r,theSim,n,RDIRECTION);  //set various quantities in theRiemann
-    riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS
+    riemann_AddFlux(theRiemann,theSim,theGravMasses,dt); // solve Riemann problem and update RHS
     riemann_destroy(theRiemann); // clean up
   }
 
@@ -73,7 +73,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-1,Z_DIR); ++n ){
       struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem
       riemann_setup_rz(theRiemann,theFaces_z,theSim,n,ZDIRECTION); // set various quantities in theRiemann
-      riemann_AddFlux(theRiemann,theSim,dt); // solve Riemann problem and update RHS 
+      riemann_AddFlux(theRiemann,theSim,theGravMasses,dt); // solve Riemann problem and update RHS 
       riemann_destroy(theRiemann); // clean up
     }
   }
@@ -84,7 +84,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     if (VISC_OLD==1){
       cell_add_visc_src_old( theCells ,theSim,dt ); // add viscous source terms
     } else{
-      cell_add_visc_src( theCells ,theSim,dt ); // add viscous source terms
+      cell_add_visc_src( theCells ,theSim, theGravMasses,dt ); // add viscous source terms
     }
   }
 

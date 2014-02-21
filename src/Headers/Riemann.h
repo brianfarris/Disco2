@@ -4,6 +4,7 @@ struct Riemann;
 struct Sim;
 struct Cell;
 struct Face;
+struct GravMass;
 
 #ifdef RIEMANN_PRIVATE_DEFS
 struct Riemann {
@@ -38,5 +39,5 @@ void riemann_destroy(struct Riemann *);
 //other routines
 void riemann_setup_rz(struct Riemann *,struct Face * , struct Sim *,int,int );
 void riemann_setup_p(struct Riemann * ,struct Cell *** ,struct Sim * ,int ,int ,int,int );
-void riemann_AddFlux(struct Riemann *, struct Sim *,double);
+void riemann_AddFlux(struct Riemann *, struct Sim *,struct GravMass *,double);
 #endif
