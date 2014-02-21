@@ -424,7 +424,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct Gr
       //nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
       nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]
         *(sqrt(M0)+sqrt(M1))/(sqrt(M0)*pow(dist_bh0,-1.5)+sqrt(M1)*pow(dist_bh1,-1.5));
-     // printf("r: %e, M0: %e, M1: %e, dist_bh0: %e, dist_bh1: %e, nu: %e\n",r,M0,M1,dist_bh0,dist_bh1,nu);
+      //printf("r: %e, M0: %e, M1: %e, dist_bh0: %e, dist_bh1: %e, nu: %e\n",r,M0,M1,dist_bh0,dist_bh1,nu);
     }
   }
 

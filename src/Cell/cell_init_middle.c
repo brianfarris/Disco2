@@ -19,8 +19,8 @@ void cell_single_init_middle(struct Cell *theCell, struct Sim *theSim,int i,int 
   double alpha = sim_EXPLICIT_VISCOSITY(theSim);
   double Gam = sim_GAMMALAW(theSim);
 
-  double rho = pow(r,-3./5.)*exp(-pow(r/20.,-2.));
-  double   P = 1.e-2*pow(r,-3./2.)*exp(-pow(r/20.,-2.));
+  double rho = pow(r,-3./5.)*exp(-pow(r/7.,-2.));
+  double   P = 1.e-2*pow(r,-3./2.)*exp(-pow(r/7.,-2.));
 
   if (rho<1.e-5) rho=1.e-5;
   if (P<1.e-8) P=1.e-8;
@@ -57,8 +57,8 @@ void cell_init_middle(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
       for (j = 0; j < sim_N_p(theSim,i); j++) {
 
 
-        double rho = pow(r,-3./5.)*exp(-pow(r/20.,-2.));
-        double   P = 1.e-2*pow(r,-3./2.)*exp(-pow(r/20.,-2.));
+        double rho = pow(r,-3./5.)*exp(-pow(r/7.,-2.));
+        double   P = 1.e-2*pow(r,-3./2.)*exp(-pow(r/7.,-2.));
         if (rho<1.e-5) rho=1.e-5;
         if (P<1.e-8) P=1.e-8;
         
