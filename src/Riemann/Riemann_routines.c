@@ -412,19 +412,20 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct Gr
   }
 
   double nu;
+  double alpha =  sim_EXPLICIT_VISCOSITY(theSim);
+  double Gamma =  sim_GAMMALAW(theSim);
   if (sim_VISC_CONST(theSim)==1){
-    nu = sim_EXPLICIT_VISCOSITY(theSim);
+    nu = alpha;
   } else{
     if (sim_InitialDataType(theSim)==SHEAR){
       double HoR = 0.1;
-      //nu = sim_EXPLICIT_VISCOSITY(theSim)*HoR*HoR*pow(fabs((r*cos(tiph))),1.5);
-      nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(fabs(r*cos(tiph)),2.0);    
+      //nu = alpha*HoR*HoR*pow(fabs((r*cos(tiph))),1.5);
+      nu = alpha*Gamma*AvgPrim[PPP]/AvgPrim[RHO]*pow(fabs(r*cos(tiph)),2.0);    
       if (r*cos(tiph)>20.) nu=0.0;
     } else{
-      //nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
-      nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*AvgPrim[PPP]/AvgPrim[RHO]
-        *(sqrt(M0)+sqrt(M1))/(sqrt(M0)*pow(dist_bh0,-1.5)+sqrt(M1)*pow(dist_bh1,-1.5));
-      //printf("r: %e, M0: %e, M1: %e, dist_bh0: %e, dist_bh1: %e, nu: %e\n",r,M0,M1,dist_bh0,dist_bh1,nu);
+      //nu = alpha*Gamma*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
+      //nu = alpha*Gamma*AvgPrim[PPP]/AvgPrim[RHO]*(sqrt(M0)+sqrt(M1))/(sqrt(M0)*pow(dist_bh0,-1.5)+sqrt(M1)*pow(dist_bh1,-1.5));
+      nu = alpha*AvgPrim[PPP]/AvgPrim[RHO]/sqrt(pow(dist_bh0,-3.)*M0+pow(dist_bh1,-3.)*M1);
     }
   }
 

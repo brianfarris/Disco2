@@ -309,8 +309,8 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, struct Gr
         double alpha = sim_EXPLICIT_VISCOSITY(theSim);
         double drOm_a = sim_OM_A_DERIV(theSim,r);
         //double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P*pow(r,1.5);
-        double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P
-          *(sqrt(M0)+sqrt(M1))/(sqrt(M0)*pow(dist_bh0,-1.5)+sqrt(M1)*pow(dist_bh1,-1.5));
+        //double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P*(sqrt(M0)+sqrt(M1))/(sqrt(M0)*pow(dist_bh0,-1.5)+sqrt(M1)*pow(dist_bh1,-1.5));
+        double Sigma_nu = alpha*P/sqrt(pow(dist_bh0,-3)*M0+pow(dist_bh1,-3.)*M1);
 
         c->cons[TAU] += dt*dV*Sigma_nu*r*drOm_a*(r*drOm_a + r*c->grad[UPP] + c->gradp[URR]);
       }
