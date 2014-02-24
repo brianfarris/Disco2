@@ -17,29 +17,36 @@ double fgrav_neg_centrifugal( double M , double r , double eps, double n ){
   return( M*r*Om*Om );
 }
 
-void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, double dt, int p, double r, double phi, double rho, double P, double * drho_dt_sink){
+void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, double dt, double r0,double r1,double M0, double M1, double rho, double P, double * drho_dt_sink){
 
-  double rp = gravMass_r(theGravMasses,p);
-  double pp = gravMass_phi(theGravMasses,p);
-  double cosp = cos(phi);
-  double sinp = sin(phi);
-  double dx = r*cosp-rp*cos(pp);
-  double dy = r*sinp-rp*sin(pp);
-  double script_r = sqrt(dx*dx+dy*dy);
-
-  double HoR = sim_HoR(theSim);
+  double Mtotal = M0+M1;
   double alpha = sim_EXPLICIT_VISCOSITY(theSim);
-  double m = gravMass_M(theGravMasses,p);
-  //double t_visc_sqrtm = TVISC_FAC * 2./3. * 1./(alpha*HoR*HoR)*pow(script_r,1.5);
-  double t_visc_sqrtm = TVISC_FAC * 2./3. * pow(r,0.5)/(alpha*sim_GAMMALAW(theSim)*(P/rho));
+ 
+  double one_o_nu = 1.0/(alpha*P/rho)*sqrt(pow(r0,-3)*M0/Mtotal + pow(r1,-3)*M1/Mtotal);
+  double t_visc0 = TVISC_FAC * 2./3. * r0*r0*one_o_nu;
+  double t_visc1 = TVISC_FAC * 2./3. * r1*r1*one_o_nu;    
+ 
+  if (t_visc0 < 10.* dt){
+    t_visc0 = 10.*dt;
+  }
+  if (t_visc1 < 10.* dt){
+    t_visc1 = 10.*dt;
+  }
+
   *drho_dt_sink = 0.0;
   double sink_size = 0.5;
 
-  if (t_visc_sqrtm < 10.* dt * sqrt(m)){
-    t_visc_sqrtm = 10.*dt*sqrt(m);
-  }
-  if (script_r<sink_size){
-    *drho_dt_sink = rho * sqrt(m)/ t_visc_sqrtm;
+  if (p==0){
+    if (r0<sink_size){
+      *drho_dt_sink = rho / t_visc0;
+    }
+  } else if (p==1){
+    if (r0<sink_size){
+      *drho_dt_sink = rho / t_visc1;
+    }
+  } else{
+    printf("bad value for p\n");
+    exit(1);
   }
 }
 
@@ -96,8 +103,28 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
   int kmax_noghost = sim_N(theSim,Z_DIR) - sim_Nghost_max(theSim,Z_DIR);
 
   double total_torque_temp = 0.0;
-//  double total_Fr_temp = 0.0;
-  
+  //  double total_Fr_temp = 0.0;
+
+
+  double Mtotal = 1.0;
+  double sep = 1.0;
+  double M0 = gravMass_M(theGravMasses,0);
+  double M1 = gravMass_M(theGravMasses,1);
+
+  double rbh0 = gravMass_r(theGravMasses,0);
+  double rbh1 = gravMass_r(theGravMasses,1);
+
+  double phi_bh0 = gravMass_phi(theGravMasses,0);
+  double phi_bh1 = gravMass_phi(theGravMasses,1);
+
+  double xbh0 = rbh0*cos(phi_bh0);
+  double ybh0 = rbh0*sin(phi_bh0);
+
+  double xbh1 = rbh1*cos(phi_bh1);
+  double ybh1 = rbh1*sin(phi_bh1);
+
+
+
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     double zp = sim_FacePos(theSim,k,Z_DIR);
@@ -117,6 +144,12 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double vp  = c->prim[UPP]*r;
         double dz = zp-zm;
         double dV = dphi*.5*(rp*rp-rm*rm)*dz;
+
+        double xpos = r*cos(phi);
+        double ypos = r*sin(phi);
+
+        double r0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
+        double r1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
 
         double z  = .5*(zp+zm);
         double R  = sqrt(r*r+z*z);
@@ -161,7 +194,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         if (sim_RhoSinkOn(theSim)==1){
           double drho_dt_sink;
           for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
-            get_rho_sink( theGravMasses, theSim, dt, p, r, phi, rho,Pp, &drho_dt_sink);
+            get_rho_sink( theGravMasses, theSim,p,dt,r0,r1,M0,M1,rho,Pp, &drho_dt_sink);
             c->cons[RHO] -= drho_dt_sink * dt * dV;
             if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
               Mdot_temp[p] += drho_dt_sink*dV;
@@ -245,7 +278,7 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, struct Gr
   double xbh1 = r1*cos(phi_bh1);
   double ybh1 = r1*sin(phi_bh1);
 
- 
+
   int i,j,k;
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
@@ -262,9 +295,9 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, struct Gr
         double vr  = c->prim[URR];
         double dz = zp-zm;
         double dV = dphi*.5*(rp*rp-rm*rm)*dz;
-       
+
         double phi = c->tiph - 0.5*c->dphi;
-        
+
         double xpos = r*cos(phi);
         double ypos = r*sin(phi);
 
