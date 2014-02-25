@@ -24,13 +24,13 @@ void cell_single_init_middle(struct Cell *theCell, struct Sim *theSim,int i,int 
   double rho = pow(r,-3./5.)*exp(-pow(r/r0,-2.));
   double   P = 1.e-2*pow(r,-3./2.)*exp(-pow(r/r0,-2.));
 
-  double r_drP_o_P = -1.5 + 2.*pow(r/r0,-3)*1./r0;
+  double r_drP_o_P = -1.5 + 2.*pow(r/r0,-2);
 
   if (rho<1.e-5) rho=1.e-5;
   if (P<1.e-8) P=1.e-8;
   double o2  = 1./r/r/r * pow( 1. + 3./16./r/r , 2) + r_drP_o_P * P/rho /r/r;
   double omega = sqrt(o2);
-  double vr     = 3.*alpha/r/r/omega*P/rho*(1.+r_drP_o_P);
+  double vr     = -3.*alpha/r/omega*P/rho*(2.+r_drP_o_P);
 
 
   theCell->prim[RHO] = rho;
@@ -66,14 +66,14 @@ void cell_init_middle(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
         double rho = pow(r,-3./5.)*exp(-pow(r/r0,-2.));
         double   P = 1.e-2*pow(r,-3./2.)*exp(-pow(r/r0,-2.));
 
-        double r_drP_o_P = -1.5 + 2.*pow(r/r0,-3)*1./r0;
+        double r_drP_o_P = -1.5 + 2.*pow(r/r0,-2);
 
         if (rho<1.e-5) rho=1.e-5;
         if (P<1.e-8) P=1.e-8;
 
         double o2  = 1./r/r/r * pow( 1. + 3./16./r/r , 2) + r_drP_o_P * P/rho /r/r;
         double omega = sqrt(o2);
-        double vr     = 3.*alpha/r/r/omega*P/rho*(1.+r_drP_o_P);
+        double vr     = -3.*alpha/r/omega*P/rho*(2.+r_drP_o_P);
 
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = P;
