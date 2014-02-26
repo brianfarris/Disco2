@@ -41,7 +41,7 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, 
       *drho_dt_sink = rho / t_visc0;
     }
   } else if (p==1){
-    if (r0<sink_size){
+    if (r1<sink_size){
       *drho_dt_sink = rho / t_visc1;
     }
   } else{
