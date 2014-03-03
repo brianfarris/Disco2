@@ -55,6 +55,7 @@ void mpisetup_setprocs(struct MPIsetup * theMPIsetup,char * filename){
   }
   theMPIsetup->NumProcs=NumProcs;
   theMPIsetup->MyProc=MyProc;
+  printf("MyProc: %d\n",MyProc);
 }
 
 void mpisetup_cart_create(struct MPIsetup * theMPIsetup){

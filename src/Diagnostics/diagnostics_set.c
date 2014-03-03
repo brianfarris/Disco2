@@ -88,6 +88,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double rho = cell_prim(cell_single(theCells,i,j,k),RHO);
           double press = cell_prim(cell_single(theCells,i,j,k),PPP);
           double vr = cell_prim(cell_single(theCells,i,j,k),URR);
+          double vp_minus_w = cell_prim(cell_single(theCells,i,j,k),UPP)*r;
           double vp = cell_prim(cell_single(theCells,i,j,k),UPP)*r+sim_W_A(theSim,r);
           double vz = cell_prim(cell_single(theCells,i,j,k),UZZ);
           double Br = cell_prim(cell_single(theCells,i,j,k),BRR);
