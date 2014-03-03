@@ -11,7 +11,7 @@
 struct Diagnostics *diagnostics_create(struct Sim * theSim, struct TimeStep * theTimeStep, struct MPIsetup * theMPIsetup) {
   struct Diagnostics * theDiagnostics = (struct Diagnostics *) malloc(sizeof(struct Diagnostics));
 
-  theDiagnostics->NUM_DIAG = 16; //DD added delta Sig (was 16)
+  theDiagnostics->NUM_DIAG = 16; //DD change this if add new output in diagnostics_set (was 16)
   //int NUM_TST  = 1;
 
   int * N_p_global_temp = malloc(sizeof(int)*sim_N_global(theSim,R_DIR));

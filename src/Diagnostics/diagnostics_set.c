@@ -24,11 +24,13 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     double tacc   = sim_RhoSinkTimescale(theSim);    
     double eps    = sim_G_EPS(theSim);
     double Rcut   = sim_Rcut(theSim);
+    double Gam    = sim_GAMMALAW(theSim);
+    double tramp  = sim_tramp(theSim);
     if(mpisetup_MyProc(theMPIsetup)==0){
       char CstParamFilename[256];
-      sprintf(CstParamFilename,"2CstParam.dat");
+      sprintf(CstParamFilename,"3CstParam.dat");
       FILE * CstParamFile = fopen(CstParamFilename,"a");
-      fprintf(CstParamFile,"%e %e %e %e %e %e %e %e %e %e %e\n", q, sep0, alpha, Mach0, MdoMs, rmin, rmax, tmigon, tacc, eps, Rcut);
+      fprintf(CstParamFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e\n", q, sep0, alpha, Mach0, MdoMs, rmin, rmax, tmigon, tacc, eps, Rcut, Gam, tramp);
       fclose(CstParamFile);
     }
   }
@@ -150,19 +152,15 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 	  //double abhbin = sqrt(r_bh0*r_bh0 + r_bh1*r_bh1 - 2.*r_bh0*r_bh1*cos(phi_bh1-phi_bh0)); //Added abhbin DD
 	  double abhbin = r_bh0 + r_bh1;
 			
-			//double dPhi_dphi = 1/4.*r*sin(phi-Omega*t) * (
-			//pow(r*r+.25-r*cos(phi-Omega*t),-1.5) -  
-			//pow(r*r+.25+r*cos(phi-Omega*t),-1.5));
-	  double dPhi_dphi =  abhbin*r/((1.+q)*(1.+1./q))*sin(phi-Omega*t) * (  
-							  pow(r*r+(abhbin/(1+1./q))*(abhbin/(1.+1./q))-2.*r*abhbin/(1.+1./q)*cos(phi-Omega*t),-1.5) -  
-							  pow(r*r+(abhbin/(1+q))*(abhbin/(1+q))+2.*r*abhbin/(1+q)*cos(phi-Omega*t),-1.5)) ;  //DD: for general q (for entire binary)
-			
-	  // double dPhi_dphi_S =  -abhbin*r/((1.+q)*(1.+1./q))*sin(phi-Omega*t) * (  
-	  //			pow( (eps1*eps1 +  r*r + (abhbin/(1.+q))*(abhbin/(1.+q)) + 2.*r*abhbin/(1.+q)*cos(phi-Omega*t) ),-1.5)) ;  //DD: for general q (for secondary only)
 
           double dist_bh0 = sqrt(r_bh0*r_bh0 + r*r - 2.*r_bh0*r*cos(phi_bh0-phi));
           double dist_bh1 = sqrt(r_bh1*r_bh1 + r*r - 2.*r_bh1*r*cos(phi_bh1-phi));
 
+	  // NOTE THIS IS THE derivative of the potential (add a -1/r for the force)
+          double dPhi_dphi  =  abhbin*r/((1.+q)*(1.+1./q))*sin(phi-Omega*t) * 
+	    ( pow( (eps1*eps1 + dist_bh0*dist_bh0),-1.5)- pow( (eps1*eps1 + dist_bh1*dist_bh1) ,-1.5) ) ;  
+	  //above DD: for general q - entire binary
+	  
 	  double dPhi_dphi_S =  -abhbin*r/((1.+q)*(1.+1./q))*sin(phi-Omega*t) * (
 	       			pow( (eps1*eps1 + dist_bh1*dist_bh1 ),-1.5)) ;  //DD: for general q (for secondary only) 
 
@@ -216,7 +214,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+9] = rho*vr*sin(phi);            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+10] = rho*vr*cos(2.*phi);            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+11] = rho*vr*sin(2.*phi);            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = r*rho*dPhi_dphi_S/r; //DD added only secondary Pot
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = r*rho*dPhi_dphi/r; //DD added only secondary Pot
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+13] = 0.5*B2;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = Br*Bp;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = psi;
@@ -238,8 +236,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (rho*vr*sin(2.*phi)/sim_N_p(theSim,i)*dz) ;
           // Don't count torques within a certain radius from secondary add r and 2pi for integration
 	  if (dist_bh1 > Rcut*Rhill && r>0.15){ //add 2pi to Trq to not azi average - see Scalar int below
-	    	   VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (2.*M_PI*r*rho*dPhi_dphi_S/sim_N_p(theSim,i));
-		   TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 += (2.*M_PI*r*rho*dPhi_dphi_S/sim_N_p(theSim,i));//2pi/Nphi = dphi
+	    VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)); //positive gives torque ON binary
+	    TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i));//2pi/Nphi = dphi
 	    //	   VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+20] += (2.*M_PI*rho*dPhi_dphi_S/sim_N_p(theSim,i)*dz); //DD added only secondary Pot 
 	  }else{
 	          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += 0.0;
@@ -251,9 +249,10 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (psi/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += (180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (passive_scalar/sim_N_p(theSim,i)*dz) ; 
-
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += (180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz);
+	  if (r<r_bh1){ ///Mass encolsed by binary
+	    VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (2*M_PI*rho/sim_N_p(theSim,i)*dz) ; 
+	  }
     			// the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }
@@ -332,7 +331,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 	  
     if(mpisetup_MyProc(theMPIsetup)==0){
       char DiagMdotFilename[256];
-      sprintf(DiagMdotFilename,"2DiagMdot.dat");
+      sprintf(DiagMdotFilename,"3DiagMdot.dat");
       FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
       fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_near_bh0_r0p1_reduce,mass_near_bh1_r0p1_reduce,mass_near_bh0_r0p2_reduce,mass_near_bh1_r0p2_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_r0p4_reduce);       
       fclose(DiagMdotFile);
@@ -368,7 +367,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 	  
 	if(mpisetup_MyProc(theMPIsetup)==0){
 		char DiagBPFilename[256];
-		sprintf(DiagBPFilename,"2BinaryParams.dat");
+		sprintf(DiagBPFilename,"3BinaryParams.dat");
 		FILE * DiagBpFile = fopen(DiagBPFilename,"a");
 		fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, L0, L1, vr0, Om, Fr1, Fp1, TrScal_reduce);       
 		fclose(DiagBpFile);

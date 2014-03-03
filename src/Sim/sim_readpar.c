@@ -109,6 +109,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "tmig_on"           , VAR_DOUB , &(theSim->tmig_on) ); //For Live Binary
       err += readvar( pfile , "Mach"           , VAR_DOUB , &(theSim->Mach) );
       err += readvar( pfile , "Rcut"           , VAR_DOUB , &(theSim->Rcut) );
+      err += readvar( pfile , "tramp"           , VAR_DOUB , &(theSim->tramp) );
   }
 
     MPI_Barrier(MPI_COMM_WORLD);

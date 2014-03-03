@@ -55,6 +55,7 @@ void GravMass_set_omega( struct GravMass *, int, double);
 void gravMass_clean_pi(struct GravMass *,struct Sim *);
 void gravMass_copy(struct GravMass *,struct Sim *);
 void gravMass_adv_anly( struct GravMass * , double, double );
+void gravMass_adv_arb( struct GravMass * , double, double );
 //void gravMass_move(struct Sim *, struct GravMass *,double, double RK); //added RK as last argument
 void gravMass_move(struct Sim *, struct GravMass *,double); //without RK as last argument
 //void gravMass_move(struct GravMass *,double);

@@ -73,6 +73,7 @@ struct Sim {
   double tmig_on;
   double Mach;
   double Rcut;
+  double tramp;
 };
 #endif
 
@@ -136,6 +137,7 @@ double sim_sep0(struct Sim *);
 double sim_tmig_on(struct Sim *);
 double sim_Mach(struct Sim *);
 double sim_Rcut(struct Sim *);
+double sim_tramp(struct Sim *);
 
 int sim_GravMassType(struct Sim * );
 //set Grid data

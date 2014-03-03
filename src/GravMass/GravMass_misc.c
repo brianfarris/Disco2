@@ -110,6 +110,12 @@ void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt )
 
 
 
+// Analytic update via Keplers Laws - now jsut e=0 circular orbits
+void gravMass_adv_arb( struct GravMass * thisGravMass , double Mp , double dt ){
+  thisGravMass->r -=  0.00005; //roughly 100 orbits to merger with 0.005 avg timestep
+  double a = thisGravMass->r *(1+thisGravMass->M/Mp);
+  thisGravMass->omega = pow(a,(-3./2.));
+}
 
 
 
@@ -117,16 +123,18 @@ void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt )
 void gravMass_move( struct Sim * theSim, struct GravMass * theGravMasses, double dt ){
 	if (sim_GravMassType(theSim)==LIVEBINARY){
 		//printf("LIVEBINARY");
-	  double Mp = theGravMasses[0].M; //primary
-	  double Ms = theGravMasses[1].M; //secondary
+	        double Mp = theGravMasses[0].M; //primary
+		double Ms = theGravMasses[1].M; //secondary
 
 	
 		//Here we need to analytically update a, phi, vr from Kepler's equations
-		gravMass_adv_anly(&(theGravMasses[1]), Mp, dt);
+	  	gravMass_adv_anly(&(theGravMasses[1]), Mp, dt);
+		// Or just push the binary together arbitrarily for testing
+		//gravMass_adv_arb(&(theGravMasses[1]), Mp, dt); //TESTING
 	
 		//theGravMasses[0].phi = theGravMasses[1].phi + M_PI;
 		theGravMasses[0].r   = theGravMasses[1].r*Ms/Mp;
-	        theGravMasses[0].vr  = theGravMasses[1].vr*Ms/Mp;
+		theGravMasses[0].vr  = theGravMasses[1].vr*Ms/Mp;
 		theGravMasses[0].omega  = theGravMasses[1].omega;
 		
 		theGravMasses[1].phi += theGravMasses[1].omega*dt; //Instead of updating in adv_anly ONLY GOOD FOR CIRC? 
@@ -229,17 +237,17 @@ void gravMass_update_RK( struct Cell *** theCells, struct GravMass * theGravMass
     theGravMasses[i].L     = (1.0-RK)*theGravMasses[i].L   + RK*theGravMasses[i].RK_L;
     theGravMasses[i].E     = (1.0-RK)*theGravMasses[i].E   + RK*theGravMasses[i].RK_E;
     theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr  + RK*theGravMasses[i].RK_vr; 
-    if ( (sim_GravMassType(theSim)==LIVEBINARY) && (time_global > sim_tmig_on(theSim)) ){
+    if ( (sim_GravMassType(theSim)==LIVEBINARY) && (time_global > 2.*M_PI*sim_tmig_on(theSim)) ){
                 GravMass_set_Fr(theGravMasses, i, 0.0);
 		GravMass_set_Fp(theGravMasses, i, 0.0);
 		cell_gravMassForcePlanets( theSim, theCells, theGravMasses );
 		
 
 		double r  = theGravMasses[i].r;
-		double Fp = theGravMasses[i].Fp;  //Right now this is the total torque
+		double Fp = theGravMasses[i].Fp; 
 		
 		
-		theGravMasses[i].L      += r*Fp*dt;  //Fp is total Torque in cell_source 
+		theGravMasses[i].L      += r*Fp*dt; 
 		//theGravMasses[0].L      += 0.0; // For now only evolve secondary Angular momwntum
 		
 		//Keep track of a total E use 0 arbitrarily

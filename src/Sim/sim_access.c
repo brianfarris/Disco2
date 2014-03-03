@@ -188,3 +188,6 @@ double sim_Mach(struct Sim *theSim){
 double sim_Rcut(struct Sim *theSim){
   return(theSim->Rcut);
 }
+double sim_tramp(struct Sim *theSim){
+  return(theSim->tramp);
+}
