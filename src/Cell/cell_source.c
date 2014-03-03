@@ -100,9 +100,9 @@ void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, str
 	///Set a density scale for feedback to holes
         double Rcut = sim_Rcut(theSim);
         double dens_scale = (sim_Mdisk_ovr_Ms(theSim)/(1.+1./sim_MassRatio(theSim)))/(M_PI*sim_sep0(theSim)*sim_sep0(theSim));
-	if (time_global <= (sim_tmig_on(theSim) + 10.0) ){
-	  dens_scale *= (time_global - sim_tmig_on(theSim))/(10.0 );
-          // ABOVE^ Allow migration to turn on slowly
+	if (   time_global <=    2.*M_PI*(sim_tmig_on(theSim) + sim_tramp(theSim))   ){
+	   dens_scale *= (time_global - 2*M_PI*sim_tmig_on(theSim))/( sim_tramp(theSim)*2*M_PI );
+           // ABOVE^ Allow migration to turn on slowly
 	}	
 
 	double Rhill = ( gravMass_r(theGravMasses, 0) + gravMass_r(theGravMasses, 1) ) * pow((sim_MassRatio(theSim)/3.),(1./3.)); 
@@ -140,67 +140,40 @@ void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, str
 				double dV  = dz*dr*r*dp;
 				double dm  = fabs(rho*dV);
 				double phi = theCells[k][i][j].tiph-.5*dp;
-				for( p=0 ; p<Np ; ++p ){
-					
-				  	double rp = gravMass_r(theGravMasses,p);
-				  	double pp = gravMass_phi(theGravMasses,p);
-				  	double cosp = cos(phi);
-				  	double sinp = sin(phi);
-				  	double dx = r*cosp-rp*cos(pp);
-				  	double dy = r*sinp-rp*sin(pp);
-				  	double script_r = sqrt(dx*dx+dy*dy);
+				
+       				//double r0 = gravMass_r(theGravMasses,0);
+				//double p0 = gravMass_phi(theGravMasses,0);
+				//double cosp = cos(phi);
+				//double sinp = sin(phi);
+				//double dx0 = r*cosp-r0*cos(p0);
+				//double dy0 = r*sinp-r0*sin(p0);
+				//double script_r0 = sqrt(dx0*dx0+dy0*dy0);
 			       	
-				  //	double cosa = dx/script_r;  // a is the angle between script_r and x axis
-				  //	double sina = dy/script_r;
-					double ffr;
-					double ffp;
-					if (p==0){
-					    if (r > 0.15){
-					         gravMassForce( theGravMasses , theSim , p , r , phi , &ffr , &ffp );
-						 Fr[0] -= 0.0;//ffr*dm;
-						 Fp[0] -= 0.0;//ffp*dm;
-						// Fx is total force between hole and density patch * cos(a)
-					//       Fx[p] +=  fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER )*cosa*dm; //Newtons 3rd law so -- = +
-                                                // Fy is total force between hole and density patch * sin(a)
-                                        //        Fy[p] += fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER )*sina*dm; //Newtons 3rd law so -- = +
-					    }else{
-					         Fr[0] -= 0.0;
-					         Fp[0] -= 0.0;
-					    }
-					}
-				// only applying force to secondary for now
-					if (p==1){
-					  if (script_r > Rcut*Rhill && r>0.15){ //Only sum forces outside the secondary Hill radius & Damping Region
-				         	gravMassForce(theGravMasses , theSim , p , r , phi , &ffr , &ffp );
-					        Fr[1] -= ffr*dm; //try Torque 
-					        Fp[1] -= ffp*dm;
+                                double r1 = gravMass_r(theGravMasses,1);
+                                double p1 = gravMass_phi(theGravMasses,1);
+                                double cosp = cos(phi);
+                                double sinp = sin(phi);
+                                double dx1 = r*cosp-r1*cos(p1);
+                                double dy1 = r*sinp-r1*sin(p1);
+                                double script_r1 = sqrt(dx1*dx1+dy1*dy1);
 
-						// Fx is total force between hole and density patch * cos(a)
-				  //	Fx[p] +=  fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER )*cosa*dm; //Newtons 3rd law so -- = +
-						// Fy is total force between hole and density patch * sin(a)
-					//		Fy[p] +=  fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER )*sina*dm; //Newtons 3rd law so -- = +
-					    }else{
-					       	Fr[1] -= 0.0;
-					       	Fp[1] -= 0.0;
-					    }
-					}
+				double ffr;
+				double ffp;
+				
+				for( p=0 ; p<Np ; ++p ){
+					  if (script_r1 > Rcut*Rhill && r>0.15){ //Only sum forces outside the secondary Hill radius & Damping Region
+				         	gravMassForce(theGravMasses , theSim , p , r , phi , &ffr , &ffp );
+					        Fr[p] -= ffr*dm; 
+					        Fp[p] -= ffp*dm;
+					  //}else{
+					       	//Fr[p] -= 0.0;
+					       	//Fp[p] -= 0.0;
+					  }
+					
 				}
 			}
 		}
 	}
-	//printf("%lf\n",Fx[0]);
-	//	double Fr[Np];
-	//	double Fp[Np];
-	
-	//	for( p=0 ; p<Np ; ++p ){	
-	  //		double pp = gravMass_phi(theGravMasses,p);
-		//Convert back to polar 
-		//		Fr[p] = Fy[p]*sin(pp) + Fx[p]*cos(pp);
-		//		Fp[p] = Fy[p]*cos(pp) - Fx[p]*sin(pp);
-		//Set values in GravMass structure - not yet right??
-		//GravMass_set_Fr(theGravMasses, p, Fr[p]);
-		//GravMass_set_Fp(theGravMasses, p, Fp[p]);
-	//}
 	// Sum over the procs
 	double FrTot[Np];
 	double FpTot[Np];        
@@ -209,10 +182,10 @@ void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, str
 	   FpTot[p]=0.0;
         }
 							  
-	MPI_Allreduce( &Fr , &FrTot , Np , MPI_DOUBLE , MPI_SUM , sim_comm ); //changed grid_comm (Disco1) to sim_comm
+	MPI_Allreduce( &Fr , &FrTot , Np , MPI_DOUBLE , MPI_SUM , sim_comm ); 
 	MPI_Allreduce( &Fp , &FpTot , Np , MPI_DOUBLE , MPI_SUM , sim_comm );
 	
-	
+	// Now Set the GravMass vars
 	for( p=0 ; p<Np ; ++p ){
 		GravMass_set_Fr(theGravMasses, p, FrTot[p]);
 		GravMass_set_Fp(theGravMasses, p, FpTot[p]);
