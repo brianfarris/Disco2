@@ -23,7 +23,7 @@ void cell_single_init_middle(struct Cell *theCell, struct Sim *theSim,int i,int 
   int d  = 10;
 
   double rho = pow(r,-3./5.)*exp(-pow(r/r0,-d));
-  double   P = 1.e-4*pow(r,-3./2.)*exp(-pow(r/r0,-d));
+  double   P = PoRho_r1*pow(r,-3./2.)*exp(-pow(r/r0,-d));
 
   double r_drP_o_P = -1.5 + d*pow(r/r0,-d);
 
@@ -65,12 +65,12 @@ void cell_init_middle(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
 
 
         double rho = pow(r,-3./5.)*exp(-pow(r/r0,-d));
-        double   P = 1.e-4*pow(r,-3./2.)*exp(-pow(r/r0,-d));
+        double   P = PoRho_r1*pow(r,-3./2.)*exp(-pow(r/r0,-d));
 
         double r_drP_o_P = -1.5 + d*pow(r/r0,-d);
 
         if (rho<1.e-5) rho=1.e-5;
-        if (P<1.e-8) P=1.e-8;
+        if (P<1.e-7) P=1.e-7;
 
         double o2  = 1./r/r/r * pow( 1. + 3./16./r/r , 2) + r_drP_o_P * P/rho /r/r;
         double omega = sqrt(o2);

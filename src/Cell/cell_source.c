@@ -25,7 +25,7 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, 
   double one_o_nu = 1.0/(alpha*P/rho)*sqrt(pow(r0,-3)*M0/Mtotal + pow(r1,-3)*M1/Mtotal);
   double t_visc0 = TVISC_FAC * 2./3. * r0*r0*one_o_nu;
   double t_visc1 = TVISC_FAC * 2./3. * r1*r1*one_o_nu;    
- 
+
   if (t_visc0 < 10.* dt){
     t_visc0 = 10.*dt;
   }
@@ -44,8 +44,8 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, 
     if (r1<sink_size){
       *drho_dt_sink = rho / t_visc1;
     }
+
   } else{
-    printf("bad value for p\n");
     exit(1);
   }
 }
@@ -193,7 +193,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
         if (sim_RhoSinkOn(theSim)==1){
           double drho_dt_sink;
-          for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
+          int num_sinks = sim_GravMassType(theSim);
+          for( p=0 ; p<num_sinks; ++p ){
             get_rho_sink( theGravMasses, theSim,p,dt,r0,r1,M0,M1,rho,Pp, &drho_dt_sink);
             c->cons[RHO] -= drho_dt_sink * dt * dV;
             if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
@@ -241,7 +242,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         if (sim_COOLING(theSim)==1){
           double cooling_cap = c->cons[TAU]*1000000000000000.0;
           //double cooling_term = numfac * pow(Pp/rho,0.5)*pow(r,-1.5)*pow(a_o_M,0.5)*dt*dV;
-          double cooling_term = 9./4.*0.1*5./3.*1.e6/rho*pow(Pp/rho,4.)*dt*dV;
+          double cooling_term = 9./4.*0.1*pow(PoRho_r1,-3)/rho*pow(Pp/rho,4.)*dt*dV;
           if (cooling_term>cooling_cap) cooling_term = cooling_cap;
           c->cons[TAU] -= cooling_term;
         }

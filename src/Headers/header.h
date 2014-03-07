@@ -27,4 +27,5 @@ MPI_Comm sim_comm;
 #define zero_bfields 0
 #define EXTRAP_BC 0
 #define SS_BCS 0
+#define PoRho_r1 0.001
 double time_global;

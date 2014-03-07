@@ -39,7 +39,7 @@ void gravMass_init_single(struct GravMass * theGravMasses,struct Sim * theSim){
   theGravMasses[0].omega = 0.0;
   theGravMasses[0].Mdot = 0.0;
   theGravMasses[1].M   = 0.0;
-  theGravMasses[1].r   = 0.0;
+  theGravMasses[1].r   = 1.0;
   theGravMasses[1].phi = 0.0;
   theGravMasses[1].omega = 0.0;
   theGravMasses[1].Mdot = 0.0;
