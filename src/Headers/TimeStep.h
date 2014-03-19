@@ -24,7 +24,7 @@ void timestep_forward_euler(struct TimeStep * , struct Sim * , struct Cell *** ,
 struct TimeStep *timestep_create(struct Sim * );
 void timestep_destroy(struct TimeStep *); 
 //adjust t, dt, and RK
-void timestep_set_dt(struct TimeStep * , struct Cell *** , struct Sim * );
+void timestep_set_dt(struct TimeStep * , struct Cell *** , struct Sim * , struct GravMass * );
 void timestep_set_t(struct TimeStep * ,double );
 void timestep_update_t(struct TimeStep *);
 void timestep_set_RK(struct TimeStep * ,double);

@@ -106,7 +106,7 @@ void cell_prim2cons( double * , double * , double , double ,struct Sim *);
 void cell_calc_cons(struct Cell ***,struct Sim *); 
 void cell_cons2prim( double * , double * , double , double ,struct Sim *);
 //miscellaneous
-double cell_mindt( struct Cell *** , struct Sim * );
+double cell_mindt( struct Cell *** , struct Sim * , struct GravMass *);
 void cell_copy(struct Cell ***,struct Sim * );
 void cell_adjust_RK_cons( struct Cell *** , struct Sim * , double );
 void cell_set_prim(struct Cell ***,int,int,int,int,double);//this will morph into a checkpoint restart routine

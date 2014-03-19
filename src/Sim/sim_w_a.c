@@ -17,7 +17,7 @@ double sim_W_A(struct Sim * theSim,double r){
     return(r*20); 
   }else if (sim_W_A_TYPE(theSim)==A_MILOS){
     //Useful for Milos/MacFadyen disks
-    return((1.-exp(-pow((r/0.5),1.5)))/sqrt(r)); 
+    return((1.-exp(-pow((r/0.5),w_a_milos_index)))/sqrt(r)); 
   } else if (sim_W_A_TYPE(theSim)==A_POWERLAW){
     //Useful for a torus
     return(pow(r,-1.0));
@@ -39,7 +39,7 @@ double sim_OM_A_DERIV(struct Sim * theSim,double r){
     return(0.0); 
   }else if (sim_W_A_TYPE(theSim)==A_MILOS){
     //Useful for Milos/MacFadyen disks
-    return(1.5*pow(r,-2.5)*(-1.+(1.+pow((r/0.5),1.5))*exp(-pow((r/0.5),1.5)))); 
+    return(1.5*pow(r,-2.5)*(-1.+(1.+(w_a_milos_index/1.5)*pow((r/0.5),w_a_milos_index))*exp(-pow((r/0.5),w_a_milos_index)))); 
   } else if (sim_W_A_TYPE(theSim)==A_POWERLAW){
     //Useful for a torus
     return(-2.*pow(r,-3.0));

@@ -67,7 +67,9 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
         if( direction==R_DIR ){
           if (mpisetup_check_rin_bndry(theMPIsetup) && i==0){
             dAtot = dz*rp*dp;
-          } else{
+          } else if(mpisetup_check_rout_bndry(theMPIsetup) && i==sim_N(theSim,R_DIR)-1){
+            dAtot = dz*rm*dp; 
+          }else {
             dAtot = dz*(rp+rm)*dp;
           }
         } else{

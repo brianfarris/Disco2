@@ -13,9 +13,9 @@
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
-void timestep_set_dt(struct TimeStep * theTimeStep, struct Cell *** theCells, struct Sim * theSim){
+void timestep_set_dt(struct TimeStep * theTimeStep, struct Cell *** theCells, struct Sim * theSim, struct GravMass * theGravMasses){
   //theTimeStep->dt = (1.95/(1+exp(-theTimeStep->t/0.01))-0.95) * cell_mindt(theCells,theSim);
-  theTimeStep->dt = cell_mindt(theCells,theSim);
+  theTimeStep->dt = cell_mindt(theCells,theSim,theGravMasses);
   if( theTimeStep->t+theTimeStep->dt > sim_get_T_MAX(theSim) ) {
     theTimeStep->dt = sim_get_T_MAX(theSim)-theTimeStep->t;
   }

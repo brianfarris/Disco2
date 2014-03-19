@@ -425,7 +425,8 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct Gr
     } else{
       //nu = alpha*Gamma*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
       //nu = alpha*Gamma*AvgPrim[PPP]/AvgPrim[RHO]*(sqrt(M0)+sqrt(M1))/(sqrt(M0)*pow(dist_bh0,-1.5)+sqrt(M1)*pow(dist_bh1,-1.5));
-      nu = alpha*AvgPrim[PPP]/AvgPrim[RHO]/sqrt(pow(dist_bh0,-3.)*M0+pow(dist_bh1,-3.)*M1);
+      double eps = sim_G_EPS(theSim);
+      nu = alpha*AvgPrim[PPP]/AvgPrim[RHO]/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
     }
   }
 

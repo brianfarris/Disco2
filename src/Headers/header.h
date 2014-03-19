@@ -28,4 +28,5 @@ MPI_Comm sim_comm;
 #define EXTRAP_BC 0
 #define SS_BCS 0
 #define PoRho_r1 0.001
+#define w_a_milos_index 8
 double time_global;
