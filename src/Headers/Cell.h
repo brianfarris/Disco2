@@ -20,6 +20,7 @@ struct Cell{
   double wiph;
   double divB;
   double GradPsi[3];
+  double Cool;
 };
 #endif
 //create and destroy
@@ -68,6 +69,7 @@ double cell_dphi(struct Cell *);
 double cell_wiph(struct Cell *);
 double cell_GradPsi(struct Cell ***,int ,int ,int ,int );
 double cell_divB(struct Cell ***,int,int,int);
+double cell_Cool(struct Cell ***,int,int,int);
 //modify cell data
 void cell_add_cons(struct Cell *, int, double);
 void cell_add_divB(struct Cell *, double);

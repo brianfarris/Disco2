@@ -19,6 +19,9 @@ double gravMass_omega(struct GravMass * theGravMasses,int p){
 double gravMass_Mdot(struct GravMass * theGravMasses,int p){
   return(theGravMasses[p].Mdot);
 }
+double gravMass_Macc(struct GravMass * theGravMasses,int p){
+  return(theGravMasses[p].Macc);
+}
 double gravMass_total_torque(struct GravMass * theGravMasses,int p){
   return(theGravMasses[p].total_torque);
 }

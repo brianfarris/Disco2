@@ -85,11 +85,14 @@ void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, do
     //theGravMasses[i].vr  = (1.0-RK)*theGravMasses[i].vr  + RK*theGravMasses[i].RK_vr;
     theGravMasses[i].omega = (1.0-RK)*theGravMasses[i].omega  + RK*theGravMasses[i].RK_omega;
   }
-
 }
 
 void gravMass_set_Mdot( struct GravMass * theGravMasses, double Mdot, int p){
   theGravMasses[p].Mdot = Mdot;
+}
+
+void gravMass_set_Macc( struct GravMass * theGravMasses, double Macc, int p){
+  theGravMasses[p].Macc = Macc;
 }
 
 void gravMass_set_total_torque( struct GravMass * theGravMasses, double total_torque, int p){

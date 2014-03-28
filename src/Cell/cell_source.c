@@ -246,6 +246,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           double cooling_term = 9./4.*0.1*pow(PoRho_r1,-3)/rho*pow(Pp/rho,4.)*dt*dV;
           if (cooling_term>cooling_cap) cooling_term = cooling_cap;
           c->cons[TAU] -= cooling_term;
+          c->Cool = cooling_term/dt/dV;
         }
       }
     }
@@ -258,6 +259,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
   int p;
   for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
     gravMass_set_Mdot(theGravMasses,Mdot_reduce[p],p);
+    double Macc_prev = gravMass_Macc(theGravMasses,p);
+    gravMass_set_Macc(theGravMasses,Macc_prev+Mdot_reduce[p]*dt,p);
     gravMass_set_total_torque(theGravMasses,total_torque_reduce,p);
   }
 }

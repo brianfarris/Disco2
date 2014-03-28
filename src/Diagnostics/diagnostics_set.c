@@ -100,7 +100,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double KE = 0.5*rho*v2;
           double psi = cell_prim(cell_single(theCells,i,j,k),PSI);
           double E_hydro = rhoe + KE;
-
+          double Cool = cell_Cool(theCells,i,j,k);
           double dV = 0.5*(rp*rp-rm*rm)*dphi;
           double divB = fabs(cell_divB(theCells,i,j,k)/dV);
           double GradPsi_r = cell_GradPsi(theCells,i,j,k,0)/dV;
@@ -161,7 +161,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+5] = vp;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+6] = vz;            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+7] = vp_minus_w;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+8] = Bp;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+8] = Cool;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+9] = Bz;            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+10] = E_hydro;            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+11] = KE;            
@@ -181,7 +181,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+4] += (vp/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+5] += (vz/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+6] += (vp_minus_w/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+7] += (Bp/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+7] += (Cool/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+8] += (Bz/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (E_hydro/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (KE/sim_N_p(theSim,i)*dz) ;
@@ -265,7 +265,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagMdotFilename[256];
       sprintf(DiagMdotFilename,"DiagMdot.dat");
       FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
-      fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_inside_1_reduce,mass_inner_wedge_reduce,gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),mass_near_bh0_r0p1_reduce,mass_near_bh1_r0p1_reduce,mass_near_bh0_r0p2_reduce,mass_near_bh1_r0p2_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_r0p4_reduce);       
+      fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_inside_1_reduce,mass_inner_wedge_reduce,gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),gravMass_Macc(theGravMasses,0),gravMass_Macc(theGravMasses,1),mass_near_bh0_r0p2_reduce,mass_near_bh1_r0p2_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_r0p4_reduce);       
       fclose(DiagMdotFile);
     
       char DiagTorqueFilename[256];

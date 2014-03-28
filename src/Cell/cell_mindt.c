@@ -4,6 +4,7 @@
 #include <math.h>
 #include "../Headers/Cell.h"
 #include "../Headers/Sim.h"
+#include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
 double maxvel(double * prim , double w , double r ,struct Sim * theSim){
@@ -108,7 +109,7 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim, struct GravMas
               double nu = alpha*Pp/rho/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
             }
           }
-          double dt_visc = .9*dx*dx/nu;
+          double dt_visc = .25*dx*dx/nu;
           dt = dt/( 1. + dt/dt_visc );
         }
         if( dt_m > dt ) {

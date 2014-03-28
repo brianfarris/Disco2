@@ -35,3 +35,6 @@ double cell_GradPsi(struct Cell ***theCells,int i,int j,int k,int n){
 double cell_divB(struct Cell ***theCells,int i,int j,int k){
   return(theCells[k][i][j].divB);
 }
+double cell_Cool(struct Cell ***theCells,int i,int j,int k){
+  return(theCells[k][i][j].Cool);
+}
