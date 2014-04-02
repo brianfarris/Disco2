@@ -15,7 +15,7 @@ enum{HLLC,HLL};
 #include "mpi.h"
 MPI_Comm sim_comm;
 #define farris_mpi_factorization 0
-#define NO_W_IN_CFL 0
+#define NO_W_IN_CFL 0  // if 1 then do not subtract cell velocity in CFL condition
 #define KEP_BNDRY 0
 #define BzZ 0
 #define BNORM_AVG 1

@@ -11,7 +11,7 @@
 #include "../Headers/header.h"
 
 void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCells,struct Sim * theSim,struct TimeStep * theTimeStep,struct MPIsetup * theMPIsetup,struct GravMass * theGravMasses){
-  if (time_global <= 0.006 ){
+  if (time_global <= 0.3 ){
     //Make a File that only writes once to output constant parameters                                                                                
     double q      = sim_MassRatio(theSim); 
     double sep0   = sim_sep0(theSim);
@@ -157,11 +157,13 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double dist_bh1 = sqrt(r_bh1*r_bh1 + r*r - 2.*r_bh1*r*cos(phi_bh1-phi));
 
 	  // NOTE THIS IS THE derivative of the potential (add a -1/r for the force)
-          double dPhi_dphi  =  abhbin*r/((1.+q)*(1.+1./q))*sin(phi-Omega*t) * 
-	    ( pow( (eps1*eps1 + dist_bh0*dist_bh0),-1.5)- pow( (eps1*eps1 + dist_bh1*dist_bh1) ,-1.5) ) ;  
+          //double dPhi_dphi  =  abhbin*r/((1.+q)*(1.+1./q))*sin(phi-Omega*t) * 
+	  //  ( pow( (eps1*eps1 + dist_bh0*dist_bh0),-1.5)- pow( (eps1*eps1 + dist_bh1*dist_bh1) ,-1.5) ) ;
+	  //SLIGHTLY DIFFERENT
+	  double dPhi_dphi  =  abhbin*r/((1.+q)*(1.+1./q))*sin(phi-phi_bh0) * ( pow( (eps1*eps1 + dist_bh0*dist_bh0),-1.5)- pow( (eps1*eps1 + dist_bh1*dist_bh1) ,-1.5) ) ;  
 	  //above DD: for general q - entire binary
 	  
-	  double dPhi_dphi_S =  -abhbin*r/((1.+q)*(1.+1./q))*sin(phi-Omega*t) * (
+	  double dPhi_dphi_S =  -abhbin*r/((1.+q)*(1.+1./q))*sin(phi-phi_bh0) * (
 	       			pow( (eps1*eps1 + dist_bh1*dist_bh1 ),-1.5)) ;  //DD: for general q (for secondary only) 
 
 	  double Rhill = abhbin * pow((q/3.),(1./3.));
@@ -214,7 +216,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+9] = rho*vr*sin(phi);            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+10] = rho*vr*cos(2.*phi);            
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+11] = rho*vr*sin(2.*phi);            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = r*rho*dPhi_dphi/r; //DD added only secondary Pot
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = r*rho*dPhi_dphi/r; //DD 
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+13] = 0.5*B2;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = Br*Bp;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = psi;
@@ -235,7 +237,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (rho*vr*cos(2.*phi)/sim_N_p(theSim,i)*dz) ;
 	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (rho*vr*sin(2.*phi)/sim_N_p(theSim,i)*dz) ;
           // Don't count torques within a certain radius from secondary add r and 2pi for integration
-	  if (dist_bh1 > Rcut*Rhill && r>0.15){ //add 2pi to Trq to not azi average - see Scalar int below
+	  if (dist_bh1 > Rcut*Rhill && r>0.1){ //add 2pi to Trq to not azi average - see Scalar int below
 	    VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)); //positive gives torque ON binary
 	    TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i));//2pi/Nphi = dphi
 	    //	   VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+20] += (2.*M_PI*rho*dPhi_dphi_S/sim_N_p(theSim,i)*dz); //DD added only secondary Pot 

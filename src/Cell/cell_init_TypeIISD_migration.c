@@ -21,14 +21,24 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
 	double massratio = sim_MassRatio(theSim);
 	double M0 = Mtotal/(1.+massratio);
 	double M1 = Mtotal/(1.+1./massratio);
-	double r0 = M1/Mtotal*sep;
-	double r1 = M0/Mtotal*sep;
+	double r0 = sep*M1/Mtotal;
+	double r1 = sep*M0/Mtotal;
+	double eps0 = sim_G_EPS(theSim) * r0;
+        double eps1 = sim_G_EPS(theSim) * r1;	
+
+
+	if (massratio == 0.0){
+	  sep = 0.0;
+	  M1 = 0.0;
+	  r0 = 0.0;
+	  r1 = 0.0;	 
+	  eps0 = sim_G_EPS(theSim);
+	  eps1 = eps0;
+	}
 
 	//double Mach   = 10.0 *pow(sep,(-0.5)) ; //For uniform cs
 	double Mach   = sim_Mach(theSim);                   //For uniform Mach	
 
-	double eps0 = sim_G_EPS(theSim) * r0;
-	double eps1 = sim_G_EPS(theSim) * r1;
 	
 	double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
 	
@@ -68,7 +78,9 @@ void cell_single_init_TypeIISD_migration(struct Cell *theCell, struct Sim *theSi
         double cs = r*omega/Mach;
         //      double cs = pow(r,-0.5)/Mach; 
 
-	omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
+	if (massratio!=0.0){
+	  omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
+	}
 	double O2 = omega*omega - omega*omega/Mach/Mach/Gam; // add 1/(sigma r) * dP/dr term
 	omega = sqrt(O2);
    
@@ -124,12 +136,22 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
   double M1 = Mtotal/(1.+1./massratio);
   double r0 = M1/Mtotal*sep;
   double r1 = M0/Mtotal*sep;
+  double eps0 = sim_G_EPS(theSim) * r0;
+  double eps1 = sim_G_EPS(theSim) * r1;
+
+  if (massratio == 0.0){
+    sep = 0.0;
+    M1 = 0.0;
+    r0 = 0.0;
+    r1 = 0.0;
+    eps0 = sim_G_EPS(theSim);
+    eps1 = eps0;
+  }
+
 
  // double Mach   =  10.0 *pow(sep,(-0.5)) ; //For uniform cs
   double Mach   =  sim_Mach(theSim);                   //For unifrom Mach
 
-  double eps0 = sim_G_EPS(theSim) * r0;
-  double eps1 = sim_G_EPS(theSim) * r1;
   
   double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
 
@@ -177,8 +199,11 @@ void cell_init_TypeIISD_migration(struct Cell ***theCells,struct Sim *theSim,str
         double omega = 1./pow(r,1.5);
         double cs = r*omega/Mach;
         //        double cs = pow(r,-0.5)/Mach; 
-
-        omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
+	
+	if (massratio!=0.0){
+	  omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
+	}
+	
 	double O2 = omega*omega - omega*omega/Mach/Mach/Gam; // 1/(r Sig)* dP/dr term
 
 	omega = sqrt(O2);
