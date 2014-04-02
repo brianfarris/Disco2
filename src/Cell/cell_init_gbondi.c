@@ -18,7 +18,7 @@ void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int 
     double RS = sim_InitPar1(theSim);
     double Mdot = sim_InitPar2(theSim);
     double EPS = 0.00001;
-    double cut = 0.1;
+    double cut = 0.5;
 
     double rm = sim_FacePos(theSim,i-1,R_DIR);
     double rp = sim_FacePos(theSim,i,R_DIR);
@@ -134,8 +134,8 @@ void cell_single_init_gbondi(struct Cell *theCell, struct Sim *theSim,int i,int 
     }
     if(dim == 3)
     {
-        theCell->prim[URR] = r/R * vr;
-        theCell->prim[UZZ] = z/R * vr;
+        theCell->prim[URR] = vr * r/sqrt(r*r+z*z);
+        theCell->prim[UZZ] = vr * z/sqrt(r*r+z*z);
     }
 
   //TODO: Not sure what this is for.  Ask someone if important.
@@ -152,7 +152,7 @@ void cell_init_gbondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
     double RS = sim_InitPar1(theSim);
     double Mdot = sim_InitPar2(theSim);
     double EPS = 0.00001;
-    double cut = 0.1;
+    double cut = 0.5;
 
     double n = 1.0/(GAMMALAW-1.0);
 
@@ -293,8 +293,8 @@ void cell_init_gbondi(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
                 }
                 if(dim == 3)
                 {
-                    theCells[k][i][j].prim[URR] = r/R * vr;
-                    theCells[k][i][j].prim[UZZ] = z/R * vr;
+                    theCells[k][i][j].prim[URR] = vr * r/sqrt(r*r+z*z);
+                    theCells[k][i][j].prim[UZZ] = vr * z/sqrt(r*r+z*z);
                 }
             }
         }

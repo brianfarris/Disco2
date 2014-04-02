@@ -66,8 +66,8 @@ void riemann_set_vel_newt(struct Riemann * theRiemann,struct Sim * theSim,double
     /(theRiemann->primR[RHO]*(Sr-vnR)-theRiemann->primL[RHO]*(Sl-vnL));
 
   //TODO: remove: Lax-Friedrichs
-    Sl = -1.0;
-    Sr = 1.0;
+  //Sl = -1.0;
+  //Sr = 1.0;
 
   theRiemann->Sl = Sl;
   theRiemann->Sr = Sr;
