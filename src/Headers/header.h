@@ -12,7 +12,7 @@ enum{R_DIR,Z_DIR,P_DIR}; //P_DIR has to be last as is.
 enum{RDIRECTION,PDIRECTION,ZDIRECTION};
 enum{HLLC,HLL};
 //Background Types
-enum{NEWTON,GR};
+enum{NEWTON,GR,GRVISC1};
 //Metric Types
 enum{SR,SCHWARZSCHILD_SC,SCHWARZSCHILD_KS,KERR};
 #include "mpi.h"
