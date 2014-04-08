@@ -15,13 +15,17 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
   double PLM = sim_PLM(theSim);
 
   int Nf = timestep_n(theTimeStep,sim_N(theSim,direction)-1,direction); // number of faces
+
   
   int i,j,k,q;
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         for( q=0 ; q<NUM_Q ; ++q ){
-          theCells[k][i][j].grad[q] = 0.0;
+          if(direction == R_DIR)
+            theCells[k][i][j].gradr[q] = 0.0;
+          else
+            theCells[k][i][j].gradz[q] = 0.0;
         }
       }
     }
@@ -31,6 +35,16 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
   for( n=0 ; n<Nf ; ++n ){
     struct Cell * cL = face_L_pointer(theFaces,n);
     struct Cell * cR = face_R_pointer(theFaces,n);
+    double *gradL;
+    double *gradR;
+    if(direction == R_DIR){
+      gradL = cL->gradr;
+      gradR = cR->gradr;
+    }
+    else{
+      gradL = cL->gradz;
+      gradR = cR->gradz;
+    }
     double deltaL = face_deltaL(theFaces,n);
     double deltaR = face_deltaR(theFaces,n);
     double pL = cL->tiph - .5*cL->dphi;
@@ -46,8 +60,8 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       double WL = cL->prim[q] + dpL*cL->gradp[q];
       double WR = cR->prim[q] - dpR*cR->gradp[q];
       double S = (WR-WL)/(deltaR+deltaL);
-      cL->grad[q] += S*dA;
-      cR->grad[q] += S*dA; 
+      gradL[q] += S*dA;
+      gradR[q] += S*dA; 
     }
   }
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -72,7 +86,10 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
         else 
             dAtot = 2.*.5*(rp*rp-rm*rm)*dp;
         for( q=0 ; q<NUM_Q ; ++q ){
-          theCells[k][i][j].grad[q] /= dAtot;
+          if(direction == R_DIR)
+            theCells[k][i][j].gradr[q] /= dAtot;
+          else
+            theCells[k][i][j].gradz[q] /= dAtot;
         }
       }
     }
@@ -80,6 +97,16 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
   for( n=0 ; n<Nf ; ++n ){
     struct Cell * cL = face_L_pointer(theFaces,n);
     struct Cell * cR = face_R_pointer(theFaces,n);
+    double *gradL;
+    double *gradR;
+    if(direction == R_DIR){
+      gradL = cL->gradr;
+      gradR = cR->gradr;
+    }
+    else{
+      gradL = cL->gradz;
+      gradR = cR->gradz;
+    }
     double deltaL = face_deltaL(theFaces,n);
     double deltaR = face_deltaR(theFaces,n);
     double pL = cL->tiph - .5*cL->dphi;
@@ -96,17 +123,17 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       double WR = cR->prim[q] - dpR*cR->gradp[q];
 
       double S = (WR-WL)/(deltaR+deltaL);
-      double SL = cL->grad[q];
-      double SR = cR->grad[q];
+      double SL = gradL[q];
+      double SR = gradR[q];
       if( S*SL < 0.0 ){
-        cL->grad[q] = 0.0;
+        gradL[q] = 0.0;
       }else if( fabs(PLM*S) < fabs(SL) ){
-        cL->grad[q] = PLM*S;
+        gradL[q] = PLM*S;
       }
       if( S*SR < 0.0 ){
-        cR->grad[q] = 0.0;
+        gradR[q] = 0.0;
       }else if( fabs(PLM*S) < fabs(SR) ){
-        cR->grad[q] = PLM*S;
+        gradR[q] = PLM*S;
       }
     }
   }

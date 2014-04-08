@@ -167,3 +167,56 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
     return dt2;
 }
 
+double cell_mindt_grvisc1(struct Cell ***theCells, struct Sim *theSim)
+{
+    double dt_m = 1.e100;//HUGE_VAL;
+    int i,j,k;
+    for(k = sim_Nghost_min(theSim,Z_DIR); k < sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR); ++k)
+    {
+        double zm = sim_FacePos(theSim,k-1,Z_DIR);
+        double zp = sim_FacePos(theSim,k,Z_DIR);
+        double dz = zp-zm;
+        double z = 0.5*(zm+zp);
+        
+        for(i = sim_Nghost_min(theSim,R_DIR); i < sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR); ++i)
+        {
+            double rm = sim_FacePos(theSim,i-1,R_DIR);
+            double rp = sim_FacePos(theSim,i,R_DIR);
+            double dr = rp-rm;
+            double r = .5*(rp+rm);
+            
+            for(j = 0; j < sim_N_p(theSim,i); ++j)
+            {
+                int jm = j-1;
+                if(j == 0) 
+                    jm = sim_N_p(theSim,i)-1;
+                double w = .5*(theCells[k][i][j].wiph+theCells[k][i][jm].wiph); 
+                double dphi = theCells[k][i][j].dphi;
+                double phi = theCells[k][i][j].tiph - 0.5*dphi;
+
+                double ar, ap, az;
+                ar = cell_maxvel_gr(theCells[k][i][j].prim, 0, w, r, phi, z, theSim);
+                ap = cell_maxvel_gr(theCells[k][i][j].prim, 1, w, r, phi, z, theSim);
+                az = cell_maxvel_gr(theCells[k][i][j].prim, 2, w, r, phi, z, theSim);
+                
+                double dt = dr/ar;
+                if(dt > dphi/ap)
+                    dt = dphi/ap;
+                if(dt > dz/az)
+                    dt = dz/az;
+                dt *= sim_CFL(theSim);
+
+                if(dt_m > dt)
+                    dt_m = dt;
+            }     
+        }
+    }
+    double dt2;
+    MPI_Allreduce( &dt_m , &dt2 , 1 , MPI_DOUBLE , MPI_MIN , sim_comm );
+
+    double dt_newt = cell_mindt_newt(theCells, theSim);
+    //printf("\nNewtonian dt: %lg, GR dt: %lg\n", dt_newt, dt2);
+
+    return dt2;
+}
+

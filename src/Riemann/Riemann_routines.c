@@ -137,8 +137,14 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
 
   int q;
   for (q=0;q<NUM_Q;++q){
-    theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_grad(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
-    theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_grad(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
+    if(direction == R_DIR){
+      theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_gradr(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
+      theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_gradr(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
+    }
+    else{
+      theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_gradz(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
+      theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_gradz(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
+    }
   }
 }
 
