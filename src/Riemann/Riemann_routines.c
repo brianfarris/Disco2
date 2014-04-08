@@ -244,6 +244,10 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
     }
   }
 
+  //Add viscous flux
+  if(sim_Background(theSim) == GRVISC1)
+    riemann_visc_flux(theRiemann, theSim);
+
   int q;
   for( q=0 ; q<NUM_Q ; ++q ){
     cell_add_cons(theRiemann->cL,q,-dt*theRiemann->dA*theRiemann->F[q]);

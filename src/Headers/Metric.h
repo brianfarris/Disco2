@@ -52,6 +52,8 @@ double metric_dot3_u(struct Metric *g, double *a, double *b);
 double metric_dot3_d(struct Metric *g, double *a, double *b);
 double metric_dot4_u(struct Metric *g, double *a, double *b);
 double metric_dot4_d(struct Metric *g, double *a, double *b);
+double metric_conn(struct Metric *g, int tau, int mu, int nu);
+double metric_shear_uu(struct Metric *g, double *u, double *du, double *shear);
 
 //Exact Metrics
 double (*metric_g_dd_exact)(int i, int j, double t, double r, double p, double z, struct Sim *theSim);
