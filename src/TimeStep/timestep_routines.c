@@ -68,8 +68,14 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     }
   
 
+  //Piecewise-Linear Reconstructions.
+  //  must be done before AddFlux to find gradients for viscosity
+  cell_plm_p(theCells,theSim);
+  cell_plm_rz(theCells,theSim,theFaces_r,theTimeStep,theMPIsetup,R_DIR);
+  if( sim_N_global(theSim,Z_DIR) != 1 )
+    cell_plm_rz(theCells,theSim,theFaces_z,theTimeStep,theMPIsetup,Z_DIR );
+
   //Phi Flux
-  cell_plm_p(theCells,theSim);//piecewise-linear reconstruction
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
@@ -97,7 +103,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     }
   }
   //R Flux
-  cell_plm_rz(theCells,theSim,theFaces_r,theTimeStep,theMPIsetup,R_DIR); //piecewise-linear reconstruction
   int n;
   for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR) ; ++n ){
     struct Riemann * theRiemann = riemann_create(theSim); //struct to contain everything we need to solve Riemann problem
@@ -124,7 +129,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   }
   //Z Flux
   if( sim_N_global(theSim,Z_DIR) != 1 ){
-    cell_plm_rz(theCells,theSim,theFaces_z,theTimeStep,theMPIsetup,Z_DIR );//piecewise-linear reconstruction
     for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-1,Z_DIR); ++n ){
       struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem
       riemann_setup_rz(theRiemann,theFaces_z,theSim,n,ZDIRECTION); // set various quantities in theRiemann

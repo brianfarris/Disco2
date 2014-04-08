@@ -42,10 +42,8 @@ void riemann_AddFlux(struct Riemann *, struct Sim *,double);
 void (*riemann_set_flux)(struct Riemann *, struct Sim *, double, int);
 void riemann_set_flux_newt(struct Riemann *, struct Sim *, double, int);
 void riemann_set_flux_gr(struct Riemann *, struct Sim *, double, int);
-void riemann_set_flux_grvisc1(struct Riemann *, struct Sim *, double, int);
 
 void (*riemann_set_vel)(struct Riemann *, struct Sim *, double, double);
 void riemann_set_vel_newt(struct Riemann *, struct Sim *, double, double);
 void riemann_set_vel_gr(struct Riemann *, struct Sim *, double, double);
-void riemann_set_vel_grvisc1(struct Riemann *, struct Sim *, double, double);
 #endif
