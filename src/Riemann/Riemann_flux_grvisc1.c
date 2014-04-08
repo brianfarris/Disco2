@@ -12,9 +12,12 @@
 void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
 {
     int i,j,k,dir;
-    double a, sqrtg, du0, hn;
+    double a, sqrtg, du0, hn, cs2, rhoh, visc;
     double v[3], dv[9], b[3], u[4], du[16], shear[16];
     
+    double alpha = sim_AlphaVisc(theSim);
+    double GAMMA = sim_GAMMALAW(theSim);
+    double M = sim_GravM(theSim);
     int NUMQ = sim_NUM_Q(theSim);
     double *prim = (double *)malloc(NUMQ * sizeof(double));
     double *F = (double *)malloc(NUMQ * sizeof(double));
@@ -43,7 +46,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
         b[i] = metric_shift_u(g, i);
     sqrtg = metric_sqrtgamma(g)/theRiemann->pos[R_DIR];
 
-    u[0] = 1.0/sqrt(metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
+    u[0] = 1.0/sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
     for(i=0; i<3; i++)
         u[i+1] = u[0]*v[i];
 
@@ -66,6 +69,11 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
 
     metric_shear_uu(g, u, du, shear);
 
+    //TODO: CHECK THIS!  Probably not relativistic and/or isothermal.
+    rhoh = prim[RHO] + GAMMA*prim[PPP]/(GAMMA-1.0);
+    cs2 = GAMMA*prim[PPP] / rhoh;
+    visc = alpha * cs2 * sqrt(theRiemann->pos[R_DIR]*theRiemann->pos[R_DIR]*theRiemann->pos[R_DIR] / M);
+
     for(i=0; i<3; i++)
         if(theRiemann->n[i] == 1)
             dir = i;
@@ -80,14 +88,14 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
 
     for(i=0; i<4; i++)
     {
-        F[SRR] += metric_g_dd(g,i,1)*shear[4+i];
-        F[LLL] += metric_g_dd(g,i,2)*shear[8+i];
-        F[SZZ] += metric_g_dd(g,i,3)*shear[12+i];
+        F[SRR] += metric_g_dd(g,i,1)*shear[4*(dir+1)+i];
+        F[LLL] += metric_g_dd(g,i,2)*shear[4*(dir+1)+i];
+        F[SZZ] += metric_g_dd(g,i,3)*shear[4*(dir+1)+i];
     }
-    F[SRR] *= a*sqrtg*hn;
-    F[LLL] *= a*sqrtg*hn;
-    F[SZZ] *= a*sqrtg*hn;
-    F[TAU] = a*a*sqrtg*hn * shear[dir+1];
+    F[SRR] *= a*sqrtg*hn * visc;
+    F[LLL] *= a*sqrtg*hn * visc;
+    F[SZZ] *= a*sqrtg*hn * visc;
+    F[TAU] = a*a*sqrtg*hn * visc * shear[dir+1];
 
     theRiemann->F[SRR] += F[SRR];
     theRiemann->F[LLL] += F[LLL];

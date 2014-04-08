@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
 
   //Point Cell & Riemann to Newtonian/GR versions
   metric_init_background(theSim);
-  if(sim_Background(theSim)==GR)
+  if(sim_Background(theSim)==GR || sim_Background(theSim)==GRVISC1)
     metric_init_metric(theSim);
 
   printf("Setting initial conditions.\n");

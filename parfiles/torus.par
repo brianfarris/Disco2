@@ -44,6 +44,7 @@ GravM          1.0
 InitPar0        0
 InitPar1        0
 InitPar2        0
+AlphaVisc       0.0
 
 PHI_ORDER               2
 

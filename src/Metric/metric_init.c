@@ -25,6 +25,15 @@ void metric_init_background(struct Sim *theSim)
         riemann_set_flux = &riemann_set_flux_gr;
         riemann_set_vel = &riemann_set_vel_gr;
     }
+    else if(sim_Background(theSim) == GRVISC1)
+    {
+        cell_prim2cons = &cell_prim2cons_gr;
+        cell_cons2prim = &cell_cons2prim_gr;
+        cell_mindt = &cell_mindt_gr;
+        riemann_set_flux = &riemann_set_flux_gr;
+        riemann_set_vel = &riemann_set_vel_gr;
+    }
+
 }
 
 void metric_init_metric(struct Sim *theSim)

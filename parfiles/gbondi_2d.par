@@ -4,7 +4,7 @@ InitialDataType         9       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 4 Shock1, 5 Shock2, 6 Shock3, 7 Shock4,
                                 // 8 Isentrope, 9 GR-Bondi
 GravMassType            0       // 0 none, 1 single, 2 binary
-Background              1       // 0 Newtonian, 1 GR
+Background              2       // 0 Newtonian, 1 GR, 2 GRvisc
 Metric                  2       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS
 Restart                 0       // If this=1 restart using input.h5
@@ -22,7 +22,7 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                200
+Time_Max                10
 Num_Checkpoints	        20	
 Num_Diag_Dump           20
 Num_Diag_Measure        20
@@ -35,7 +35,7 @@ ZeroPsiBndry         1
 
 Move_Cells              4
 RiemannSolver           1           // 0 hllc, 1 hll
-Adiabatic_Index         1.3333333333
+Adiabatic_Index         1.2
 
 //Numerical Parameters
 CFL			0.5
@@ -44,6 +44,7 @@ PLM			1.0
 Grav_2D			1
 G_EPS			0.0
 GravM           1.0
+AlphaVisc       0.01
 
 //Initial Condition Parameters
 InitPar0        0 // 0 for 2D, 1 for  3D.

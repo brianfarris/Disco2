@@ -160,4 +160,7 @@ double sim_InitPar1(struct Sim *theSim){
 double sim_InitPar2(struct Sim *theSim){
   return(theSim->InitPar2);
 }
+double sim_AlphaVisc(struct Sim *theSim){
+  return(theSim->AlphaVisc);
+}
 
