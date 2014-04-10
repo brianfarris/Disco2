@@ -8,7 +8,8 @@
 #include "../Headers/header.h"
 
 
-void cell_add_split_fictitious( struct Cell *** theCells ,struct Sim * theSim,double dt){
+void cell_add_split_fictitious( struct Cell *** theCells ,struct Sim * theSim,struct GravMass * theGravMasses, double dt){
+  double a = gravMass_r(theGravMasses,0) + gravMass_r(theGravMasses,1);
   int i,j,k;
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
@@ -22,8 +23,8 @@ void cell_add_split_fictitious( struct Cell *** theCells ,struct Sim * theSim,do
         struct Cell * c = &(theCells[k][i][j]);
         double dphi = c->dphi;
         double dV = dphi*.5*(rp*rp-rm*rm)*dz;
-        double Omega = sim_W_A(theSim,r)/r;
-        double dr_r2Om = 2.*sim_W_A(theSim,r) + r*r*sim_OM_A_DERIV(theSim,r);
+        double Omega = sim_rOm_a(theSim,r,a)/r;
+        double dr_r2Om = 2.*sim_rOm_a(theSim,r,a) + r*sim_rdrOm_a(theSim,r,a);
 
         double kappa2 = 2.*Omega/r*dr_r2Om;
         if (kappa2>0.){

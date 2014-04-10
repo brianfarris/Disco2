@@ -81,9 +81,9 @@ void cell_add_visc_src_old( struct Cell *** ,struct Sim * , double );
 void cell_setT( struct Cell *** ,struct Sim *, struct GravMass * );
 void cell_mult_psi(struct Cell *, double);
 void cell_clean_pi(struct Cell *** ,struct Sim *);
-void cell_update_phi( struct Cell *** , struct Sim * , double , double );
+void cell_update_phi( struct Cell *** , struct Sim * , struct GravMass * , double , double );
 void cell_update_dphi( struct Cell *** ,struct Sim * );
-void cell_add_split_fictitious( struct Cell *** ,struct Sim * ,double );
+void cell_add_split_fictitious( struct Cell *** ,struct Sim * ,struct GravMass * , double );
 //clear
 void cell_clear_w(struct Cell ***,struct Sim * );
 void cell_clear_divB( struct Cell ***,struct Sim * );

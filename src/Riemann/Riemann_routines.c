@@ -48,7 +48,7 @@ void LR_speed_mhd(double *prim,double r,int * n,double ch, double * p_cf2,double
   double vp  = r*prim[UPP];
   double vz  =   prim[UZZ];
   double vn  = vr*n[0] + vp*n[1] + vz*n[2];
- 
+
   double Br = prim[BRR];
   double Bp = prim[BPP];
   double Bz = prim[BZZ];
@@ -73,7 +73,7 @@ void LR_speed_mhd(double *prim,double r,int * n,double ch, double * p_cf2,double
 }
 
 // Find velocities needed for the Riemann problem
-void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,double *Bpack,double GAMMALAW,double DIVB_CH){
+void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,struct GravMass * theGravMasses, double r,double *Bpack,double GAMMALAW,double DIVB_CH){
   double Sl, Sr, Ss;
 
   double vnL,cf21,mnL,BnL,B2L;
@@ -93,8 +93,9 @@ void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,double r,do
   }
   if( Sl > vnR - sqrt( cf22 ) ) Sl = vnR - sqrt( cf22 );
   if( Sr < vnR + sqrt( cf22 ) ) Sr = vnR + sqrt( cf22 );
- 
-  double wp_a = theRiemann->n[1]*sim_W_A(theSim,r);
+
+  double a = gravMass_r(theGravMasses,0) + gravMass_r(theGravMasses,1);
+  double wp_a = theRiemann->n[1]*sim_rOm_a(theSim,r,a);
 
   if (sim_runtype(theSim)==MHD && DIVB_CH>0.00000001){
     if( Sl - wp_a > -DIVB_CH ) Sl = -DIVB_CH + wp_a;
@@ -196,7 +197,7 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
   double Msp   = ( Sk - vn )*mp / ( Sk - Ss );
   double Msz   = ( Sk - vn )*mz / ( Sk - Ss );
   double Estar = ( ( Sk - vn )*E_hydro + Ps*Ss - Pp*vn ) / ( Sk - Ss );
-  
+
   if (sim_runtype(theSim)==MHD){
     double Bsn = Bpack[0];
     double Bsr = Bpack[1];
@@ -226,7 +227,9 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
       + theRiemann->primR[BPP]*theRiemann->n[1] 
       + theRiemann->primR[BZZ]*theRiemann->n[2];
 
-    double wp_a = sim_W_A(theSim,r);
+    double wp_a = sim_rOm_a(theSim,r,1.);
+    printf("Need to fix wp_a stuff when MHD is turned on\n");
+    exit(1);
 
     theRiemann->Ustar[BRR] = Bsr;
     theRiemann->Ustar[BPP] = (Bsp + wp_a*(BnL-BnR)/(theRiemann->Sr-theRiemann->Sl))/r;
@@ -293,7 +296,9 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     double vB = vr*Br + vp*Bp + vz*Bz;
     double B2 = Br*Br + Bp*Bp + Bz*Bz;
 
-    double wp_a = sim_W_A(theSim,r);
+    double wp_a = sim_rOm_a(theSim,r,1.);
+    printf("Need to fix wp_a stuff when MHD is turned on\n");
+    exit(1);
 
     F[SRR] +=     .5*B2*theRiemann->n[0] - Br*Bn;
     F[LLL] += r*( .5*B2*theRiemann->n[1] - Bp*Bn );
@@ -314,33 +319,33 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
 }
 
 /*
-double Gradient_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_prim, double r, double tiph, int IDtype, int direction){
-  if (direction==RDIRECTION){
-    if (sim_VISC_CONST(theSim)==1){
-      return(2./r + Grad_prim[RHO]/AvgPrim[RHO]);
-    } else{
-      if (IDtype==SHEAR){
-        return(4./r + Grad_prim[PPP]/AvgPrim[PPP]);
-      } else{
-        return(7./2./r + Grad_prim[PPP]/AvgPrim[PPP]);
-      } 
-    } 
-  } else if (direction==PDIRECTION){
-    if (sim_VISC_CONST(theSim)==1){
-      return(Grad_prim[RHO]/AvgPrim[RHO]);
-    } else{
-      if (IDtype==SHEAR){
-        return(Grad_prim[PPP]/AvgPrim[PPP] - 2.0/r * tan(tiph));
-      } else{
-        return(Grad_prim[PPP]/AvgPrim[PPP]);
-      } 
-    } 
-  } else{
-    printf("error in Gradient_r2RhoNu_o_r2RhoNu\n");
-    exit(1);
-  }
-}
-*/
+   double Gradient_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_prim, double r, double tiph, int IDtype, int direction){
+   if (direction==RDIRECTION){
+   if (sim_VISC_CONST(theSim)==1){
+   return(2./r + Grad_prim[RHO]/AvgPrim[RHO]);
+   } else{
+   if (IDtype==SHEAR){
+   return(4./r + Grad_prim[PPP]/AvgPrim[PPP]);
+   } else{
+   return(7./2./r + Grad_prim[PPP]/AvgPrim[PPP]);
+   } 
+   } 
+   } else if (direction==PDIRECTION){
+   if (sim_VISC_CONST(theSim)==1){
+   return(Grad_prim[RHO]/AvgPrim[RHO]);
+   } else{
+   if (IDtype==SHEAR){
+   return(Grad_prim[PPP]/AvgPrim[PPP] - 2.0/r * tan(tiph));
+   } else{
+   return(Grad_prim[PPP]/AvgPrim[PPP]);
+   } 
+   } 
+   } else{
+   printf("error in Gradient_r2RhoNu_o_r2RhoNu\n");
+   exit(1);
+   }
+   }
+   */
 
 void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct GravMass * theGravMasses ){
   int NUM_Q = sim_NUM_Q(theSim);
@@ -355,6 +360,8 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct Gr
 
   double r0 = gravMass_r(theGravMasses,0);
   double r1 = gravMass_r(theGravMasses,1);
+
+  double a = r0 + r1;
 
   double phi_bh0 = gravMass_phi(theGravMasses,0);
   double phi_bh1 = gravMass_phi(theGravMasses,1);
@@ -448,8 +455,8 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct Gr
   double Gp_om = Grad_ph_prim[UPP];
   double Gp_vz = Grad_ph_prim[UZZ];
 
-  double om_cell = sim_W_A(theSim,r)/r;
-  double dr_om_cell = sim_OM_A_DERIV(theSim,r);
+  double om_cell = sim_rOm_a(theSim,r,a)/r;
+  double rdr_om_cell = sim_rdrOm_a(theSim,r,a);
 
   /*
      if (sim_MOVE_CELLS(theSim)==C_FIXED){
@@ -483,13 +490,13 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct Gr
         r*Gr_vr - vr - r*r*Gp_om
         );
     VFlux[LLL] = -nu*rho*(
-        r*r*(Gr_om+dr_om_cell) + r*Gp_vr
+        r*(r*Gr_om+rdr_om_cell) + r*Gp_vr
         );
 
     VFlux[SZZ] = 0.0; //deal with this later
 
     VFlux[TAU] = - nu * rho * (
-        vr*( Gr_vr - vr/r - r*Gp_om ) + r*om*( Gp_vr + r*(dr_om_cell + Gr_om) )
+        vr*( Gr_vr - vr/r - r*Gp_om ) + r*om*( Gp_vr + (rdr_om_cell + r*Gr_om) )
         );
 
 
@@ -507,7 +514,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct Gr
        );
        */
     VFlux[SRR] = -nu*rho*(
-        r*r*(Gr_om+dr_om_cell) + r*Gp_vr
+        r*(r*Gr_om+rdr_om_cell) + r*Gp_vr
         );
     VFlux[LLL] = -nu*rho*(
         -r*Gr_vr + vr + r*r*Gp_om
@@ -516,7 +523,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct Gr
     VFlux[SZZ] = 0.0; //deal with this later
 
     VFlux[TAU] = -nu * rho * (
-        -r*om*( Gr_vr - vr/r - r*Gp_om ) + vr*(Gp_vr + r*(dr_om_cell + Gr_om ) )
+        -r*om*( Gr_vr - vr/r - r*Gp_om ) + vr*(Gp_vr + (rdr_om_cell + r*Gr_om ) )
         );
   }
 
@@ -674,7 +681,7 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,struct Grav
   double DIVB_CH = sim_DIVB_CH(theSim);
 
   double Bpack[6];
-  riemann_set_vel(theRiemann,theSim,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
+  riemann_set_vel(theRiemann,theSim,theGravMasses,theRiemann->r,Bpack,GAMMALAW,DIVB_CH);
 
   double Bk_face,Psi_face;
   if (sim_runtype(theSim)==1){
@@ -755,7 +762,6 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,struct Grav
     cell_add_cons(theRiemann->cL,q,-dt*theRiemann->dA*theRiemann->F[q]);
     cell_add_cons(theRiemann->cR,q,dt*theRiemann->dA*theRiemann->F[q]);
   }
-
 
   if (VISC_OLD==1){
     cell_add_cons(theRiemann->cL,SRR,-dt*theRiemann->dA*theRiemann->Fvisc[SRR]);

@@ -63,9 +63,6 @@ void cell_calc_cons( struct Cell *** theCells,struct Sim *theSim ){
         double dV = .5*(rp*rp - rm*rm)*c->dphi*dz;
         double tau_before = c->cons[TAU];
         cell_prim2cons( c->prim , c->cons , r , dV,theSim);
-        if (fabs(tau_before - c->cons[TAU])>1.e-14 && r<=10.0){
-          //printf("r: %e, before P: %e, before vr: %e, before om: %e, before rho: %e, before TAU: %e, after: %e\n",r,c->prim[PPP],c->prim[URR],c->prim[UPP],c->prim[RHO],tau_before,c->cons[TAU]);
-        }   
       }
     }    
   }
@@ -80,7 +77,6 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
   double GAMMALAW = sim_GAMMALAW(theSim);
   double rho = cons[DDD]/dV;
   if( rho < RHO_FLOOR ) {
-    //printf("RHO_FLOOR:\n");
     rho = RHO_FLOOR;
   }
   double Sr  = cons[SRR]/dV;
@@ -109,18 +105,15 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
   double Pp = (GAMMALAW-1.)*rhoe;
 
   if( Pp < CS_FLOOR*CS_FLOOR*rho/GAMMALAW ) {
-    //printf("CS_FLOOR: %e, Pp: %e, new Pp: %e\n",CS_FLOOR,Pp,CS_FLOOR*CS_FLOOR*rho/GAMMALAW);
     Pp = CS_FLOOR*CS_FLOOR*rho/GAMMALAW;
   }
   if ( Pp > CS_CAP*CS_CAP*rho/GAMMALAW) {
     Pp = CS_CAP*CS_CAP*rho/GAMMALAW;
-    //printf("CS_CAP\n");
   }
   if ( v_magnitude>VEL_CAP ){
     vr = vr*VEL_CAP/v_magnitude;
     vp = vp*VEL_CAP/v_magnitude;
     vz = vz*VEL_CAP/v_magnitude;
-    //printf("VMAG\n");
   }
   prim[RHO] = rho;
   prim[PPP] = Pp;

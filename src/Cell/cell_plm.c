@@ -50,9 +50,6 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       cL->grad[q] += S*dA;
       cR->grad[q] += S*dA; 
     }
-    if (face_rad<1.0){
-      //printf("face_rad: %e, dpL: %e, dpR: %e, WL: %e, WR: %e, deltaL: %e, deltaR: %e, cL->grad[PPP]: %e, cR->grad[PPP]: %e\n",face_rad,dpL,dpR,cL->prim[PPP] + dpL*cL->gradp[PPP],cR->prim[PPP] - dpR*cR->gradp[PPP],deltaL,deltaR,cL->grad[PPP],cR->grad[PPP]);
-    }
   }
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
@@ -155,6 +152,9 @@ void cell_plm_p( struct Cell *** theCells ,struct Sim * theSim){
           c->gradp[q] = s;
 
         } 
+        double rp = sim_FacePos(theSim,i,R_DIR);
+        double rm = sim_FacePos(theSim,i-1,R_DIR);
+        double r = .5*(rp+rm);
       }
     }
   }   

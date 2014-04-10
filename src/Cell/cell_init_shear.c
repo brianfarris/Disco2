@@ -49,7 +49,7 @@ void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,int i,int j
   theCell->prim[RHO] = rho;
   theCell->prim[PPP] = Pp;
   theCell->prim[URR] = vr;
-  theCell->prim[UPP] = omega-sim_W_A(theSim,r)/r;
+  theCell->prim[UPP] = omega-sim_rOm_a(theSim,r,1.)/r; //it doesn't matter what we put for a
   theCell->prim[UZZ] = 0.0;
   theCell->wiph = 0.0;
   theCell->divB = 0.0;
@@ -108,7 +108,7 @@ void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = Pp;
         theCells[k][i][j].prim[URR] = vr;
-        theCells[k][i][j].prim[UPP] = omega-sim_W_A(theSim,r)/r;
+        theCells[k][i][j].prim[UPP] = omega-sim_rOm_a(theSim,r,1.)/r; //it doesn't matter what we put for a
         theCells[k][i][j].prim[UZZ] = 0.0;
         theCells[k][i][j].wiph = 0.0;
         theCells[k][i][j].divB = 0.0;

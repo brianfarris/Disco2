@@ -56,7 +56,9 @@ void cell_adjust_RK_cons( struct Cell *** theCells , struct Sim * theSim, double
   }
 }
 
-void cell_update_phi( struct Cell *** theCells , struct Sim * theSim, double RK , double dt ){
+void cell_update_phi( struct Cell *** theCells , struct Sim * theSim, struct GravMass * theGravMasses, double RK , double dt ){
+
+  double a = gravMass_r(theGravMasses,0) + gravMass_r(theGravMasses,1);
 
   int i,j,k;
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -69,7 +71,7 @@ void cell_update_phi( struct Cell *** theCells , struct Sim * theSim, double RK 
         while( c->tiph - c->RKtiph >  PHIMAX/2. ) c->RKtiph += PHIMAX;
         while( c->tiph - c->RKtiph < -PHIMAX/2. ) c->RKtiph -= PHIMAX;
         c->tiph = (1.0-RK)*c->tiph + RK*c->RKtiph;
-        double w_total = theCells[k][i][j].wiph + sim_W_A(theSim,r);
+        double w_total = theCells[k][i][j].wiph + sim_rOm_a(theSim,r,a);
         theCells[k][i][j].tiph += w_total*dt/r;
       }
     }

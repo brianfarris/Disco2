@@ -113,6 +113,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
   double rbh0 = gravMass_r(theGravMasses,0);
   double rbh1 = gravMass_r(theGravMasses,1);
+  
+  double a = rbh0+rbh1;
 
   double phi_bh0 = gravMass_phi(theGravMasses,0);
   double phi_bh1 = gravMass_phi(theGravMasses,1);
@@ -122,8 +124,6 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
   double xbh1 = rbh1*cos(phi_bh1);
   double ybh1 = rbh1*sin(phi_bh1);
-
-
 
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
@@ -174,16 +174,17 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           Fr += fr;
           Fp += fp;
         }
-        double w_a = sim_W_A(theSim,r);
-        double drOm_a = sim_OM_A_DERIV(theSim,r);
+        double w_a = sim_rOm_a(theSim,r,a);
+        double rdrOm_a = sim_rdrOm_a(theSim,r,a);
         double F_centrifugal_r = w_a*w_a/r;
         double F_coriolis_r =  2.*w_a*vp/r;
         double F_coriolis_phi = -2.*w_a*vr/r;
-        double F_euler_phi =  -vr*r*drOm_a;
+        double dtOm_a = sim_dtOm_a(theSim,r,a);
+        double F_euler_phi =  -(r*dtOm_a + vr*rdrOm_a);
 
         c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;
         c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r/*+F_coriolis_r*/);
-        c->cons[LLL] += dt*dV*rho*(Fp/*+F_coriolis_phi+F_euler_phi*/)*r;
+        c->cons[LLL] += dt*dV*rho*(Fp/*+F_coriolis_phi+F_euler_phi*/ -r*dtOm_a)*r;
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( (Fr*sint+F_centrifugal_r)*vr+Fr*vz*cost + (Fp+F_euler_phi)*vp);
         if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
@@ -197,7 +198,6 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           for( p=0 ; p<num_sinks; ++p ){
             get_rho_sink( theGravMasses, theSim,p,dt,r0,r1,M0,M1,rho,Pp, &drho_dt_sink);
             c->cons[RHO] -= drho_dt_sink * dt * dV;
-           //printf("check: %e, %e, %e, %e\n",r0,r1,Pp*exp(-r0*r0/(.02*.02))/.001,Pp*exp(-r1*r1/(.02*.02))/.001);
             if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
               Mdot_temp[p] += drho_dt_sink*dV;
             }
@@ -217,15 +217,15 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
           double vdotB = vr*Br+(vp/*+pow(r,-.5)*/)*Bp+vz*Bz;
           double BdotGradPsi = /*dV**/(Br*GradPsi[0]+Bp*GradPsi[1]+Bz*GradPsi[2]);
-          double vdotGradPsi = /*dV**/(vr*GradPsi[0]+(vp-sim_W_A(theSim,r))*GradPsi[1]+vz*GradPsi[2]);
+          double vdotGradPsi = /*dV**/(vr*GradPsi[0]+(vp-w_a)*GradPsi[1]+vz*GradPsi[2]);
 
           c->cons[SRR] += dt*dV*( .5*B2 - Bp*Bp )/r;
-          c->cons[TAU] += dt*dV*r*Br*Bp*drOm_a;
+          c->cons[TAU] += dt*dV*Br*Bp*rdrOm_a;
           double psi = c->prim[PSI];
           c->cons[BRR] += dt*dV*( psi )/r;
           //cons[PSI] -= dt*dV*psi*DIVB_CH/DIVB_L;//DIVB_CH2/DIVB_CP2;
           //c->cons[BPP] += dt*dV*Br*sim_OM_A_DERIV(theSim,r);
-          c->cons[BPP] += dt*dV*Br*drOm_a;
+          c->cons[BPP] += dt*dV*Br*rdrOm_a/r;
 
           c->cons[SRR] -= POWELL*dt*divB*Br;
           c->cons[SZZ] -= POWELL*dt*divB*Bz;
@@ -241,9 +241,10 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double numfac = 1.;
         double a_o_M = 100.0;
         if (sim_COOLING(theSim)==1){
+          double alpha = sim_EXPLICIT_VISCOSITY(theSim);
           double cooling_cap = c->cons[TAU]*1000000000000000.0;
           //double cooling_term = numfac * pow(Pp/rho,0.5)*pow(r,-1.5)*pow(a_o_M,0.5)*dt*dV;
-          double cooling_term = 9./4.*0.1*pow(PoRho_r1,-3)/rho*pow(Pp/rho,4.)*dt*dV;
+          double cooling_term = 9./4.*alpha*pow(PoRho_r1,-3)/rho*pow(Pp/rho,4.)*dt*dV;
           if (cooling_term>cooling_cap) cooling_term = cooling_cap;
           c->cons[TAU] -= cooling_term;
           c->Cool = cooling_term/dt/dV;
@@ -259,8 +260,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
   int p;
   for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
     gravMass_set_Mdot(theGravMasses,Mdot_reduce[p],p);
-    double Macc_prev = gravMass_Macc(theGravMasses,p);
-    gravMass_set_Macc(theGravMasses,Macc_prev+Mdot_reduce[p]*dt,p);
+    //double Macc_prev = gravMass_Macc(theGravMasses,p);
+    //gravMass_set_Macc(theGravMasses,Macc_prev+Mdot_reduce[p]*dt,p);
     gravMass_set_total_torque(theGravMasses,total_torque_reduce,p);
   }
 }
@@ -273,6 +274,8 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, struct Gr
 
   double r0 = gravMass_r(theGravMasses,0);
   double r1 = gravMass_r(theGravMasses,1);
+
+  double a = r0 + r1;
 
   double phi_bh0 = gravMass_phi(theGravMasses,0);
   double phi_bh1 = gravMass_phi(theGravMasses,1);
@@ -312,13 +315,13 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, struct Gr
 
 
         double alpha = sim_EXPLICIT_VISCOSITY(theSim);
-        double drOm_a = sim_OM_A_DERIV(theSim,r);
+        double rdrOm_a = sim_rdrOm_a(theSim,r,a);
         double eps = sim_G_EPS(theSim);
         //double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P*pow(r,1.5);
         //double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P*(sqrt(M0)+sqrt(M1))/(sqrt(M0)*pow(dist_bh0,-1.5)+sqrt(M1)*pow(dist_bh1,-1.5));
         double Sigma_nu = alpha*P/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
 
-        c->cons[TAU] += dt*dV*Sigma_nu*r*drOm_a*(r*drOm_a + r*c->grad[UPP] + c->gradp[URR]);
+        c->cons[TAU] += dt*dV*Sigma_nu*rdrOm_a*(rdrOm_a + r*c->grad[UPP] + c->gradp[URR] );
         //c->cons[TAU] -= c->cons[TAU]*exp(-dist_bh0*dist_bh0/(.03*.03))/0.1*dt;
         //c->cons[TAU] -= c->cons[TAU]*exp(-dist_bh1*dist_bh1/(.03*.03))/0.1*dt;
       }

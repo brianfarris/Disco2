@@ -82,6 +82,11 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
         double rp = sim_FacePos(theSim,i,R_DIR);
         double rm = sim_FacePos(theSim,i-1,R_DIR);
         double r = 0.5*(rm+rp);
+        double r_bh0 = gravMass_r(theGravMasses,0);
+        double phi_bh0 = gravMass_phi(theGravMasses,0);
+        double r_bh1 = gravMass_r(theGravMasses,1);
+        double phi_bh1 = gravMass_phi(theGravMasses,1);
+        double a = r_bh0 + r_bh1;        
         for (j=0;j<sim_N_p(theSim,i);++j){
           double phi = cell_tiph(cell_single(theCells,i,j,k));
           double dphi = cell_dphi(cell_single(theCells,i,j,k));
@@ -89,7 +94,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double press = cell_prim(cell_single(theCells,i,j,k),PPP);
           double vr = cell_prim(cell_single(theCells,i,j,k),URR);
           double vp_minus_w = cell_prim(cell_single(theCells,i,j,k),UPP)*r;
-          double vp = cell_prim(cell_single(theCells,i,j,k),UPP)*r+sim_W_A(theSim,r);
+          double vp = cell_prim(cell_single(theCells,i,j,k),UPP)*r+sim_rOm_a(theSim,r,a);
           double vz = cell_prim(cell_single(theCells,i,j,k),UZZ);
           double Br = cell_prim(cell_single(theCells,i,j,k),BRR);
           double Bp = cell_prim(cell_single(theCells,i,j,k),BPP);
@@ -114,11 +119,6 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double dPhi_dphi = 1/4.*r*sin(phi-Omega*t) * (
               pow(r*r+.25-r*cos(phi-Omega*t),-1.5) -  
               pow(r*r+.25+r*cos(phi-Omega*t),-1.5));
-
-          double r_bh0 = gravMass_r(theGravMasses,0);
-          double phi_bh0 = gravMass_phi(theGravMasses,0);
-          double r_bh1 = gravMass_r(theGravMasses,1);
-          double phi_bh1 = gravMass_phi(theGravMasses,1);
 
           double dist_bh0 = sqrt(r_bh0*r_bh0 + r*r - 2.*r_bh0*r*cos(phi_bh0-phi));
           double dist_bh1 = sqrt(r_bh1*r_bh1 + r*r - 2.*r_bh1*r*cos(phi_bh1-phi));
@@ -267,13 +267,13 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
       fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_inside_1_reduce,mass_inner_wedge_reduce,gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),gravMass_Macc(theGravMasses,0),gravMass_Macc(theGravMasses,1),mass_near_bh0_r0p2_reduce,mass_near_bh1_r0p2_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_r0p4_reduce);       
       fclose(DiagMdotFile);
-    
+
       char DiagTorqueFilename[256];
       sprintf(DiagTorqueFilename,"DiagTorque.dat");
       FILE * DiagTorqueFile = fopen(DiagTorqueFilename,"a");
       fprintf(DiagTorqueFile,"%e %e\n",timestep_get_t(theTimeStep), gravMass_total_torque(theGravMasses,0));       
       fclose(DiagTorqueFile);
-      
+
     }
 
     //We are doing time averaged diagnostics, so mult by delta t and add it

@@ -16,22 +16,28 @@ void sim_set_N_p(struct Sim * theSim){
   }else{
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       double r = sim_FacePos(theSim,i,R_DIR);
+      double r_cell = 0.5*(sim_FacePos(theSim,i-1,R_DIR)+sim_FacePos(theSim,i,R_DIR));
       double dr = sim_FacePos(theSim,i,R_DIR)-sim_FacePos(theSim,i-1,R_DIR);
-      theSim->N_p[i] = (int)( PHIMAX*( 1. + (r/dr-1.)/theSim->aspect ) ) ;
+      if (r_cell<sim_MIN(theSim,R_DIR)){
+        double dr_plus = sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i,R_DIR);
+        theSim->N_p[i] = (int)( PHIMAX*( 1. + (r_cell/dr_plus-1.)/theSim->aspect ) ) ;
+      }else{
+        theSim->N_p[i] = (int)( PHIMAX*( 1. + (r_cell/dr-1.)/theSim->aspect ) ) ;
+      }
       if (theSim->NPCAP>0){
         if (theSim->N_p[i]>theSim->NPCAP) theSim->N_p[i] = theSim->NPCAP;
       }
-	//printf("%e %e %e %d\n",r,dr,2.*M_PI*r/theSim->N_p[i],theSim->N_p[i]);
+      //printf("%e %e %e %d\n",r_cell,dr,2.*M_PI*r_cell/theSim->N_p[i],theSim->N_p[i]);
     }
   }
 }
 
 //used by root finder
-double r_func( double r, double r2, double fac,double sigma, double r0a, double r0b){
-  double F = r+fac*sigma*sqrt(M_PI/4.0)*(erf((r-r0a)/sigma)+1.0)
-    +fac*sigma*sqrt(M_PI/4.0)*(erf((r-r0b)/sigma)+1.0)-r2;
-  return(F);
-}
+  double r_func( double r, double r2, double fac,double sigma, double r0a, double r0b){
+    double F = r+fac*sigma*sqrt(M_PI/4.0)*(erf((r-r0a)/sigma)+1.0)
+      +fac*sigma*sqrt(M_PI/4.0)*(erf((r-r0b)/sigma)+1.0)-r2;
+    return(F);
+  }
 
 //find the sign
 int sgn(double x) {

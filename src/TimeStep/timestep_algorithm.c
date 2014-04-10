@@ -31,6 +31,14 @@ void timestep_rk2(struct TimeStep * theTimeStep, struct Sim * theSim,
   // Psi is updated in operator split manner
   if (sim_runtype(theSim)==1) timestep_update_Psi(theTimeStep,theCells,theSim,theMPIsetup);
   timestep_update_t(theTimeStep); 
+
+  int p;
+  for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
+    double Macc_prev = gravMass_Macc(theGravMasses,p);
+    double Mdot = gravMass_Mdot(theGravMasses,p);
+    gravMass_set_Macc(theGravMasses,Macc_prev+Mdot*timestep_dt(theTimeStep),p);
+  }
+
 }
 
 void timestep_forward_euler(struct TimeStep * theTimeStep, struct Sim * theSim,

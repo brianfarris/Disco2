@@ -145,6 +145,7 @@ void sim_set_N_p(struct Sim *);
 void sim_set_rz(struct Sim *,struct MPIsetup *);
 void sim_set_misc(struct Sim *,struct MPIsetup *);
 // W_A stuff
-double sim_W_A(struct Sim * ,double );
-double sim_OM_A_DERIV(struct Sim * ,double );
+double sim_rOm_a(struct Sim * ,double,double );
+double sim_rdrOm_a(struct Sim * ,double,double );
+double sim_dtOm_a(struct Sim * ,double,double );
 #endif
