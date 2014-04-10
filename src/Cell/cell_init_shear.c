@@ -66,9 +66,11 @@ void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
   double t0  = 0.25;
 
   int i, j,k;
+  /*
   printf("sim_EXPLICIT_VISCOSITY(theSim): %e\n",sim_EXPLICIT_VISCOSITY(theSim));
   printf("sim_GAMMALAW(theSim): %e\n",sim_GAMMALAW(theSim));
   printf("sim_VISC_CONST(theSim): %d\n",sim_VISC_CONST(theSim));
+  */
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
     for (i = 0; i < sim_N(theSim,R_DIR); i++) {
       double rm = sim_FacePos(theSim,i-1,R_DIR);
@@ -104,6 +106,7 @@ void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup 
 
         double vr    = vy*sin(t);
         double omega = vy*cos(t)/r;
+
 
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = Pp;

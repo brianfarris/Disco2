@@ -319,8 +319,12 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, struct Gr
         double eps = sim_G_EPS(theSim);
         //double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P*pow(r,1.5);
         //double Sigma_nu = alpha*sim_GAMMALAW(theSim)*P*(sqrt(M0)+sqrt(M1))/(sqrt(M0)*pow(dist_bh0,-1.5)+sqrt(M1)*pow(dist_bh1,-1.5));
-        double Sigma_nu = alpha*P/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
-
+        double Sigma_nu;
+        if (sim_VISC_CONST(theSim)==1){
+          Sigma_nu = rho*alpha;
+        }else{
+          Sigma_nu = alpha*P/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
+        }
         c->cons[TAU] += dt*dV*Sigma_nu*rdrOm_a*(rdrOm_a + r*c->grad[UPP] + c->gradp[URR] );
         //c->cons[TAU] -= c->cons[TAU]*exp(-dist_bh0*dist_bh0/(.03*.03))/0.1*dt;
         //c->cons[TAU] -= c->cons[TAU]*exp(-dist_bh1*dist_bh1/(.03*.03))/0.1*dt;

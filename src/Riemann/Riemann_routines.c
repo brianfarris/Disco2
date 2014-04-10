@@ -288,6 +288,7 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
   F[SZZ] =     rho*vz*vn + Pp*theRiemann->n[2] ;
   F[TAU] = ( .5*rho*v2 + rhoe + Pp )*vn ;
 
+
   if (sim_runtype(theSim)==MHD){ 
     double Br  = prim[BRR];
     double Bp  = prim[BPP];
