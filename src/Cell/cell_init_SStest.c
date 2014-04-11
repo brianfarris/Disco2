@@ -19,7 +19,7 @@ void cell_single_init_SStest(struct Cell *theCell, struct Sim *theSim,int i,int 
   double alpha = sim_EXPLICIT_VISCOSITY(theSim);
   double Gam = sim_GAMMALAW(theSim);
   
-  double r0 = 25.;
+  double r0 = 15.;
   int d  = 4;
 
   double rho = pow(r,-3./5.)*exp(-pow(r/r0,-d));
@@ -55,7 +55,7 @@ void cell_init_SStest(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
   double alpha = sim_EXPLICIT_VISCOSITY(theSim);
   double Gam = sim_GAMMALAW(theSim);
 
-  double r0 = 25.;
+  double r0 = 15.;
   int d = 4;
   int i, j,k;
   for (k = 0; k < sim_N(theSim,Z_DIR); k++) {
