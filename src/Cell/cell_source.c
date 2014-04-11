@@ -111,7 +111,7 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
 void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, struct GravMass * theGravMasses ){
 	///Set a density scale for feedback to holes
         double Rcut = sim_Rcut(theSim);
-        double dens_scale = (sim_Mdisk_ovr_Ms(theSim)/(1.+1./sim_MassRatio(theSim)))/(M_PI*sim_sep0(theSim)*sim_sep0(theSim));
+        double dens_scale = ( sim_Mdisk_ovr_Ms(theSim)/( 1.+1./sim_MassRatio(theSim) ) )/( M_PI*sim_sep0(theSim)*sim_sep0(theSim) );
 	if (   time_global <=    2.*M_PI*(sim_tmig_on(theSim) + sim_tramp(theSim))   ){
 	   dens_scale *= (time_global - 2*M_PI*sim_tmig_on(theSim))/( sim_tramp(theSim)*2*M_PI );
            // ABOVE^ Allow migration to turn on slowly
@@ -141,6 +141,7 @@ void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, str
 		double zp = sim_FacePos(theSim,k,Z_DIR);   // used to be z_iph[i] in Disco1
 		double zm = sim_FacePos(theSim,k-1,Z_DIR);   // used to be z_iph[i-1] in Disco1
 		double dz = zp-zm;
+		//printf("%lf\n",dz)
 		for( i=imin ; i<imax ; ++i ){
 			double rp = sim_FacePos(theSim,i,R_DIR);   // used to be r_iph[i] in Disco1
 			double rm = sim_FacePos(theSim,i-1,R_DIR); // used to be r_iph[i-1];
@@ -169,20 +170,26 @@ void cell_gravMassForcePlanets(struct Sim * theSim, struct Cell ***theCells, str
                                 double dy1 = r*sinp-r1*sin(p1);
                                 double script_r1 = sqrt(dx1*dx1+dy1*dy1);
 
-				double ffr;
-				double ffp;
+				//double ffr;
+				//double ffp;
+				double ffr0;
+				double ffp0;
+				double ffr1;
+				double ffp1;
 				
-				for( p=0 ; p<Np ; ++p ){
-					  if (script_r1 > Rcut*Rhill && r>0.1){ //Only sum forces outside the secondary Hill radius & Damping Region
-				         	gravMassForce(theGravMasses , theSim , p , r , phi , &ffr , &ffp );
-					        Fr[p] -= ffr*dm; 
-					        Fp[p] -= ffp*dm;
+				  //for( p=0 ; p<Np ; ++p ){
+				if (script_r1 > Rcut*Rhill && r>0.1){ //Only sum forces outside the secondary Hill radius & Damping Region
+				         	gravMassForce(theGravMasses , theSim , 0 , r , phi , &ffr0 , &ffp0 );
+					        gravMassForce(theGravMasses , theSim , 1 , r , phi , &ffr1 , &ffp1 );
+						Fr[1] -= (ffr0+ffr1)*dm; 
+					        Fp[1] -= r*(ffp0 + ffp1)*dm;
+						
 					  //}else{
-					       	//Fr[p] -= 0.0;
-					       	//Fp[p] -= 0.0;
-					  }
-					
+					       	Fr[0] = 0.0;
+					       	Fp[0] = 0.0;
 				}
+					
+				//}
 			}
 		}
 	}

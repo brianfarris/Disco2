@@ -121,7 +121,7 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim, struct GravMas
               nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(r,1.5);
             }
           }
-          double dt_visc = .9*dx*dx/nu;
+          double dt_visc = .25*dx*dx/nu; //CHANGED FROM 0.9 to 0.25 -DD
           dt = dt/( 1. + dt/dt_visc );
         }
         if( dt_m > dt ) {

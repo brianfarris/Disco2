@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
     // here the actual timestep is taken
     timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
-
+    //timestep_forward_euler(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
     // calculate diagnostics
     diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep,theMPIsetup,theGravMasses);
     //write diagnostics to file

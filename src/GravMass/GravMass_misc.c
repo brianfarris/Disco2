@@ -41,7 +41,7 @@ void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt )
 	double E = thisGravMass->E;   // Etot
 	double Ls = thisGravMass->L;           // Lsec/Msec
 	//double Lp = Ls*Ms/Mp; // Omega the same right? 3 1/q's to convert 1M and 2 r's works out to one Ms/Mp
-	double Ltot = Ls*(1.+Ms/Mp);
+	double Ltot = Ls; //FOR NOW Ls is tot L - DD April 7 2014 *(1.+Ms/Mp);
 	
 	double r1 = thisGravMass->r;
 	double phi = thisGravMass->phi;
@@ -236,18 +236,23 @@ void gravMass_update_RK( struct Cell *** theCells, struct GravMass * theGravMass
     theGravMasses[i].omega = (1.0-RK)*theGravMasses[i].omega  + RK*theGravMasses[i].RK_omega;
     theGravMasses[i].L     = (1.0-RK)*theGravMasses[i].L   + RK*theGravMasses[i].RK_L;
     theGravMasses[i].E     = (1.0-RK)*theGravMasses[i].E   + RK*theGravMasses[i].RK_E;
-    theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr  + RK*theGravMasses[i].RK_vr; 
-    if ( (sim_GravMassType(theSim)==LIVEBINARY) && (time_global > 2.*M_PI*sim_tmig_on(theSim)) ){
+    theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr  + RK*theGravMasses[i].RK_vr;
+    // ONLY UPDATE total L (= L1 for now) once
+    if ( (sim_GravMassType(theSim)==LIVEBINARY)  && (time_global > 2.*M_PI*sim_tmig_on(theSim)) ){
                 GravMass_set_Fr(theGravMasses, i, 0.0);
 		GravMass_set_Fp(theGravMasses, i, 0.0);
 		cell_gravMassForcePlanets( theSim, theCells, theGravMasses );
 		
 
-		double r  = theGravMasses[i].r;
-		double Fp = theGravMasses[i].Fp; 
+		//double r  = theGravMasses[i].r;
+		//double Fp = theGravMasses[i].Fp; 
+		double Fpbin = theGravMasses[i].Fp; ///For now total Bin trq is Fp[1] -DD April 7 2014
 		
+		//	theGravMasses[i].L      += Fp*dt;
 		
-		theGravMasses[i].L      += r*Fp*dt; 
+		theGravMasses[i].L      += Fpbin*dt; //1/2 when doing Euler and not counting twice for i=0,1
+
+ 
 		//theGravMasses[0].L      += 0.0; // For now only evolve secondary Angular momwntum
 		
 		//Keep track of a total E use 0 arbitrarily

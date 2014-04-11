@@ -121,6 +121,8 @@ void gravMass_init_livebinary(struct GravMass * theGravMasses,struct Sim * theSi
 	double L0 = M0*r0*r0*om;
 	double L1 = M1*r1*r1*om;
 	
+	L1 = L0+L1; //QUICK FIX April 7 2014 -DD/
+	
 	double v0 = 0.0;
 	double v1 = v0*M1/M0;
 	//double E  = .5*M0*v0*v0 + .5*M1*v1*v1 + .5*L0*L0/M0/r0/r0 + .5*L1*L1/M1/r1/r1 - M0*M1/(r0+r1); //baryocentric 
