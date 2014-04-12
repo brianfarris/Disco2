@@ -20,7 +20,7 @@ double fgrav_neg_centrifugal( double M , double r , double eps, double n ){
 void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, double dt, double r0,double r1,double M0, double M1, double rho, double P, double * drho_dt_sink){
 
   double Mtotal = M0+M1;
-  double alpha = sim_EXPLICIT_VISCOSITY(theSim);
+  double alpha = 0.01;//*sim_EXPLICIT_VISCOSITY(theSim);
  
   double one_o_nu = 1.0/(alpha*P/rho)*sqrt(pow(r0,-3)*M0/Mtotal + pow(r1,-3)*M1/Mtotal);
   double t_visc0 = TVISC_FAC * 2./3. * r0*r0*one_o_nu;
@@ -34,14 +34,20 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, 
   }
 
   *drho_dt_sink = 0.0;
+  double rbh0 = gravMass_r(theGravMasses,0);
+  double rbh1 = gravMass_r(theGravMasses,1);
+
+  double a = rbh0+rbh1;
+
+  double Rhill = a * pow(sim_MassRatio(theSim)/3., (1./3.));
   double sink_size = 0.5;
 
   if (p==0){
-    if (r0<sink_size){
+    if (r0<Rhill){
       *drho_dt_sink = rho / t_visc0;
     }
   } else if (p==1){
-    if (r1<sink_size){
+    if (r1<Rhill){
       *drho_dt_sink = rho / t_visc1;
     }
 
@@ -85,6 +91,16 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
 }
 
 void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses , double dt ){
+  ///Set a density scale for feedback to holes                                                                                                
+
+  double dens_scale = ( sim_Mdsk_o_Ms(theSim)/( 1.+1./sim_MassRatio(theSim) ) )/( M_PI*sim_sep0(theSim)*sim_sep0(theSim) );
+  if (   time_global <=    2.*M_PI*(sim_tmig_on(theSim) + sim_tramp(theSim))   ){
+    dens_scale *= (time_global - 2*M_PI*sim_tmig_on(theSim))/( sim_tramp(theSim)*2*M_PI );
+    // ABOVE^ Allow migration to turn on slowly                                                                                               
+  }
+
+
+
   int GRAV2D=sim_GRAV2D(theSim);
   int POWELL=sim_POWELL(theSim);
   int i,j,k;
@@ -144,12 +160,16 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double vp  = c->prim[UPP]*r;
         double dz = zp-zm;
         double dV = dphi*.5*(rp*rp-rm*rm)*dz;
+	double dVol = (rp-rm)*r*dphi*dz;
 
         double xpos = r*cos(phi);
         double ypos = r*sin(phi);
 
         double r0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
         double r1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
+
+
+	double Rhill = a * pow(sim_MassRatio(theSim)/3., (1./3.));
 
         double z  = .5*(zp+zm);
         double R  = sqrt(r*r+z*z);
@@ -168,11 +188,18 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double fr,fp;
         double Fr = 0.0;
         double Fp = 0.0;
+	//double Fmr =0.0; // for torques
+	double Fmp =0.0;
+
+	double dm = dens_scale * fabs(rho*dVol); // for torques
+ 	
         int p;
         for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
           gravMassForce( theGravMasses , theSim , p , gravdist , phi , &fr , &fp );
           Fr += fr;
           Fp += fp;
+	  //Fmr -= fr*dm;
+	  Fmp -= fp*dm;
         }
         double w_a = sim_rOm_a(theSim,r,a);
         double rdrOm_a = sim_rdrOm_a(theSim,r,a);
@@ -188,8 +215,10 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( (Fr*sint+F_centrifugal_r)*vr+Fr*vz*cost + (Fp+F_euler_phi)*vp);
         if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
-          total_torque_temp += Fp*r;
-          //total_Fr_temp += Fr;
+	  if (r1 > sim_Rcut(theSim) * Rhill && r>0.05){
+	    total_torque_temp += Fmp*r;
+	    //total_Fr_temp += Fr;
+	  }
         }
 
         if (sim_RhoSinkOn(theSim)==1){

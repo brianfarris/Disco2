@@ -85,7 +85,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   //Bookkeeping
   cell_update_phi( theCells ,theSim, theGravMasses, theTimeStep->RK , dt ); // allow the cells to move in phi direction
   cell_update_dphi( theCells ,theSim); // all the cells to change size
-  gravMass_update_RK( theGravMasses ,theSim, theTimeStep->RK ); // allow the GravMasses to move
+  gravMass_update_RK( theGravMasses ,theSim, theTimeStep->RK, dt ); //DD added dt- allow the GravMasses to move
   cell_calc_prim( theCells ,theSim); // calculate primitives
 
   //Set temperature to keep HoR constant

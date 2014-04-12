@@ -188,4 +188,18 @@ double sim_RDAMP_INNER(struct Sim * theSim){
 double sim_RDAMP_OUTER(struct Sim * theSim){
   return(theSim->RDAMP_OUTER);
 }
-
+double sim_sep0(struct Sim * theSim){
+  return(theSim->sep0);
+}
+double sim_Rcut(struct Sim * theSim){
+  return(theSim->Rcut);
+}
+double sim_Mdsk_o_Ms(struct Sim * theSim){
+  return(theSim->Mdsk_o_Ms);
+}
+double sim_tmig_on(struct Sim * theSim){
+  return(theSim->tmig_on);
+}
+double sim_tramp(struct Sim * theSim){
+  return(theSim->tramp);
+}

@@ -110,6 +110,11 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "HiResR0b"           , VAR_DOUB , &(theSim->HiResR0b)  );
       err += readvar( pfile , "HiResFac"           , VAR_DOUB , &(theSim->HiResFac)  );
       err += readvar( pfile , "w_a_type"            , VAR_INT , &(theSim->W_A_TYPE));
+      err += readvar( pfile , "sep0"            , VAR_DOUB , &(theSim->sep0));
+      err += readvar( pfile , "Rcut"            , VAR_DOUB , &(theSim->Rcut));
+      err += readvar( pfile , "Mdsk_o_Ms"            , VAR_DOUB , &(theSim->Mdsk_o_Ms));
+      err += readvar( pfile , "tmig_on"            , VAR_DOUB , &(theSim->tmig_on));
+      err += readvar( pfile , "tramp"            , VAR_DOUB , &(theSim->tramp));
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }

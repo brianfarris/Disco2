@@ -25,3 +25,21 @@ double gravMass_Macc(struct GravMass * theGravMasses,int p){
 double gravMass_total_torque(struct GravMass * theGravMasses,int p){
   return(theGravMasses[p].total_torque);
 }
+double gravMass_E(struct GravMass * theGravMasses,int p){
+  return(theGravMasses[p].E);
+}
+double gravMass_L(struct GravMass * theGravMasses,int p){
+  return(theGravMasses[p].L);
+}
+double gravMass_Ltot(struct GravMass * theGravMasses,int p){
+  return(theGravMasses[p].Ltot);
+}
+double gravMass_vr(struct GravMass * theGravMasses,int p){
+  return(theGravMasses[p].vr);
+}
+double gravMass_Fr(struct GravMass * theGravMasses,int p){
+  return(theGravMasses[p].Fr);
+}
+double gravMass_Fp(struct GravMass * theGravMasses,int p){
+  return(theGravMasses[p].Fp);
+}

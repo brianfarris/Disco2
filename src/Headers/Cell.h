@@ -59,6 +59,8 @@ void cell_init_middle(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_middle(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_SStest(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_SStest(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_CDmigration(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_CDmigration(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
