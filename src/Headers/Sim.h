@@ -63,7 +63,10 @@ struct Sim {
   int InitPar0;
   double InitPar1;
   double InitPar2;
+  double InitPar3;
+  double InitPar4;
   double AlphaVisc;
+  double CoolFac;
 };
 #endif
 
@@ -120,7 +123,10 @@ double sim_RDAMP_OUTER(struct Sim *);
 int sim_InitPar0(struct Sim *);
 double sim_InitPar1(struct Sim *);
 double sim_InitPar2(struct Sim *);
+double sim_InitPar3(struct Sim *);
+double sim_InitPar4(struct Sim *);
 double sim_AlphaVisc(struct Sim *);
+double sim_CoolFac(struct Sim *);
 
 int sim_GravMassType(struct Sim * );
 //set Grid data

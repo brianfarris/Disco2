@@ -43,13 +43,16 @@ PLM			1.0
 
 Grav_2D			1
 G_EPS			0.0
-GravM      0.04
+GravM           0.04
 AlphaVisc       0.0
+CoolFac         0.0
 
 //Initial Condition Parameters
 InitPar0        0
 InitPar1        10.0
 InitPar2        0.1
+InitPar3        0.00
+InitPar4        0.00
 
 PHI_ORDER               2
 

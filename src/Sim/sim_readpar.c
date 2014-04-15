@@ -99,7 +99,10 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "InitPar0"           , VAR_INT , &(theSim->InitPar0)  );
       err += readvar( pfile , "InitPar1"           , VAR_DOUB , &(theSim->InitPar1)  );
       err += readvar( pfile , "InitPar2"           , VAR_DOUB , &(theSim->InitPar2)  );
+      err += readvar( pfile , "InitPar3"           , VAR_DOUB , &(theSim->InitPar3)  );
+      err += readvar( pfile , "InitPar4"           , VAR_DOUB , &(theSim->InitPar4)  );
       err += readvar( pfile , "AlphaVisc"           , VAR_DOUB , &(theSim->AlphaVisc)  );
+      err += readvar( pfile , "CoolFac"           , VAR_DOUB , &(theSim->CoolFac)  );
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }
