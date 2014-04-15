@@ -72,7 +72,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     //TODO: CHECK THIS!  Probably not relativistic and/or isothermal.
     rhoh = prim[RHO] + GAMMA*prim[PPP]/(GAMMA-1.0);
     cs2 = GAMMA*prim[PPP] / rhoh;
-    visc = alpha * cs2 * sqrt(theRiemann->pos[R_DIR]*theRiemann->pos[R_DIR]*theRiemann->pos[R_DIR] / M);
+    visc = alpha * prim[PPP] * (1-2*M/theRiemann->pos[R_DIR]) / sqrt(1-3*M/theRiemann->pos[R_DIR]);
 
     for(i=0; i<3; i++)
         if(theRiemann->n[i] == 1)

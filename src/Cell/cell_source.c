@@ -156,11 +156,13 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 double alpha = sim_AlphaVisc(theSim);
                 double M = sim_GravM(theSim);
 
-                cool = Pp / rho;
-                cool = cool*cool*cool*cool * sim_CoolFac(theSim);
+                double temp = Pp/rho;
+                double height = sqrt(P*r*r*r*(1-3*M/r)/(rho*M));
+
+                cool = sim_CoolFac(theSim) * pow(temp,7.5) / (rho*rho*height);
 
                 cs2 = GAMMALAW*Pp / rhoh;
-                alpha *= cs2 * sqrt(r*r*r/M);
+                alpha *= Pp * (1-2*M/r) / sqrt(1-3*M/r);
 
                 dv[0] = cell_gradr(c, URR);  dv[1] = cell_gradr(c, UPP);  dv[2] = cell_gradr(c, UZZ);
                 dv[3] = cell_gradp(c, URR);  dv[4] = cell_gradp(c, UPP);  dv[5] = cell_gradp(c, UZZ);

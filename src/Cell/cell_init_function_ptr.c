@@ -30,6 +30,8 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_equil1);
   } else if (sim_InitialDataType(theSim)==EQUIL2){
     return(&cell_init_equil2);
+  } else if (sim_InitialDataType(theSim)==SSDISC){
+    return(&cell_init_ssdisc);
    } else{
     printf("ERROR: Do not recognize initial data selection.\n");
     exit(0);
@@ -63,6 +65,8 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_equil1);
    } else if (sim_InitialDataType(theSim)==EQUIL2){
     return(&cell_single_init_equil2);
+   } else if (sim_InitialDataType(theSim)==SSDISC){
+    return(&cell_single_init_ssdisc);
   } else{
     printf("ERROR: Do not recognize initial data selection.\n");
     exit(0);
