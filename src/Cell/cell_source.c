@@ -141,8 +141,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             rhoh = rho + GAMMALAW*Pp/(GAMMALAW-1);
            
             //Viscous Terms
-            double visc[16];
-            double viscm[16];
+            double cool, visc[16], viscm[16];
+            cool = 0.0;
             for(mu=0; mu<16; mu++)
             {
                 visc[mu] = 0.0;
@@ -155,6 +155,9 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 double cs2;
                 double alpha = sim_AlphaVisc(theSim);
                 double M = sim_GravM(theSim);
+
+                cool = Pp / rho;
+                cool = cool*cool*cool*cool * sim_CoolFac(theSim);
 
                 cs2 = GAMMALAW*Pp / rhoh;
                 alpha *= cs2 * sqrt(r*r*r/M);
@@ -258,6 +261,11 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             }
 
             c->cons[TAU] += dt*dV*sqrtg*a * s;
+
+            c->cons[SRR] -= dt*dV*sqrtg*a* cool*u_d[1];
+            c->cons[LLL] -= dt*dV*sqrtg*a* cool*u_d[2];
+            c->cons[SZZ] -= dt*dV*sqrtg*a* cool*u_d[3];
+            c->cons[TAU] -= dt*dV*sqrtg*a* a*cool*u[0]; 
 
             metric_destroy(g);
         }
