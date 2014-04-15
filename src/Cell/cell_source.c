@@ -238,16 +238,22 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
         } 
         //cooling
-        double numfac = 1.;
-        double a_o_M = 100.0;
         if (sim_COOLING(theSim)==1){
-          double alpha = sim_EXPLICIT_VISCOSITY(theSim);
-          double cooling_cap = c->cons[TAU]*1000000000000000.0;
-          //double cooling_term = numfac * pow(Pp/rho,0.5)*pow(r,-1.5)*pow(a_o_M,0.5)*dt*dV;
-          double cooling_term = 9./4.*alpha*pow(PoRho_r1,-3)/rho*pow(Pp/rho,4.)*dt*dV;
-          if (cooling_term>cooling_cap) cooling_term = cooling_cap;
-          c->cons[TAU] -= cooling_term;
-          c->Cool = cooling_term/dt/dV;
+          if (sim_InitialDataType(theSim)==SHEAR){
+            //double cooling_term = c->cons[TAU] - (.5*rho*(vr*vr+w_a*w_a)*(vr*vr+w_a*w_a) + .01/(sim_GAMMALAW(theSim)-1.))*dV;
+            double cooling_term = (Pp-.01)/(sim_GAMMALAW(theSim)-1.)*dV/1.e-2;
+            if (cooling_term<0.0) cooling_term = 0.0;
+            c->cons[TAU] -= cooling_term*dt;
+            c->Cool = cooling_term/dV;
+          }else{
+            double numfac = 1.;
+            double alpha = sim_EXPLICIT_VISCOSITY(theSim);
+            double cooling_cap = c->cons[TAU]*1000000000000000.0;
+            double cooling_term = 9./4.*alpha*pow(PoRho_r1,-3)/rho*pow(Pp/rho,4.)*dt*dV;
+            if (cooling_term>cooling_cap) cooling_term = cooling_cap;
+            c->cons[TAU] -= cooling_term;
+            c->Cool = cooling_term/dt/dV;
+          }
         }
       }
     }
