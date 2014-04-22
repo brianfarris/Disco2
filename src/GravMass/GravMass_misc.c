@@ -20,14 +20,14 @@ void gravMass_clean_pi(struct GravMass * theGravMasses,struct Sim * theSim){
 void gravMass_copy(struct GravMass * theGravMasses,struct Sim * theSim){
   int p;
   for( p=0 ; p<sim_NumGravMass(theSim) ; ++p ){
-    theGravMasses[p].RK_r   = theGravMasses[p].r;
-    theGravMasses[p].RK_phi = theGravMasses[p].phi;
-    theGravMasses[p].RK_M   = theGravMasses[p].M;
-    theGravMasses[p].RK_omega   = theGravMasses[p].omega;
-    theGravMasses[p].RK_E   = theGravMasses[p].E;
-    theGravMasses[p].RK_L   = theGravMasses[p].L;
+    theGravMasses[p].RK_r      = theGravMasses[p].r;
+    theGravMasses[p].RK_phi    = theGravMasses[p].phi;
+    theGravMasses[p].RK_M      = theGravMasses[p].M;
+    theGravMasses[p].RK_omega  = theGravMasses[p].omega;
+    theGravMasses[p].RK_E      = theGravMasses[p].E;
+    theGravMasses[p].RK_L      = theGravMasses[p].L;
     theGravMasses[p].RK_Ltot   = theGravMasses[p].Ltot;
-    theGravMasses[p].RK_vr  = theGravMasses[p].vr;
+    //theGravMasses[p].RK_vr     = theGravMasses[p].vr;
   }
 }
 
@@ -35,12 +35,12 @@ void gravMass_copy(struct GravMass * theGravMasses,struct Sim * theSim){
 
 // Analytic uodate via Keplers Laws - now jsut e=0 circular orbits
 void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt ){
-  double Ms = thisGravMass->M;  //The mass of the secondary
+  ////double Ms = thisGravMass->M;  //The mass of the secondary
   //-double mt = Mp/pow(1.+Ms/Mp,2.);            // ??  
   //-double E = thisGravMass->E;   // Etot                             
-  double Ltot = thisGravMass->Ltot;           // Lsec/Msec
+  //double Ltot = thisGravMass->Ltot;           // Lsec/Msec
   //-double Lp = Ls*Ms/Mp; // Omega the same right? 3 1/q's to convert 1M and 2 r's works out to one Ms/Mp
-  //-double Ltot = Ls; //FOR NOW Ls is tot L - DD April 7 2014 *(1.+Ms/Mp);
+  ////-double Ltot = Ls; //FOR NOW Ls is tot L - DD April 7 2014 *(1.+Ms/Mp);
   //-double r1 = thisGravMass->r;
   //-double phi = thisGravMass->phi;
   //-double vr1 = thisGravMass->vr;
@@ -48,7 +48,7 @@ void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt )
   //- double rt = r1 + r1*Ms/Mp;
 
   //either update with Delta L
-  double a = Ltot*Ltot/(Ms*Ms*Mp*Mp)*(Ms+Mp);
+  ////double a = Ltot*Ltot/(Ms*Ms*Mp*Mp)*(Ms+Mp);
 
   // Or update with Delta E                                
   //double a = -.5*Ms*Mp/Enew;               // E = -G(M0+M1)/(2a) for elliptical orbit
@@ -100,6 +100,9 @@ void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt )
   //-if( sin(E1) < 0.0 ) vr = -vr; //???
   //*vrt = vr2;
   //-thisGravMass->vr = vr/(1.+Ms/Mp);
+  double Ms = thisGravMass->M; 
+  double Ltot = thisGravMass->Ltot;
+  double a = Ltot*Ltot/(Ms*Ms*Mp*Mp)*(Ms+Mp);
   thisGravMass->r = a/(1.+Ms/Mp);
   thisGravMass->omega = pow(a,(-3./2.));           //Is this a bad idea?
 }
@@ -118,9 +121,10 @@ void gravMass_move( struct Sim * theSim, struct GravMass * theGravMasses, double
     //Here we need to analytically update a, phi, vr from Kepler's equations 
     gravMass_adv_anly(&(theGravMasses[1]), Mp, dt);
     // Or just push the binary together arbitrarily for testing
-    //gravMass_adv_arb(&(theGravMasses[1]), Mp, dt); //TESTING                                                                        
+    //gravMass_adv_arb(&(theGravMasses[1]), Mp, dt); //TESTING 
+                                                                       
     theGravMasses[0].r   = theGravMasses[1].r*Ms/Mp;
-    theGravMasses[0].vr  = theGravMasses[1].vr*Ms/Mp;
+    //theGravMasses[0].vr  = theGravMasses[1].vr*Ms/Mp;
     theGravMasses[0].omega  = theGravMasses[1].omega;
 
     theGravMasses[1].phi += theGravMasses[1].omega*dt; //Instead of updating in adv_anly ONLY GOOD FOR CIRC?
@@ -190,17 +194,11 @@ void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, do
     theGravMasses[i].L     = (1.0-RK)*theGravMasses[i].L      + RK*theGravMasses[i].RK_L;
     theGravMasses[i].Ltot  = (1.0-RK)*theGravMasses[i].Ltot   + RK*theGravMasses[i].RK_Ltot;
     theGravMasses[i].E     = (1.0-RK)*theGravMasses[i].E      + RK*theGravMasses[i].RK_E;
-    theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr     + RK*theGravMasses[i].RK_vr;
+    //theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr     + RK*theGravMasses[i].RK_vr;
     theGravMasses[i].omega = (1.0-RK)*theGravMasses[i].omega  + RK*theGravMasses[i].RK_omega;
   }
   if ( (sim_GravMassType(theSim)==LIVEBINARY)  && (time_global > 2.*M_PI*sim_tmig_on(theSim)) ){
-    ///Set a density scale for feedback to holes                                 
-    //    double Rcut = sim_Rcut(theSim);
-    // double dens_scale = ( sim_Mdsk_o_Ms(theSim)/( 1.+1./sim_MassRatio(theSim) ) )/( M_PI*sim_sep0(theSim)*sim_sep0(theSim) );
-    //if (   time_global <=    2.*M_PI*(sim_tmig_on(theSim) + sim_tramp(theSim))   ){
-    //  dens_scale *= (time_global - 2*M_PI*sim_tmig_on(theSim))/( sim_tramp(theSim)*2*M_PI );
-    //  // ABOVE^ Allow migration to turn on slowly 
-    //}
+
     //toal torque gives the torque on the binary due to the gas wrt to r=0 
     double Tot_Trq =  gravMass_total_torque(theGravMasses,0);
     double Lbin    =  gravMass_Ltot(theGravMasses,1); //theGravMasses[1].Ltot;

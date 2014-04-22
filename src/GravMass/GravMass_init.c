@@ -16,7 +16,7 @@ void (*gravMass_init_ptr(struct Sim * theSim))(struct GravMass *,struct Sim *){
   } else if  (sim_GravMassType(theSim)==LIVEBINARY){
     return(&gravMass_init_livebinary);
   } else{
-    printf("ERROR\n");
+    printf("No GravMass type Selected ERROR\n");
     exit(0);
   }
 }
@@ -92,10 +92,10 @@ void gravMass_init_livebinary(struct GravMass * theGravMasses,struct Sim * theSi
   double Mtotal = 1.0;
   double sep = sim_sep0(theSim);
   double massratio = sim_MassRatio(theSim);
-  theGravMasses[0].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
-  theGravMasses[1].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
-  theGravMasses[0].OrbShrinkT0 = sim_OrbShrinkT0(theSim);
-  theGravMasses[1].OrbShrinkT0 = sim_OrbShrinkT0(theSim);
+  //theGravMasses[0].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
+  //theGravMasses[1].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
+  //theGravMasses[0].OrbShrinkT0 = sim_OrbShrinkT0(theSim);
+  //theGravMasses[1].OrbShrinkT0 = sim_OrbShrinkT0(theSim);
 
 
   double M0 = Mtotal/(1.+massratio);
@@ -121,12 +121,15 @@ void gravMass_init_livebinary(struct GravMass * theGravMasses,struct Sim * theSi
   theGravMasses[0].omega = om;
   theGravMasses[0].E = E;
   theGravMasses[0].L = L0;
-  theGravMasses[0].vr = v0;
-  theGravMasses[0].Fr = 0.0;
-  theGravMasses[0].Fp = 0.0;
+  // theGravMasses[0].vr = v0;
+  //theGravMasses[0].Fr = 0.0;
+  //theGravMasses[0].Fp = 0.0;
   theGravMasses[0].Ltot = Ltot;
-  theGravMasses[0].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
-  theGravMasses[0].OrbShrinkT0 = sim_OrbShrinkT0(theSim);
+  //theGravMasses[0].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
+  //theGravMasses[0].OrbShrinkT0 = sim_OrbShrinkT0(theSim);
+  theGravMasses[0].Mdot = 0.0;
+  theGravMasses[0].Macc = 0.0;
+  theGravMasses[0].total_torque = 0.0;
 
 
   theGravMasses[1].M   = M1;
@@ -135,16 +138,20 @@ void gravMass_init_livebinary(struct GravMass * theGravMasses,struct Sim * theSi
   theGravMasses[1].omega = om;
   theGravMasses[1].E = E;
   theGravMasses[1].L = L1;
-  theGravMasses[1].vr = v1;
-  theGravMasses[1].Fr = 0.0;
-  theGravMasses[1].Fp = 0.0;
+  //theGravMasses[1].vr = v1;
+  //theGravMasses[1].Fr = 0.0;
+  //theGravMasses[1].Fp = 0.0;
   theGravMasses[1].Ltot = Ltot;
-  theGravMasses[1].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
-  theGravMasses[1].OrbShrinkT0 = sim_OrbShrinkT0(theSim);
+  //theGravMasses[1].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
+  //theGravMasses[1].OrbShrinkT0 = sim_OrbShrinkT0(theSim);
+  theGravMasses[1].Mdot = 0.0;
+  theGravMasses[1].Macc = 0.0;
+  theGravMasses[1].total_torque = 0.0;
 }
 
-
-void gravMass_set_chkpt(struct GravMass * theGravMasses,int p,double r,double phi,double M, double omega, double E, double L, double Ltot, double vr, double Fr, double Fp){
+// If you change the number of things to chpnt about the GravMasses then you need to normal Header changes as well as update io_buffer and 
+// also update fdims[2] twice! in io_hdf5
+void gravMass_set_chkpt(struct GravMass * theGravMasses,int p,double r,double phi, double M, double omega, double E, double L, double Ltot, double Mdot, double Macc, double total_torque){
     theGravMasses[p].r = r;
     theGravMasses[p].phi = phi;
     theGravMasses[p].M = M;
@@ -152,10 +159,13 @@ void gravMass_set_chkpt(struct GravMass * theGravMasses,int p,double r,double ph
     theGravMasses[p].E = E;
     theGravMasses[p].L = L;
     theGravMasses[p].Ltot = Ltot;
-    theGravMasses[p].vr = vr;
-    theGravMasses[p].Fr = Fr;
-    theGravMasses[p].Fp = Fp;
-  }
+    //    theGravMasses[p].vr = vr;
+    //    theGravMasses[p].Fr = Fr;
+    //    theGravMasses[p].Fp = Fp;
+    theGravMasses[p].Mdot = Mdot;
+    theGravMasses[p].Macc = Macc;
+    theGravMasses[0].total_torque = total_torque;
+}
   //void gravMass_set_chkpt(struct GravMass * theGravMasses,int p,double r,double phi,double M, double omega){
   // theGravMasses[p].r = r; 
   //theGravMasses[p].phi = phi;

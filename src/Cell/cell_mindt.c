@@ -31,14 +31,14 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim, struct G
     cf2 += b2;
   }
   double maxv = sqrt(cf2) + sqrt( vr*vr + vp*vp + vz*vz );
-  // BH's moving on Grid                              
+    // BH's moving on Grid                              
   //FOR CIRC ORBIT case vr is 0 but really is moving in r - put vr ~ dL/dt/(M r Omega) = Fp/(M Omega) here?
   if (sim_GravMassType(theSim)==LIVEBINARY){
     double Om    = gravMass_omega(theGravMasses,0);
     double rBH0  = gravMass_r(theGravMasses,0);
     double rBH1  = gravMass_r(theGravMasses,1);
-    double vrBH0   = 0.0;//gravMass_Fp(theGravMasses,0)/( gravMass_M(theGravMasses,0) * Om );
-    double vrBH1   = 0.0;//gravMass_Fp(theGravMasses,1)/( gravMass_M(theGravMasses,1) * Om );
+    double vrBH1 = 2.*gravMass_total_torque(theGravMasses,0)/( gravMass_M(theGravMasses,1) * Om * rBH1); //approx for small mass ratio
+    //double vrBH0   = 0.0;//gravMass_Fp(theGravMasses,1)/( gravMass_M(theGravMasses,1) * Om );
     //double vrBH0 = gravMass_vr(theGravMasses,0);
     //double vrBH1 = gravMass_vr(theGravMasses,1);
     double vpBH0;
@@ -56,8 +56,8 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim, struct G
       //printf("MaxVel=BHvel");
       maxv = maxvBH;
     }
-
-  }
+  
+  } 
 
   if (sim_runtype(theSim)==MHD){
     double ch = sim_DIVB_CH(theSim); 

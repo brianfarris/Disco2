@@ -162,7 +162,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double Omega = gravMass_omega(theGravMasses,1); //DD: changed from double Omega = 1.
 	  double q = sim_MassRatio(theSim);       // Added Mass ratio DD 
           double t = timestep_get_t(theTimeStep);
-          double eps1 = sim_G_EPS(theSim);
+          double eps = sim_G_EPS(theSim);
           //double abhbin = sqrt(r_bh0*r_bh0 + r_bh1*r_bh1 - 2.*r_bh0*r_bh1*cos(phi_bh1-phi_bh0)); //Added abhbin DD
 	  double abhbin = r_bh0 + r_bh1;
 	  double Rhill = abhbin * pow((q/3.),(1./3.)); //DD; Secondary Hill sphere
@@ -172,7 +172,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 
           // NOTE THIS IS THE derivative of the potential (add a -1/r for the force)                                                  
           double dPhi_dphi  =  abhbin*r/((1.+q)*(1.+1./q))*sin(phi-phi_bh0) * 
-	    ( pow( (eps1*eps1 + dist_bh0*dist_bh0),-1.5)- pow( (eps1*eps1 + dist_bh1*dist_bh1) ,-1.5) ) ;
+	    ( pow( (eps*eps + dist_bh0*dist_bh0),-1.5)- pow( (eps*eps + dist_bh1*dist_bh1) ,-1.5) ) ;
           //above DD: for general q - entire binary
           
 
@@ -247,7 +247,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (GradPsi_r/sim_N_p(theSim,i)*dz) ; 
 	  // Don't count torques within a certain radius from secondary add r and 2pi for integration
 	  if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
-	    if (dist_bh1 > Rcut*Rhill && r>0.05){ //add 2pi to Trq to not azi average - see Scalar int below
+	    if (dist_bh1 > Rcut*Rhill && dist_bh0 > Rcut*Rhill){ //add 2pi to Trq to not azi average - see Scalar int below
 	      VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz); 
 	    //positive gives torque ON binary                 
 	      TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz);//2pi/Nphi = dphi
@@ -326,7 +326,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
         ScalarDiag_reduce[n] *= dtout/((ZMAX-ZMIN)*(RMAX*RMAX-RMIN*RMIN));
       }else if(n==16){
         ScalarDiag_reduce[n] *= dtout/(ZMAX-ZMIN);
-	TrScal_reduce        *= 1./(ZMAX-ZMIN);                 
+	//TrScal_reduce        *= 1./(ZMAX-ZMIN);   don't volume average sigma = int{rho * dz}             
       }
     }
 
@@ -369,19 +369,22 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     double phi_bh0 = gravMass_phi(theGravMasses,0);
     double phi_bh1 = gravMass_phi(theGravMasses,1);
 
-    double L0 = gravMass_L(theGravMasses,0); //inital primary L now -DD
-    double L1 = gravMass_L(theGravMasses,1); 
+    double Ltot = gravMass_Ltot(theGravMasses,1); //
+    // double L1 = gravMass_L(theGravMasses,1); 
     double M0 = gravMass_M(theGravMasses,0);
     double M1 = gravMass_M(theGravMasses,1);
     double E  = gravMass_E(theGravMasses,1);
     double Om = gravMass_omega(theGravMasses,1);
 
-    double vr0 = gravMass_vr(theGravMasses,0);
-    double vr1 = gravMass_vr(theGravMasses,1);
+    //double vr0 = gravMass_vr(theGravMasses,0);
+    //double vr1 = gravMass_vr(theGravMasses,1);
 
-    double Fr1 = gravMass_Fr(theGravMasses,1);
-    double Fp1 = gravMass_Fp(theGravMasses,1);
-    double sim_trq = gravMass_total_torque(theGravMasses,1);
+    double Mdotp = gravMass_Mdot(theGravMasses,0);
+    double Maccp = gravMass_Macc(theGravMasses,0);
+    double Mdots = gravMass_Mdot(theGravMasses,1);
+    double Maccs = gravMass_Macc(theGravMasses,1);
+
+    double sim_trq = gravMass_total_torque(theGravMasses,0);
     //If CM of binary strays from r=0, then phi1-phi0 != pi                     
     //double a_bin = sqrt(r_bh0*r_bh0 + r_bh1*r_bh1 - 2.*r_bh0*r_bh1*cos(phi_bh1-phi_bh0));
     double a_bin = r_bh0+r_bh1;
@@ -392,7 +395,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagBPFilename[256];
       sprintf(DiagBPFilename,"BinaryParams.dat");
       FILE * DiagBpFile = fopen(DiagBPFilename,"a");
-      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, L0, L1, vr0, Om, Fr1, sim_trq, TrScal_reduce);
+      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Mdotp, Maccp, Om, Om, sim_trq, TrScal_reduce, Mdots, Maccs);
       fclose(DiagBpFile);
     }
     //----------------ADDED above DD-------------------------//                                                                                                                
