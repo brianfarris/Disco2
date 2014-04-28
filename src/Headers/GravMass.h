@@ -59,11 +59,11 @@ double gravMass_vr(struct GravMass * ,int );
 double gravMass_Fr(struct GravMass * ,int);
 double gravMass_Fp(struct GravMass * ,int );
 //set Data
-void GravMass_set_Fr( struct GravMass *, int, double);
-void GravMass_set_Fp( struct GravMass *, int, double);
+//void GravMass_set_Fr( struct GravMass *, int, double);
+//void GravMass_set_Fp( struct GravMass *, int, double);
 void GravMass_set_omega( struct GravMass *, int, double);
 void GravMass_set_Ltot( struct GravMass *, int, double);
-void GravMass_set_L( struct GravMass *, int, double);
+//void GravMass_set_L( struct GravMass *, int, double);
 //miscellaneous
 void gravMass_clean_pi(struct GravMass *,struct Sim *);
 void gravMass_copy(struct GravMass *,struct Sim *);

@@ -247,7 +247,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (GradPsi_r/sim_N_p(theSim,i)*dz) ; 
 	  // Don't count torques within a certain radius from secondary add r and 2pi for integration
 	  if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
-	    if (dist_bh1 > Rcut*Rhill && dist_bh0 > Rcut*Rhill){ //add 2pi to Trq to not azi average - see Scalar int below
+	    if (dist_bh1 > Rcut*Rhill && dist_bh0 > 0.06){ //add 2pi to Trq to not azi average - see Scalar int below
 	      VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz); 
 	    //positive gives torque ON binary                 
 	      TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz);//2pi/Nphi = dphi

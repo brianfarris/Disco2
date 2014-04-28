@@ -23,6 +23,8 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	double M1 = Mtotal/(1.+1./massratio);
 	double r0 = sep*M1/Mtotal;
 	double r1 = sep*M0/Mtotal;
+	double phi0 = 0.0;
+	double phi1 = M_PI; 
 	double eps0 = sim_G_EPS(theSim) * r0;
         double eps1 = sim_G_EPS(theSim) * r1;	
 
@@ -53,6 +55,7 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	//}else{
 	//	cs = sqrt(1./r)/Mach;
 	//}
+	
 	double xbh0 = r0;
 	double xbh1 = -r1;
 	double ybh0 = 0.0;
@@ -71,59 +74,75 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	double cs0,cs1;
         double PoRho0,PoRho1,PoRho;
         double vp0,vp1;
-        if (dist_bh0>0.05){
+	if (dist_bh0>0.05){
 	  vp0 = pow(dist_bh0,-0.5) * sqrt(M0) ;
 	  cs0 = HoR*vp0;
-	  PoRho0 = cs0*cs0/sim_GAMMALAW(theSim);
+	  PoRho0 = cs0*cs0/Gam;
         } else{
 	  vp0 = pow(0.05,-0.5);
 	  cs0 = HoR*vp0;
-	  PoRho0 = cs0*cs0/sim_GAMMALAW(theSim);
+	  PoRho0 = cs0*cs0/Gam;
 	  //PoRho = T0 * exp(-r*r/(r_a*r_a));                                                                                             
         }
         if (dist_bh1>0.05){
 	  vp1 = pow(dist_bh1,-0.5) * sqrt(M1) ;
 	  cs1 = HoR*vp1;
-	  PoRho1 = cs1*cs1/sim_GAMMALAW(theSim);
+	  PoRho1 = cs1*cs1/Gam;
         } else{
 	  vp1 = pow(0.05,-0.5);
 	  cs1 = HoR*vp1;
-	  PoRho1 = cs1*cs1/sim_GAMMALAW(theSim);
+	  PoRho1 = cs1*cs1/Gam;
 	  //PoRho = T0 * exp(-r*r/(r_a*r_a));                                                                                             
         }
 
+	/*
+	double cs0 = pow((dist_bh0*dist_bh0 + 0.05*0.05),-0.5) * sqrt(M0) * HoR;
+	double cs1 = pow((dist_bh1*dist_bh1 + 0.05*0.05),-0.5) * sqrt(M1) * HoR;
+	double PoRho0 =  cs0*cs0/Gam;
+	double PoRho1 =  cs1*cs1/Gam; 
+	  
+	*/
         PoRho = PoRho0+PoRho1;
-	///
-
+   
 				
 	double n = sim_PHI_ORDER(theSim);
 	double Pot0 = M0/pow( pow(dist_bh0,n) + pow(eps0,n) , 1./n );
 	double Pot1 = M1/pow( pow(dist_bh1,n) + pow(eps1,n) , 1./n );
 				
 
-	double omega = 1./pow(r,1.5);
+	double OmegaK = 1./pow(r,1.5);
 
-        double cs = r*omega/Mach;
-        //      double cs = pow(r,-0.5)/Mach;
+        double cs    = sqrt(PoRho*Gam);//r*omega/Mach;
+	//double scr_1 = sqrt(r1*r1 + r*r - 2.*r1*r*cos(phi1-phi));
+	//double scr_0 = sqrt(r0*r0 + r*r - 2.*r0*r*cos(phi0-phi));
+	//double drcs2 = - M0*(r-r0*cos(phi0 - phi))/pow((dist_bh0*dist_bh0 + 0.05*0.05), 1.5) - M1*(r-r1*cos(phi1 - phi))/pow((dist_bh1*dist_bh1 + 0.05*0.05), 1.5);
+
+        double drcs2 = -1./(r*r)/Mach/Mach;
 
  
 	double eps = sim_G_EPS(theSim);
         double disk_nu;
 	double dr_nu;
 	double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
+	double Omeff;
+	double dreff;
         if (sim_VISC_CONST(theSim)==1){
           disk_nu = DISK_ALPHA;
 	  dr_nu   = 0.0;
 	}else{
-          disk_nu = DISK_ALPHA*cs*cs/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
-	  dr_nu   = 0.5*DISK_ALPHA/Mach/Mach * sqrt(M0+M1) * pow(r,-0.5);
+	  Omeff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
+          disk_nu = DISK_ALPHA*cs*cs/Omeff;
+	  //dr_nu   = 0.5*DISK_ALPHA/Mach/Mach * sqrt(M0+M1) * pow(r,-0.5);
+	  //dreff = -3.*M0*(r-r0*cos(phi0 - phi))/pow((dist_bh0*dist_bh0 + 0.05*0.05), 2.5) - 3.*M1*(r-r1*cos(phi1 - phi))/pow((dist_bh1*dist_bh1 + 0.05*0.05), 2.5);	
+	  //dr_nu = DISK_ALPHA * cs*cs/Omeff * dreff;
+	  dr_nu = 0.5*DISK_ALPHA*pow(r,-0.5)/Mach/Mach;
         }
 
-
+	double omega;
 	if (massratio!=0.0){
-	  omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
+	  omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
 	}
-	double O2 = omega*omega - omega*omega/Mach/Mach/Gam; // add 1/(sigma r) * dP/dr term
+	double O2 = omega*omega + 1./2.*1/r * drcs2/Gam;    // 1/2 for rho -> sigma?- OmegaK*OmegaK/Mach/Mach/Gam; // add +1/(sigma r) * dP/dr term
 	omega = sqrt(O2);
    
 
@@ -179,6 +198,8 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
   double M1 = Mtotal/(1.+1./massratio);
   double r0 = M1/Mtotal*sep;
   double r1 = M0/Mtotal*sep;
+  double phi0 = 0.0;
+  double phi1 = M_PI;
   double eps0 = sim_G_EPS(theSim) * r0;
   double eps1 = sim_G_EPS(theSim) * r1;
 
@@ -205,17 +226,6 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
       double rp = sim_FacePos(theSim,i,R_DIR);
       double r = 0.5*(rm+rp);
 
-
-      // See below
-      //double cs;
-      //cs = pow(r,(-0.5))/Mach;
-
-//      if (r<1.){
- //       cs = 1./Mach;
-  //    }else{
-   //     cs = sqrt(1./r)/Mach;
-    //  }
-
       double xbh0 = r0;
       double xbh1 = -r1;
       double ybh0 = 0.0;
@@ -230,102 +240,92 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
         double dist_bh0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
         double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
 
-
-        ///```````````````````````````0                                                                                                         
-
+	///```````````````````````````0                                                                                                                                    
         double cs0,cs1;
         double PoRho0,PoRho1,PoRho;
         double vp0,vp1;
         if (dist_bh0>0.05){
           vp0 = pow(dist_bh0,-0.5) * sqrt(M0) ;
           cs0 = HoR*vp0;
-          PoRho0 = cs0*cs0/sim_GAMMALAW(theSim);
+          PoRho0 = cs0*cs0/Gam;
         } else{
           vp0 = pow(0.05,-0.5);
           cs0 = HoR*vp0;
-          PoRho0 = cs0*cs0/sim_GAMMALAW(theSim);
-          //PoRho = T0 * exp(-r*r/(r_a*r_a));                                                                                                   
+          PoRho0 = cs0*cs0/Gam;
+          //PoRho = T0 * exp(-r*r/(r_a*r_a));                                                                                                                              
         }
         if (dist_bh1>0.05){
           vp1 = pow(dist_bh1,-0.5) * sqrt(M1) ;
           cs1 = HoR*vp1;
-          PoRho1 = cs1*cs1/sim_GAMMALAW(theSim);
+          PoRho1 = cs1*cs1/Gam;
         } else{
           vp1 = pow(0.05,-0.5);
           cs1 = HoR*vp1;
-          PoRho1 = cs1*cs1/sim_GAMMALAW(theSim);
-          //PoRho = T0 * exp(-r*r/(r_a*r_a));                                                                                                   
+          PoRho1 = cs1*cs1/Gam;
+          //PoRho = T0 * exp(-r*r/(r_a*r_a));                                                                                                                              
         }
 
-	PoRho = PoRho0+PoRho1;
-	///  
 
+	//        double cs0 = pow((dist_bh0*dist_bh0 + 0.05*0.05),-0.5) * sqrt(M0) * HoR;
+        //double cs1 = pow((dist_bh1*dist_bh1 + 0.05*0.05),-0.5) * sqrt(M1) * HoR;
+        //double PoRho0 =  cs0*cs0/Gam;
+        //double PoRho1 =  cs1*cs1/Gam;
+
+
+        PoRho = PoRho0+PoRho1;
 
 
         double n = sim_PHI_ORDER(theSim);
         double Pot0 = M0/pow( pow(dist_bh0,n) + pow(eps0,n) , 1./n );
         double Pot1 = M1/pow( pow(dist_bh1,n) + pow(eps1,n) , 1./n );
 
-	    //---------------------------Shakura Sunyaev---------------------------//
-		  //(7.21337*10^23 (1 - 0.0129692 Sqrt[1/R])^(7/10))/R^(3/4)  From Mathematica ".nb" 
-		  // For 10^7Msun q=0.01 such that at r_sim=10 Mdisk = Msec 
-	//double f = pow(1. - 0.0129692*sqrt(1./r),1./4.);
-	double rho = rho0; //pow(r,(-3./4.)) * pow(f,(14./5.));
-        double omega = 1./pow(r,1.5);
-        double cs = r*omega/Mach;
-        //        double cs = pow(r,-0.5)/Mach; 
-	
 
-	double eps = sim_G_EPS(theSim);
+	double rho = rho0; //pow(r,(-3./4.)) * pow(f,(14./5.));
+
+        double OmegaK = 1./pow(r,1.5);
+
+        double cs    = sqrt(PoRho*Gam);//r*omega/Mach;
+	//double drcs2 = - M0*(r-r0*cos(phi0 - phi))/pow((dist_bh0*dist_bh0 + 0.05*0.05), 1.5) - M1*(r-r1*cos(phi1 - phi))/pow((dist_bh1*dist_bh1 + 0.05*0.05), 1.5);
+	double drcs2 = -1./(r*r)/Mach/Mach;
+
+
+        double eps = sim_G_EPS(theSim);
         double disk_nu;
-	double dr_nu;
+        double dr_nu;
         double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
+        double Omeff;
+        double dreff;
         if (sim_VISC_CONST(theSim)==1){
           disk_nu = DISK_ALPHA;
-	  dr_nu   = 0.0;
-	}else{
-          disk_nu = DISK_ALPHA*cs*cs/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
-          dr_nu   = 0.5*DISK_ALPHA/Mach/Mach * sqrt(M0+M1) * pow(r,-0.5);
+          dr_nu   = 0.0;
+        }else{
+          Omeff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
+          disk_nu = DISK_ALPHA*cs*cs/Omeff;
+	  // dreff = -3.*M0*(r-r0*cos(phi0 - phi))/pow((dist_bh0*dist_bh0 + 0.05*0.05), 2.5) - 3.*M1*(r-r1*cos(phi1 - phi))/pow((dist_bh1*dist_bh1 + 0.05*0.05), 2.5);
+	  //          dr_nu = DISK_ALPHA * cs*cs/Omeff * dreff;
+	  dr_nu= 0.5*DISK_ALPHA*pow(r,-0.5)/Mach/Mach;
         }
 
 
+	double omega;
+        if (massratio!=0.0){
+          omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
+        }
+        double O2 = omega*omega + 1./2.*1/r * drcs2/Gam;    // 1/2 for rho -> sigma?- OmegaK*OmegaK/Mach/Mach/Gam; // add +1/(sigma r) * dP/dr term                        
+        omega = sqrt(O2);
 
-	if (massratio!=0.0){
-	  omega *= 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio))));
-	}
-	
-	double O2 = omega*omega - omega*omega/Mach/Mach/Gam; // 1/(r Sig)* dP/dr term
-
-	omega = sqrt(O2);
 
         double vr;
-        if (DISK_ALPHA > 0.0){
+	if (DISK_ALPHA > 0.0){
           vr = -3./2.*disk_nu/r - 3.*dr_nu;
         }else{
           vr = 0.0;
         }
 
-        
-//        if (r<sep){
-//	  omega = sqrt(O2);//*pow(r,2.);
-//         vr = 0.0;
-//          //vr = scaled SS;
-//       }else{
-//          omega = sqrt(O2);
-//          vr = 0.0;
-//          //vr = scaled SS;
-//        }		  
 
-		//---------------------------Shakura Sunyaev---------------------------//
-        /* 
-        if (r<3.){
-          omega = 0.0;//pow(r,-1.5);
-        }
-        */
         if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
         
-        //double Pp = 1/20.*1/20.*rho/Gam; //cs*cs*rho/Gam * r; //mult by r to get cst P
-	//double Pp = cs*cs*rho/Gam; 
+
 	double Pp = PoRho * rho;
 
         theCells[k][i][j].prim[RHO] = rho*exp(fac*(Pot0+Pot1)/cs/cs);

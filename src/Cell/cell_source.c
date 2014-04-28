@@ -57,20 +57,21 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, 
 
   // double sink_size = fmin(Rhill, Rbondi);
   //sink_size = 0.5;
-  double sink_size = 0.75 * Rhill;
+  double sink_size = 0.5 * Rhill;
 
+  if (rho > sim_RHO_FLOOR(theSim)){
+    if (p==0){
+      if (r0<sink_size){
+	*drho_dt_sink = rho / t_visc0;
+      }
+    } else if (p==1){
+      if (r1<sink_size){
+	*drho_dt_sink = rho / t_visc1;
+      }
 
-  if (p==0){
-    if (r0<sink_size){
-      *drho_dt_sink = rho / t_visc0;
+    } else{
+      exit(1);
     }
-  } else if (p==1){
-    if (r1<sink_size){
-      *drho_dt_sink = rho / t_visc1;
-    }
-
-  } else{
-    exit(1);
   }
 }
 
@@ -237,7 +238,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( (Fr*sint+F_centrifugal_r)*vr+Fr*vz*cost + (Fp+F_euler_phi)*vp);
         if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
-	  if (r1 > Rcut*Rhill && r0 > Rcut * Rhill){
+	  if (r1 > Rcut*Rhill && r0 > 0.06){
 	    total_torque_temp += Fmp*r;
 	    //total_Fr_temp += Fr;
 	  }

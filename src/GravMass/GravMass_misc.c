@@ -220,3 +220,9 @@ void gravMass_set_Macc( struct GravMass * theGravMasses, double Macc, int p){
 void gravMass_set_total_torque( struct GravMass * theGravMasses, double total_torque, int p){
   theGravMasses[p].total_torque = total_torque;
 }
+//void GravMass_set_omega( struct GravMass * theGravMasses, int p, double Om){
+//  theGravMasses[p].omega = Om;
+//}
+//void GravMass_set_Ltot( struct GravMass * theGravMasses, int p, double Ltot){
+//  theGravMasses[p].Ltot = Ltot;
+//}

@@ -9,6 +9,7 @@
 
 
 void cell_setT( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses ){
+  double Gam = sim_GAMMALAW(theSim); //DD
   double Mtotal = 1.0;
   double sep = 1.0;
   double M0 = gravMass_M(theGravMasses,0);
@@ -77,6 +78,15 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim, struct GravMass *
                 //PoRho = T0 * exp(-r*r/(r_a*r_a)); 
 	}
 
+
+
+        PoRho = PoRho0+PoRho1;
+	
+
+        //cs0 = pow((dist_bh0*dist_bh0 + 0.05*0.05),-0.5) * sqrt(M0) * HoR;
+        //cs1 = pow((dist_bh1*dist_bh1 + 0.05*0.05),-0.5) * sqrt(M1) * HoR;
+        //PoRho0 =  cs0*cs0/Gam;
+        //PoRho1 =  cs1*cs1/Gam;
 
 
         PoRho = PoRho0+PoRho1;

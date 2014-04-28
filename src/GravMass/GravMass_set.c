@@ -5,14 +5,13 @@
 #include "../Headers/header.h"
 
 
-void GravMass_set_Fr( struct GravMass * theGravMasses, int p, double FFr){
-  theGravMasses[p].Fr = FFr;
-}
-
-void GravMass_set_Fp( struct GravMass * theGravMasses, int p, double FFp){
-  theGravMasses[p].Fp = FFp;
-}
-
+//void GravMass_set_Fr( struct GravMass * theGravMasses, int p, double FFr){
+//  theGravMasses[p].Fr = FFr;
+//}
+//
+//void GravMass_set_Fp( struct GravMass * theGravMasses, int p, double FFp){
+//  theGravMasses[p].Fp = FFp;
+//}
 void GravMass_set_omega( struct GravMass * theGravMasses, int p, double Om){
   theGravMasses[p].omega = Om;
 }
