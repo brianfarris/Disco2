@@ -1,0 +1,98 @@
+// parameter file for migrating planets April 2014
+
+//Disk and Binary ICs-------------------------------------------------------------------//
+InitialDataType         15              // 0 Flock, 1 Shear 7 MM08 10 SSmigration
+GravMassType            3               // 0 none, 1 single, 2 binary, 3 live binary
+MassRatio               0.01            //0.00000261 =  0.0209M_{Th} for Mach=20
+sep0                    1.0             // starting binary separation
+                                        //(or permanent separations if GravMassType is not 3)
+Restart                 0               //If this=1 restart using input.h5
+//--------------------------------------------------------------------------------------//
+
+//Computational Setup-------------------------------------------------------------------//
+NumR                    256                     //Radial Zones
+NumZ                    1                       //Vertical Zones
+ng                      2
+R_Min                   0.05   //was 0.05
+R_Max                   40.0
+Z_Min                   -1.0
+Z_Max                   1.0
+NP_CONST                -256
+NPCAP                   256 //aspect 1 out to >~
+aspect                  1
+
+NUM_C                   5
+NUM_N                   0
+Time_Max                628318.5307
+Num_Checkpoints         0.0
+Num_Diag_Dump           100000.0
+Num_Diag_Measure        10000000.0
+
+NoInnerBC               1               // 1 means do not apply an inner BC
+BoundTypeR              1               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZ              2               // 0 fixed, 1 outflow, 2 periodic
+ZeroPsiBndry            1
+
+Move_Cells              0           // move cels on top of w_det_a 0 FIXED, 3  Kepler, 5 MILOS
+RiemannSolver           0           // 0 hllc, 1 hll
+//--------------------------------------------------------------------------------------//
+
+//Viscosity-----------------------------------------------------------------------------//
+Explicit_Viscosity      0.1 //0.000025  // if nu cst in header.h then this should be alpha for IC 10
+ViscConst               0
+
+//Thermodynamics------------------------------------------------------------------------//
+Adiabatic_Index         1.001
+Cooling                 0   //turn cooling on if 1 
+SET_T                   1   // keep isothermal if 1
+HoR                     0.05
+//--------------------------------------------------------------------------------------//
+
+RhoSinkOn        	1      // 1 means sink
+
+
+//Trq migrate params//
+Rcut                    1.0   // Number of Hill spheres to remove around secondary in Trq calc
+Mdsk_o_Ms     		0.1   //Fraction of secondary mass in disk r<a
+tmig_on                 10000000000000.00  // time when live binary turns on (in orbits)
+tramp                   0.00  // time period after tmigon over whicih disk density turns on
+
+//GW decay params//
+OrbShrinkTscale         1000000000000000000000.0
+OrbShrinkT0		0.0
+
+
+DivB_Ch                 0.06            //Dedner divergence cleaning
+DivB_l                  0.1
+//Numerical Parameters
+CFL                     0.5
+PLM                     1.0
+
+POWELL                  1
+w_a_type                1    //move cells 1st order 0 NONE, 1 KEPLER, 3 MILOS
+Grav_2D                 1
+G_EPS                   0.005
+
+PHI_ORDER               2
+
+//Atmosphere Parameters
+Rho_Floor               0.000001 //n5
+Cs_Floor                0.0001
+Cs_Cap                  1.0
+Vel_Cap                 10.0
+
+
+runtype                 0
+
+DAMP_TIME               0.001       // Set negative to turn off
+RDAMP_INNER             0.0
+RDAMP_OUTER             36.0
+
+
+RLogScale               15.0  //13.14   // Large numbers gives uniform spacing
+ZLogScale               10000.0
+HiResSigma              2.0    // SET IN sim_set.c
+HiResR0a                0.99    //SET IN sim_set.c
+HiResR0b		0.0099
+HiResFac                3.0 //changes by factor of 1+HiResFac at r0.
+
