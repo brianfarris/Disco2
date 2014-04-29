@@ -157,12 +157,15 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 double M = sim_GravM(theSim);
 
                 double temp = Pp/rho;
-                double height = sqrt(P*r*r*r*(1-3*M/r)/(rho*M));
-
-                cool = sim_CoolFac(theSim) * pow(temp,7.5) / (rho*rho*height);
+                double height = sqrt(Pp*r*r*r*(1-3*M/r)/(rhoh*M));
+                
+                //free-free cooling
+                //cool = sim_CoolFac(theSim) * pow(temp,7.5) / (rho*rho*height);
+                //electron scatter cooling
+                cool = sim_CoolFac(theSim) * pow(temp,4) / (rho);
 
                 cs2 = GAMMALAW*Pp / rhoh;
-                alpha *= Pp * (1-2*M/r) / sqrt(1-3*M/r);
+                alpha *= sqrt(cs2) * height;
 
                 dv[0] = cell_gradr(c, URR);  dv[1] = cell_gradr(c, UPP);  dv[2] = cell_gradr(c, UZZ);
                 dv[3] = cell_gradp(c, URR);  dv[4] = cell_gradp(c, UPP);  dv[5] = cell_gradp(c, UZZ);
@@ -187,7 +190,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 metric_shear_uu(g, u, du, visc);
             
                 for(mu=0; mu<16; mu++)
-                    visc[mu] *= alpha;
+                    visc[mu] *= -alpha;
                 for(mu=0; mu<4; mu++)
                     for(nu=0; nu<4; nu++)
                         for(la=0; la<4; la++)

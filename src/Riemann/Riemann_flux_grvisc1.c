@@ -12,7 +12,7 @@
 void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
 {
     int i,j,k,dir;
-    double a, sqrtg, du0, hn, cs2, rhoh, visc;
+    double a, sqrtg, du0, hn, cs2, rhoh, visc, height, r;
     double v[3], dv[9], b[3], u[4], du[16], shear[16];
     
     double alpha = sim_AlphaVisc(theSim);
@@ -23,6 +23,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     double *F = (double *)malloc(NUMQ * sizeof(double));
     struct Metric *g = metric_create(time_global, theRiemann->pos[R_DIR], theRiemann->pos[P_DIR], theRiemann->pos[Z_DIR], theSim);
 
+    r = theRiemann->pos[R_DIR];
     for(i=0; i<NUMQ; i++)
         prim[i] = 0.5*(theRiemann->primL[i] + theRiemann->primR[i]);
 
@@ -44,7 +45,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     a = metric_lapse(g);
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g, i);
-    sqrtg = metric_sqrtgamma(g)/theRiemann->pos[R_DIR];
+    sqrtg = metric_sqrtgamma(g)/r;
 
     u[0] = 1.0/sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
     for(i=0; i<3; i++)
@@ -72,7 +73,8 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     //TODO: CHECK THIS!  Probably not relativistic and/or isothermal.
     rhoh = prim[RHO] + GAMMA*prim[PPP]/(GAMMA-1.0);
     cs2 = GAMMA*prim[PPP] / rhoh;
-    visc = alpha * prim[PPP] * (1-2*M/theRiemann->pos[R_DIR]) / sqrt(1-3*M/theRiemann->pos[R_DIR]);
+    height = sqrt(prim[PPP]*r*r*r*(1-3*M/r)/(rhoh*M));
+    visc = -alpha * sqrt(cs2) * height;
 
     for(i=0; i<3; i++)
         if(theRiemann->n[i] == 1)
