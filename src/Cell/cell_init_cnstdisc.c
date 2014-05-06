@@ -8,8 +8,8 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-// Shakura-Sunyaev Disc
-void cell_single_init_ssdisc(struct Cell *theCell, struct Sim *theSim,int i,int j,int k)
+// Constant Density Disc
+void cell_single_init_cnstdisc(struct Cell *theCell, struct Sim *theSim,int i,int j,int k)
 {
     double rho, Pp, vr, vp;
     double GAMMALAW = sim_GAMMALAW(theSim);
@@ -27,14 +27,26 @@ void cell_single_init_ssdisc(struct Cell *theCell, struct Sim *theSim,int i,int 
     double z = 0.5*(zm+zp);
     double t = theCell->tiph-.5*theCell->dphi;
 
-    double rho0 = 2.0/3.0 * sqrt(q0/alpha) * pow(GAMMALAW,0.25) * pow(R0*R0*R0/M,0.25) * pow(cs20,1.5);
-    double P0 = cs20 * rho0;
-    double vr0 = 1.5 * alpha * sqrt(GAMMALAW*R0/M) * P0/rho0;
+    double rho0, P0, vr0;
 
-    rho = rho0 * pow(r/R0, -0.6);
-    Pp = P0 * pow(r/R0, -1.5);
-    vr = -vr0 * pow(r/R0, -0.3); 
-    vp = sqrt(M/(r*r*r));
+    if(sim_Background(theSim) == GRVISC1)
+    {
+        rho0 = sqrt(8.0*R0*R0*q0/(3.0*M*alpha)) * pow(GAMMALAW,-0.25) * pow(cs20,3.5);
+        P0 = cs20 * rho0;
+        vr0 = -1.5 * alpha * sqrt(GAMMALAW*P0/rho0);
+        
+        rho = rho0;
+        Pp = P0 * pow(r/R0,-0.75);
+        vr = vr0 * R0/r;
+        vp = sqrt(M/(r*r*r));
+    }
+    else
+    {
+        rho = R0;
+        Pp = R0 * cs20;
+        vr = 0.0; 
+        vp = sqrt(M/(r*r*r));
+    }
 
     theCell->prim[RHO] = rho;
     theCell->prim[PPP] = Pp;
@@ -49,7 +61,7 @@ void cell_single_init_ssdisc(struct Cell *theCell, struct Sim *theSim,int i,int 
   //if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = Qq;
 }
 
-void cell_init_ssdisc(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup)
+void cell_init_cnstdisc(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup)
 {
 
     double rho, Pp, vr, vp;
@@ -60,9 +72,13 @@ void cell_init_ssdisc(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
     double alpha = sim_AlphaVisc(theSim);
     double q0 = sim_CoolFac(theSim);
 
-    double rho0 = 2.0/3.0 * sqrt(q0/alpha) * pow(GAMMALAW,0.25) * pow(R0*R0*R0/M,0.25) * pow(cs20,1.5);
-    double P0 = cs20 * rho0;
-    double vr0 = 1.5 * alpha * sqrt(GAMMALAW*R0/M) * P0/rho0;
+    double rho0, P0, vr0;
+    if(sim_Background(theSim) == GRVISC1)
+    {
+        rho0 = sqrt(8.0*R0*R0*q0/(3.0*M*alpha)) * pow(GAMMALAW,-0.25) * pow(cs20,3.5);
+        P0 = cs20 * rho0;
+        vr0 = -1.5 * alpha * sqrt(GAMMALAW*P0/rho0);
+    }
     
     int i, j, k;
     for (k = 0; k < sim_N(theSim,Z_DIR); k++) 
@@ -76,11 +92,21 @@ void cell_init_ssdisc(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
             double rm = sim_FacePos(theSim,i-1,R_DIR);
             double rp = sim_FacePos(theSim,i,R_DIR);
             double r = 0.5*(rm+rp);
-
-            rho = rho0 * pow(r/R0, -0.6);
-            Pp = P0 * pow(r/R0, -1.5);
-            vr = -vr0 * pow(r/R0, -0.3); 
-            vp = sqrt(M/(r*r*r));
+         
+            if(sim_Background(theSim) == GRVISC1)
+            {
+                rho = rho0;
+                Pp = P0 * pow(r/R0,-0.75);
+                vr = vr0 * R0/r;
+                vp = sqrt(M/(r*r*r));
+            }
+            else
+            {
+                rho = R0;
+                Pp = R0 * cs20;
+                vr = 0.0; 
+                vp = sqrt(M/(r*r*r));
+            }
 
             if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
             {

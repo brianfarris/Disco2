@@ -215,10 +215,10 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     {
         double cons2[sim_NUM_Q(theSim)];
         cell_prim2cons(prim,cons2,pos,dV,theSim);
-        printf("cons2prim: r=%lg, dV = %lg\n", r, dV);
-        printf("cons: rhostar=%lg, Sr=%lg, Sp=%lg, tau=%lg\n", cons[DDD],cons[SRR],cons[LLL],cons[TAU]);
-        printf("prim: rho=%lg, vr=%lg, vp=%lg, P=%lg\n", prim[RHO],prim[URR],prim[UPP],prim[PPP]);
-        printf("cons2: rhostar=%lg, Sr=%lg, Sp=%lg, tau=%lg\n", cons2[DDD],cons2[SRR],cons2[LLL],cons2[TAU]);
+        printf("cons2prim: r=%.12g, dV = %.12g\n", r, dV);
+        printf("cons: rhostar=%.12g, Sr=%.12g, Sp=%.12g, tau=%.12g\n", cons[DDD],cons[SRR],cons[LLL],cons[TAU]);
+        printf("prim: rho=%.12g, vr=%.12g, vp=%.12g, P=%.12g\n", prim[RHO],prim[URR],prim[UPP],prim[PPP]);
+        printf("cons2: rhostar=%.12g, Sr=%.12g, Sp=%.12g, tau=%.12g\n", cons2[DDD],cons2[SRR],cons2[LLL],cons2[TAU]);
     }
 }
 

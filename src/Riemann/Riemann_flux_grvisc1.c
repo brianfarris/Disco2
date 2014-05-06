@@ -74,7 +74,10 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     rhoh = prim[RHO] + GAMMA*prim[PPP]/(GAMMA-1.0);
     cs2 = GAMMA*prim[PPP] / rhoh;
     height = sqrt(prim[PPP]*r*r*r*(1-3*M/r)/(rhoh*M));
-    visc = -alpha * sqrt(cs2) * height;
+    if(alpha > 0)
+        visc = alpha * sqrt(cs2) * height;
+    else
+        visc = -alpha;
 
     for(i=0; i<3; i++)
         if(theRiemann->n[i] == 1)
@@ -94,10 +97,10 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
         F[LLL] += metric_g_dd(g,i,2)*shear[4*(dir+1)+i];
         F[SZZ] += metric_g_dd(g,i,3)*shear[4*(dir+1)+i];
     }
-    F[SRR] *= a*sqrtg*hn * visc;
-    F[LLL] *= a*sqrtg*hn * visc;
-    F[SZZ] *= a*sqrtg*hn * visc;
-    F[TAU] = a*a*sqrtg*hn * visc * shear[dir+1];
+    F[SRR] *= -a*sqrtg*hn * visc;
+    F[LLL] *= -a*sqrtg*hn * visc;
+    F[SZZ] *= -a*sqrtg*hn * visc;
+    F[TAU] = -a*a*sqrtg*hn * visc * shear[dir+1];
 
     theRiemann->F[SRR] += F[SRR];
     theRiemann->F[LLL] += F[LLL];
