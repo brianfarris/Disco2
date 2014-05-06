@@ -69,7 +69,7 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 				
 	double dist_bh0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
 	double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
-
+	/*
 	///```````````````````````````0
 	double cs0,cs1;
         double PoRho0,PoRho1,PoRho;
@@ -102,7 +102,8 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	double PoRho1 =  cs1*cs1/Gam; 
 	  
 	*/
-        PoRho = PoRho0+PoRho1;
+
+        //PoRho = PoRho0+PoRho1;
    
 				
 	double n = sim_PHI_ORDER(theSim);
@@ -112,11 +113,12 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 
 	double OmegaK = 1./pow(r,1.5);
 
-        double cs    = sqrt(PoRho*Gam);//r*omega/Mach;
+        //double cs    = sqrt(PoRho*Gam);//r*omega/Mach;
 	//double scr_1 = sqrt(r1*r1 + r*r - 2.*r1*r*cos(phi1-phi));
 	//double scr_0 = sqrt(r0*r0 + r*r - 2.*r0*r*cos(phi0-phi));
 	//double drcs2 = - M0*(r-r0*cos(phi0 - phi))/pow((dist_bh0*dist_bh0 + 0.05*0.05), 1.5) - M1*(r-r1*cos(phi1 - phi))/pow((dist_bh1*dist_bh1 + 0.05*0.05), 1.5);
 
+	double cs = r*OmegaK/Mach;
         double drcs2 = -1./(r*r)/Mach/Mach;
 
  
@@ -139,9 +141,9 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
         }
 
 	double omega;
-	if (massratio!=0.0){
-	  omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
-	}
+	//if (massratio!=0.0){
+        omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
+	//}
 	double O2 = omega*omega + 1./2.*1/r * drcs2/Gam;    // 1/2 for rho -> sigma?- OmegaK*OmegaK/Mach/Mach/Gam; // add +1/(sigma r) * dP/dr term
 	omega = sqrt(O2);
    
@@ -166,8 +168,8 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
 				
 	//double Pp = 1./20.*1./20.*rho/Gam; //cs*cs*rho/Gam * r;	//mult by r to get cst Pressure
-	//double Pp = cs*cs*rho/Gam;
-	double Pp = PoRho * rho;
+	double Pp = cs*cs*rho/Gam;
+	//double Pp = PoRho * rho;
 
 
 	theCell->prim[RHO] = rho*exp(fac*(Pot0+Pot1)/cs/cs);
@@ -239,7 +241,7 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 
         double dist_bh0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
         double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
-
+	/*
 	///```````````````````````````0                                                                                                                                    
         double cs0,cs1;
         double PoRho0,PoRho1,PoRho;
@@ -270,9 +272,9 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
         //double cs1 = pow((dist_bh1*dist_bh1 + 0.05*0.05),-0.5) * sqrt(M1) * HoR;
         //double PoRho0 =  cs0*cs0/Gam;
         //double PoRho1 =  cs1*cs1/Gam;
+	*/
 
-
-        PoRho = PoRho0+PoRho1;
+        //PoRho = PoRho0+PoRho1;
 
 
         double n = sim_PHI_ORDER(theSim);
@@ -284,8 +286,11 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 
         double OmegaK = 1./pow(r,1.5);
 
-        double cs    = sqrt(PoRho*Gam);//r*omega/Mach;
-	//double drcs2 = - M0*(r-r0*cos(phi0 - phi))/pow((dist_bh0*dist_bh0 + 0.05*0.05), 1.5) - M1*(r-r1*cos(phi1 - phi))/pow((dist_bh1*dist_bh1 + 0.05*0.05), 1.5);
+        //double cs    = sqrt(PoRho*Gam);//r*omega/Mach;
+	//double drcs2 = - M0*(r-r0*cos(phi0 - phi))/pow((dist_bh0*dist_bh0 + 0.05*0.05), 1.5) - 
+	//M1*(r-r1*cos(phi1 - phi))/pow((dist_bh1*dist_bh1 + 0.05*0.05), 1.5);
+	
+	double cs = r*OmegaK/Mach;
 	double drcs2 = -1./(r*r)/Mach/Mach;
 
 
@@ -308,9 +313,9 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 
 
 	double omega;
-        if (massratio!=0.0){
-          omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
-        }
+        //if (massratio!=0.0){
+        omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
+	//}
         double O2 = omega*omega + 1./2.*1/r * drcs2/Gam;    // 1/2 for rho -> sigma?- OmegaK*OmegaK/Mach/Mach/Gam; // add +1/(sigma r) * dP/dr term                        
         omega = sqrt(O2);
 
@@ -325,8 +330,8 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 
         if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
         
-
-	double Pp = PoRho * rho;
+	double Pp = cs*cs * rho/Gam;
+	//double Pp = PoRho * rho;
 
         theCells[k][i][j].prim[RHO] = rho*exp(fac*(Pot0+Pot1)/cs/cs);
         theCells[k][i][j].prim[PPP] = Pp*exp(fac*(Pot0+Pot1)/cs/cs);

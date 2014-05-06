@@ -60,19 +60,19 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     double TrScal_reduce = 0.0;
 
     double mass_near_bh0_r0p1_temp = 0.0;
-    double mass_near_bh1_r0p1_temp = 0.0;
+    double mass_near_bh1_0p5RH_temp = 0.0;
     double mass_near_bh0_r0p1_reduce = 0.0;
-    double mass_near_bh1_r0p1_reduce = 0.0;
+    double mass_near_bh1_0p5RH_reduce = 0.0;
 
     double mass_near_bh0_r0p2_temp = 0.0;
-    double mass_near_bh1_r0p2_temp = 0.0;
+    double mass_near_bh1_RH_temp = 0.0;
     double mass_near_bh0_r0p2_reduce = 0.0;
-    double mass_near_bh1_r0p2_reduce = 0.0;
+    double mass_near_bh1_RH_reduce = 0.0;
 
     double mass_near_bh0_r0p4_temp = 0.0;
-    double mass_near_bh1_r0p4_temp = 0.0;
+    double mass_near_bh1_2RH_temp = 0.0;
     double mass_near_bh0_r0p4_reduce = 0.0;
-    double mass_near_bh1_r0p4_reduce = 0.0;
+    double mass_near_bh1_2RH_reduce = 0.0;
 
 
     double dtout = timestep_get_t(theTimeStep)-theDiagnostics->toutprev;
@@ -174,33 +174,40 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double dPhi_dphi  =  abhbin*r/((1.+q)*(1.+1./q))*sin(phi-phi_bh0) * 
 	    ( pow( (eps*eps + dist_bh0*dist_bh0),-1.5)- pow( (eps*eps + dist_bh1*dist_bh1) ,-1.5) ) ;
           //above DD: for general q - entire binary
-          
+          double dPhi_dphi_s  =  -abhbin*r/((1.+q)*(1.+1./q))*sin(phi-phi_bh0) *
+            (pow( (eps*eps + dist_bh1*dist_bh1) ,-1.5) ) ;
+	  // above for secondary only
+          //Now get the angel between phi direction and the lever arm to teh secondary to get torque only on secondary
+	  double Cos_alph = (2.*r*r - 2.*r*abhbin/(1.+q) * cos(phi_bh1-phi))/dist_bh1;
+	  double Sin_alph = sin(acos(Cos_alph));
+
+
 
           if (dist_bh0<0.1){
             double dM = rho*dV;
             mass_near_bh0_r0p1_temp +=dM;
           }
-          if (dist_bh1<0.1){
+          if (dist_bh1<0.5*Rhill){
             double dM = rho*dV;
-            mass_near_bh1_r0p1_temp +=dM;
+            mass_near_bh1_0p5RH_temp +=dM;
           }
 
           if (dist_bh0<0.2){
             double dM = rho*dV;
             mass_near_bh0_r0p2_temp +=dM;
           }
-          if (dist_bh1<0.2){
+          if (dist_bh1<Rhill){
             double dM = rho*dV;
-            mass_near_bh1_r0p2_temp +=dM;
+            mass_near_bh1_RH_temp +=dM;
           }
 
           if (dist_bh0<0.4){
             double dM = rho*dV;
             mass_near_bh0_r0p4_temp +=dM;
           }
-          if (dist_bh1<0.4){
+          if (dist_bh1<2.*Rhill){
             double dM = rho*dV;
-            mass_near_bh1_r0p4_temp +=dM;
+            mass_near_bh1_2RH_temp +=dM;
           }
 
 
@@ -221,7 +228,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = rhoe;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+13] = 0.5*B2;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = Br*Bp;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = divB;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = dist_bh1*rho*dPhi_dphi/r * Sin_alph; //divB;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+16] = 180./M_PI*0.5*asin(-Br*Bp/(0.5*B2));
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+17] = GradPsi_r;
 	    EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+18] = r*rho*dPhi_dphi/r; //DDwas 12
@@ -301,13 +308,13 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     MPI_Allreduce( &TrScal_temp, &TrScal_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm); //DD
 
     MPI_Allreduce( &mass_near_bh0_r0p1_temp,&mass_near_bh0_r0p1_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
-    MPI_Allreduce( &mass_near_bh1_r0p1_temp,&mass_near_bh1_r0p1_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
+    MPI_Allreduce( &mass_near_bh1_0p5RH_temp, &mass_near_bh1_0p5RH_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
 
     MPI_Allreduce( &mass_near_bh0_r0p2_temp,&mass_near_bh0_r0p2_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
-    MPI_Allreduce( &mass_near_bh1_r0p2_temp,&mass_near_bh1_r0p2_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
+    MPI_Allreduce( &mass_near_bh1_RH_temp,&mass_near_bh1_RH_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
 
     MPI_Allreduce( &mass_near_bh0_r0p4_temp,&mass_near_bh0_r0p4_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
-    MPI_Allreduce( &mass_near_bh1_r0p4_temp,&mass_near_bh1_r0p4_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
+    MPI_Allreduce( &mass_near_bh1_2RH_temp,&mass_near_bh1_2RH_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
 
     double mass_inside_1_reduce;
     MPI_Allreduce( &mass_inside_1_temp,&mass_inside_1_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
@@ -330,17 +337,47 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       }
     }
 
-
+    double r_bh1 = gravMass_r(theGravMasses,1);
     int req1_found = 0;
     double Mdot_near_req1,r_near_req1;
+    int reqs_found = 0;
+    double Mdot_near_reqs,r_near_reqs;
+    int reqOut_found = 0;
+    double Mdot_near_reqOut,r_near_reqOut;
+    int reqIn_found = 0;
+    double Mdot_near_reqIn,r_near_reqIn;
     for (i=0;i<num_r_points_global;++i){
-      double r = VectorDiag_reduce[i*NUM_VEC]/(ZMAX-ZMIN);
-      if (r>1.0 && req1_found==0){
-        Mdot_near_req1 = VectorDiag_reduce[i*NUM_VEC+5]*2.*M_PI*r/(ZMAX-ZMIN);
-        r_near_req1 = r;
+      double rr = VectorDiag_reduce[i*NUM_VEC]/(ZMAX-ZMIN);
+      if (rr>1.0 && req1_found==0){
+        Mdot_near_req1 = VectorDiag_reduce[i*NUM_VEC+8]*2.*M_PI*rr/(ZMAX-ZMIN);
+        r_near_req1 = rr;
         //printf("req1_found i: %d, r: %e\n",i,r);
         req1_found = 1;
       }
+
+      if (rr>r_bh1 && reqs_found==0){
+	Mdot_near_reqs = VectorDiag_reduce[i*NUM_VEC+8]*2.*M_PI*rr/(ZMAX-ZMIN);
+	r_near_reqs = rr;
+	//printf("req1_found i: %d, r: %e\n",i,r);                                                                                              
+	reqs_found = 1;
+      }
+      
+      if (rr>r_bh1+0.5 && reqOut_found==0){
+        Mdot_near_reqOut = VectorDiag_reduce[i*NUM_VEC+8]*2.*M_PI*rr/(ZMAX-ZMIN);
+        r_near_reqOut = rr;
+        //printf("req1_found i: %d, r: %e\n",i,r);                                                                                                 
+        reqOut_found = 1;
+      }
+
+      if ((rr>r_bh1-0.5 || rr==sim_FacePos(theSim,i-1,R_DIR)) && reqIn_found==0){
+        Mdot_near_reqIn = VectorDiag_reduce[i*NUM_VEC+8]*2.*M_PI*rr/(ZMAX-ZMIN);
+        r_near_reqIn = rr;
+        //printf("req1_found i: %d, r: %e\n",i,r); 
+        reqIn_found = 1;
+      }
+
+
+
       for (n=0;n<NUM_VEC;++n){
         VectorDiag_reduce[i*NUM_VEC+n] *= dtout/(ZMAX-ZMIN);
       }
@@ -350,7 +387,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagMdotFilename[256];
       sprintf(DiagMdotFilename,"DiagMdot.dat");
       FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
-      fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_inside_1_reduce,mass_inner_wedge_reduce,gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),gravMass_Macc(theGravMasses,0),gravMass_Macc(theGravMasses,1),mass_near_bh0_r0p2_reduce,mass_near_bh1_r0p2_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_r0p4_reduce);       
+      fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1, Mdot_near_reqs,r_near_reqs, Mdot_near_reqOut,r_near_reqOut, Mdot_near_reqIn,r_near_reqIn, mass_inside_1_reduce,mass_inner_wedge_reduce,gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),gravMass_Macc(theGravMasses,0),gravMass_Macc(theGravMasses,1),mass_near_bh0_r0p2_reduce,mass_near_bh1_RH_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_2RH_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_0p5RH_reduce);       
       fclose(DiagMdotFile);
 
       char DiagTorqueFilename[256];
@@ -365,7 +402,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     //Binary params -DD ------ ADDED below DD---------//                      
     double t = timestep_get_t(theTimeStep);
     double r_bh0 = gravMass_r(theGravMasses,0);
-    double r_bh1 = gravMass_r(theGravMasses,1);
+    //double r_bh1 = gravMass_r(theGravMasses,1);
     double phi_bh0 = gravMass_phi(theGravMasses,0);
     double phi_bh1 = gravMass_phi(theGravMasses,1);
 
@@ -379,10 +416,10 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     //double vr0 = gravMass_vr(theGravMasses,0);
     //double vr1 = gravMass_vr(theGravMasses,1);
 
-    double Mdotp = gravMass_Mdot(theGravMasses,0);
-    double Maccp = gravMass_Macc(theGravMasses,0);
-    double Mdots = gravMass_Mdot(theGravMasses,1);
-    double Maccs = gravMass_Macc(theGravMasses,1);
+    //double Mdotp = gravMass_Mdot(theGravMasses,0);
+    //double Maccp = gravMass_Macc(theGravMasses,0);
+    //double Mdots = gravMass_Mdot(theGravMasses,1);
+    //double Maccs = gravMass_Macc(theGravMasses,1);
 
     double sim_trq = gravMass_total_torque(theGravMasses,0);
     //If CM of binary strays from r=0, then phi1-phi0 != pi                     
@@ -395,7 +432,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagBPFilename[256];
       sprintf(DiagBPFilename,"BinaryParams.dat");
       FILE * DiagBpFile = fopen(DiagBPFilename,"a");
-      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Mdotp, Maccp, Om, Om, sim_trq, TrScal_reduce, Mdots, Maccs);
+      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, Om, Om, Om, sim_trq, TrScal_reduce);
       fclose(DiagBpFile);
     }
     //----------------ADDED above DD-------------------------//                                                                                                                

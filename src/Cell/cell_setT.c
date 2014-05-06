@@ -42,6 +42,8 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim, struct GravMass *
       double r = 0.5*(rm+rp);
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         struct Cell * c = &(theCells[k][i][j]);
+
+	/*
         double phi = c->tiph - 0.5*c->dphi;
         double xpos = r*cos(phi);
         double ypos = r*sin(phi);
@@ -79,8 +81,9 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim, struct GravMass *
 	}
 
 
+	*/
 
-        PoRho = PoRho0+PoRho1;
+        //PoRho = PoRho0+PoRho1;
 	
 
         //cs0 = pow((dist_bh0*dist_bh0 + 0.05*0.05),-0.5) * sqrt(M0) * HoR;
@@ -88,8 +91,9 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim, struct GravMass *
         //PoRho0 =  cs0*cs0/Gam;
         //PoRho1 =  cs1*cs1/Gam;
 
-
-        PoRho = PoRho0+PoRho1;
+	double OmegaK = pow(r,-1.5);
+	double cs = r*OmegaK*HoR;
+	double PoRho = cs*cs/Gam;
 
 
         double rho = c->prim[RHO];

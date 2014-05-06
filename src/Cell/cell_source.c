@@ -57,7 +57,11 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, 
 
   // double sink_size = fmin(Rhill, Rbondi);
   //sink_size = 0.5;
-  double sink_size = 0.5 * Rhill;
+  double sink_size = 1.0 * Rhill;
+  if (a<=0.0){
+    sink_size = 0.1;
+  }
+
 
   if (rho > sim_RHO_FLOOR(theSim)){
     if (p==0){
@@ -246,7 +250,12 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
 	if (sim_RhoSinkOn(theSim)==1){
           double drho_dt_sink;
-          int num_sinks = 2; //sim_NumGravMass(theSim);
+	  int num_sinks;
+	  if (sim_GravMassType(theSim) <= 2){
+	    num_sinks = sim_GravMassType(theSim);
+	  }else{
+	    num_sinks = 2;
+	  }
           for( p=0 ; p<num_sinks; ++p ){
             get_rho_sink( theGravMasses, theSim, p, dt, r0, r1, M0, M1, rho, Pp, &drho_dt_sink);
             c->cons[RHO] -= drho_dt_sink * dt * dV;
