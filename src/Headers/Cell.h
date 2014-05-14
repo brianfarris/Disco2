@@ -61,6 +61,8 @@ void cell_init_ntdisc(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_ntdisc(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_cnstdisc(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_cnstdisc(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_cartshear(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_cartshear(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
