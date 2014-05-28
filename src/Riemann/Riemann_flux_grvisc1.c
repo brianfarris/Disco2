@@ -13,7 +13,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
 {
     int i,j,k,dir;
     double a, sqrtg, du0, hn, cs2, rhoh, visc, height, r;
-    double v[3], dv[9], b[3], u[4], du[16], shear[16];
+    double v[3], dv[12], b[3], u[4], du[16], shear[16];
     
     double alpha = sim_AlphaVisc(theSim);
     double GAMMA = sim_GAMMALAW(theSim);
@@ -31,44 +31,72 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     v[1] = prim[UPP];
     v[2] = prim[UZZ];
 
-    //TODO: FIX THIS.  Doesn't account for misaligned zones in r/z faces.
-    dv[0] = 0.5*(cell_gradr(theRiemann->cL, URR) + cell_gradr(theRiemann->cR, URR));
-    dv[1] = 0.5*(cell_gradr(theRiemann->cL, UPP) + cell_gradr(theRiemann->cR, UPP));
-    dv[2] = 0.5*(cell_gradr(theRiemann->cL, UZZ) + cell_gradr(theRiemann->cR, UZZ));
-    dv[3] = 0.5*(cell_gradp(theRiemann->cL, URR) + cell_gradp(theRiemann->cR, URR));
-    dv[4] = 0.5*(cell_gradp(theRiemann->cL, UPP) + cell_gradp(theRiemann->cR, UPP));
-    dv[5] = 0.5*(cell_gradp(theRiemann->cL, UZZ) + cell_gradp(theRiemann->cR, UZZ));
-    dv[6] = 0.5*(cell_gradz(theRiemann->cL, URR) + cell_gradz(theRiemann->cR, URR));
-    dv[7] = 0.5*(cell_gradz(theRiemann->cL, UPP) + cell_gradz(theRiemann->cR, UPP));
-    dv[8] = 0.5*(cell_gradz(theRiemann->cL, UZZ) + cell_gradz(theRiemann->cR, UZZ));
+    for(i=0; i<3; i++)
+        if(theRiemann->n[i] == 1)
+            dir = i;
 
+    //TODO: FIX THIS.  Doesn't account for misaligned zones in r/z faces.
+    
+    dv[0] = 0.0;
+    dv[1] = 0.0;
+    dv[2] = 0.0;
+    dv[3] = 0.5*(cell_gradr(theRiemann->cL, URR) + cell_gradr(theRiemann->cR, URR));
+    dv[4] = 0.5*(cell_gradr(theRiemann->cL, UPP) + cell_gradr(theRiemann->cR, UPP));
+    dv[5] = 0.5*(cell_gradr(theRiemann->cL, UZZ) + cell_gradr(theRiemann->cR, UZZ));
+    dv[6] = 0.5*(cell_gradp(theRiemann->cL, URR) + cell_gradp(theRiemann->cR, URR));
+    dv[7] = 0.5*(cell_gradp(theRiemann->cL, UPP) + cell_gradp(theRiemann->cR, UPP));
+    dv[8] = 0.5*(cell_gradp(theRiemann->cL, UZZ) + cell_gradp(theRiemann->cR, UZZ));
+    dv[9] = 0.5*(cell_gradz(theRiemann->cL, URR) + cell_gradz(theRiemann->cR, URR));
+    dv[10] = 0.5*(cell_gradz(theRiemann->cL, UPP) + cell_gradz(theRiemann->cR, UPP));
+    dv[11] = 0.5*(cell_gradz(theRiemann->cL, UZZ) + cell_gradz(theRiemann->cR, UZZ));
+
+    if(dir == 0)
+    {
+        double idr = 1.0/(theRiemann->x_cell_R - theRiemann->x_cell_L);
+        dv[3] = idr * (theRiemann->primR[URR] - theRiemann->primL[URR]);
+        dv[4] = idr * (theRiemann->primR[UPP] - theRiemann->primL[UPP]);
+        dv[5] = idr * (theRiemann->primR[UZZ] - theRiemann->primL[UZZ]);
+    }
+    else if (dir == 1)
+    {
+        double idp = 1.0/(theRiemann->x_cell_R - theRiemann->x_cell_L);
+        dv[6] = idp * (theRiemann->primR[URR] - theRiemann->primL[URR]);
+        dv[7] = idp * (theRiemann->primR[UPP] - theRiemann->primL[UPP]);
+        dv[8] = idp * (theRiemann->primR[UZZ] - theRiemann->primL[UZZ]);
+    }
+    else
+    {
+        double idz = 1.0/(theRiemann->x_cell_R - theRiemann->x_cell_L);
+        dv[9] = idz * (theRiemann->primR[URR] - theRiemann->primL[URR]);
+        dv[10] = idz * (theRiemann->primR[UPP] - theRiemann->primL[UPP]);
+        dv[11] = idz * (theRiemann->primR[UZZ] - theRiemann->primL[UZZ]);
+    }
+
+
+    
     a = metric_lapse(g);
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g, i);
     sqrtg = metric_sqrtgamma(g)/r;
 
-    u[0] = 1.0/sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
-    for(i=0; i<3; i++)
-        u[i+1] = u[0]*v[i];
-
-    du[0] = 0; du[1] = 0; du[2] = 0; du[3] = 0;
-    for(i=1; i<4; i++)
+    metric_shear_uu(g, v, dv, shear);
+    if(PRINTTOOMUCH)
     {
-        du0 = metric_dg_dd(g,i,0,0);
-        for(j=1; j<3; j++)
+        printf("v: %.12g %.12g %.12g\n", v[0],v[1],v[2]);
+        for(i=0; i<4; i++)
         {
-            du0 += 2*v[j-1]*metric_dg_dd(g,i,0,j) + 2*metric_g_dd(g,0,j)*dv[3*(i-1)+j-1];
-            for(k=1; k<4; k++)
-                du0 += v[j-1]*v[k-1]*metric_dg_dd(g,i,j,k) + 2*metric_g_dd(g,j,k)*v[j-1]*dv[3*(i-1)+j-1];
+            printf("d%dv ",i);
+            for(j=0; j<3; j++)
+                printf("%.12g ", dv[3*i+j]);
+            printf("\n");
         }
-        du[4*i] = 0.5*u[0]*u[0]*u[0]*du0;
+        for(i=0; i<4; i++)
+        {
+            for(j=0; j<4; j++)
+                printf("%.12g ", shear[4*i+j]);
+            printf("\n");
+        }
     }
-
-    for(i=1; i<4; i++)
-        for(j=1; j<4; j++)
-            du[4*i+j] = v[j-1]*du[4*i] + u[0]*dv[3*(i-1)+j-1];
-
-    metric_shear_uu(g, u, du, shear);
 
     //TODO: CHECK THIS!  Probably not relativistic and/or isothermal.
     rhoh = prim[RHO] + GAMMA*prim[PPP]/(GAMMA-1.0);
@@ -78,10 +106,6 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
         visc = alpha * sqrt(cs2) * height;
     else
         visc = -alpha;
-
-    for(i=0; i<3; i++)
-        if(theRiemann->n[i] == 1)
-            dir = i;
 
     if(dir == 1)
         hn = theRiemann->pos[R_DIR];

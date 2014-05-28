@@ -62,6 +62,14 @@ void metric_init_metric(struct Sim *theSim)
         metric_dg_uu_exact = &metric_dg_uu_exact_schw_ks;
         metric_killing_exact = &metric_killing_exact_schw_ks;
     }
+    else if(sim_Metric(theSim) == SR_CART)
+    {
+        metric_g_dd_exact = &metric_g_dd_exact_sr_cart;
+        metric_g_uu_exact = &metric_g_uu_exact_sr_cart;
+        metric_dg_dd_exact = &metric_dg_dd_exact_sr_cart;
+        metric_dg_uu_exact = &metric_dg_uu_exact_sr_cart;
+        metric_killing_exact = &metric_killing_exact_sr_cart;
+    }
     else
     {
         printf("ERROR: Trying to initialize with an unknown metric: %d\n", sim_Metric(theSim));

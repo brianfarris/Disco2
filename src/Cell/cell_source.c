@@ -151,7 +151,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             if(sim_Background(theSim) == GRVISC1)
             {
                 double du0;
-                double dv[9], du[16];
+                double dv[12], du[16];
                 double cs2;
                 double alpha = sim_AlphaVisc(theSim);
                 double M = sim_GravM(theSim);
@@ -170,27 +170,12 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 else
                     alpha = -alpha;
 
-                dv[0] = cell_gradr(c, URR);  dv[1] = cell_gradr(c, UPP);  dv[2] = cell_gradr(c, UZZ);
-                dv[3] = cell_gradp(c, URR);  dv[4] = cell_gradp(c, UPP);  dv[5] = cell_gradp(c, UZZ);
-                dv[6] = cell_gradz(c, URR);  dv[7] = cell_gradz(c, UPP);  dv[8] = cell_gradz(c, UZZ);
+                dv[0] = 0.0;  dv[1] = 0.0;  dv[2] = 0.0;
+                dv[3] = cell_gradr(c, URR);  dv[4] = cell_gradr(c, UPP);  dv[5] = cell_gradr(c, UZZ);
+                dv[6] = cell_gradp(c, URR);  dv[7] = cell_gradp(c, UPP);  dv[8] = cell_gradp(c, UZZ);
+                dv[9] = cell_gradz(c, URR);  dv[10] = cell_gradz(c, UPP);  dv[11] = cell_gradz(c, UZZ);
                 
-                du[0] = 0; du[1] = 0; du[2] = 0; du[3] = 0;
-                for(mu=1; mu<4; mu++)
-                {
-                    du0 = metric_dg_dd(g,mu,0,0);
-                    for(nu=1; nu<4; nu++)
-                    {
-                        du0 += 2*v[nu-1]*metric_dg_dd(g,mu,0,nu) + 2*metric_g_dd(g,0,nu)*dv[3*(mu-1)+nu-1];
-                        for(la=1; la<4; la++)
-                            du0 += v[nu-1]*v[la-1]*metric_dg_dd(g,mu,nu,la) + 2*metric_g_dd(g,nu,la)*v[nu-1]*dv[3*(mu-1)+nu-1];
-                    }
-                    du[4*mu] = 0.5*u[0]*u[0]*u[0]*du0;
-                }
-                for(mu=1; mu<4; mu++)
-                    for(nu=1; nu<4; nu++)
-                        du[4*mu+nu] = v[nu-1]*du[4*mu] + u[0]*dv[3*(mu-1)*nu-1];
-                
-                metric_shear_uu(g, u, du, visc);
+                metric_shear_uu(g, v, dv, visc);
             
                 for(mu=0; mu<16; mu++)
                     visc[mu] *= -alpha;
@@ -211,7 +196,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                         //TODO: REMOVE THIS IMMEDIATELY
                         if(mu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
                             continue;
-                        sk += 0.5*(rhoh*u[mu]*u[mu]+Pp*metric_g_uu(g,mu,mu)+visc[4*mu+nu]) * metric_dg_dd(g,la,mu,mu);
+                        sk += 0.5*(rhoh*u[mu]*u[mu]+Pp*metric_g_uu(g,mu,mu)+visc[4*mu+mu]) * metric_dg_dd(g,la,mu,mu);
                         for(nu=mu+1; nu<4; nu++)
                         {
                             //TODO: REMOVE THIS IMMEDIATELY
@@ -235,6 +220,10 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                     else if(la == 3)
                     {
                         c->cons[SZZ] += dt*dV*sqrtg*a * sk;
+                        if(PRINTTOOMUCH)
+                        {
+                            printf("SZZ source: (%d,%d,%d): r=%.12f, dV=%.12f, s = %.12f, S = %.12f\n",i,j,k,r,dV,a*sqrtg*sk,dt*dV*sqrtg*a * sk);
+                        }
                     }
                     //TODO: REMOVE THIS IMMEDIATELY
                     if(la == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)

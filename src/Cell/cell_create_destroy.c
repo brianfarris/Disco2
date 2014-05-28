@@ -24,7 +24,7 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
   int NUM_Q = sim_NUM_Q(theSim);
   //count up the total number of cells
   int Ncells=0;
-  int i,j,k;
+  int i,j,k,q;
   for (k=0; k<sim_N(theSim,Z_DIR); k++) {
     for (i=0; i<sim_N(theSim,R_DIR);i++){
       for(j = 0; j < sim_N_p(theSim,i); j++){
@@ -70,21 +70,15 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
       double dphi = 2.*M_PI/(double)sim_N_p(theSim,i);
       for(j = 0; j < sim_N_p(theSim,i); j++){
         double tiph = tiph_0 + (double)j*dphi;
-        theCells[k][i][j].prim[RHO] = 0.0;
-        theCells[k][i][j].prim[PPP] = 0.0;
-        theCells[k][i][j].prim[URR] = 0.0;
-        theCells[k][i][j].prim[UPP] = 0.0;
-        theCells[k][i][j].prim[UZZ] = 0.0;
-        theCells[k][i][j].cons[DDD] = 0.0;
-        theCells[k][i][j].cons[TAU] = 0.0;
-        theCells[k][i][j].cons[SRR] = 0.0;
-        theCells[k][i][j].cons[LLL] = 0.0;
-        theCells[k][i][j].cons[SZZ] = 0.0;
-        theCells[k][i][j].RKcons[DDD] = 0.0;
-        theCells[k][i][j].RKcons[TAU] = 0.0;
-        theCells[k][i][j].RKcons[SRR] = 0.0;
-        theCells[k][i][j].RKcons[LLL] = 0.0;
-        theCells[k][i][j].RKcons[SZZ] = 0.0;
+        for(q=0; q < NUM_Q; q++)
+        {
+            theCells[k][i][j].prim[q] = 0.0;
+            theCells[k][i][j].cons[q] = 0.0;
+            theCells[k][i][j].RKcons[q] = 0.0;
+            theCells[k][i][j].gradr[q] = 0.0;
+            theCells[k][i][j].gradp[q] = 0.0;
+            theCells[k][i][j].gradz[q] = 0.0;
+        }
         theCells[k][i][j].wiph = 0.0;
         theCells[k][i][j].tiph = tiph;
         theCells[k][i][j].RKtiph = tiph;

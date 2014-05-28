@@ -12,6 +12,8 @@ struct Riemann {
   double pos[3];
   double r_cell_L;
   double r_cell_R;
+  double x_cell_L;
+  double x_cell_R;
   double dA;
   double cm;
   double *primL;

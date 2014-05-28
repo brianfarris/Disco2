@@ -13,6 +13,7 @@ void cell_single_init_cartshear(struct Cell *theCell, struct Sim *theSim,int i,i
 {
     double rho, Pp, vr, vp;
     double GAMMALAW = sim_GAMMALAW(theSim);
+    int geom = sim_InitPar0(theSim);
     double v0 = sim_InitPar1(theSim);
     double cs20 = sim_InitPar2(theSim);
     double t0 = sim_InitPar3(theSim);
@@ -29,13 +30,25 @@ void cell_single_init_cartshear(struct Cell *theCell, struct Sim *theSim,int i,i
 
     double rho0 = 1.0;
     double P0 = cs20 * rho0;
-    double dx = r * cos(t) - x0;
+    double dx;
+    if(geom == 0)
+        dx = r * cos(t) - x0;
+    else
+        dx = r - x0;
     double vy = v0 * exp(-dx*dx/(4.0*alpha*t0)) / sqrt(4.0*M_PI*alpha*t0);
 
     rho = rho0;
     Pp = P0;
-    vr = vy * sin(t); 
-    vp = vy * cos(t) / r;
+    if(geom == 0)
+    {
+        vr = vy * sin(t); 
+        vp = vy * cos(t) / r;
+    }
+    else
+    {
+        vr = 0.0;
+        vp = vy;
+    }
 
     theCell->prim[RHO] = rho;
     theCell->prim[PPP] = Pp;
@@ -56,6 +69,7 @@ void cell_init_cartshear(struct Cell ***theCells,struct Sim *theSim,struct MPIse
     double rho, Pp, vr, vp;
     double GAMMALAW = sim_GAMMALAW(theSim);
     double M = sim_GravM(theSim);
+    int geom = sim_InitPar0(theSim);
     double v0 = sim_InitPar1(theSim);
     double cs20 = sim_InitPar2(theSim);
     double t0 = sim_InitPar3(theSim);
@@ -81,20 +95,34 @@ void cell_init_cartshear(struct Cell ***theCells,struct Sim *theSim,struct MPIse
             rho = rho0;
             Pp = P0;
 
-            if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
-            {
-                vr  = vr * (1.0-M/r) / (1.0-M/r+M/r*vr);
-                if(vr > (1.0-M/r) / (1.0+M/r))
-                    vr = 0.9 * (1.0-M/r) / (1.0+M/r) - 0.1*vr;
-            }
 
             for (j = 0; j < sim_N_p(theSim,i); j++) 
             {
                 double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
-                double dx = r*cos(t) - x0;
+                double dx;
+                if(geom == 0)
+                    dx = r * cos(t) - x0;
+                else
+                    dx = r - x0;
                 double vy = v0 * exp(-dx*dx/(4.0*alpha*t0)) / sqrt(4.0*M_PI*alpha*t0);
-                vr = vy * sin(t); 
-                vp = vy * cos(t) / r;
+
+                if(geom == 0)
+                {
+                    vr = vy * sin(t); 
+                    vp = vy * cos(t) / r;
+                }
+                else
+                {
+                    vr = 0.0;
+                    vp = vy;
+                }
+            
+                if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
+                {
+                    vr  = vr * (1.0-M/r) / (1.0-M/r+M/r*vr);
+                    if(vr > (1.0-M/r) / (1.0+M/r))
+                        vr = 0.9 * (1.0-M/r) / (1.0+M/r) - 0.1*vr;
+                }
              
                 theCells[k][i][j].prim[RHO] = rho;
                 theCells[k][i][j].prim[PPP] = Pp;
@@ -108,7 +136,7 @@ void cell_init_cartshear(struct Cell ***theCells,struct Sim *theSim,struct MPIse
 
                 if(PRINTTOOMUCH)
                 {
-                    printf("(%d,%d,%d) = (%.12lg, %.12lg, %.12lg): (%.12lg, %.12lg, %.12lg, %.12lg)\n", i,j,k,r,t,z,rho,vr,vp,Pp);
+                    printf("(%d,%d,%d) = (%.12lg, %.12lg, %.12lg): (%.12lg, %.12lg, %.12lg, %.12lg, %.12lg)\n", i,j,k,r,t,z,rho,vr,vp,theCells[k][i][j].prim[UZZ],Pp);
                 }
             }
         }
