@@ -25,7 +25,7 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                100
+Time_Max                1
 Num_Checkpoints	        100
 Num_Diag_Dump           20
 Num_Diag_Measure        20
@@ -51,7 +51,7 @@ AlphaVisc       -0.01
 CoolFac         0.0
 
 //Initial Condition Parameters
-InitPar0        1 
+InitPar0        1         // Geometry. 0=cyl, 1=cart.
 InitPar1        1.0e-6    // v0
 InitPar2        1.0e-6    // P/rho 
 InitPar3        0.5       // t0

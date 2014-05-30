@@ -217,6 +217,18 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
     F[SZZ] = hn*sqrtg*a*(u0*rhoh * u[2]*vn + Pp*theRiemann->n[2]);
     F[TAU] = hn*sqrtg*(a*u0*(a*u0*rhoh - rho)*vn + Pp*bn);
 
+    //HLL Viscous Fluxi
+    /*
+    double *Fvisc = (double *) malloc(sim_NUM_Q(theSim) * sizeof(double));
+    riemann_visc_flux_LR(theRiemann, theSim, SetState, Fvisc);
+    F[DDD] += Fvisc[DDD];
+    F[SRR] += Fvisc[SRR];
+    F[LLL] += Fvisc[LLL];
+    F[SZZ] += Fvisc[SZZ];
+    F[TAU] += Fvisc[TAU];
+    free(Fvisc);
+    */
+
     //Passive Fluxes
     int q;
     for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q )

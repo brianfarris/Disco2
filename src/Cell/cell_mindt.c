@@ -146,12 +146,27 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                 ap = cell_maxvel_gr(theCells[k][i][j].prim, 1, w, r, phi, z, theSim);
                 az = cell_maxvel_gr(theCells[k][i][j].prim, 2, w, r, phi, z, theSim);
                 
+                double dx = dr;
                 double dt = dr/ar;
                 if(dt > dphi/ap)
+                {
                     dt = dphi/ap;
+                    dx = r*dphi;
+                }
                 if(dt > dz/az)
+                {
                     dt = dz/az;
+                    dx = dz;
+                }
                 dt *= sim_CFL(theSim);
+
+                if(sim_Background(theSim) == GRVISC1)
+                {
+                    //TODO: Incorporate proper alpha viscosity
+                    double nu = fabs(sim_AlphaVisc(theSim));
+                    double dtv = 0.25*dx*dx/nu;
+                    dt = dt/(1.0 + dt/dtv);
+                }
 
                 if(dt_m > dt)
                     dt_m = dt;
