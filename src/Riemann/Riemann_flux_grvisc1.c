@@ -24,8 +24,23 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     struct Metric *g = metric_create(time_global, theRiemann->pos[R_DIR], theRiemann->pos[P_DIR], theRiemann->pos[Z_DIR], theSim);
 
     r = theRiemann->pos[R_DIR];
-    for(i=0; i<NUMQ; i++)
-        prim[i] = 0.5*(theRiemann->primL[i] + theRiemann->primR[i]);
+
+    //TODO: account for z-shearing too.
+    if(dir == 0)
+    {
+        double dphiR = theRiemann->pos[P_DIR] - (cell_tiph(theRiemann->cR) - 0.5*cell_dphi(theRiemann->cR));
+        double dphiL = theRiemann->pos[P_DIR] - (cell_tiph(theRiemann->cL) - 0.5*cell_dphi(theRiemann->cL));
+        while(dphiR<-M_PI) dphiR += 2*M_PI;
+        while(dphiR> M_PI) dphiR -= 2*M_PI;
+        while(dphiL<-M_PI) dphiL += 2*M_PI;
+        while(dphiL> M_PI) dphiL -= 2*M_PI;
+
+        for(i=0; i<NUMQ; i++)
+            prim[i] = 0.5*(cell_prim(theRiemann->cL,i)+cell_gradp(theRiemann->cL,i)*dphiL + cell_prim(theRiemann->cR,i)+cell_gradp(theRiemann->cR,i)*dphiR);
+    }
+ //   else
+        for(i=0; i<NUMQ; i++)
+            prim[i] = 0.5*(theRiemann->primL[i] + theRiemann->primR[i]);
 
     v[0] = prim[URR];
     v[1] = prim[UPP];
@@ -52,17 +67,70 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
 
     if(dir == 0)
     {
+        double dphiR = theRiemann->pos[P_DIR] - (cell_tiph(theRiemann->cR) - 0.5*cell_dphi(theRiemann->cR));
+        double dphiL = theRiemann->pos[P_DIR] - (cell_tiph(theRiemann->cL) - 0.5*cell_dphi(theRiemann->cL));
+        while(dphiR<-M_PI) dphiR += 2*M_PI;
+        while(dphiR> M_PI) dphiR -= 2*M_PI;
+        while(dphiL<-M_PI) dphiL += 2*M_PI;
+        while(dphiL> M_PI) dphiL -= 2*M_PI;
         double idr = 1.0/(theRiemann->x_cell_R - theRiemann->x_cell_L);
-        dv[3] = idr * (cell_prim(theRiemann->cR,URR) - cell_prim(theRiemann->cL,URR));
-        dv[4] = idr * (cell_prim(theRiemann->cR,UPP) - cell_prim(theRiemann->cL,UPP));
-        dv[5] = idr * (cell_prim(theRiemann->cR,UZZ) - cell_prim(theRiemann->cL,UZZ));
+
+        dv[3] = idr * (cell_prim(theRiemann->cR,URR)+cell_gradp(theRiemann->cR,URR)*dphiR - cell_prim(theRiemann->cL,URR)-cell_gradp(theRiemann->cL,URR)*dphiL);
+        dv[4] = idr * (cell_prim(theRiemann->cR,UPP)+cell_gradp(theRiemann->cR,UPP)*dphiR - cell_prim(theRiemann->cL,UPP)-cell_gradp(theRiemann->cL,UPP)*dphiL);
+        dv[5] = idr * (cell_prim(theRiemann->cR,UZZ)+cell_gradp(theRiemann->cR,UZZ)*dphiR - cell_prim(theRiemann->cL,UZZ)-cell_gradp(theRiemann->cL,UZZ)*dphiL);
+/*
+        double PLM = sim_PLM(theSim);
+        if(fabs(dv[3]) > PLM*fabs(cell_gradr(theRiemann->cR,URR)))
+            dv[3] = PLM*cell_gradr(theRiemann->cR,URR);
+        if(fabs(dv[3]) > PLM*fabs(cell_gradr(theRiemann->cL,URR)))
+            dv[3] = PLM*cell_gradr(theRiemann->cL,URR);
+        if(cell_gradr(theRiemann->cL,URR)*cell_gradr(theRiemann->cR,URR) < 0.0)
+            dv[3] = 0.0;
+        if(fabs(dv[4]) > PLM*fabs(cell_gradr(theRiemann->cR,UPP)))
+            dv[4] = PLM*cell_gradr(theRiemann->cR,UPP);
+        if(fabs(dv[4]) > PLM*fabs(cell_gradr(theRiemann->cL,UPP)))
+            dv[4] = PLM*cell_gradr(theRiemann->cL,UPP);
+        if(cell_gradr(theRiemann->cL,UPP)*cell_gradr(theRiemann->cR,UPP) < 0.0)
+            dv[4] = 0.0;
+        if(fabs(dv[5]) > PLM*fabs(cell_gradr(theRiemann->cR,UZZ)))
+            dv[5] = PLM*cell_gradr(theRiemann->cR,UZZ);
+        if(fabs(dv[5]) > PLM*fabs(cell_gradr(theRiemann->cL,UZZ)))
+            dv[5] = PLM*cell_gradr(theRiemann->cL,UZZ);
+        if(cell_gradr(theRiemann->cL,UZZ)*cell_gradr(theRiemann->cR,UZZ) < 0.0)
+            dv[5] = 0.0;
+  */
     }
     else if (dir == 1)
     {
-        double idp = 1.0/(theRiemann->x_cell_R - theRiemann->x_cell_L);
+        double dphi = cell_tiph(theRiemann->cR)-0.5*cell_dphi(theRiemann->cR) - cell_tiph(theRiemann->cL)+0.5*cell_dphi(theRiemann->cL);
+        while (dphi < -M_PI) dphi += 2*M_PI;
+        while (dphi >  M_PI) dphi -= 2*M_PI;
+        double idp = 1.0/dphi;
+        //double idp = 1.0/(theRiemann->x_cell_R - theRiemann->x_cell_L);
         dv[6] = idp * (cell_prim(theRiemann->cR,URR) - cell_prim(theRiemann->cL,URR));
         dv[7] = idp * (cell_prim(theRiemann->cR,UPP) - cell_prim(theRiemann->cL,UPP));
         dv[8] = idp * (cell_prim(theRiemann->cR,UZZ) - cell_prim(theRiemann->cL,UZZ));
+    /*    
+        double PLM = sim_PLM(theSim);
+        if(fabs(dv[6]) > PLM*fabs(cell_gradp(theRiemann->cR,URR)))
+            dv[6] = PLM*cell_gradp(theRiemann->cR,URR);
+        if(fabs(dv[6]) > PLM*fabs(cell_gradp(theRiemann->cL,URR)))
+            dv[6] = PLM*cell_gradp(theRiemann->cL,URR);
+        if(cell_gradp(theRiemann->cL,URR)*cell_gradp(theRiemann->cR,URR) < 0.0)
+            dv[6] = 0.0;
+        if(fabs(dv[7]) > PLM*fabs(cell_gradp(theRiemann->cR,UPP)))
+            dv[7] = PLM*cell_gradp(theRiemann->cR,UPP);
+        if(fabs(dv[7]) > PLM*fabs(cell_gradp(theRiemann->cL,UPP)))
+            dv[7] = PLM*cell_gradp(theRiemann->cL,UPP);
+        if(cell_gradp(theRiemann->cL,UPP)*cell_gradp(theRiemann->cR,UPP) < 0.0)
+            dv[7] = 0.0;
+        if(fabs(dv[8]) > PLM*fabs(cell_gradp(theRiemann->cR,UZZ)))
+            dv[8] = PLM*cell_gradp(theRiemann->cR,UZZ);
+        if(fabs(dv[8]) > PLM*fabs(cell_gradp(theRiemann->cL,UZZ)))
+            dv[8] = PLM*cell_gradp(theRiemann->cL,UZZ);
+        if(cell_gradp(theRiemann->cL,UZZ)*cell_gradp(theRiemann->cR,UZZ) < 0.0)
+            dv[8] = 0.0;
+    */
     }
     else
     {
@@ -70,9 +138,36 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
         dv[9] = idz * (cell_prim(theRiemann->cR,URR) - cell_prim(theRiemann->cL,URR));
         dv[10] = idz * (cell_prim(theRiemann->cR,UPP) - cell_prim(theRiemann->cL,UPP));
         dv[11] = idz * (cell_prim(theRiemann->cR,UZZ) - cell_prim(theRiemann->cL,UZZ));
+      /*  
+        double PLM = sim_PLM(theSim);
+        if(fabs(dv[9]) > PLM*fabs(cell_gradz(theRiemann->cR,URR)))
+            dv[9] = PLM*cell_gradz(theRiemann->cR,URR);
+        if(fabs(dv[9]) > PLM*fabs(cell_gradz(theRiemann->cL,URR)))
+            dv[9] = PLM*cell_gradz(theRiemann->cL,URR);
+        if(cell_gradz(theRiemann->cL,URR)*cell_gradz(theRiemann->cR,URR) < 0.0)
+            dv[9] = 0.0;
+        if(fabs(dv[10]) > PLM*fabs(cell_gradz(theRiemann->cR,UPP)))
+            dv[10] = PLM*cell_gradz(theRiemann->cR,UPP);
+        if(fabs(dv[10]) > PLM*fabs(cell_gradz(theRiemann->cL,UPP)))
+            dv[10] = PLM*cell_gradz(theRiemann->cL,UPP);
+        if(cell_gradz(theRiemann->cL,UPP)*cell_gradz(theRiemann->cR,UPP) < 0.0)
+            dv[10] = 0.0;
+        if(fabs(dv[11]) > PLM*fabs(cell_gradz(theRiemann->cR,UZZ)))
+            dv[11] = PLM*cell_gradz(theRiemann->cR,UZZ);
+        if(fabs(dv[11]) > PLM*fabs(cell_gradz(theRiemann->cL,UZZ)))
+            dv[11] = PLM*cell_gradz(theRiemann->cL,UZZ);
+        if(cell_gradz(theRiemann->cL,UZZ)*cell_gradz(theRiemann->cR,UZZ) < 0.0)
+            dv[11] = 0.0;
+    */
     }
 
-
+    
+    if(PRINTTOOMUCH || 1)
+    {
+        FILE *gradfile = fopen("grad_face.out","a");
+        fprintf(gradfile, "%d, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g\n", dir, theRiemann->pos[R_DIR], theRiemann->pos[P_DIR], theRiemann->pos[Z_DIR], v[0], v[1], v[2], dv[3], dv[4], dv[5], dv[6], dv[7], dv[8], dv[9], dv[10], dv[11]);
+        fclose(gradfile);
+    }
     
     a = metric_lapse(g);
     for(i=0; i<3; i++)

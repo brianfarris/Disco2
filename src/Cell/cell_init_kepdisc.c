@@ -8,17 +8,17 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-// Cartesian Shear Test
-void cell_single_init_cartshear(struct Cell *theCell, struct Sim *theSim,int i,int j,int k)
+// Keplerian Disc
+void cell_single_init_kepdisc(struct Cell *theCell, struct Sim *theSim,int i,int j,int k)
 {
     double rho, Pp, vr, vp;
     double GAMMALAW = sim_GAMMALAW(theSim);
-    int geom = sim_InitPar0(theSim);
-    double v0 = sim_InitPar1(theSim);
-    double cs20 = sim_InitPar2(theSim);
-    double t0 = sim_InitPar3(theSim);
-    double x0 = sim_InitPar4(theSim);
-    double alpha = fabs(sim_AlphaVisc(theSim));
+    double B = sim_InitPar1(theSim);
+    double mach0 = sim_InitPar2(theSim);
+    double r0 = sim_InitPar3(theSim);
+    double dr = sim_InitPar4(theSim);
+    double nu = fabs(sim_AlphaVisc(theSim));
+    double M = sim_GravM(theSim);
 
     double rm = sim_FacePos(theSim,i-1,R_DIR);
     double rp = sim_FacePos(theSim,i,R_DIR);
@@ -28,37 +28,16 @@ void cell_single_init_cartshear(struct Cell *theCell, struct Sim *theSim,int i,i
     double z = 0.5*(zm+zp);
     double t = theCell->tiph-.5*theCell->dphi;
 
-    double rho0 = 1.0;
-    double P0 = cs20 * rho0;
-    double dx;
-    if(geom == 0)
-        dx = r * cos(t) - x0;
-    else if(geom == 1)
-        dx = r - x0;
-    else
-        dx = (r-t)/sqrt(2.0) - x0;
-    double vy = v0 * exp(-dx*dx/(4.0*alpha*t0)) / sqrt(4.0*M_PI*alpha*t0);
-
-    rho = rho0;
-    Pp = P0;
-    if(geom == 0)
+    rho = 1.0 + B/sqrt(r) + exp(-(r-r0)*(r-r0)/(2*dr*dr));
+    Pp = (1.0 + B/sqrt(r0)) * M / (r0 * GAMMALAW * mach0*mach0);
+    vr = - 3*nu*(1.0+(1.0-r*(r-r0)/(dr*dr))*exp(-(r-r0)*(r-r0)/(2*dr*dr))) / (2*r*rho);
+    vp = sqrt(M/(r*r*r));
+    if(dr < 0)
     {
-        vr = vy * sin(t); 
-        vp = vy * cos(t) / r;
-        vr = v0 * sin(t); 
-        vp = v0 * cos(t) / r;
+        rho = 1.0 + B/sqrt(r);
+        vr = -3*nu/(2*r*rho);
     }
-    else if(geom == 1)
-    {
-        vr = 0.0;
-        vp = vy;
-    }
-    else
-    {
-        vr = vy/sqrt(2.0);
-        vp = vy/sqrt(2.0);
-    }
-
+   
     theCell->prim[RHO] = rho;
     theCell->prim[PPP] = Pp;
     theCell->prim[URR] = vr;
@@ -72,22 +51,18 @@ void cell_single_init_cartshear(struct Cell *theCell, struct Sim *theSim,int i,i
   //if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = Qq;
 }
 
-void cell_init_cartshear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup)
+void cell_init_kepdisc(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup)
 {
 
     double rho, Pp, vr, vp;
     double GAMMALAW = sim_GAMMALAW(theSim);
+    double B = sim_InitPar1(theSim);
+    double mach0 = sim_InitPar2(theSim);
+    double r0 = sim_InitPar3(theSim);
+    double dr = sim_InitPar4(theSim);
     double M = sim_GravM(theSim);
-    int geom = sim_InitPar0(theSim);
-    double v0 = sim_InitPar1(theSim);
-    double cs20 = sim_InitPar2(theSim);
-    double t0 = sim_InitPar3(theSim);
-    double x0 = sim_InitPar4(theSim);
-    double alpha = fabs(sim_AlphaVisc(theSim));
+    double nu = fabs(sim_AlphaVisc(theSim));
 
-    double rho0 = 1.0;
-    double P0 = cs20 * rho0;
-    
     int i, j, k;
     for (k = 0; k < sim_N(theSim,Z_DIR); k++) 
     {
@@ -101,37 +76,19 @@ void cell_init_cartshear(struct Cell ***theCells,struct Sim *theSim,struct MPIse
             double rp = sim_FacePos(theSim,i,R_DIR);
             double r = 0.5*(rm+rp);
 
-            rho = rho0;
-            Pp = P0;
-
+            rho = 1.0 + B/sqrt(r) + exp(-(r-r0)*(r-r0)/(2*dr*dr));
+            Pp = (1.0 + B/sqrt(r0)) * M / (r0 * GAMMALAW * mach0*mach0);
+            vr = - 3*nu*(1.0+(1.0-r*(r-r0)/(dr*dr))*exp(-(r-r0)*(r-r0)/(2*dr*dr))) / (2*r*rho);
+            vp = sqrt(M/(r*r*r));
+            if(dr < 0)
+            {
+                rho = 1.0 + B/sqrt(r);
+                vr = -3*nu/(2*r*rho);
+            }
 
             for (j = 0; j < sim_N_p(theSim,i); j++) 
             {
                 double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
-                double dx;
-                if(geom == 0)
-                    dx = r * cos(t) - x0;
-                else if (geom == 1)
-                    dx = r - x0;
-                else
-                    dx = (r-t)/sqrt(2.0) - x0;
-                double vy = v0 * exp(-dx*dx/(4.0*alpha*t0)) / sqrt(4.0*M_PI*alpha*t0);
-
-                if(geom == 0)
-                {
-                    vr = vy * sin(t); 
-                    vp = vy * cos(t) / r;
-                }
-                else if (geom == 1)
-                {
-                    vr = 0.0;
-                    vp = vy;
-                }
-                else
-                {
-                    vr = vy/sqrt(2.0);
-                    vp = vy/sqrt(2.0);
-                }
             
                 if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
                 {
