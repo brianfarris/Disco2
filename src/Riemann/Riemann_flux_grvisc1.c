@@ -162,7 +162,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     }
 
     
-    if(PRINTTOOMUCH || 1)
+    if(PRINTTOOMUCH || 0)
     {
         FILE *gradfile = fopen("grad_face.out","a");
         fprintf(gradfile, "%d, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g\n", dir, theRiemann->pos[R_DIR], theRiemann->pos[P_DIR], theRiemann->pos[Z_DIR], v[0], v[1], v[2], dv[3], dv[4], dv[5], dv[6], dv[7], dv[8], dv[9], dv[10], dv[11]);
@@ -174,7 +174,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
         b[i] = metric_shift_u(g, i);
     sqrtg = metric_sqrtgamma(g)/r;
 
-    metric_shear_uu(g, v, dv, shear);
+    metric_shear_uu(g, v, dv, shear, theSim);
     if(PRINTTOOMUCH)
     {
         printf("v: %.12g %.12g %.12g\n", v[0],v[1],v[2]);
@@ -200,7 +200,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     if(alpha > 0)
         visc = alpha * sqrt(cs2) * height;
     else
-        visc = -alpha;
+        visc = -alpha * prim[RHO];
 
     if(dir == 1)
         hn = theRiemann->pos[R_DIR];
@@ -310,7 +310,7 @@ void riemann_visc_flux_LR(struct Riemann *theRiemann, struct Sim *theSim, int st
         b[i] = metric_shift_u(g, i);
     sqrtg = metric_sqrtgamma(g)/r;
 
-    metric_shear_uu(g, v, dv, shear);
+    metric_shear_uu(g, v, dv, shear, theSim);
     if(PRINTTOOMUCH)
     {
         printf("v: %.12g %.12g %.12g\n", v[0],v[1],v[2]);

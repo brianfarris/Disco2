@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Metric.h"
+#include "../Headers/Sim.h"
+#include "../Headers/header.h"
+
 
 double metric_square3_u(struct Metric *g, double *vec)
 {
@@ -93,7 +96,7 @@ double metric_conn(struct Metric *g, int tau, int mu, int nu)
     return 0.5*connection;
 }
 
-double metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear)
+double metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, struct Sim *theSim)
 {
     //Fills shear tensor sigma^{ij} = shear(4*i+j) given 
     // coordinate 3-velocity v and (partial der) gradient dv (d_{i}v^{j} =  dv[3*i+j])
@@ -153,8 +156,11 @@ double metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear)
         }
     }
 
+    if(sim_N_global(theSim, Z_DIR) != 1)
+        divu *= 2.0/3.0;
+
     for(mu=0; mu<4; mu++)
         for(nu=0; nu<4; nu++)
-            shear[4*mu+nu] -= 2.0/3.0*divu*(metric_g_uu(g,mu,nu)+u[mu]*u[nu]);
+            shear[4*mu+nu] -= divu*(metric_g_uu(g,mu,nu)+u[mu]*u[nu]);
 }
 

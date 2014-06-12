@@ -74,12 +74,12 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   if( sim_N_global(theSim,Z_DIR) != 1 )
     cell_plm_rz(theCells,theSim,theFaces_z,theTimeStep,theMPIsetup,Z_DIR );
 
-  if(PRINTTOOMUCH || 1)
+  if(PRINTTOOMUCH || 0)
   {
     FILE *gradfile = fopen("grad.out", "w");
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-      double zp = sim_FacePos(theSim,k,R_DIR);
-      double zm = sim_FacePos(theSim,k-1,R_DIR);
+      double zp = sim_FacePos(theSim,k,Z_DIR);
+      double zm = sim_FacePos(theSim,k-1,Z_DIR);
       double z = 0.5*(zp+zm);
       for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
         double rp = sim_FacePos(theSim,i,R_DIR);
@@ -88,7 +88,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){   
           struct Cell * c = &(theCells[k][i][j]);
           double p = cell_tiph(c) - 0.5*cell_dphi(c);
-          fprintf(gradfile, "%d, %d, %d, %.12g, %.12g,%.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g\n",i,j,k,r,p,z,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[UZZ],c->prim[PPP],c->gradr[RHO],c->gradr[URR],c->gradr[UPP],c->gradr[UZZ],c->gradr[PPP],c->gradp[RHO],c->gradp[URR],c->gradp[UPP],c->gradp[UZZ],c->gradp[PPP],c->gradz[RHO],c->gradz[URR],c->gradz[UPP],c->gradz[UZZ],c->gradz[PPP]);
+          fprintf(gradfile, "%d, %d, %d, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g\n",i,j,k,r,p,z,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[UZZ],c->prim[PPP],c->gradr[RHO],c->gradr[URR],c->gradr[UPP],c->gradr[UZZ],c->gradr[PPP],c->gradp[RHO],c->gradp[URR],c->gradp[UPP],c->gradp[UZZ],c->gradp[PPP],c->gradz[RHO],c->gradz[URR],c->gradz[UPP],c->gradz[UZZ],c->gradz[PPP]);
           }
       }
     }  

@@ -168,14 +168,14 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 if (alpha > 0)
                     alpha *= sqrt(cs2) * height;
                 else
-                    alpha = -alpha;
+                    alpha = -alpha * rho;
 
                 dv[0] = 0.0;  dv[1] = 0.0;  dv[2] = 0.0;
                 dv[3] = cell_gradr(c, URR);  dv[4] = cell_gradr(c, UPP);  dv[5] = cell_gradr(c, UZZ);
                 dv[6] = cell_gradp(c, URR);  dv[7] = cell_gradp(c, UPP);  dv[8] = cell_gradp(c, UZZ);
                 dv[9] = cell_gradz(c, URR);  dv[10] = cell_gradz(c, UPP);  dv[11] = cell_gradz(c, UZZ);
                 
-                metric_shear_uu(g, v, dv, visc);
+                metric_shear_uu(g, v, dv, visc, theSim);
             
                 for(mu=0; mu<16; mu++)
                     visc[mu] *= -alpha;
