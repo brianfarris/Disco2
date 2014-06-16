@@ -249,7 +249,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             double numfac = 0.1;
             double alpha = sim_EXPLICIT_VISCOSITY(theSim);
             double cooling_cap = c->cons[TAU]*numfac;
-            double cooling_term = 9./4.*alpha*pow(PoRho_r1,-3)/rho*pow(Pp/rho,4.)*dt*dV;
+            double cooling_term = 9./4.*alpha*pow(sim_PoRho_r1(theSim),-3)/rho*pow(Pp/rho,4.)*dt*dV;
             if (cooling_term>cooling_cap) cooling_term = cooling_cap;
             c->cons[TAU] -= cooling_term;
             c->Cool = cooling_term/dt/dV;

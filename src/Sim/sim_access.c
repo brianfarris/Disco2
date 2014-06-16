@@ -110,6 +110,9 @@ double sim_EXPLICIT_VISCOSITY(struct Sim *theSim){
 int sim_VISC_CONST(struct Sim *theSim){
   return(theSim->VISC_CONST);
 }
+double sim_PoRho_r1(struct Sim *theSim){
+    return(theSim->PoRho_r1);
+}
 double sim_DIVB_CH(struct Sim *theSim){
   return(theSim->DIVB_CH);
 }

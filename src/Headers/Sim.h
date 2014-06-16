@@ -49,6 +49,7 @@ struct Sim {
   int COOLING;
   double EXPLICIT_VISCOSITY;
   int VISC_CONST;
+  double PoRho_r1;
   double DIVB_CH;
   double DIVB_L;
   double CFL;
@@ -110,6 +111,7 @@ double sim_GAMMALAW(struct Sim *);
 int sim_COOLING(struct Sim *);
 double sim_EXPLICIT_VISCOSITY(struct Sim *);
 int sim_VISC_CONST(struct Sim *);
+double sim_PoRho_r1(struct Sim *);
 double sim_DIVB_CH(struct Sim *);
 double sim_DIVB_L(struct Sim *);
 double sim_CFL(struct Sim *);
