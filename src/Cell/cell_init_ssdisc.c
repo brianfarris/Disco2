@@ -8,17 +8,70 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-// Shakura-Sunyaev Disc
-void cell_single_init_ssdisc(struct Cell *theCell, struct Sim *theSim,int i,int j,int k)
+//Shakura-Sunyaev Disc
+
+//Thompson Cooling
+void cell_init_ssdisc_thompson(struct Cell *c, double r, double phi, double z, struct Sim *theSim)
 {
-    double rho, Pp, vr, vp;
-    double GAMMALAW = sim_GAMMALAW(theSim);
+    double mach0 = sim_InitPar1(theSim);
+    double r0 = sim_InitPar2(theSim);
+    double DR = sim_InitPar3(theSim);
+    double GAM = sim_GAMMALAW(theSim);
     double M = sim_GravM(theSim);
-    double R0 = sim_InitPar1(theSim);
-    double cs20 = sim_InitPar2(theSim);
     double alpha = sim_AlphaVisc(theSim);
     double q0 = sim_CoolFac(theSim);
 
+    if(q0 == 0.0)
+        q0 = 1.0;
+
+    double rho0 = pow(18*alpha, -0.25) * pow(M/(GAM*r0), 0.375) * pow(q0/(r0*mach0*mach0), 0.25);
+    double P0 = M*rho0/(GAM*r0*mach0*mach0);
+    double vr0 = 3*alpha * sqrt(M/(GAM*r0)) / (mach0*mach0);
+    
+    double rho = rho0 * pow(r0/r, 0.6);
+    double P = P0 * pow(r0/r, 1.5);
+    double vr = -vr0 * pow(r0/r, 0.4);
+    double vp = sqrt(M/(r*r*r));
+
+    if(DR > 0.0)
+    {
+        prof = 1.0/(1.0+exp(-(r-r0)/DR));
+        rho *= prof;
+        P *= prof;
+    }
+    
+    c->prim[RHO] = rho;
+    c->prim[PPP] = P;
+    c->prim[URR] = vr;
+    c->prim[UPP] = vp;
+    c->prim[UZZ] = 0.0;
+
+    if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) 
+    {
+        int i;
+        double x;
+        for(i=sim_NUM_C(theSim); i<sim_NUM_Q(theSim); i++)
+        {
+            if(r*cos(phi) < 0)
+                c->prim[i] = 0.0;
+            else
+                c->prim[i] = 1.0;
+        }
+    }
+}
+
+void cell_init_ssdisc_calc(struct Cell *c, double r, double phi, double z, struct Sim *theSim)
+{
+    int disc_num = sim_InitPar0(theSim);
+
+    if(disc_num == 0)
+        cell_init_ssdisc_thompson(c, r, phi, z, theSim);
+    else
+        printf("ERROR: cell_init_ssdisc given bad option.\n");
+}
+
+void cell_single_init_ssdisc(struct Cell *theCell, struct Sim *theSim,int i,int j,int k)
+{
     double rm = sim_FacePos(theSim,i-1,R_DIR);
     double rp = sim_FacePos(theSim,i,R_DIR);
     double r = 0.5*(rm+rp);
@@ -27,43 +80,13 @@ void cell_single_init_ssdisc(struct Cell *theCell, struct Sim *theSim,int i,int 
     double z = 0.5*(zm+zp);
     double t = theCell->tiph-.5*theCell->dphi;
 
-    double rho0 = 2.0/3.0 * sqrt(q0/alpha) * pow(GAMMALAW,0.25) * pow(R0*R0*R0/M,0.25) * pow(cs20,1.5);
-    double P0 = cs20 * rho0;
-    double vr0 = 1.5 * alpha * sqrt(GAMMALAW*R0/M) * P0/rho0;
-
-    rho = rho0 * pow(r/R0, -0.6);
-    Pp = P0 * pow(r/R0, -1.5);
-    vr = -vr0 * pow(r/R0, -0.3); 
-    vp = sqrt(M/(r*r*r));
-
-    theCell->prim[RHO] = rho;
-    theCell->prim[PPP] = Pp;
-    theCell->prim[URR] = vr;
-    theCell->prim[UPP] = vp;
-    theCell->prim[UZZ] = 0.0;
-    theCell->divB = 0.0;
-    theCell->GradPsi[0] = 0.0;
-    theCell->GradPsi[1] = 0.0;
-
-  //TODO: Not sure what this is for.  Ask someone if important.
-  //if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = Qq;
+    cell_init_ssdisc_calc(theCell, r, t, z, theSim);
 }
 
 void cell_init_ssdisc(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup)
 {
+    int test_num = sim_InitPar0(theSim);
 
-    double rho, Pp, vr, vp;
-    double GAMMALAW = sim_GAMMALAW(theSim);
-    double M = sim_GravM(theSim);
-    double R0 = sim_InitPar1(theSim);
-    double cs20 = sim_InitPar2(theSim);
-    double alpha = sim_AlphaVisc(theSim);
-    double q0 = sim_CoolFac(theSim);
-
-    double rho0 = 2.0/3.0 * sqrt(q0/alpha) * pow(GAMMALAW,0.25) * pow(R0*R0*R0/M,0.25) * pow(cs20,1.5);
-    double P0 = cs20 * rho0;
-    double vr0 = 1.5 * alpha * sqrt(GAMMALAW*R0/M) * P0/rho0;
-    
     int i, j, k;
     for (k = 0; k < sim_N(theSim,Z_DIR); k++) 
     {
@@ -77,31 +100,16 @@ void cell_init_ssdisc(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
             double rp = sim_FacePos(theSim,i,R_DIR);
             double r = 0.5*(rm+rp);
 
-            rho = rho0 * pow(r/R0, -0.6);
-            Pp = P0 * pow(r/R0, -1.5);
-            vr = -vr0 * pow(r/R0, -0.3); 
-            vp = sqrt(M/(r*r*r));
-
-            if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
-            {
-                vr  = vr * (1.0-M/r) / (1.0-M/r+M/r*vr);
-                if(vr > (1.0-M/r) / (1.0+M/r))
-                    vr = 0.9 * (1.0-M/r) / (1.0+M/r) - 0.1*vr;
-            }
-
             for (j = 0; j < sim_N_p(theSim,i); j++) 
             {
                 double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
              
-                theCells[k][i][j].prim[RHO] = rho;
-                theCells[k][i][j].prim[PPP] = Pp;
-                theCells[k][i][j].prim[URR] = vr;
-                theCells[k][i][j].prim[UPP] = vp;
-                theCells[k][i][j].prim[UZZ] = 0.0;
-                theCells[k][i][j].divB = 0.0;
-                theCells[k][i][j].GradPsi[0] = 0.0;
-                theCells[k][i][j].GradPsi[1] = 0.0;
-                theCells[k][i][j].GradPsi[2] = 0.0;
+                cell_init_ssdisc_calc(&(theCells[k][i][j]), r, t, z, theSim);
+                
+                if(PRINTTOOMUCH)
+                {
+                    printf("(%d,%d,%d) = (%.12lg, %.12lg, %.12lg): (%.12lg, %.12lg, %.12lg, %.12lg, %.12lg)\n", i,j,k,r,t,z,theCells[k][i][j].prim[RHO],theCells[k][i][j].prim[URR],theCells[k][i][j].prim[UPP],theCells[k][i][j].prim[UZZ],theCells[k][i][j].prim[PPP]);
+                }
             }
         }
     }

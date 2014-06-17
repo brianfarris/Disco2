@@ -157,7 +157,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 double M = sim_GravM(theSim);
 
                 double temp = Pp/rho;
-                double height = sqrt(Pp*r*r*r*(1-3*M/r)/(rhoh*M));
+                double height = 2*sqrt(Pp*r*r*r*(1-3*M/r)/(rhoh*M));
                 
                 //free-free cooling
                 //cool = sim_CoolFac(theSim) * pow(temp,7.5) / (rho*rho*height);
@@ -166,7 +166,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
                 cs2 = GAMMALAW*Pp / rhoh;
                 if (alpha > 0)
-                    alpha *= sqrt(cs2) * height;
+                    alpha *= sqrt(cs2) * height * rho;
                 else
                     alpha = -alpha * rho;
 
@@ -194,13 +194,15 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                     for(mu=0; mu<4; mu++)
                     {
                         //TODO: REMOVE THIS IMMEDIATELY
-                        if(mu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                        //if(mu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                        if(mu == 3  && sim_N(theSim,Z_DIR)==1)
                             continue;
                         sk += 0.5*(rhoh*u[mu]*u[mu]+Pp*metric_g_uu(g,mu,mu)+visc[4*mu+mu]) * metric_dg_dd(g,la,mu,mu);
                         for(nu=mu+1; nu<4; nu++)
                         {
                             //TODO: REMOVE THIS IMMEDIATELY
-                            if(nu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                            //if(nu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                            if(nu == 3 && sim_N(theSim,Z_DIR)==1)
                                 continue;
                             sk += (rhoh*u[mu]*u[nu]+Pp*metric_g_uu(g,mu,nu)+visc[4*mu+nu]) * metric_dg_dd(g,la,mu,nu);
                         }
@@ -210,7 +212,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                         c->cons[SRR] += dt*dV*sqrtg*a * sk;
                         if(PRINTTOOMUCH)
                         {
-                            printf("SRR source: (%d,%d,%d): r=%.12f, dV=%.12f, s = %.12f, S = %.12f\n",i,j,k,r,dV,a*sqrtg*sk,dt*dV*sqrtg*a * sk);
+                            printf("SRR source: (%d,%d,%d): r=%.12g, dV=%.12g, s = %.12g, S = %.12g\n",i,j,k,r,dV,a*sqrtg*sk,dt*dV*sqrtg*a * sk);
                         }
                     }
                     else if(la == 2)
@@ -226,7 +228,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                         }
                     }
                     //TODO: REMOVE THIS IMMEDIATELY
-                    if(la == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                    //if(la == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                    if(la == 3 && sim_N(theSim,Z_DIR)==1)
                         continue;
                     s -= n[la]*sk;
                 }
@@ -239,7 +242,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                     for(mu=0; mu<4; mu++)
                     {
                         //TODO: REMOVE THIS IMMEDIATELY
-                        if(mu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                        //if(mu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                        if(mu == 3 && sim_N(theSim,Z_DIR)==1)
                             continue;
                         if(mu == la)
                             sk += a*(rhoh*u[la]*u_d[mu]+Pp+viscm[4*la+mu])*metric_dg_uu(g,la,0,mu);
@@ -247,14 +251,15 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                             sk += a*(rhoh*u[la]*u_d[mu]+viscm[4*la+mu])*metric_dg_uu(g,la,0,mu);
                     }
                     //TODO: REMOVE THIS IMMEDIATELY
-                    if(la == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                    //if(la == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
+                    if(la == 3 && sim_N(theSim,Z_DIR)==1)
                         continue;
                     s += sk;
                 }
 
             if(PRINTTOOMUCH)
             {
-                printf("TAU source: (%d,%d,%d): r=%.12f, dV=%.12f, s = %.12f, S = %.12f\n",i,j,k,r,dV,a*sqrtg*s,dt*dV*sqrtg*a * s);
+                printf("TAU source: (%d,%d,%d): r=%.12g, dV=%.12g, s = %.12g, S = %.12g\n",i,j,k,r,dV,a*sqrtg*s,dt*dV*sqrtg*a * s);
             }
 
             c->cons[TAU] += dt*dV*sqrtg*a * s;

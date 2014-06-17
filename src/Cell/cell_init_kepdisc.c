@@ -28,13 +28,13 @@ void cell_single_init_kepdisc(struct Cell *theCell, struct Sim *theSim,int i,int
     double z = 0.5*(zm+zp);
     double t = theCell->tiph-.5*theCell->dphi;
 
-    rho = 1.0 + B/sqrt(r) + exp(-(r-r0)*(r-r0)/(2*dr*dr));
-    Pp = (1.0 + B/sqrt(r0)) * M / (r0 * GAMMALAW * mach0*mach0);
+    rho = 1.0 + B*sqrt(r0/r) + exp(-(r-r0)*(r-r0)/(2*dr*dr));
+    Pp = (1.0 + B) * M / (r0 * GAMMALAW * mach0*mach0);
     vr = - 3*nu*(1.0+(1.0-r*(r-r0)/(dr*dr))*exp(-(r-r0)*(r-r0)/(2*dr*dr))) / (2*r*rho);
     vp = sqrt(M/(r*r*r));
     if(dr < 0)
     {
-        rho = 1.0 + B/sqrt(r);
+        rho = 1.0 + B*sqrt(r0/r);
         vr = -3*nu/(2*r*rho);
     }
    
@@ -76,13 +76,13 @@ void cell_init_kepdisc(struct Cell ***theCells,struct Sim *theSim,struct MPIsetu
             double rp = sim_FacePos(theSim,i,R_DIR);
             double r = 0.5*(rm+rp);
 
-            rho = 1.0 + B/sqrt(r) + exp(-(r-r0)*(r-r0)/(2*dr*dr));
-            Pp = (1.0 + B/sqrt(r0)) * M / (r0 * GAMMALAW * mach0*mach0);
+            rho = 1.0 + B*sqrt(r0/r) + exp(-(r-r0)*(r-r0)/(2*dr*dr));
+            Pp = (1.0 + B) * M / (r0 * GAMMALAW * mach0*mach0);
             vr = - 3*nu*(1.0+(1.0-r*(r-r0)/(dr*dr))*exp(-(r-r0)*(r-r0)/(2*dr*dr))) / (2*r*rho);
             vp = sqrt(M/(r*r*r));
             if(dr < 0)
             {
-                rho = 1.0 + B/sqrt(r);
+                rho = 1.0 + B*sqrt(r0/r);
                 vr = -3*nu/(2*r*rho);
             }
 

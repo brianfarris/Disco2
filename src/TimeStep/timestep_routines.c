@@ -74,7 +74,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   if( sim_N_global(theSim,Z_DIR) != 1 )
     cell_plm_rz(theCells,theSim,theFaces_z,theTimeStep,theMPIsetup,Z_DIR );
 
-  if(PRINTTOOMUCH || 0)
+  if(PRINTTOOMUCH && 0)
   {
     FILE *gradfile = fopen("grad.out", "w");
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){

@@ -13,7 +13,7 @@ Metric                  0       // 0 Flat, 1 Schwarzschild-SC,
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR		    256			//Radial Zones
+NumR		    64			//Radial Zones
 NumZ			1          //Vertical Zones
 ng              2
 R_Min		    1.0
@@ -32,13 +32,13 @@ Num_Diag_Measure        20
 
 
 NoInnerBC            0
-BoundTypeR           0               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry         1
 
 Move_Cells              0
 RiemannSolver           1           // 0 hllc, 1 hll
-Adiabatic_Index         1.000001
+Adiabatic_Index         1.3333333333
 
 //Numerical Parameters
 CFL			0.5

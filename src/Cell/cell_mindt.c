@@ -163,7 +163,20 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                 if(sim_Background(theSim) == GRVISC1)
                 {
                     //TODO: Incorporate proper alpha viscosity
-                    double nu = fabs(sim_AlphaVisc(theSim));
+                    double nu;
+                    double alpha = sim_AlphaVisc(theSim);
+                    if(alpha < 0.0)
+                        nu = -alpha;
+                    else
+                    {
+                        double rho = theCells[k][i][j].prim[RHO];
+                        double Pp = theCells[k][i][j].prim[PPP];
+                        double GAM = sim_GAMMALAW(theSim);
+                        double M = sim_GravM(theSim);
+                        double rhoh = rho + GAM/(GAM-1)*Pp;
+
+                        nu = alpha * 2.0 * sqrt(GAM*r*r*r*(1-3.0*M/r)/M) * Pp/rhoh;
+                    }
                     double dtv = 0.25*dx*dx/nu;
                     dt = dt/(1.0 + dt/dtv);
                 }

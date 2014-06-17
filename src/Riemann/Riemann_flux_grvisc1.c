@@ -26,6 +26,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     r = theRiemann->pos[R_DIR];
 
     //TODO: account for z-shearing too.
+    /*
     if(dir == 0)
     {
         double dphiR = theRiemann->pos[P_DIR] - (cell_tiph(theRiemann->cR) - 0.5*cell_dphi(theRiemann->cR));
@@ -38,7 +39,8 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
         for(i=0; i<NUMQ; i++)
             prim[i] = 0.5*(cell_prim(theRiemann->cL,i)+cell_gradp(theRiemann->cL,i)*dphiL + cell_prim(theRiemann->cR,i)+cell_gradp(theRiemann->cR,i)*dphiR);
     }
- //   else
+    else
+    */
         for(i=0; i<NUMQ; i++)
             prim[i] = 0.5*(theRiemann->primL[i] + theRiemann->primR[i]);
 
@@ -162,7 +164,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     }
 
     
-    if(PRINTTOOMUCH || 0)
+    if(PRINTTOOMUCH && 0)
     {
         FILE *gradfile = fopen("grad_face.out","a");
         fprintf(gradfile, "%d, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g\n", dir, theRiemann->pos[R_DIR], theRiemann->pos[P_DIR], theRiemann->pos[Z_DIR], v[0], v[1], v[2], dv[3], dv[4], dv[5], dv[6], dv[7], dv[8], dv[9], dv[10], dv[11]);
@@ -175,30 +177,13 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     sqrtg = metric_sqrtgamma(g)/r;
 
     metric_shear_uu(g, v, dv, shear, theSim);
-    if(PRINTTOOMUCH)
-    {
-        printf("v: %.12g %.12g %.12g\n", v[0],v[1],v[2]);
-        for(i=0; i<4; i++)
-        {
-            printf("d%dv ",i);
-            for(j=0; j<3; j++)
-                printf("%.12g ", dv[3*i+j]);
-            printf("\n");
-        }
-        for(i=0; i<4; i++)
-        {
-            for(j=0; j<4; j++)
-                printf("%.12g ", shear[4*i+j]);
-            printf("\n");
-        }
-    }
-
+    
     //TODO: CHECK THIS!  Probably not relativistic and/or isothermal.
     rhoh = prim[RHO] + GAMMA*prim[PPP]/(GAMMA-1.0);
     cs2 = GAMMA*prim[PPP] / rhoh;
-    height = sqrt(prim[PPP]*r*r*r*(1-3*M/r)/(rhoh*M));
+    height = 2 * sqrt(prim[PPP]*r*r*r*(1-3*M/r)/(rhoh*M));
     if(alpha > 0)
-        visc = alpha * sqrt(cs2) * height;
+        visc = alpha * sqrt(cs2) * height * prim[RHO];
     else
         visc = -alpha * prim[RHO];
 
@@ -220,6 +205,36 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     F[LLL] *= -a*sqrtg*hn * visc;
     F[SZZ] *= -a*sqrtg*hn * visc;
     F[TAU] = -a*a*sqrtg*hn * visc * shear[dir+1];
+
+    if(PRINTTOOMUCH)
+    {
+        printf("v: %.12g %.12g %.12g\n", v[0],v[1],v[2]);
+        for(i=0; i<4; i++)
+        {
+            printf("d%dv ",i);
+            for(j=0; j<3; j++)
+                printf("%.12g ", dv[3*i+j]);
+            printf("\n");
+        }
+        for(i=0; i<4; i++)
+        {
+            for(j=0; j<4; j++)
+                printf("%.12g ", shear[4*i+j]);
+            printf("\n");
+        }
+        printf("prim: %.12g, %.12g, %.12g, %.12g, %.12g,\n", prim[RHO], prim[URR], prim[UPP], prim[UZZ], prim[PPP]);
+        printf("nonvisc flux: %.12g, %.12g, %.12g, %.12g,\n", theRiemann->F[SRR], theRiemann->F[LLL], theRiemann->F[SZZ], theRiemann->F[TAU]);
+        printf("   visc flux: %.12g, %.12g, %.12g, %.12g,\n", F[SRR], F[LLL], F[SZZ], F[TAU]);
+        printf("nu: %.12g\n", visc);
+        printf("g: ");
+        for(i=0; i<4; i++)
+        {
+            for(j=0; j<4; j++)
+                printf("%.12g ", metric_g_dd(g,i,j));
+            printf("\n");
+        }
+
+    }
 
     theRiemann->F[SRR] += F[SRR];
     theRiemann->F[LLL] += F[LLL];
@@ -332,11 +347,11 @@ void riemann_visc_flux_LR(struct Riemann *theRiemann, struct Sim *theSim, int st
     //TODO: CHECK THIS!  Probably not relativistic and/or isothermal.
     rhoh = prim[RHO] + GAMMA*prim[PPP]/(GAMMA-1.0);
     cs2 = GAMMA*prim[PPP] / rhoh;
-    height = sqrt(prim[PPP]*r*r*r*(1-3*M/r)/(rhoh*M));
+    height = 2*sqrt(prim[PPP]*r*r*r*(1-3*M/r)/(rhoh*M));
     if(alpha > 0)
-        visc = alpha * sqrt(cs2) * height;
+        visc = alpha * sqrt(cs2) * height * prim[RHO];
     else
-        visc = -alpha;
+        visc = -alpha * prim[RHO];
 
     if(dir == 1)
         hn = theRiemann->pos[R_DIR];

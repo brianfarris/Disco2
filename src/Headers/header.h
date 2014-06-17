@@ -22,4 +22,4 @@ MPI_Comm sim_comm;
 //#define NPCAP 256 
 double time_global;
 
-#define PRINTTOOMUCH 0
+#define PRINTTOOMUCH 1
