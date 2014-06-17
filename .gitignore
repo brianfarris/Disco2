@@ -6,3 +6,8 @@
 *.pdf
 html
 latex
+bin*
+*.png
+*.dat
+*.h5
+.DS_store

@@ -216,12 +216,16 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     cell_boundary_outflow_r_inner( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
   }else if (sim_BoundTypeRIn(theSim)==BOUND_FIXED){
     cell_boundary_fixed_r_inner(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+  }else if (sim_BoundTypeRIn(theSim)==BOUND_SS){
+    cell_boundary_ssprofile_r_inner(theCells,theSim,theMPIsetup);    
   }
   //R - Outer
   if (sim_BoundTypeROut(theSim)==BOUND_OUTFLOW){
     cell_boundary_outflow_r_outer( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
   }else if (sim_BoundTypeROut(theSim)==BOUND_FIXED){
     cell_boundary_fixed_r_outer(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+  }else if (sim_BoundTypeROut(theSim)==BOUND_SS){
+    cell_boundary_ssprofile_r_outer(theCells,theSim,theMPIsetup);    
   }
   if (sim_N_global(theSim,Z_DIR)>1){
     //Z - Bottom
