@@ -28,10 +28,12 @@ Num_Diag_Dump           20
 Num_Diag_Measure        20
 
 
-NoInnerBC            0
-BoundTypeR           0               // 0 fixed, 1 outflow, 2 periodic
-BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
-ZeroPsiBndry         1
+NoInnerBC               0
+BoundTypeRIn            0               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeROut           0               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZBot           2               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZTop           2               // 0 fixed, 1 outflow, 2 periodic
+ZeroPsiBndry            1
 
 Move_Cells              0
 RiemannSolver           1           // 0 hllc, 1 hll

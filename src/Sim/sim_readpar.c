@@ -55,8 +55,10 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Restart"              , VAR_INT  , &(theSim->Restart)  );
       err += readvar( pfile , "InitialDataType"      , VAR_INT  , &(theSim->InitialDataType)  );
       err += readvar( pfile , "GravMassType"      , VAR_INT  , &(theSim->GravMassType)  );
-      err += readvar( pfile , "BoundTypeR"         , VAR_INT  , &(theSim->BoundTypeR)  );
-      err += readvar( pfile , "BoundTypeZ"         , VAR_INT  , &(theSim->BoundTypeZ)  );
+      err += readvar( pfile , "BoundTypeRIn"         , VAR_INT  , &(theSim->BoundTypeRIn)  );
+      err += readvar( pfile , "BoundTypeROut"         , VAR_INT  , &(theSim->BoundTypeROut)  );
+      err += readvar( pfile , "BoundTypeZBot"         , VAR_INT  , &(theSim->BoundTypeZBot)  );
+      err += readvar( pfile , "BoundTypeZTop"         , VAR_INT  , &(theSim->BoundTypeZTop)  );
       err += readvar( pfile , "NoInnerBC"         , VAR_INT  , &(theSim->NoInnerBC)  );
       err += readvar( pfile , "Background"         , VAR_INT  , &(theSim->Background)  );
       err += readvar( pfile , "Metric"         , VAR_INT  , &(theSim->Metric)  );

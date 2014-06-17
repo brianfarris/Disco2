@@ -37,11 +37,17 @@ double sim_FacePos(struct Sim *theSim,int index,int direction){
 int sim_N(struct Sim *theSim, int direction){
   return(theSim->N_noghost[direction]+theSim->Nghost_min[direction]+theSim->Nghost_max[direction]);
 }
-int sim_BoundTypeR(struct Sim *theSim){
-  return(theSim->BoundTypeR);
+int sim_BoundTypeRIn(struct Sim *theSim){
+  return(theSim->BoundTypeRIn);
 }
-int sim_BoundTypeZ(struct Sim *theSim){
-  return(theSim->BoundTypeZ);
+int sim_BoundTypeROut(struct Sim *theSim){
+  return(theSim->BoundTypeROut);
+}
+int sim_BoundTypeZBot(struct Sim *theSim){
+  return(theSim->BoundTypeZBot);
+}
+int sim_BoundTypeZTop(struct Sim *theSim){
+  return(theSim->BoundTypeZTop);
 }
 int sim_Ncells(struct Sim *theSim){
   return(theSim->Ncells);

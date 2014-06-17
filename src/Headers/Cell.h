@@ -96,10 +96,14 @@ void cell_syncproc_z( struct Cell *** , struct Sim *,struct MPIsetup *);
 void cell_plm_rz( struct Cell *** ,struct Sim *, struct Face * , struct TimeStep * , struct MPIsetup *, int );
 void cell_plm_p( struct Cell *** ,struct Sim * );
 //boundary conditions
-void cell_boundary_outflow_r( struct Cell *** , struct Face * ,struct Sim * ,struct MPIsetup *, struct TimeStep * );
-void cell_boundary_outflow_z( struct Cell *** , struct Face * , struct Sim * ,struct MPIsetup *,struct TimeStep * );
-void cell_boundary_fixed_r( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell *,struct Sim *,int,int,int));
-void cell_boundary_fixed_z( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell *,struct Sim *,int,int,int));
+void cell_boundary_outflow_r_inner( struct Cell *** , struct Face * ,struct Sim * ,struct MPIsetup *, struct TimeStep * );
+void cell_boundary_outflow_r_outer( struct Cell *** , struct Face * ,struct Sim * ,struct MPIsetup *, struct TimeStep * );
+void cell_boundary_outflow_z_bot( struct Cell *** , struct Face * , struct Sim * ,struct MPIsetup *,struct TimeStep * );
+void cell_boundary_outflow_z_top( struct Cell *** , struct Face * , struct Sim * ,struct MPIsetup *,struct TimeStep * );
+void cell_boundary_fixed_r_inner( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell *,struct Sim *,int,int,int));
+void cell_boundary_fixed_r_outer( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell *,struct Sim *,int,int,int));
+void cell_boundary_fixed_z_bot( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell *,struct Sim *,int,int,int));
+void cell_boundary_fixed_z_top( struct Cell ***, struct Sim *,struct MPIsetup *,void (*)(struct Cell *,struct Sim *,int,int,int));
 void cell_bc_damp( struct Cell *** , struct Sim * , double ,void (*)(struct Cell *,struct Sim *,int,int,int));
 //primitive-conservative conversion routines
 void cell_calc_prim( struct Cell ***,struct Sim *);

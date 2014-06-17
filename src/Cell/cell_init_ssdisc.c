@@ -35,7 +35,7 @@ void cell_init_ssdisc_thompson(struct Cell *c, double r, double phi, double z, s
 
     if(DR > 0.0)
     {
-        prof = 1.0/(1.0+exp(-(r-r0)/DR));
+        double prof = 1.0/(1.0+exp(-(r-r0)/DR));
         rho *= prof;
         P *= prof;
     }

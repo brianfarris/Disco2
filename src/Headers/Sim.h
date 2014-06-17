@@ -19,8 +19,10 @@ struct Sim {
   //fixed parameters
   int InitialDataType;
   int GravMassType;
-  int BoundTypeR;
-  int BoundTypeZ;
+  int BoundTypeRIn;
+  int BoundTypeROut;
+  int BoundTypeZBot;
+  int BoundTypeZTop;
   int NoInnerBC;
   int Restart;
   int Background;
@@ -85,8 +87,10 @@ int sim_NoInnerBC(struct Sim *);
 int sim_Restart(struct Sim *);
 int sim_Background(struct Sim *);
 int sim_Metric(struct Sim *);
-int sim_BoundTypeR(struct Sim *);
-int sim_BoundTypeZ(struct Sim *);
+int sim_BoundTypeRIn(struct Sim *);
+int sim_BoundTypeROut(struct Sim *);
+int sim_BoundTypeZBot(struct Sim *);
+int sim_BoundTypeZTop(struct Sim *);
 int sim_N_global(struct Sim *,int);
 int sim_Ncells(struct Sim *);
 int sim_Ncells_global(struct Sim *);

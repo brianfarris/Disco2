@@ -11,7 +11,7 @@
 #include "../Headers/header.h"
 
 
-void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces ,struct Sim * theSim,struct MPIsetup * theMPIsetup, struct TimeStep * theTimeStep ){
+void cell_boundary_outflow_r_inner( struct Cell *** theCells , struct Face * theFaces ,struct Sim * theSim,struct MPIsetup * theMPIsetup, struct TimeStep * theTimeStep ){
   int Nf = timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR);
   int NUM_Q = sim_NUM_Q(theSim);
   int n1 = timestep_n(theTimeStep,sim_N(theSim,R_DIR)-2,R_DIR);
@@ -61,6 +61,16 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
       }
     }
   }
+}
+
+void cell_boundary_outflow_r_outer( struct Cell *** theCells , struct Face * theFaces ,struct Sim * theSim,struct MPIsetup * theMPIsetup, struct TimeStep * theTimeStep ){
+  int Nf = timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR);
+  int NUM_Q = sim_NUM_Q(theSim);
+  int n1 = timestep_n(theTimeStep,sim_N(theSim,R_DIR)-2,R_DIR);
+
+  int n,q;
+  int i,j,k;
+  double r_face,r_face_m1,r_face_p1,r_cell;
 
   if( mpisetup_check_rout_bndry(theMPIsetup) ){
     for( n=n1 ; n<Nf ; ++n ){
@@ -95,12 +105,10 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         }
       }
     }
-
   }
-
 }
 
-void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces, struct Sim * theSim,struct MPIsetup * theMPIsetup,struct TimeStep * theTimeStep ){
+void cell_boundary_outflow_z_bot( struct Cell *** theCells , struct Face * theFaces, struct Sim * theSim,struct MPIsetup * theMPIsetup,struct TimeStep * theTimeStep ){
   int NUM_Q = sim_NUM_Q(theSim);
 
   int j,i;
@@ -136,6 +144,18 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       }
     }
   }
+}
+
+
+void cell_boundary_outflow_z_top( struct Cell *** theCells , struct Face * theFaces, struct Sim * theSim,struct MPIsetup * theMPIsetup,struct TimeStep * theTimeStep ){
+  int NUM_Q = sim_NUM_Q(theSim);
+
+  int j,i;
+  int Nf = timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-1,Z_DIR);
+  int n0 = timestep_n(theTimeStep,1,Z_DIR);
+  int n1 = timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-2,Z_DIR);
+
+  int n,q;
 
   if(mpisetup_check_ztop_bndry(theMPIsetup)){
     for( n=n1 ; n<Nf ; ++n ){
@@ -164,10 +184,9 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       }
     }
   }
-
 }
 
-void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup, 
+void cell_boundary_fixed_r_inner( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup, 
     void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int) ){
   int i,j,k;
   if (sim_NoInnerBC(theSim)!=1){ // if the global inner radius is set negative, we don't apply an inner BC
@@ -193,7 +212,11 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct 
                 for(j=0; j<sim_N_p(theSim,0); j++)
                     (*single_init_ptr)(&(theCells[k][0][j]),theSim,0,j,k);
           }
+}
 
+void cell_boundary_fixed_r_outer( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup, 
+    void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int) ){
+    int i,j,k;
   if( mpisetup_check_rout_bndry(theMPIsetup) ){
     for( i=sim_N(theSim,R_DIR)-1 ; i>sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)-1 ; --i ){
       for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -206,7 +229,7 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct 
 
 }
 
-void cell_boundary_fixed_z( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup,
+void cell_boundary_fixed_z_bot( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup,
     void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int)  ){
   int i,j,k;
   if(mpisetup_check_zbot_bndry(theMPIsetup)){
@@ -218,7 +241,11 @@ void cell_boundary_fixed_z( struct Cell *** theCells, struct Sim *theSim,struct 
       }
     }
   }
+}
 
+void cell_boundary_fixed_z_top( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup,
+    void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int)  ){
+  int i,j,k;
   if( mpisetup_check_ztop_bndry(theMPIsetup) ){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( k=sim_N(theSim,Z_DIR)-1 ; k>sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR)-1 ; --k ){

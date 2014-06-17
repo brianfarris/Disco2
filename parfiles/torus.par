@@ -25,8 +25,10 @@ Num_Diag_Dump           100
 Num_Diag_Measure        100
 
 NoInnerBC               0
-BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
-BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeRIn            1               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeROut           1               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZBot           2               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZTop           2               // 0 fixed, 1 outflow, 2 periodic
 
 Move_Cells              3
 RiemannSolver           0           // 0 hllc, 1 hll

@@ -211,17 +211,33 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_syncproc_z(theCells,theSim,theMPIsetup);
 
   //Boundary Data
-  if (sim_BoundTypeR(theSim)==BOUND_OUTFLOW){
-    cell_boundary_outflow_r( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
-  }else if (sim_BoundTypeR(theSim)==BOUND_FIXED){
-    cell_boundary_fixed_r(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+  //R - Inner
+  if (sim_BoundTypeRIn(theSim)==BOUND_OUTFLOW){
+    cell_boundary_outflow_r_inner( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
+  }else if (sim_BoundTypeRIn(theSim)==BOUND_FIXED){
+    cell_boundary_fixed_r_inner(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+  }
+  //R - Outer
+  if (sim_BoundTypeROut(theSim)==BOUND_OUTFLOW){
+    cell_boundary_outflow_r_outer( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
+  }else if (sim_BoundTypeROut(theSim)==BOUND_FIXED){
+    cell_boundary_fixed_r_outer(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
   }
   if (sim_N_global(theSim,Z_DIR)>1){
-    if (sim_BoundTypeZ(theSim)==BOUND_OUTFLOW){
-      cell_boundary_outflow_z( theCells , theFaces_z ,theSim,theMPIsetup, theTimeStep );
-    }else if (sim_BoundTypeZ(theSim)==BOUND_FIXED){
-      cell_boundary_fixed_z(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
-    } else if (sim_BoundTypeZ(theSim)==BOUND_PERIODIC){
+    //Z - Bottom
+    if (sim_BoundTypeZBot(theSim)==BOUND_OUTFLOW){
+      cell_boundary_outflow_z_bot( theCells , theFaces_z ,theSim,theMPIsetup, theTimeStep );
+    }else if (sim_BoundTypeZBot(theSim)==BOUND_FIXED){
+      cell_boundary_fixed_z_bot(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+    } else if (sim_BoundTypeZBot(theSim)==BOUND_PERIODIC){
+      //do nothing, this is already handled by the syncing routine
+    }
+    //Z - Top
+    if (sim_BoundTypeZTop(theSim)==BOUND_OUTFLOW){
+      cell_boundary_outflow_z_top( theCells , theFaces_z ,theSim,theMPIsetup, theTimeStep );
+    }else if (sim_BoundTypeZTop(theSim)==BOUND_FIXED){
+      cell_boundary_fixed_z_top(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+    } else if (sim_BoundTypeZTop(theSim)==BOUND_PERIODIC){
       //do nothing, this is already handled by the syncing routine
     }
   } 
