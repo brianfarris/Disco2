@@ -50,7 +50,9 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
 void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses , double dt ){
   int GRAV2D=sim_GRAV2D(theSim);
   int i,j,k;
-  //FILE * gradpsifile= fopen("gradpsi.dat","w");
+  FILE *sourcefile;
+  if(PRINTTOOMUCH)
+      sourcefile = fopen("source.out","w");
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     double zp = sim_FacePos(theSim,k,Z_DIR);
@@ -213,6 +215,9 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                         if(PRINTTOOMUCH)
                         {
                             printf("SRR source: (%d,%d,%d): r=%.12g, dV=%.12g, s = %.12g, S = %.12g\n",i,j,k,r,dV,a*sqrtg*sk,dt*dV*sqrtg*a * sk);
+                            fprintf(sourcefile, "(%d,%d,%d): r=%.12g, Fg=%.12g, Fc=%.12g, P/r=%.12g, F=%.12g\n", 
+                                    i,j,k,r,0.5*rhoh*u[0]*u[0]*metric_dg_dd(g,1,0,0), 0.5*rhoh*u[2]*u[2]*metric_dg_dd(g,1,2,2), 
+                                    0.5*metric_g_uu(g,2,2)*Pp*metric_dg_dd(g,1,2,2), sk);
                         }
                     }
                     else if(la == 2)
@@ -264,10 +269,14 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
             c->cons[TAU] += dt*dV*sqrtg*a * s;
 
+            //Cooling
             c->cons[SRR] -= dt*dV*sqrtg*a* cool*u_d[1];
             c->cons[LLL] -= dt*dV*sqrtg*a* cool*u_d[2];
             c->cons[SZZ] -= dt*dV*sqrtg*a* cool*u_d[3];
-            c->cons[TAU] -= dt*dV*sqrtg*a* a*cool*u[0]; 
+            if(c->cons[TAU] < dt*dV*sqrtg*a* a*cool*u[0])
+                c->cons[TAU] /= 2.0;
+            else
+                c->cons[TAU] -= dt*dV*sqrtg*a* a*cool*u[0]; 
 
             metric_destroy(g);
         }
@@ -279,5 +288,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
       }
     }
   }
+
+  if(PRINTTOOMUCH)
+    fclose(sourcefile);
 }
 

@@ -48,12 +48,59 @@ void cell_init_disctest_rigid(struct Cell *c, double r, double phi, double z, st
     }
 }
 
+//Keplerian Disc, with optional gaussian bump.
+void cell_init_disctest_kepler(struct Cell *c, double r, double phi, double z, struct Sim *theSim)
+{
+    double rho = 1.0;
+    double vr, vp, Pp;
+    double B = sim_InitPar1(theSim);
+    double mach0 = sim_InitPar2(theSim);
+    double r0 = sim_InitPar3(theSim);
+    double dr = sim_InitPar4(theSim);
+    double GAM = sim_GAMMALAW(theSim);
+    double M  = sim_GravM(theSim);
+    double nu = fabs(sim_AlphaVisc(theSim));
+
+
+    rho = 1.0 + B*sqrt(r0/r) + exp(-(r-r0)*(r-r0)/(2*dr*dr));
+    Pp = (1.0 + B) * M / (r0 * GAM * mach0*mach0);
+    vr = - 3*nu*(1.0+(1.0-r*(r-r0)/(dr*dr))*exp(-(r-r0)*(r-r0)/(2*dr*dr))) / (2*r*rho);
+    vp = sqrt(M/(r*r*r));
+    
+    if(dr < 0)
+    {
+        rho = 1.0 + B*sqrt(r0/r);
+        vr = -3*nu/(2*r);
+    }
+   
+    c->prim[RHO] = rho;
+    c->prim[PPP] = Pp;
+    c->prim[URR] = vr;
+    c->prim[UPP] = vp;
+    c->prim[UZZ] = 0.0;
+
+    if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) 
+    {
+        int i;
+        double x;
+        for(i=sim_NUM_C(theSim); i<sim_NUM_Q(theSim); i++)
+        {
+            if(r*cos(phi) < 0)
+                c->prim[i] = 0.0;
+            else
+                c->prim[i] = 1.0;
+        }
+    }
+}
+
 void cell_init_disctest_calc(struct Cell *c, double r, double phi, double z, struct Sim *theSim)
 {
     int test_num = sim_InitPar0(theSim);
 
     if(test_num == 0)
         cell_init_disctest_rigid(c, r, phi, z, theSim);
+    else if(test_num == 1)
+        cell_init_disctest_kepler(c, r, phi, z, theSim);
     else
         printf("ERROR: cell_init_disctest given bad option.\n");
 }

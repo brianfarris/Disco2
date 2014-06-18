@@ -5,9 +5,9 @@ InitialDataType        17       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 8 Isentrope, 9 GR-Bondi, 10 GR-Bondi2,
                                 // 11 Equilibrium1, 12 Equilibrium2, 13 SSDisc
                                 // 14 NTDisc, 15 ConstantDisc,
-                                // 16 Cartesian-Shear, 17 Keplerian Disc
+                                // 16 Cartesian-Shear, 17 Disc Tests
 GravMassType            0       // 0 none, 1 single, 2 binary
-Background              2       // 0 Newtonian, 1 GR, 2 GRvisc
+Background              1       // 0 Newtonian, 1 GR, 2 GRvisc
 Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS, 3 Flat-Cartesian
 Restart                 0       // If this=1 restart using input.h5
@@ -16,27 +16,27 @@ Restart                 0       // If this=1 restart using input.h5
 NumR		    64			//Radial Zones
 NumZ			1          //Vertical Zones
 ng              2
-R_Min		    200
+R_Min		    50
 R_Max			2000
 Z_Min			-1000.0
 Z_Max			1000.0
-NP_CONST        -1
+NP_CONST        3
 aspect          1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                3.0e6
-Num_Checkpoints	        100
+Time_Max                6.28e7
+Num_Checkpoints	        1000
 Num_Diag_Dump           20
 Num_Diag_Measure        20
 
 
-NoInnerBC            0
+NoInnerBC               1
 BoundTypeRIn            0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeROut           0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZTop           2               // 0 fixed, 1 outflow, 2 periodic
-ZeroPsiBndry         1
+ZeroPsiBndry            1
 
 Move_Cells              0
 RiemannSolver           1           // 0 hllc, 1 hll
@@ -48,16 +48,16 @@ PLM			1.0
 
 Grav_2D			1
 G_EPS			0.0
-GravM           0.0001
-AlphaVisc       0.001
+GravM           0.001
+AlphaVisc       0.000
 CoolFac         0.0
 
 //Initial Condition Parameters
-InitPar0        0         // 
-InitPar1        1.0       // B
-InitPar2        20        // mach# at r0
+InitPar0        1         // Keplerian Spreading
+InitPar1        0.0       // B
+InitPar2        10        // mach# at r0
 InitPar3        1000      // r0
-InitPar4        100       // dr
+InitPar4        -100      // dr
 
 PHI_ORDER               2
 
@@ -74,9 +74,9 @@ DAMP_TIME               -1.0        // Set negative to turn off
 RDAMP_INNER             0.0
 RDAMP_OUTER             0.0
 
-RLogScale               1000.0
-ZLogScale               1000.0
-HiResSigma              1000.0
-HiResR0                 1000.0
+RLogScale               1.0e6
+ZLogScale               1.0e6
+HiResSigma              1.0e6
+HiResR0                 1.0e6
 HiResFac                0.0
 

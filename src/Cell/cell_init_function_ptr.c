@@ -38,8 +38,6 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_cnstdisc);
   } else if (sim_InitialDataType(theSim)==CARTSHEAR){
     return(&cell_init_cartshear);
-  } else if (sim_InitialDataType(theSim)==KEPDISC){
-    return(&cell_init_kepdisc);
   } else if (sim_InitialDataType(theSim)==DISCTEST){
     return(&cell_init_disctest);
    } else{
@@ -83,8 +81,6 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_cnstdisc);
    } else if (sim_InitialDataType(theSim)==CARTSHEAR){
     return(&cell_single_init_cartshear);
-   } else if (sim_InitialDataType(theSim)==KEPDISC){
-    return(&cell_single_init_kepdisc);
    } else if (sim_InitialDataType(theSim)==DISCTEST){
     return(&cell_single_init_disctest);
   } else{

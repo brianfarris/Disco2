@@ -84,7 +84,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     double w, wmo, wmo0, wmo1; //w = lapse * u^0, wmo = w-1
     double e, s2, gam; //e = (tau+rhostar)/rhostar, s2 = S_i*S^i/rhostar^2, gam = (GAMMALAW-1)/GAMMALAW
     double c[5];
-    double eps = 1.0e-10;
+    double eps = 1.0e-14;
     double CS_FLOOR, CS_CAP, RHO_FLOOR;
     double r, phi, z;
 
@@ -165,8 +165,8 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
         printf("ERROR: h < 0 in cons2prim_gr (r = %lg, h-1 = %lg)\n", r, hmo);
     else if(hmo < 0.0)
     {
-        printf("ERROR: h < 1 in cons2prim_gr (r = %lg, h-1 = %lg)\n", r, hmo);
-        printf("       e^2 = %lg, s^2 = %lg, w =%lg\n", e*e, s2, w);
+        printf("ERROR: h < 1 in cons2prim_gr (r = %.12g, h-1 = %.12g)\n", r, hmo);
+        printf("       e^2 = %.12g, s^2 = %.12g, w =%.12g\n", e*e, s2, w);
     }
 
     RHO_FLOOR = sim_RHO_FLOOR(theSim);
