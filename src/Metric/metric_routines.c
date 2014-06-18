@@ -96,7 +96,7 @@ double metric_conn(struct Metric *g, int tau, int mu, int nu)
     return 0.5*connection;
 }
 
-double metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, struct Sim *theSim)
+void metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, struct Sim *theSim)
 {
     //Fills shear tensor sigma^{ij} = shear(4*i+j) given 
     // coordinate 3-velocity v and (partial der) gradient dv (d_{i}v^{j} =  dv[3*i+j])
