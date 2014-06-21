@@ -33,7 +33,7 @@ void cell_init_ssdisc_thompson(struct Cell *c, double r, double phi, double z, s
     double vr = -vr0 * pow(r0/r, 0.4);
     double vp = sqrt(M/(r*r*r));
 
-    if(DR > 0.0)
+    if(DR > 0.0 && r < r0+3*DR)
     {
         double prof = 1.0/(1.0+exp(-(r-r0)/DR));
         rho *= prof;
