@@ -24,13 +24,13 @@ void cell_init_ssdisc_thompson(struct Cell *c, double r, double phi, double z, s
     if(q0 == 0.0)
         q0 = 1.0;
 
-    double rho0 = pow(18*alpha, -0.25) * pow(M/(GAM*r0), 0.375) * pow(q0/(r0*mach0*mach0), 0.25);
+    double rho0 = sqrt(2*q0/alpha)*pow(M*M*M*M*M/(GAM*GAM*GAM*GAM*GAM*GAM*GAM*r0*r0*r0), 0.25) / (3.0*mach0*mach0*mach0);
     double P0 = M*rho0/(GAM*r0*mach0*mach0);
-    double vr0 = 3*alpha * sqrt(M/(GAM*r0)) / (mach0*mach0);
+    double vr0 = -3*alpha * sqrt(M/(GAM*r0)) / (mach0*mach0);
     
     double rho = rho0 * pow(r0/r, 0.6);
     double P = P0 * pow(r0/r, 1.5);
-    double vr = -vr0 * pow(r0/r, 0.4);
+    double vr = vr0 * pow(r0/r, 0.4);
     double vp = sqrt(M/(r*r*r));
 
     if(DR > 0.0 && r < r0+3*DR)

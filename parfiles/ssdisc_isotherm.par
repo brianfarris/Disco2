@@ -38,7 +38,7 @@ BoundTypeZTop           2       // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2       // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry            1
 
-Move_Cells              2       // 0 None, 2 Keplerian
+Move_Cells              0       // 0 None, 2 Keplerian
 RiemannSolver           1           // 0 hllc, 1 hll
 Adiabatic_Index         1.0001
 
@@ -54,9 +54,9 @@ CoolFac         0.0
 
 //Initial Condition Parameters
 InitPar0        1       //0 Thompson Cooling, 1 Isothermic
-InitPar1        10      // Mach # @ R0
+InitPar1        20      // Mach # @ R0
 InitPar2        2.0     // R0
-InitPar3        -0.2    // DR Cavity width (negative to turn off)
+InitPar3        0.2    // DR Cavity width (negative to turn off)
 InitPar4        1.0     // Rho0 (Isotherm)
 
 PHI_ORDER               2
