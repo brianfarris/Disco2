@@ -56,7 +56,7 @@ CoolFac         1.0e28
 InitPar0        0       //0 Thompson Cooling
 InitPar1        10      // Mach # @ R0
 InitPar2        2.0     // R0
-InitPar3        -0.2     // DR Cavity width (negative to turn off)
+InitPar3        0.2     // DR Cavity width (negative to turn off)
 InitPar4        0.0
 
 PHI_ORDER               2
