@@ -60,12 +60,59 @@ void cell_init_ssdisc_thompson(struct Cell *c, double r, double phi, double z, s
     }
 }
 
+void cell_init_ssdisc_isotherm(struct Cell *c, double r, double phi, double z, struct Sim *theSim)
+{
+    double mach0 = sim_InitPar1(theSim);
+    double r0 = sim_InitPar2(theSim);
+    double DR = sim_InitPar3(theSim);
+    double rho0 = sim_InitPar4(theSim);
+    double GAM = sim_GAMMALAW(theSim);
+    double M = sim_GravM(theSim);
+    double alpha = sim_AlphaVisc(theSim);
+    double q0 = sim_CoolFac(theSim);
+
+    double P0  = rho0 * M / (sqrt(GAM) * r0 * mach0*mach0);
+    double vr0 = - 3 * alpha * sqrt(M/(GAM*r0)) / (mach0*mach0);
+    
+    double rho = rho0 * pow(r/r0, -1.5);
+    double P = P0 * pow(r/r0, -1.5);
+    double vr = vr0 * sqrt(r/r0);
+    double vp = sqrt(M/(r*r*r));
+
+    if(DR > 0.0 && r < r0+3*DR)
+    {
+        double prof = 1.0/(1.0+exp(-(r-r0)/DR));
+        rho *= prof;
+        P *= prof;
+    }
+    
+    c->prim[RHO] = rho;
+    c->prim[PPP] = P;
+    c->prim[URR] = vr;
+    c->prim[UPP] = vp;
+    c->prim[UZZ] = 0.0;
+
+    if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) 
+    {
+        int i;
+        double x;
+        for(i=sim_NUM_C(theSim); i<sim_NUM_Q(theSim); i++)
+        {
+            if(r*cos(phi) < 0)
+                c->prim[i] = 0.0;
+            else
+                c->prim[i] = 1.0;
+        }
+    }
+}
 void cell_init_ssdisc_calc(struct Cell *c, double r, double phi, double z, struct Sim *theSim)
 {
     int disc_num = sim_InitPar0(theSim);
 
     if(disc_num == 0)
         cell_init_ssdisc_thompson(c, r, phi, z, theSim);
+    else if(disc_num == 1)
+        cell_init_ssdisc_isotherm(c, r, phi, z, theSim);
     else
         printf("ERROR: cell_init_ssdisc given bad option.\n");
 }
