@@ -276,13 +276,26 @@ void cell_boundary_ssprofile_r_inner( struct Cell *** theCells, struct Sim *theS
                 for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k )
                     for( j=0 ; j<sim_N_p(theSim,i) ; ++j )
                     {
-                        theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn, -0.6);
-                        theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn, -1.5);
-                        theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn, -0.4);
-                        theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn, -1.5);
-                        theCells[k][i][j].prim[UZZ] = 0.0;
-                        for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
-                            theCells[k][i][j].prim[q] = primIn[q] * pow(r/rIn, -0.6);
+                        if(sim_InitPar0(theSim)==0)
+                        {
+                            theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn, -0.6);
+                            theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn, -1.5);
+                            theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn, -0.4);
+                            theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn, -1.5);
+                            theCells[k][i][j].prim[UZZ] = 0.0;
+                            for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                theCells[k][i][j].prim[q] = primIn[q] * pow(r/rIn, -0.6);
+                        }
+                        else if(sim_InitPar0(theSim)==1)
+                        {
+                            theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn, -1.5);
+                            theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn, -1.5);
+                            theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn, 0.5);
+                            theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn, -1.5);
+                            theCells[k][i][j].prim[UZZ] = 0.0;
+                            for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                theCells[k][i][j].prim[q] = primIn[q] * pow(r/rIn, -1.5);
+                        }
                     }
             }
         }
@@ -305,13 +318,26 @@ void cell_boundary_ssprofile_r_outer( struct Cell *** theCells, struct Sim *theS
             for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k )
                 for( j=0 ; j<sim_N_p(theSim,i) ; ++j )
                 {
-                    theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut, -0.6);
-                    theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut, -1.5);
-                    theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut, -0.4);
-                    theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut, -1.5);
-                    theCells[k][i][j].prim[UZZ] = 0.0;
-                    for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
-                        theCells[k][i][j].prim[q] = primOut[q] * pow(r/rOut, -0.6);
+                    if(sim_InitPar0(theSim)==0)
+                    {
+                        theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut, -0.6);
+                        theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut, -1.5);
+                        theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut, -0.4);
+                        theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut, -1.5);
+                        theCells[k][i][j].prim[UZZ] = 0.0;
+                        for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                            theCells[k][i][j].prim[q] = primOut[q] * pow(r/rOut, -0.6);
+                    }
+                    else if(sim_InitPar0(theSim)==1)
+                    {
+                        theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut, -1.5);
+                        theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut, -1.5);
+                        theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut, 0.5);
+                        theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut, -1.5);
+                        theCells[k][i][j].prim[UZZ] = 0.0;
+                        for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                            theCells[k][i][j].prim[q] = primOut[q] * pow(r/rOut, -1.5);
+                    }
                 }
         }
     }

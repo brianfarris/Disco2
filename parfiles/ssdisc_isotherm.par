@@ -40,7 +40,7 @@ ZeroPsiBndry            1
 
 Move_Cells              2       // 0 None, 2 Keplerian
 RiemannSolver           1           // 0 hllc, 1 hll
-Adiabatic_Index         1.3333333333
+Adiabatic_Index         1.0001
 
 //Numerical Parameters
 CFL			0.5
