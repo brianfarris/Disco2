@@ -33,9 +33,9 @@ void cell_init_ssdisc_thompson(struct Cell *c, double r, double phi, double z, s
     double vr = vr0 * pow(r0/r, 0.4);
     double vp = sqrt(M/(r*r*r));
 
-    if(DR > 0.0 && r < r0+3*DR)
+    if(DR > 0.0 && r < r0)
     {
-        double prof = 1.0/(1.0+exp(-(r-r0)/DR));
+        double prof = exp(-(r-r0)*(r-r0)/(2*DR*DR));
         rho *= prof;
         P *= prof;
     }
@@ -79,9 +79,9 @@ void cell_init_ssdisc_isotherm(struct Cell *c, double r, double phi, double z, s
     double vr = vr0 * sqrt(r/r0);
     double vp = sqrt(M/(r*r*r));
 
-    if(DR > 0.0 && r < r0+3*DR)
+    if(DR > 0.0 && r < r0)
     {
-        double prof = 1.0/(1.0+exp(-(r-r0)/DR));
+        double prof = exp(-(r-r0)*(r-r0)/(2*DR*DR));
         rho *= prof;
         P *= prof;
     }
