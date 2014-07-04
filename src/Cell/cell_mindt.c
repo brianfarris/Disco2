@@ -180,6 +180,7 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                     double dtv = 0.25*dx*dx/nu;
                     
                     //Luminosity Time
+                    double maxdisp = 0.1;
                     double dV = 0.5*(rp+rm)*dr*dphi*dz;
                     double rho = theCells[k][i][j].prim[RHO];
                     double Pp = theCells[k][i][j].prim[PPP];
@@ -210,7 +211,6 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                     }
                     metric_destroy(g);
 
-                    double maxdisp = 0.1;
                     double dtl, dtl_min;
                     dtl = maxdisp * theCells[k][i][j].cons[TAU] / (dV*al*al*sqrtg*u[0]*cool);
                     dtl_min = dtl;
