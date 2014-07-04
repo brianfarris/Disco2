@@ -179,6 +179,8 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
             u[i] += metric_gamma_dd(g,i,j) * (v[j]+b[j]);
         u[i] *= u0;
     }
+    if(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v) < 0)
+        printf("ERROR: Velocity too high in visc_flux. r=%.12g, vr=%.12g, vp=%.12g, vz=%.12g\n", r, v[0], v[1], v[2]);
 
     //Calculate beta & v normal to face.
     vn = v[0]*theRiemann->n[0] + v[1]*theRiemann->n[1] + v[2]*theRiemann->n[2];

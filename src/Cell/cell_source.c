@@ -144,19 +144,19 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
            
             //Viscous Terms
             double cool, visc[16], viscm[16];
+            double M = sim_GravM(theSim);
             cool = 0.0;
             for(mu=0; mu<16; mu++)
             {
                 visc[mu] = 0.0;
                 viscm[mu] = 0.0;
             }
-            if(sim_Background(theSim) == GRVISC1)
+            if(sim_Background(theSim) == GRVISC1 && r > 3*M)
             {
                 double du0;
                 double dv[12], du[16];
                 double cs2;
                 double alpha = sim_AlphaVisc(theSim);
-                double M = sim_GravM(theSim);
 
                 double temp = Pp/rho;
                 double height = 2*sqrt(Pp*r*r*r*(1-3*M/r)/(rhoh*M));
@@ -270,11 +270,22 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             c->cons[TAU] += dt*dV*sqrtg*a * s;
 
             //Cooling
-            c->cons[SRR] -= dt*dV*sqrtg*a* cool*u_d[1];
-            c->cons[LLL] -= dt*dV*sqrtg*a* cool*u_d[2];
-            c->cons[SZZ] -= dt*dV*sqrtg*a* cool*u_d[3];
+            //Cooling should never (?) change the sign of the momenta,
+            //if it will, instead reduce the momenta by 0.9.
+            if(fabs(c->cons[SRR]) < fabs(dt*dV*sqrtg*a* cool*u_d[1]))
+                c->cons[SRR] /= 1.1;
+            else
+                c->cons[SRR] -= dt*dV*sqrtg*a* cool*u_d[1];
+            if(fabs(c->cons[LLL]) <  fabs(dt*dV*sqrtg*a* cool*u_d[2]))
+                c->cons[LLL] /= 1.1;
+            else
+                c->cons[LLL] -= dt*dV*sqrtg*a* cool*u_d[2];
+            if( fabs(c->cons[SZZ]) < fabs(dt*dV*sqrtg*a* cool*u_d[3]))
+                c->cons[SZZ] /= 1.1;
+            else
+                c->cons[SZZ] -= dt*dV*sqrtg*a* cool*u_d[3];
             if(c->cons[TAU] < dt*dV*sqrtg*a* a*cool*u[0])
-                c->cons[TAU] /= 2.0;
+                c->cons[TAU] /= 1.1;
             else
                 c->cons[TAU] -= dt*dV*sqrtg*a* a*cool*u[0]; 
 

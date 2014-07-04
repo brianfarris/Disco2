@@ -39,6 +39,11 @@ void cell_init_ssdisc_thompson(struct Cell *c, double r, double phi, double z, s
         rho *= prof;
         P *= prof;
     }
+
+    //TODO: Make General
+    //if(r*vp >= sqrt(1-2*M/r-vr*vr/(1-2*M/r)))
+    if(r <= 6*M)
+        vp = 0.5*sqrt(1-2*M/r-vr*vr/(1-2*M/r))/r;
     
     c->prim[RHO] = rho;
     c->prim[PPP] = P;

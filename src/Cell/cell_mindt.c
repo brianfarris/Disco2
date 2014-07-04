@@ -178,7 +178,54 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                         nu = alpha * 2.0 * sqrt(GAM*r*r*r*(1-3.0*M/r)/M) * Pp/rhoh;
                     }
                     double dtv = 0.25*dx*dx/nu;
-                    dt = dt/(1.0 + dt/dtv);
+                    
+                    //Luminosity Time
+                    double dV = 0.5*(rp+rm)*dr*dphi*dz;
+                    double rho = theCells[k][i][j].prim[RHO];
+                    double Pp = theCells[k][i][j].prim[PPP];
+                    double temp = Pp/rho;
+                    double cool = sim_CoolFac(theSim) * pow(temp,4) / (rho);
+
+                    struct Metric *g;
+                    int mu;
+                    g = metric_create(time_global, r, phi, z, theSim);
+                    double al, b[3], sqrtg, v[3], u[4], u_d[4];
+                    al = metric_lapse(g);
+                    for(mu=0; mu<3; mu++)
+                        b[mu] = metric_shift_u(g,mu);
+                    sqrtg = metric_sqrtgamma(g)/r;
+                    v[0] = theCells[k][i][j].prim[URR];
+                    v[1] = theCells[k][i][j].prim[UPP];
+                    v[2] = theCells[k][i][j].prim[UZZ];
+                    u[0] = 1.0/sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
+                    u[1] = u[0]*v[0]; u[2] = u[0]*v[1]; u[3] = u[0]*v[2];
+                    for(mu=0; mu<4; mu++)
+                        u_d[mu] = 0.0;
+                    for(mu=0; mu<4; mu++)
+                    {
+                        u_d[0] += metric_g_dd(g,0,mu)*u[mu];
+                        u_d[1] += metric_g_dd(g,1,mu)*u[mu];
+                        u_d[2] += metric_g_dd(g,2,mu)*u[mu];
+                        u_d[3] += metric_g_dd(g,3,mu)*u[mu];
+                    }
+                    metric_destroy(g);
+
+                    double maxdisp = 0.1;
+                    double dtl, dtl_min;
+                    dtl = maxdisp * theCells[k][i][j].cons[TAU] / (dV*al*al*sqrtg*u[0]*cool);
+                    dtl_min = dtl;
+                    dtl = maxdisp * theCells[k][i][j].cons[SRR] / (dV*al*sqrtg*u_d[1]*cool);
+                    if(dtl < dtl_min)
+                        dtl_min = dtl;
+                    dtl = maxdisp * theCells[k][i][j].cons[LLL] / (dV*al*sqrtg*u_d[2]*cool);
+                    if(dtl < dtl_min)
+                        dtl_min = dtl;
+                    dtl = maxdisp * theCells[k][i][j].cons[SZZ] / (dV*al*sqrtg*u_d[3]*cool);
+                    if(dtl < dtl_min)
+                        dtl_min = dtl;
+                    dtl = dtl_min;
+
+                    dt = dt/(1.0 + dt/dtv + dt/dtl);
                 }
 
                 if(dt_m > dt)
@@ -189,60 +236,7 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
     double dt2;
     MPI_Allreduce( &dt_m , &dt2 , 1 , MPI_DOUBLE , MPI_MIN , sim_comm );
 
-    double dt_newt = cell_mindt_newt(theCells, theSim);
-    //printf("\nNewtonian dt: %lg, GR dt: %lg\n", dt_newt, dt2);
-
-    return dt2;
-}
-
-double cell_mindt_grvisc1(struct Cell ***theCells, struct Sim *theSim)
-{
-    double dt_m = 1.e100;//HUGE_VAL;
-    int i,j,k;
-    for(k = sim_Nghost_min(theSim,Z_DIR); k < sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR); ++k)
-    {
-        double zm = sim_FacePos(theSim,k-1,Z_DIR);
-        double zp = sim_FacePos(theSim,k,Z_DIR);
-        double dz = zp-zm;
-        double z = 0.5*(zm+zp);
-        
-        for(i = sim_Nghost_min(theSim,R_DIR); i < sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR); ++i)
-        {
-            double rm = sim_FacePos(theSim,i-1,R_DIR);
-            double rp = sim_FacePos(theSim,i,R_DIR);
-            double dr = rp-rm;
-            double r = .5*(rp+rm);
-            
-            for(j = 0; j < sim_N_p(theSim,i); ++j)
-            {
-                int jm = j-1;
-                if(j == 0) 
-                    jm = sim_N_p(theSim,i)-1;
-                double w = .5*(theCells[k][i][j].wiph+theCells[k][i][jm].wiph); 
-                double dphi = theCells[k][i][j].dphi;
-                double phi = theCells[k][i][j].tiph - 0.5*dphi;
-
-                double ar, ap, az;
-                ar = cell_maxvel_gr(theCells[k][i][j].prim, 0, w, r, phi, z, theSim);
-                ap = cell_maxvel_gr(theCells[k][i][j].prim, 1, w, r, phi, z, theSim);
-                az = cell_maxvel_gr(theCells[k][i][j].prim, 2, w, r, phi, z, theSim);
-                
-                double dt = dr/ar;
-                if(dt > dphi/ap)
-                    dt = dphi/ap;
-                if(dt > dz/az)
-                    dt = dz/az;
-                dt *= sim_CFL(theSim);
-
-                if(dt_m > dt)
-                    dt_m = dt;
-            }     
-        }
-    }
-    double dt2;
-    MPI_Allreduce( &dt_m , &dt2 , 1 , MPI_DOUBLE , MPI_MIN , sim_comm );
-
-    double dt_newt = cell_mindt_newt(theCells, theSim);
+    //double dt_newt = cell_mindt_newt(theCells, theSim);
     //printf("\nNewtonian dt: %lg, GR dt: %lg\n", dt_newt, dt2);
 
     return dt2;

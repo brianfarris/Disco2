@@ -276,26 +276,48 @@ void cell_boundary_ssprofile_r_inner( struct Cell *** theCells, struct Sim *theS
                 for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k )
                     for( j=0 ; j<sim_N_p(theSim,i) ; ++j )
                     {
-                        if(sim_InitPar0(theSim)==0)
+                        if(sim_InitialDataType(theSim) == SSDISC)
                         {
-                            theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn, -0.6);
-                            theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn, -1.5);
-                            theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn, -0.4);
-                            theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn, -1.5);
-                            theCells[k][i][j].prim[UZZ] = 0.0;
-                            for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
-                                theCells[k][i][j].prim[q] = primIn[q] * pow(r/rIn, -0.6);
+                            if(sim_InitPar0(theSim)==0)
+                            {
+                                theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn, -0.6);
+                                theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn, -1.5);
+                                theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn, -0.4);
+                                theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn, -1.5);
+                                theCells[k][i][j].prim[UZZ] = 0.0;
+                                for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                    theCells[k][i][j].prim[q] = primIn[q] * pow(r/rIn, -0.6);
+                            }
+                            else if(sim_InitPar0(theSim)==1)
+                            {
+                                theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn, -1.5);
+                                theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn, -1.5);
+                                theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn, 0.5);
+                                theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn, -1.5);
+                                theCells[k][i][j].prim[UZZ] = 0.0;
+                                for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                    theCells[k][i][j].prim[q] = primIn[q] * pow(r/rIn, -1.5);
+                            }
                         }
-                        else if(sim_InitPar0(theSim)==1)
+                        else if(sim_InitialDataType(theSim) == NTDISC)
                         {
-                            theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn, -1.5);
-                            theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn, -1.5);
-                            theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn, 0.5);
-                            theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn, -1.5);
-                            theCells[k][i][j].prim[UZZ] = 0.0;
-                            for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
-                                theCells[k][i][j].prim[q] = primIn[q] * pow(r/rIn, -1.5);
+                            double M = sim_GravM(theSim);
+                            double rs = 6*M;
+                            double C = (1.0-3*M/r)/(1.0-3*M/rIn);
+                            double D = (1.0-2*M/r)/(1.0-2*M/rIn);
+                            double P = (1.0 - sqrt(rs/r) + sqrt(3*M/r)*(atanh(sqrt(3*M/r))-atanh(sqrt(3*M/rs)))) / (1.0 - sqrt(rs/rIn) + sqrt(3*M/rIn)*(atanh(sqrt(3*M/rIn))-atanh(sqrt(3*M/rs))));
+                            if(sim_InitPar0(theSim)==0)
+                            {
+                                theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn,-0.6) * pow(C,0.6) * pow(D,-1.6) * pow(P,0.6);
+                                theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn,-1.5) * sqrt(C) * P / (D*D);
+                                theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn,-0.4) * pow(C,-0.1) * pow(D,1.6) * pow(P,-0.6);
+                                theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn,-1.5);
+                                theCells[k][i][j].prim[UZZ] = 0.0;
+                                for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                    theCells[k][i][j].prim[q] = primIn[q] * pow(r/rIn,-0.6) * pow(C,0.6) * pow(D,-1.6) * pow(P,0.6);
+                            }
                         }
+
                     }
             }
         }
@@ -318,25 +340,47 @@ void cell_boundary_ssprofile_r_outer( struct Cell *** theCells, struct Sim *theS
             for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k )
                 for( j=0 ; j<sim_N_p(theSim,i) ; ++j )
                 {
-                    if(sim_InitPar0(theSim)==0)
+                    if(sim_InitialDataType(theSim) == SSDISC)
                     {
-                        theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut, -0.6);
-                        theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut, -1.5);
-                        theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut, -0.4);
-                        theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut, -1.5);
-                        theCells[k][i][j].prim[UZZ] = 0.0;
-                        for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
-                            theCells[k][i][j].prim[q] = primOut[q] * pow(r/rOut, -0.6);
+                        if(sim_InitPar0(theSim)==0)
+                        {
+                            theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut, -0.6);
+                            theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut, -1.5);
+                            theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut, -0.4);
+                            theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut, -1.5);
+                            theCells[k][i][j].prim[UZZ] = 0.0;
+                            for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                theCells[k][i][j].prim[q] = primOut[q] * pow(r/rOut, -0.6);
+                        }
+                        else if(sim_InitPar0(theSim)==1)
+                        {
+                            theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut, -1.5);
+                            theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut, -1.5);
+                            theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut, 0.5);
+                            theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut, -1.5);
+                            theCells[k][i][j].prim[UZZ] = 0.0;
+                            for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                theCells[k][i][j].prim[q] = primOut[q] * pow(r/rOut, -1.5);
+                        }
                     }
-                    else if(sim_InitPar0(theSim)==1)
+                    
+                    else if(sim_InitialDataType(theSim) == NTDISC)
                     {
-                        theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut, -1.5);
-                        theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut, -1.5);
-                        theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut, 0.5);
-                        theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut, -1.5);
-                        theCells[k][i][j].prim[UZZ] = 0.0;
-                        for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
-                            theCells[k][i][j].prim[q] = primOut[q] * pow(r/rOut, -1.5);
+                        double M = sim_GravM(theSim);
+                        double rs = 6*M;
+                        double C = (1.0-3*M/r)/(1.0-3*M/rOut);
+                        double D = (1.0-2*M/r)/(1.0-2*M/rOut);
+                        double P = (1.0 - sqrt(rs/r) + sqrt(3*M/r)*(atanh(sqrt(3*M/r))-atanh(sqrt(3*M/rs)))) / (1.0 - sqrt(rs/rOut) + sqrt(3*M/rOut)*(atanh(sqrt(3*M/rOut))-atanh(sqrt(3*M/rs))));
+                        if(sim_InitPar0(theSim)==0)
+                        {
+                            theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut,-0.6) * pow(C,0.6) * pow(D,-1.6) * pow(P,0.6);
+                            theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut,-1.5) * sqrt(C) * P / (D*D);
+                            theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut,-0.4) * pow(C,-0.1) * pow(D,1.6) * pow(P,-0.6);
+                            theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut,-1.5);
+                            theCells[k][i][j].prim[UZZ] = 0.0;
+                            for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                theCells[k][i][j].prim[q] = primOut[q] * pow(r/rOut,-0.6) * pow(C,0.6) * pow(D,-1.6) * pow(P,0.6);
+                        }
                     }
                 }
         }
