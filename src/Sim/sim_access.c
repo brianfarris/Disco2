@@ -65,7 +65,7 @@ int sim_Metric(struct Sim *theSim){
   return(theSim->Metric);
 }
 int sim_Frame(struct Sim *theSim){
-  return(theSim->Metric);
+  return(theSim->Frame);
 }
 int sim_Ncells_global(struct Sim *theSim){
   return(theSim->Ncells_global);

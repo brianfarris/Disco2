@@ -15,7 +15,7 @@ void cell_prim2cons_gr( double * prim , double * cons , double *pos , double dV 
 
     struct Metric *g;
     double a, b[3], sqrtg;
-    double u0, u[3];
+    double u0, u[4], U[4];
     double rho, Pp, v[3];
     double GAMMALAW, rhoh;
     double r, phi, z;
@@ -36,14 +36,17 @@ void cell_prim2cons_gr( double * prim , double * cons , double *pos , double dV 
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g, i);
     sqrtg = metric_sqrtgamma(g)/r;
+    for(i=0; i<4; i++)
+        U[i] = metric_frame_U_u(g, i, theSim);
 
     //Calculate 4-velocity, u0 = u^0, u[i] = u_i
     u0 = 1.0 / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
-    for(i=0; i<3; i++)
+    u[0] = metric_g_dd(g,0,0) * u0 + u0*metric_dot3_u(g,b,v);
+    for(i=1; i<4; i++)
     {
         u[i] = 0;
         for(j=0; j<3; j++)
-            u[i] += metric_gamma_dd(g,i,j) * (v[j]+b[j]);
+            u[i] += metric_gamma_dd(g,i-1,j) * (v[j]+b[j]);
         u[i] *= u0;
     }
 
@@ -60,10 +63,11 @@ void cell_prim2cons_gr( double * prim , double * cons , double *pos , double dV 
         printf("whoa, dV < 0! (r=%.12f)\n", r);
     
     cons[DDD] = a*sqrtg*u0 * rho * dV;
-    cons[SRR] = a*sqrtg*rhoh*u0 * u[0] * dV;
-    cons[LLL] = a*sqrtg*rhoh*u0 * u[1] * dV;
-    cons[SZZ] = a*sqrtg*rhoh*u0 * u[2] * dV;
-    cons[TAU] = sqrtg * (a*u0*(a*u0*rhoh - rho) - Pp) * dV;
+    cons[SRR] = a*sqrtg*rhoh*u0 * u[1] * dV;
+    cons[LLL] = a*sqrtg*rhoh*u0 * u[2] * dV;
+    cons[SZZ] = a*sqrtg*rhoh*u0 * u[3] * dV;
+    cons[TAU] = a*sqrtg*(u0*(-rhoh*(U[0]*u[0]+U[1]*u[1]+U[2]*u[2]+U[3]*u[3]) - rho) - U[0]*Pp) * dV;
+    //cons[TAU] = sqrtg * (a*u0*(a*u0*rhoh - rho) - Pp) * dV;
 
     int q;
     for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q ){
@@ -77,12 +81,12 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
 {
     int i,j;
     struct Metric *g;
-    double a, b[3], sqrtg;
+    double a, b[3], sqrtg, U[4];
     double GAMMALAW, rhoh, u0, hmo;
     double rho, v[3], Pp;
     double rhostar, S[3], tau;
     double w, wmo, wmo0, wmo1; //w = lapse * u^0, wmo = w-1
-    double e, s2, gam; //e = (tau+rhostar)/rhostar, s2 = S_i*S^i/rhostar^2, gam = (GAMMALAW-1)/GAMMALAW
+    double e, s2, gam, Us; //e = tau/rhostar, s2 = S_i*S^i/rhostar^2, gam = (GAMMALAW-1)/GAMMALAW, Us = (U0*b^i+U^i)S_i
     double c[5];
     double eps = 1.0e-14;
     double CS_FLOOR, CS_CAP, RHO_FLOOR;
@@ -99,6 +103,8 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g,i);
     sqrtg = metric_sqrtgamma(g)/r;
+    for(i=0; i<4; i++)
+        U[i] = metric_frame_U_u(g,i,theSim);
 
     //Conserved Quantities
     rhostar = cons[DDD]/dV;
@@ -109,19 +115,24 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     GAMMALAW = sim_GAMMALAW(theSim);
 
     //Dimensionless conserved variables for w recovery
-    e = (tau+rhostar)/rhostar;
+    e = tau/rhostar;
     s2 = metric_square3_d(g,S)/(rhostar*rhostar);
     gam = (GAMMALAW-1.0)/GAMMALAW;
+    Us = 0.0;
+    for(i=0; i<3; i++)
+        Us += (U[0]*b[i]+U[i+1])*S[i];
+    Us /= rhostar;
+    double E = (1.0 + e + Us) / (a*U[0]);
 
     //Coefficients of polynomial to solve for w
     c[0] = -s2*(gam-1)*(gam-1);
-    c[1] = 2*((e-gam)*(e-gam)+2*(gam-1)*s2);
-    c[2] = (5*e-gam)*(e-gam)-2*(3-gam)*s2;
-    c[3] = 4*e*e-4*s2-2*gam*e;
-    c[4] = e*e-s2;
+    c[1] = 2*((E-gam)*(E-gam)+2*(gam-1)*s2);
+    c[2] = (5*E-gam)*(E-gam)-2*(3-gam)*s2;
+    c[3] = 4*(E*E-s2) - 2*gam*E;
+    c[4] = E*E-s2;
     if(c[4] <= 0)
     {
-        printf("ERROR: e2 <= s2!: e^2 = %lg, s^2 = %lg\n",e*e,s2);
+        printf("ERROR: E2 <= s2!: e^2 = %lg, s^2 = %lg\n",e*e,s2);
         printf("r = %lg, dV = %lg\n", r, dV);
         printf("rho = %lg, P = %lg, vr = %lg, vp = %lg, vz = %lg\n",prim[RHO],prim[PPP],prim[URR],prim[UPP],prim[UZZ]);
         printf("rhostar = %lg, tau = %lg, Sr = %lg, Sp = %lg, Sz = %lg\n",cons[DDD],cons[TAU],cons[SRR],cons[LLL],cons[SZZ]);
@@ -160,7 +171,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     //Prim recovery
     w = wmo + 1.0;
     u0 = w/a;
-    hmo = w*(e-w)/(w*w-gam);
+    hmo = w*(E-w)/(w*w-gam);
     if(hmo < -1.0)
         printf("ERROR: h < 0 in cons2prim_gr (r = %lg, h-1 = %lg)\n", r, hmo);
     else if(hmo < 0.0)
