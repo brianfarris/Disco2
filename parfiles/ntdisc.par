@@ -49,12 +49,12 @@ PLM			1.0
 Grav_2D			1
 G_EPS			0.0
 GravM           1.0
-AlphaVisc       0.01
+AlphaVisc       0.1
 CoolFac         1.0e28
 
 //Initial Condition Parameters
 InitPar0        0       //0 Thompson Cooling
-InitPar1        1.0e10    // Accretion Rate
+InitPar1        1.0e9    // Accretion Rate
 InitPar2        200.0 // R0
 InitPar3        100.0    // DR Cavity width (negative to turn off)
 InitPar4        0.0
