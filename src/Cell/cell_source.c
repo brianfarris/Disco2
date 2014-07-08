@@ -108,7 +108,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         else if(sim_Background(theSim) == GR || sim_Background(theSim) == GRVISC1)
         {
             int mu, nu, la;
-            double a, b[3], sqrtg, n[4], u[4], u_d[4], s, sk, rhoh, GAMMALAW;
+            double a, b[3], sqrtg, u[4], u_d[4], U[4], s, sk, rhoh, GAMMALAW;
             double v[3];
             struct Metric *g;
             
@@ -117,6 +117,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             for(mu=0; mu<3; mu++)
                 b[mu] = metric_shift_u(g,mu);
             sqrtg = metric_sqrtgamma(g)/r;
+            for(mu=0; mu<4; mu++)
+                U[mu] = metric_frame_U_u(g, mu, theSim);
 
             v[0] = c->prim[URR];
             v[1] = c->prim[UPP];
@@ -133,11 +135,6 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 for(nu=0; nu<4; nu++)
                     u_d[mu] += metric_g_dd(g,mu,nu) * u[nu];
             }
-            //Normal vector n[i] = n^i
-            n[0] = 1.0/a;
-            n[1] = -n[0]*b[0];
-            n[2] = -n[0]*b[1];
-            n[3] = -n[0]*b[2];
 
             GAMMALAW = sim_GAMMALAW(theSim);
             rhoh = rho + GAMMALAW*Pp/(GAMMALAW-1);
@@ -181,6 +178,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             
                 for(mu=0; mu<16; mu++)
                     visc[mu] *= -alpha;
+                //viscm[4*mu+nu] = visc^mu_nu
                 for(mu=0; mu<4; mu++)
                     for(nu=0; nu<4; nu++)
                         for(la=0; la<4; la++)
@@ -236,32 +234,23 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                     //if(la == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
                     if(la == 3 && sim_N(theSim,Z_DIR)==1)
                         continue;
-                    s -= n[la]*sk;
+                    s -= U[la]*sk;
                 }
 
             //Remaining energy sources
-            for(la=0; la<4; la++)
-                if(!metric_killcoord(g,la))
+            
+            for(mu=0; mu<4; mu++)
+                for(nu=0; nu<4; nu++)
                 {
-                    sk = (rhoh*u[0]*u[la] + Pp*metric_g_uu(g,0,la) + visc[la])*metric_dlapse(g,la);
-                    for(mu=0; mu<4; mu++)
-                    {
-                        //TODO: REMOVE THIS IMMEDIATELY
-                        //if(mu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
-                        if(mu == 3 && sim_N(theSim,Z_DIR)==1)
-                            continue;
-                        if(mu == la)
-                            sk += a*(rhoh*u[la]*u_d[mu]+Pp+viscm[4*la+mu])*metric_dg_uu(g,la,0,mu);
-                        else
-                            sk += a*(rhoh*u[la]*u_d[mu]+viscm[4*la+mu])*metric_dg_uu(g,la,0,mu);
-                    }
                     //TODO: REMOVE THIS IMMEDIATELY
-                    //if(la == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
-                    if(la == 3 && sim_N(theSim,Z_DIR)==1)
+                    if((mu == 3 || nu == 3) && sim_N(theSim,Z_DIR)==1)
                         continue;
-                    s += sk;
+                    if(mu == nu)
+                        s -= (rhoh*u[mu]*u_d[nu] + Pp + visc[4*mu+la]) * metric_frame_dU_du(g, mu, nu, theSim);
+                    else
+                        s -= (rhoh*u[mu]*u_d[nu] + visc[4*mu+la]) * metric_frame_dU_du(g, mu, nu, theSim);
                 }
-
+            
             if(PRINTTOOMUCH)
             {
                 printf("TAU source: (%d,%d,%d): r=%.12g, dV=%.12g, s = %.12g, S = %.12g\n",i,j,k,r,dV,a*sqrtg*s,dt*dV*sqrtg*a * s);
@@ -271,7 +260,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
             //Cooling
             //Cooling should never (?) change the sign of the momenta,
-            //if it will, instead reduce the momenta by 0.9.
+            //if it will, instead reduce the momenta by 0.9.  These lines
+            //should be irrelevant because of the luminosity-limited timestep.
             if(fabs(c->cons[SRR]) < fabs(dt*dV*sqrtg*a* cool*u_d[1]))
                 c->cons[SRR] /= 1.1;
             else
@@ -284,10 +274,10 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 c->cons[SZZ] /= 1.1;
             else
                 c->cons[SZZ] -= dt*dV*sqrtg*a* cool*u_d[3];
-            if(c->cons[TAU] < dt*dV*sqrtg*a* a*cool*u[0])
+            if(fabs(c->cons[TAU]) < fabs(dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3])))
                 c->cons[TAU] /= 1.1;
             else
-                c->cons[TAU] -= dt*dV*sqrtg*a* a*cool*u[0]; 
+                c->cons[TAU] += dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]); 
 
             metric_destroy(g);
         }

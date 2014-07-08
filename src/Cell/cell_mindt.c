@@ -180,10 +180,11 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                     double dtv = 0.25*dx*dx/nu;
                     
                     //Luminosity Time
-                    double maxdisp = 0.1;
+                    double maxdisp = 0.1; //Should be a fraction like 0.1
                     double dV = 0.5*(rp+rm)*dr*dphi*dz;
                     double rho = theCells[k][i][j].prim[RHO];
                     double Pp = theCells[k][i][j].prim[PPP];
+                    double U[4];
                     double temp = Pp/rho;
                     double cool = sim_CoolFac(theSim) * pow(temp,4) / (rho);
 
@@ -195,6 +196,8 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                     for(mu=0; mu<3; mu++)
                         b[mu] = metric_shift_u(g,mu);
                     sqrtg = metric_sqrtgamma(g)/r;
+                    for(mu = 0; mu < 4; mu++)
+                        U[mu] = metric_frame_U_u(g, mu, theSim);
                     v[0] = theCells[k][i][j].prim[URR];
                     v[1] = theCells[k][i][j].prim[UPP];
                     v[2] = theCells[k][i][j].prim[UZZ];
@@ -212,7 +215,10 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                     metric_destroy(g);
 
                     double dtl, dtl_min;
-                    dtl = maxdisp * theCells[k][i][j].cons[TAU] / (dV*al*al*sqrtg*u[0]*cool);
+                    dtl = maxdisp * theCells[k][i][j].cons[TAU] / dV*sqrtg*al* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]);
+                    dtl = fabs(dtl);
+                    if (dtl < 0)
+                        printf("WHAT.");
                     dtl_min = dtl;
                     dtl = maxdisp * theCells[k][i][j].cons[SRR] / (dV*al*sqrtg*u_d[1]*cool);
                     if(dtl < dtl_min)
@@ -220,9 +226,12 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                     dtl = maxdisp * theCells[k][i][j].cons[LLL] / (dV*al*sqrtg*u_d[2]*cool);
                     if(dtl < dtl_min)
                         dtl_min = dtl;
-                    dtl = maxdisp * theCells[k][i][j].cons[SZZ] / (dV*al*sqrtg*u_d[3]*cool);
-                    if(dtl < dtl_min)
-                        dtl_min = dtl;
+                    if(sim_N(theSim, Z_DIR) > 1)
+                    {
+                        dtl = maxdisp * theCells[k][i][j].cons[SZZ] / (dV*al*sqrtg*u_d[3]*cool);
+                        if(dtl < dtl_min)
+                            dtl_min = dtl;
+                    }
                     dtl = dtl_min;
 
                     dt = dt/(1.0 + dt/dtv + dt/dtl);

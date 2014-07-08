@@ -198,7 +198,7 @@ double metric_frame_U_u_kep(struct Metric *g, int mu, struct Sim *theSim)
         if(mu == 0)
             return 1.0/sqrt(1.0-3.0*M/r);
         else if(mu == 2)
-            return sqrt(M/(r*r-3.0*M*r));
+            return sqrt(M/(r*r*(r-3.0*M)));
         return 0.0;
     }
     else
