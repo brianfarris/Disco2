@@ -151,10 +151,10 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
 
     int i,j;
     struct Metric *g;
-    double a, b[3], sqrtg;
-    double u0, u[3]; //u0 = u^0, u[i] = u_i
+    double a, b[3], sqrtg, U[4];
+    double u0, u[4]; //u0 = u^0, u[i] = u_i
     double rho, Pp, v[3];
-    double rhoh, vn, bn, hn;
+    double rhoh, vn, bn, hn, Un;
 
     //Get hydro primitives
     rho = prim[RHO];
@@ -169,57 +169,43 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g, i);
     sqrtg = metric_sqrtgamma(g)/r;
+    for(i=0; i<4; i++)
+        U[i] = metric_frame_U_u(g,i,theSim);
 
     //Calculate 4-velocity
     u0 = 1.0 / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
-    for(i=0; i<3; i++)
+    u[0] = metric_g_dd(g,0,0) * u0 + u0*metric_dot3_u(g,b,v);
+    for(i=1; i<4; i++)
     {
         u[i] = 0;
         for(j=0; j<3; j++)
-            u[i] += metric_gamma_dd(g,i,j) * (v[j]+b[j]);
+            u[i] += metric_gamma_dd(g,i-1,j) * (v[j]+b[j]);
         u[i] *= u0;
     }
+    
     if(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v) < 0)
-        printf("ERROR: Velocity too high in visc_flux. r=%.12g, vr=%.12g, vp=%.12g, vz=%.12g\n", r, v[0], v[1], v[2]);
+        printf("ERROR: Velocity too high in flux. r=%.12g, vr=%.12g, vp=%.12g, vz=%.12g\n", r, v[0], v[1], v[2]);
 
     //Calculate beta & v normal to face.
     vn = v[0]*theRiemann->n[0] + v[1]*theRiemann->n[1] + v[2]*theRiemann->n[2];
     bn = b[0]*theRiemann->n[0] + b[1]*theRiemann->n[1] + b[2]*theRiemann->n[2];
+    Un = U[1]*theRiemann->n[0] + U[2]*theRiemann->n[1] + U[3]*theRiemann->n[2];
     if(theRiemann->n[1] == 1)
         hn = r;
     else
         hn = 1.0;
-/*
-    int dir;
-    double gA;
-    if theRiemann->n[0] == 1
-    {
-        dir = 0;
-        gA = r;
-    }
-    else if theRiemann->n[0] == 2
-    {
-        dir = 1;
-        gA = 1.0;
-    }
-    else
-    {
-        dir = 2;
-        gA = r;
-    }
-    hn = 1.0/sqrt(metric_g_uu(g, dir+1,dir+1));
-*/
     
     rhoh = rho+GAMMALAW*Pp/(GAMMALAW-1.);
     
     //Fluxes
     F[DDD] = hn*sqrtg*a*u0 * rho*vn;
-    F[SRR] = hn*sqrtg*a*(u0*rhoh * u[0]*vn + Pp*theRiemann->n[0]);
-    F[LLL] = hn*sqrtg*a*(u0*rhoh * u[1]*vn + Pp*theRiemann->n[1]);
-    F[SZZ] = hn*sqrtg*a*(u0*rhoh * u[2]*vn + Pp*theRiemann->n[2]);
-    F[TAU] = hn*sqrtg*(a*u0*(a*u0*rhoh - rho)*vn + Pp*bn);
+    F[SRR] = hn*sqrtg*a*(u0*rhoh * u[1]*vn + Pp*theRiemann->n[0]);
+    F[LLL] = hn*sqrtg*a*(u0*rhoh * u[2]*vn + Pp*theRiemann->n[1]);
+    F[SZZ] = hn*sqrtg*a*(u0*rhoh * u[3]*vn + Pp*theRiemann->n[2]);
+    F[TAU] = hn*sqrtg*a*(u0*(-rhoh*(U[0]*u[0]+U[1]*u[1]+U[2]*u[2]+U[3]*u[3]) - rho)*vn - Un*Pp);
+    //F[TAU] = hn*sqrtg*(a*u0*(a*u0*rhoh - rho)*vn + Pp*bn);
 
-    //HLL Viscous Fluxi
+    //HLL Viscous Flux
     /*
     double *Fvisc = (double *) malloc(sim_NUM_Q(theSim) * sizeof(double));
     riemann_visc_flux_LR(theRiemann, theSim, SetState, Fvisc);

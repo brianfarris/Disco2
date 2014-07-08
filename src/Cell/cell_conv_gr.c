@@ -125,6 +125,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     double E = (1.0 + e + Us) / (a*U[0]);
 
     //Coefficients of polynomial to solve for w
+    //TODO: expand E and arrange to minimize truncation error.
     c[0] = -s2*(gam-1)*(gam-1);
     c[1] = 2*((E-gam)*(E-gam)+2*(gam-1)*s2);
     c[2] = (5*E-gam)*(E-gam)-2*(3-gam)*s2;
