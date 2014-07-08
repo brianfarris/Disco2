@@ -164,3 +164,55 @@ void metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, str
             shear[4*mu+nu] -= divu*(metric_g_uu(g,mu,nu)+u[mu]*u[nu]);
 }
 
+double metric_ref_U_u(double t, double r, double p, double z, int mu, struct Sim *theSim)
+{
+    if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
+    {
+        double M = sim_GravM(theSim);
+
+        if(r > 3.0*M)
+        {
+            if(mu == 0)
+                return 1.0/sqrt(1.0-3.0*M/r);
+            else if(mu == 2)
+                return sqrt(M/(r*r-3.0*M*r));
+            return 0.0;
+        }
+        else
+        {
+            if(mu == 0)
+                return 1.0/sqrt(1.0-2.0*M/r);
+            return 0.0;
+        }
+    }
+    
+    return 0.0;
+}
+
+double metric_ref_dU_du(double t, double r, double p, double z, int mu, int nu, struct Sim *theSim)
+{
+    if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
+    {
+        double M = sim_GravM(theSim);
+
+        if(mu != 1)
+            return 0.0;
+
+        if(r > 3.0*M)
+        {
+            if(nu == 0)
+                return -1.5*M/sqrt(r*(r-3.0*M)*(r-3.0*M)*(r-3.0*M));
+            else if(nu == 2)
+                return -1.5*(r-2*M) / (r*r*(r-3*M)) * sqrt(M/(r-3*M));
+            return 0.0;
+        }
+        else
+        {
+            if(nu == 0)
+                return -1.5*M/sqrt(r*(r-2.0*M)*(r-2.0*M)*(r-2.0*M));
+            return 0.0;
+        }
+    }
+    
+    return 0.0;
+}
