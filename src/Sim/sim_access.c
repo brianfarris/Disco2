@@ -64,6 +64,9 @@ int sim_Background(struct Sim *theSim){
 int sim_Metric(struct Sim *theSim){
   return(theSim->Metric);
 }
+int sim_Frame(struct Sim *theSim){
+  return(theSim->Metric);
+}
 int sim_Ncells_global(struct Sim *theSim){
   return(theSim->Ncells_global);
 }

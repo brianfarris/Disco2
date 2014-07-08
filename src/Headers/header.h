@@ -15,6 +15,9 @@ enum{HLLC,HLL};
 enum{NEWTON,GR,GRVISC1};
 //Metric Types
 enum{SR,SCHWARZSCHILD_SC,SCHWARZSCHILD_KS,SR_CART};
+//Frames
+enum{FR_EULER,FR_KEP};
+
 #include "mpi.h"
 MPI_Comm sim_comm;
 #define farris_mpi_factorization 0

@@ -27,6 +27,7 @@ struct Sim {
   int Restart;
   int Background;
   int Metric;
+  int Frame;
   int N_global[2];
   int NP_CONST;
   double aspect;
@@ -87,6 +88,7 @@ int sim_NoInnerBC(struct Sim *);
 int sim_Restart(struct Sim *);
 int sim_Background(struct Sim *);
 int sim_Metric(struct Sim *);
+int sim_Frame(struct Sim *);
 int sim_BoundTypeRIn(struct Sim *);
 int sim_BoundTypeROut(struct Sim *);
 int sim_BoundTypeZBot(struct Sim *);

@@ -62,6 +62,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "NoInnerBC"         , VAR_INT  , &(theSim->NoInnerBC)  );
       err += readvar( pfile , "Background"         , VAR_INT  , &(theSim->Background)  );
       err += readvar( pfile , "Metric"         , VAR_INT  , &(theSim->Metric)  );
+      err += readvar( pfile , "Frame"         , VAR_INT  , &(theSim->Frame)  );
       err += readvar( pfile , "NumR"              , VAR_INT  , &(theSim->N_global[R_DIR]) );
       err += readvar( pfile , "NumZ"              , VAR_INT  , &(theSim->N_global[Z_DIR]) );
       err += readvar( pfile , "ng"              , VAR_INT  , &(theSim->ng));

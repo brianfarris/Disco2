@@ -34,6 +34,17 @@ void metric_init_background(struct Sim *theSim)
         riemann_set_vel = &riemann_set_vel_gr;
     }
 
+    if(sim_Frame(theSim) == FR_EULER)
+    {
+        metric_frame_U_u = &metric_frame_U_u_euler;
+        metric_frame_dU_du = &metric_frame_dU_du_euler;
+    }
+    else if(sim_Frame(theSim) == FR_KEP)
+    {
+        metric_frame_U_u = &metric_frame_U_u_kep;
+        metric_frame_dU_du = &metric_frame_dU_du_kep;
+    }
+
 }
 
 void metric_init_metric(struct Sim *theSim)
