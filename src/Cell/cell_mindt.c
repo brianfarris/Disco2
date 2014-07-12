@@ -180,61 +180,80 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                     double dtv = 0.25*dx*dx/nu;
                     
                     //Luminosity Time
-                    double maxdisp = 0.1; //Should be a fraction like 0.1
-                    double dV = 0.5*(rp+rm)*dr*dphi*dz;
-                    double rho = theCells[k][i][j].prim[RHO];
-                    double Pp = theCells[k][i][j].prim[PPP];
-                    double U[4];
-                    double temp = Pp/rho;
-                    double cool = sim_CoolFac(theSim) * pow(temp,4) / (rho);
+                    double maxdisp = 1.0e100; //Should be a fraction like 0.1
+                    double dtl;
 
-                    struct Metric *g;
-                    int mu;
-                    g = metric_create(time_global, r, phi, z, theSim);
-                    double al, b[3], sqrtg, v[3], u[4], u_d[4];
-                    al = metric_lapse(g);
-                    for(mu=0; mu<3; mu++)
-                        b[mu] = metric_shift_u(g,mu);
-                    sqrtg = metric_sqrtgamma(g)/r;
-                    for(mu = 0; mu < 4; mu++)
-                        U[mu] = metric_frame_U_u(g, mu, theSim);
-                    v[0] = theCells[k][i][j].prim[URR];
-                    v[1] = theCells[k][i][j].prim[UPP];
-                    v[2] = theCells[k][i][j].prim[UZZ];
-                    u[0] = 1.0/sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
-                    u[1] = u[0]*v[0]; u[2] = u[0]*v[1]; u[3] = u[0]*v[2];
-                    for(mu=0; mu<4; mu++)
-                        u_d[mu] = 0.0;
-                    for(mu=0; mu<4; mu++)
+                    if(sim_CoolingType(theSim) != COOL_NONE)
                     {
-                        u_d[0] += metric_g_dd(g,0,mu)*u[mu];
-                        u_d[1] += metric_g_dd(g,1,mu)*u[mu];
-                        u_d[2] += metric_g_dd(g,2,mu)*u[mu];
-                        u_d[3] += metric_g_dd(g,3,mu)*u[mu];
-                    }
-                    metric_destroy(g);
+                        double dV = 0.5*(rp+rm)*dr*dphi*dz;
+                        double rho = theCells[k][i][j].prim[RHO];
+                        double Pp = theCells[k][i][j].prim[PPP];
+                        double U[4];
+                        double cool;
+                    
+                        if(sim_CoolingType(theSim) == COOL_ISOTHERM)
+                        {
+                            cool = (Pp/rho - sim_CoolPar1(theSim)) / sim_CoolPar2(theSim);
+                        }
+                        else if(sim_CoolingType(theSim) == COOL_BB_ES)
+                        {
+                            double temp = Pp/rho;
+                            cool = sim_CoolPar1(theSim) * pow(temp, 4) / rho;
+                        }
 
-                    double dtl, dtl_min;
-                    dtl = maxdisp * theCells[k][i][j].cons[TAU] / dV*sqrtg*al* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]);
-                    dtl = fabs(dtl);
-                    if (dtl < 0)
-                        printf("WHAT.");
-                    dtl_min = dtl;
-                    dtl = maxdisp * theCells[k][i][j].cons[SRR] / (dV*al*sqrtg*u_d[1]*cool);
-                    if(dtl < dtl_min)
+                        struct Metric *g;
+                        int mu;
+                        g = metric_create(time_global, r, phi, z, theSim);
+                        double al, b[3], sqrtg, v[3], u[4], u_d[4];
+                        al = metric_lapse(g);
+                        for(mu=0; mu<3; mu++)
+                            b[mu] = metric_shift_u(g,mu);
+                        sqrtg = metric_sqrtgamma(g)/r;
+                        for(mu = 0; mu < 4; mu++)
+                            U[mu] = metric_frame_U_u(g, mu, theSim);
+                        v[0] = theCells[k][i][j].prim[URR];
+                        v[1] = theCells[k][i][j].prim[UPP];
+                        v[2] = theCells[k][i][j].prim[UZZ];
+                        u[0] = 1.0/sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
+                        u[1] = u[0]*v[0]; u[2] = u[0]*v[1]; u[3] = u[0]*v[2];
+                        for(mu=0; mu<4; mu++)
+                            u_d[mu] = 0.0;
+                        for(mu=0; mu<4; mu++)
+                        {
+                            u_d[0] += metric_g_dd(g,0,mu)*u[mu];
+                            u_d[1] += metric_g_dd(g,1,mu)*u[mu];
+                            u_d[2] += metric_g_dd(g,2,mu)*u[mu];
+                            u_d[3] += metric_g_dd(g,3,mu)*u[mu];
+                        }
+                        metric_destroy(g);
+
+                        double dtl_min;
+                        dtl = maxdisp * fabs(theCells[k][i][j].cons[TAU] / dV*sqrtg*al* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]));
+                        dtl = fabs(dtl);
+                        if (dtl < 0)
+                            printf("WHAT.");
                         dtl_min = dtl;
-                    dtl = maxdisp * theCells[k][i][j].cons[LLL] / (dV*al*sqrtg*u_d[2]*cool);
-                    if(dtl < dtl_min)
-                        dtl_min = dtl;
-                    if(sim_N(theSim, Z_DIR) > 1)
-                    {
-                        dtl = maxdisp * theCells[k][i][j].cons[SZZ] / (dV*al*sqrtg*u_d[3]*cool);
+                        dtl = maxdisp * fabs(theCells[k][i][j].cons[SRR] / (dV*al*sqrtg*u_d[1]*cool));
                         if(dtl < dtl_min)
                             dtl_min = dtl;
-                    }
-                    dtl = dtl_min;
+                        dtl = maxdisp * fabs(theCells[k][i][j].cons[LLL] / (dV*al*sqrtg*u_d[2]*cool));
+                        if(dtl < dtl_min)
+                            dtl_min = dtl;
+                        if(sim_N(theSim, Z_DIR) > 1)
+                        {
+                            dtl = maxdisp * fabs(theCells[k][i][j].cons[SZZ] / (dV*al*sqrtg*u_d[3]*cool));
+                            if(dtl < dtl_min)
+                                dtl_min = dtl;
+                        }
+                        dtl = dtl_min;
 
-                    dt = dt/(1.0 + dt/dtv + dt/dtl);
+                        dt = dt/(1.0 + dt/dtv + dt/dtl);
+                    }
+                    else
+                    {
+                        dt = dt/(1.0 + dt/dtv);
+                    }
+
                 }
 
                 if(dt_m > dt)

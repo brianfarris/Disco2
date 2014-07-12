@@ -10,6 +10,7 @@ GravMassType            0       // 0 none, 1 single, 2 binary
 Background              2       // 0 Newtonian, 1 GR, 2 GRvisc
 Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS
+Frame                   1       // 0 Euler, 1 Keplerian
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
@@ -38,7 +39,7 @@ BoundTypeZTop           2       // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2       // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry            1
 
-Move_Cells              2       // 0 None, 2 Keplerian
+Move_Cells              0       // 0 None, 2 Keplerian
 RiemannSolver           1           // 0 hllc, 1 hll
 Adiabatic_Index         1.3333333333
 
@@ -50,7 +51,11 @@ Grav_2D			1
 G_EPS			0.0
 GravM           1.0e-6
 AlphaVisc       0.01
-CoolFac         1.0e28
+
+//Cooling
+CoolingType         2      //0 None, 1 Isothermal, 2 Blackbody-Thompson
+CoolPar1            1.0e28
+CoolPar2            0.0
 
 //Initial Condition Parameters
 InitPar0        0       //0 Thompson Cooling

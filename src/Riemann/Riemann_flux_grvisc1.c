@@ -108,6 +108,14 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     }
 
     metric_shear_uu(g, v, dv, shear, theSim);
+    if(sim_N(theSim,Z_DIR)==1)
+    {
+        for(i=0; i<4; i++)
+        {
+            shear[4*i+3] = 0.0;
+            shear[4*3+i] = 0.0;
+        }
+    }
     
     //TODO: CHECK THIS!  Probably not relativistic and/or isothermal.
     rhoh = prim[RHO] + GAMMA*prim[PPP]/(GAMMA-1.0);

@@ -17,7 +17,7 @@ void cell_single_init_cnstdisc(struct Cell *theCell, struct Sim *theSim,int i,in
     double R0 = sim_InitPar1(theSim);
     double cs20 = sim_InitPar2(theSim);
     double alpha = sim_AlphaVisc(theSim);
-    double q0 = sim_CoolFac(theSim);
+    double q0 = sim_CoolPar1(theSim); //TODO: Assumes CoolingType == COOL_BB_ES
 
     double rm = sim_FacePos(theSim,i-1,R_DIR);
     double rp = sim_FacePos(theSim,i,R_DIR);
@@ -70,7 +70,7 @@ void cell_init_cnstdisc(struct Cell ***theCells,struct Sim *theSim,struct MPIset
     double R0 = sim_InitPar1(theSim);
     double cs20 = sim_InitPar2(theSim);
     double alpha = sim_AlphaVisc(theSim);
-    double q0 = sim_CoolFac(theSim);
+    double q0 = sim_CoolPar1(theSim); //TODO: Assumes CoolingType == COOL_BB_ES
 
     double rho0, P0, vr0;
     if(sim_Background(theSim) == GRVISC1)

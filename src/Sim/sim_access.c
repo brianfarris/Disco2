@@ -178,7 +178,13 @@ double sim_InitPar4(struct Sim *theSim){
 double sim_AlphaVisc(struct Sim *theSim){
   return(theSim->AlphaVisc);
 }
-double sim_CoolFac(struct Sim *theSim){
-  return(theSim->CoolFac);
+int sim_CoolingType(struct Sim *theSim){
+  return(theSim->CoolingType);
+}
+double sim_CoolPar1(struct Sim *theSim){
+  return(theSim->CoolPar1);
+}
+double sim_CoolPar2(struct Sim *theSim){
+  return(theSim->CoolPar2);
 }
 

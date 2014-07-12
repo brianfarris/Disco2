@@ -64,13 +64,13 @@ void cell_init_disctest_kepler(struct Cell *c, double r, double phi, double z, s
 
     rho = 1.0 + B*sqrt(r0/r) + exp(-(r-r0)*(r-r0)/(2*dr*dr));
     Pp = (1.0 + B) * M / (r0 * GAM * mach0*mach0);
-    vr = - 3*nu*(1.0+(1.0-r*(r-r0)/(dr*dr))*exp(-(r-r0)*(r-r0)/(2*dr*dr))) / (2*r*rho);
+    vr = - 3*nu/(2*r) * (1.0+(B*sqrt(r0/r) - 2*r*(r-r0)/(dr*dr)*exp(-(r-r0)*(r-r0)/(2*dr*dr)))/rho);
     vp = sqrt(M/(r*r*r));
     
     if(dr < 0)
     {
         rho = 1.0 + B*sqrt(r0/r);
-        vr = -3*nu/(2*r);
+        vr = -3*nu/(2*r) * (1.0/(1.0+B*sqrt(r0/r)));
     }
    
     c->prim[RHO] = rho;

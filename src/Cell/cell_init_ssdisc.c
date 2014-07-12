@@ -19,7 +19,7 @@ void cell_init_ssdisc_thompson(struct Cell *c, double r, double phi, double z, s
     double GAM = sim_GAMMALAW(theSim);
     double M = sim_GravM(theSim);
     double alpha = sim_AlphaVisc(theSim);
-    double q0 = sim_CoolFac(theSim);
+    double q0 = sim_CoolPar1(theSim); //TODO: Assumes CoolingType == COOL_BB_ES
 
     if(q0 == 0.0)
         q0 = 1.0;
@@ -74,7 +74,7 @@ void cell_init_ssdisc_isotherm(struct Cell *c, double r, double phi, double z, s
     double GAM = sim_GAMMALAW(theSim);
     double M = sim_GravM(theSim);
     double alpha = sim_AlphaVisc(theSim);
-    double q0 = sim_CoolFac(theSim);
+    double q0 = sim_CoolPar1(theSim); //TODO: Assumes CoolingType == COOL_BB_ES
 
     double P0  = rho0 * M / (sqrt(GAM) * r0 * mach0*mach0);
     double vr0 = - 3 * alpha * sqrt(M/(GAM*r0)) / (mach0*mach0);

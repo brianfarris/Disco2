@@ -19,7 +19,7 @@ void cell_init_ntdisc_thompson(struct Cell *c, double r, double phi, double z, s
     double GAM = sim_GAMMALAW(theSim);
     double M = sim_GravM(theSim);
     double alpha = sim_AlphaVisc(theSim);
-    double q0 = sim_CoolFac(theSim);
+    double q0 = sim_CoolPar1(theSim); //TODO: Assumes CoolingType == COOL_BB_ES
     double rs = 6*M;
 
     if(q0 == 0.0)

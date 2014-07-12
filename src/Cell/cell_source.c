@@ -155,13 +155,19 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 double cs2;
                 double alpha = sim_AlphaVisc(theSim);
 
-                double temp = Pp/rho;
                 double height = 2*sqrt(Pp*r*r*r*(1-3*M/r)/(rhoh*M));
-                
+              
+                //Isotherm: drive to constant P/rho
+                if(sim_CoolingType(theSim) == COOL_ISOTHERM)
+                    cool = (Pp/rho - sim_CoolPar1(theSim)) / sim_CoolPar2(theSim);
+                //BlackBody - Electron-Scatter opacity
+                else if(sim_CoolingType(theSim) == COOL_BB_ES)
+                {
+                    double temp = Pp/rho;
+                    cool = sim_CoolPar1(theSim) * pow(temp,4) / (rho);
+                }
                 //free-free cooling
                 //cool = sim_CoolFac(theSim) * pow(temp,7.5) / (rho*rho*height);
-                //electron scatter cooling
-                cool = sim_CoolFac(theSim) * pow(temp,4) / (rho);
 
                 cs2 = GAMMALAW*Pp / rhoh;
                 if (alpha > 0)
@@ -175,6 +181,14 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 dv[9] = cell_gradz(c, URR);  dv[10] = cell_gradz(c, UPP);  dv[11] = cell_gradz(c, UZZ);
                 
                 metric_shear_uu(g, v, dv, visc, theSim);
+                if(sim_N(theSim,Z_DIR)==1)
+                {
+                    for(mu=0; mu<4; mu++)
+                    {
+                        visc[4*mu+3] = 0.0;
+                        visc[4*3+mu] = 0.0;
+                    }
+                }
             
                 for(mu=0; mu<16; mu++)
                     visc[mu] *= -alpha;
@@ -187,25 +201,19 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
             //Momentum sources and contribution to energy source
             s = 0;
-            for(la=0; la<4; la++)
+            int max_dim = 4;
+            if(sim_N(theSim,Z_DIR)==1)
+                max_dim = 3;
+   
+            for(la=0; la<max_dim; la++)
                 if(!metric_killcoord(g,la))
                 {
                     sk = 0;
-                    for(mu=0; mu<4; mu++)
+                    for(mu=0; mu<max_dim; mu++)
                     {
-                        //TODO: REMOVE THIS IMMEDIATELY
-                        //if(mu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
-                        if(mu == 3  && sim_N(theSim,Z_DIR)==1)
-                            continue;
                         sk += 0.5*(rhoh*u[mu]*u[mu]+Pp*metric_g_uu(g,mu,mu)+visc[4*mu+mu]) * metric_dg_dd(g,la,mu,mu);
-                        for(nu=mu+1; nu<4; nu++)
-                        {
-                            //TODO: REMOVE THIS IMMEDIATELY
-                            //if(nu == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
-                            if(nu == 3 && sim_N(theSim,Z_DIR)==1)
-                                continue;
+                        for(nu=mu+1; nu<max_dim; nu++)
                             sk += (rhoh*u[mu]*u[nu]+Pp*metric_g_uu(g,mu,nu)+visc[4*mu+nu]) * metric_dg_dd(g,la,mu,nu);
-                        }
                     }
                     if(la == 1)
                     {
@@ -213,9 +221,9 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                         if(PRINTTOOMUCH)
                         {
                             printf("SRR source: (%d,%d,%d): r=%.12g, dV=%.12g, s = %.12g, S = %.12g\n",i,j,k,r,dV,a*sqrtg*sk,dt*dV*sqrtg*a * sk);
-                            fprintf(sourcefile, "(%d,%d,%d): r=%.12g, Fg=%.12g, Fc=%.12g, P/r=%.12g, F=%.12g\n", 
-                                    i,j,k,r,0.5*rhoh*u[0]*u[0]*metric_dg_dd(g,1,0,0), 0.5*rhoh*u[2]*u[2]*metric_dg_dd(g,1,2,2), 
-                                    0.5*metric_g_uu(g,2,2)*Pp*metric_dg_dd(g,1,2,2), sk);
+                            //fprintf(sourcefile, "(%d,%d,%d): r=%.12g, Fg=%.12g, Fc=%.12g, P/r=%.12g, F=%.12g\n", 
+                            //        i,j,k,r,0.5*rhoh*u[0]*u[0]*metric_dg_dd(g,1,0,0), 0.5*rhoh*u[2]*u[2]*metric_dg_dd(g,1,2,2), 
+                            //        0.5*metric_g_uu(g,2,2)*Pp*metric_dg_dd(g,1,2,2), sk);
                         }
                     }
                     else if(la == 2)
@@ -230,25 +238,18 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                             printf("SZZ source: (%d,%d,%d): r=%.12f, dV=%.12f, s = %.12f, S = %.12f\n",i,j,k,r,dV,a*sqrtg*sk,dt*dV*sqrtg*a * sk);
                         }
                     }
-                    //TODO: REMOVE THIS IMMEDIATELY
-                    //if(la == 3 && sim_InitialDataType(theSim) == GBONDI && sim_N(theSim,Z_DIR)==1)
-                    if(la == 3 && sim_N(theSim,Z_DIR)==1)
-                        continue;
                     s -= U[la]*sk;
                 }
 
             //Remaining energy sources
             
-            for(mu=0; mu<4; mu++)
-                for(nu=0; nu<4; nu++)
+            for(mu=0; mu<max_dim; mu++)
+                for(nu=0; nu<max_dim; nu++)
                 {
-                    //TODO: REMOVE THIS IMMEDIATELY
-                    if((mu == 3 || nu == 3) && sim_N(theSim,Z_DIR)==1)
-                        continue;
                     if(mu == nu)
-                        s -= (rhoh*u[mu]*u_d[nu] + Pp + visc[4*mu+la]) * metric_frame_dU_du(g, mu, nu, theSim);
+                        s -= (rhoh*u[mu]*u_d[nu] + Pp + viscm[4*mu+nu]) * metric_frame_dU_du(g,mu,nu,theSim);
                     else
-                        s -= (rhoh*u[mu]*u_d[nu] + visc[4*mu+la]) * metric_frame_dU_du(g, mu, nu, theSim);
+                        s -= (rhoh*u[mu]*u_d[nu] + viscm[4*mu+nu]) * metric_frame_dU_du(g,mu,nu,theSim);
                 }
             
             if(PRINTTOOMUCH)
@@ -278,6 +279,12 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 c->cons[TAU] /= 1.1;
             else
                 c->cons[TAU] += dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]); 
+            if(PRINTTOOMUCH)
+            {
+                printf("SRR cooling: (%d,%d,%d): r=%.12g, dV=%.12g, q = %.12g, Q = %.12g\n",i,j,k,r,dV,-a*sqrtg* cool*u_d[1],-dt*dV*sqrtg*a *cool*u_d[1]);
+                printf("LLL cooling: (%d,%d,%d): r=%.12g, dV=%.12g, q = %.12g, Q = %.12g\n",i,j,k,r,dV,-a*sqrtg* cool*u_d[2],-dt*dV*sqrtg*a *cool*u_d[2]);
+                printf("TAU cooling: (%d,%d,%d): r=%.12g, dV=%.12g, q = %.12g, Q = %.12g\n",i,j,k,r,dV,a*sqrtg* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]),dt*dV*sqrtg*a *cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]));
+            }
 
             metric_destroy(g);
         }

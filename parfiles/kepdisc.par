@@ -7,17 +7,18 @@ InitialDataType        17       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 14 NTDisc, 15 ConstantDisc,
                                 // 16 Cartesian-Shear, 17 Disc Tests
 GravMassType            0       // 0 none, 1 single, 2 binary
-Background              1       // 0 Newtonian, 1 GR, 2 GRvisc
+Background              2       // 0 Newtonian, 1 GR, 2 GRvisc
 Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS, 3 Flat-Cartesian
+Frame                   1       // 0 Euler, 1 Keplerian
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR		    64			//Radial Zones
+NumR		    128			//Radial Zones
 NumZ			1          //Vertical Zones
 ng              2
-R_Min		    50
-R_Max			2000
+R_Min		    1.0e6
+R_Max			1.0e7
 Z_Min			-1000.0
 Z_Max			1000.0
 NP_CONST        3
@@ -25,13 +26,13 @@ aspect          1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                6.28e7
+Time_Max                1.0e11
 Num_Checkpoints	        1000
 Num_Diag_Dump           20
 Num_Diag_Measure        20
 
 
-NoInnerBC               1
+NoInnerBC               0
 BoundTypeRIn            0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeROut           0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2               // 0 fixed, 1 outflow, 2 periodic
@@ -40,7 +41,7 @@ ZeroPsiBndry            1
 
 Move_Cells              0
 RiemannSolver           1           // 0 hllc, 1 hll
-Adiabatic_Index         1.3
+Adiabatic_Index         1.00001
 
 //Numerical Parameters
 CFL			0.5
@@ -48,16 +49,20 @@ PLM			1.0
 
 Grav_2D			1
 G_EPS			0.0
-GravM           0.001
-AlphaVisc       0.000
-CoolFac         0.0
+GravM           1.0
+AlphaVisc       -1.0
+
+//Cooling
+CoolingType         0       //0 None, 1 Isothermal, 2 Blackbody-Thompson
+CoolPar1            1.0e-6
+CoolPar2            0.1
 
 //Initial Condition Parameters
 InitPar0        1         // Keplerian Spreading
-InitPar1        0.0       // B
-InitPar2        10        // mach# at r0
-InitPar3        1000      // r0
-InitPar4        -100      // dr
+InitPar1        0.5       // B
+InitPar2        20        // mach# at r0
+InitPar3        5.0e6     // r0
+InitPar4        2.0e5      // dr
 
 PHI_ORDER               2
 
