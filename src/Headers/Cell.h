@@ -65,6 +65,10 @@ void cell_init_cartshear(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_cartshear(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_disctest(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_disctest(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_accdisc(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_accdisc(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_adaf(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_adaf(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data

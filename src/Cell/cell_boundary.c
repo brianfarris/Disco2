@@ -317,6 +317,13 @@ void cell_boundary_ssprofile_r_inner( struct Cell *** theCells, struct Sim *theS
                                     theCells[k][i][j].prim[q] = primIn[q] * pow(r/rIn,-0.6) * pow(C,0.6) * pow(D,-1.6) * pow(P,0.6);
                             }
                         }
+                        else if (sim_InitialDataType(theSim) == ADAF)
+                        {
+                            theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn,-0.5);
+                            theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn,-1.5);
+                            theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn,-0.5);
+                            theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn,-1.5);
+                        }
 
                     }
             }
@@ -381,6 +388,13 @@ void cell_boundary_ssprofile_r_outer( struct Cell *** theCells, struct Sim *theS
                             for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
                                 theCells[k][i][j].prim[q] = primOut[q] * pow(r/rOut,-0.6) * pow(C,0.6) * pow(D,-1.6) * pow(P,0.6);
                         }
+                    }
+                    else if (sim_InitialDataType(theSim) == ADAF)
+                    {
+                        theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut,-0.5);
+                        theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut,-1.5);
+                        theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut,-0.5);
+                        theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut,-1.5);
                     }
                 }
         }

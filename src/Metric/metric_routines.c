@@ -193,18 +193,40 @@ double metric_frame_U_u_kep(struct Metric *g, int mu, struct Sim *theSim)
     double M = sim_GravM(theSim);
     double r = g->x[1];
 
-    if(r > 3.0*M)
+    double u0, vr, vp;
+
+    if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
     {
+        vr = 0.0;
+
+        if(r > 3.0*M)
+            vp = exp(-0.5/(r/M-3.0)) * sqrt(M/(r*r*r));
+        else
+            vp = 0.0;
+
+        u0 = 1.0/sqrt(1-2*M/r-vr*vr/(1-2*M/r)-r*r*vp*vp);
         if(mu == 0)
-            return 1.0/sqrt(1.0-3.0*M/r);
+            return u0;
         else if(mu == 2)
-            return sqrt(M/(r*r*(r-3.0*M)));
+            return u0*vp;
         return 0.0;
     }
-    else
+    else if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
+        vr = -2*M/(r + 2*M);
+
+        if(r > 3.0*M)
+            vp = exp(-0.5/(r/M-3.0)) * sqrt(M/(r*r*r));
+        else
+            vp = 0.0;
+
+        u0 = 1.0/sqrt(1.0-2*M/r - 4*M/r*vr - (1.0+2*M/r)*vr*vr - r*r*vp*vp);
         if(mu == 0)
-            return 1.0/sqrt(1.0-2.0*M/r);
+            return u0;
+        else if(mu == 1)
+            return u0*vr;
+        else if(mu == 2)
+            return u0*vp;
         return 0.0;
     }
 }
@@ -214,21 +236,60 @@ double metric_frame_dU_du_kep(struct Metric *g, int mu, int nu, struct Sim *theS
     double M = sim_GravM(theSim);
     double r = g->x[1];
 
+    double u0, du0, vr, dvr, vp, dvp;
+
     if(mu != 1)
         return 0.0;
 
-    if(r > 3.0*M)
+    if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
     {
+        vr = 0.0;
+
+        if(r > 3.0*M)
+        {
+            vp = exp(-0.5/(r/M-3.0)) * sqrt(M/(r*r*r));
+            dvp = -vp * (27*M*M-19*M*r+3*r*r) / (2*(r-3*M)*(r-3*M));
+        }
+        else
+        {
+            vp = 0.0;
+            dvp = 0.0;
+        }
+
+        u0 = 1.0/sqrt(1-2*M/r-r*r*vp*vp);
+        du0 = -0.5*u0*u0*u0*(2*M/(r*r) - 2*r*vp*vp - 2*r*r*vp*dvp);
+
         if(nu == 0)
-            return -1.5*M/sqrt(r*(r-3.0*M)*(r-3.0*M)*(r-3.0*M));
+            return du0;
         else if(nu == 2)
-            return -1.5*(r-2*M) / (r*r*(r-3*M)) * sqrt(M/(r-3*M));
+            return du0*vp + u0*dvp;
         return 0.0;
     }
-    else
+    else if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
+        vr = -2*M/(r + 2*M);
+        dvr = 2*M/((r+2*M)*(r+2*M));
+
+        if(r > 3.0*M)
+        {
+            vp = exp(-0.5/(r/M-3.0)) * sqrt(M/(r*r*r));
+            dvp = -vp * (27*M*M-19*M*r+3*r*r) / (2*(r-3*M)*(r-3*M));
+        }
+        else
+        {
+            vp = 0.0;
+            dvp = 0.0;
+        }
+
+        u0 = 1.0/sqrt(1.0-2*M/r - 4*M/r*vr - (1.0+2*M/r)*vr*vr - r*r*vp*vp);
+        du0 = -0.5*u0*u0*u0*(2*M/(r*r) + 4*M*vr/(r*r) - 4*M/r*dvr + 2*M*vr*vr/(r*r) - 4*M/r*vr*dvr - 2*r*vp*vp - 2*r*r*vp*dvp);
+
         if(nu == 0)
-            return -1.5*M/sqrt(r*(r-2.0*M)*(r-2.0*M)*(r-2.0*M));
+            return du0;
+        else if(nu == 1)
+            return du0*vr + u0*dvr;
+        else if(nu == 2)
+            return du0*vp + u0*dvp;
         return 0.0;
     }
 }

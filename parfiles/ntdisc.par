@@ -59,7 +59,7 @@ CoolPar2            0.0
 
 //Initial Condition Parameters
 InitPar0        0           //0 Thompson Cooling
-InitPar1        1.0e10    // Accretion Rate
+InitPar1        1.0e8    // Accretion Rate
 InitPar2        200.0       // R0
 InitPar3        100.0    // DR Cavity width (negative to turn off)
 InitPar4        0.0
