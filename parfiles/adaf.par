@@ -11,7 +11,7 @@ GravMassType            0       // 0 none, 1 single, 2 binary
 Background              2       // 0 Newtonian, 1 GR, 2 GRvisc
 Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS
-Frame                   1       // 0 Euler, 1 Keplerian
+Frame                   0       // 0 Euler, 1 Keplerian
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid

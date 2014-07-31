@@ -30,7 +30,7 @@ void cell_init_adaf_nocool(struct Cell *c, double r, double phi, double z, struc
 
     rho = -Mdot/(2*M_PI*r*u0*vr); //Vertically-integrated Density
     Pp = rho*(2*(5+2*eps)*g/(9*alpha*alpha*GAM))*(M/r);  //Vertically-integrated Pressure
- 
+/* 
     eps = (3.0 - GAM) / (GAM - 1.0); // eps' parameter from Narayan & Yi
     g = sqrt(1.0+2*18.0*18.0*alpha*alpha*GAM/((9+2*eps)*(9+2*eps))) - 1.0;
 
@@ -41,7 +41,19 @@ void cell_init_adaf_nocool(struct Cell *c, double r, double phi, double z, struc
 
     rho = -Mdot/(2*M_PI*r*u0*vr); //Vertically-integrated Density
     Pp = rho * ((9+2*eps)*g/(54*alpha*alpha*GAM)) * (M/r);  //Vertically-integrated Pressure
+    */
     
+    eps = (GAM - 3.0/7.0) / (GAM - 1.0); // eps' parameter from Narayan & Yi
+    g = 2.0*alpha*sqrt(GAM);
+
+    //TODO: Make relativistic?  Confirm formulae.
+    vr = -9.0*g/(7.0*eps) * sqrt(M/r);
+    vp = sqrt(49.0-63.0/eps-81.0*g*g/(eps*eps))/7.0 * sqrt(M/(r*r*r));
+    u0 = 1.0/sqrt(1.0-2*M/r-vr*vr/(1.0-2*M/r)-r*r*vp*vp);
+
+    rho = -Mdot/(2*M_PI*r*u0*vr); //Vertically-integrated Density
+    Pp = rho * 6.0/(7.0*eps) * (M/r);  //Vertically-integrated Pressure
+
     if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
         if(r < 10)
