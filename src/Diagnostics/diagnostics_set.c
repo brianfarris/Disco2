@@ -11,8 +11,9 @@
 #include "../Headers/header.h"
 
 void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCells,struct Sim * theSim,struct TimeStep * theTimeStep,struct MPIsetup * theMPIsetup,struct GravMass * theGravMasses){
-  if (time_global <= 0.3 ){
-    //Make a File that only writes 2-afew times  to output constant parameters    
+  //  if ( (time_global <= 0.3 || sim_Restart(theSim)==1) && ii<2){
+  if (iGlob<2){ 
+  //Make a File that only writes 2-afew times  to output constant parameters    
     double q      = sim_MassRatio(theSim);
     double sep0   = sim_sep0(theSim);
     double alpha  = sim_EXPLICIT_VISCOSITY(theSim);
@@ -26,16 +27,20 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     int nu_cst    = sim_VISC_CONST(theSim);    
     double Rcut   = sim_Rcut(theSim);
     double Gam    = sim_GAMMALAW(theSim);
+    double Rsink0 = sim_Rsink0(theSim);
+    double Rsink1 = sim_Rsink1(theSim);
     //Rot Frame or no here
     double tramp  = sim_tramp(theSim);
+    double vRate  = sim_vRate(theSim);
     if(mpisetup_MyProc(theMPIsetup)==0){
       char CstParamFilename[256];
       sprintf(CstParamFilename,"CstParam.dat");
       FILE * CstParamFile = fopen(CstParamFilename,"a");
-      fprintf(CstParamFile,"%e %e %e %e %e %e %e %e %e %e %i %e %e %e \n", q, sep0, alpha, Mach0, MdoMs, rmin, rmax, tmigon, tacc, eps, nu_cst, Rcut, Gam, tramp);
+      fprintf(CstParamFile,"%e %e %e %e %e %e %e %e %e %e %i %e %e %e %e %e %e \n", q, sep0, alpha, Mach0, MdoMs, rmin, rmax, tmigon, tacc, eps, nu_cst, Rcut, Gam, tramp, vRate, Rsink0, Rsink1);
       fclose(CstParamFile);
     }
   }
+  iGlob += 1;
 
  if (timestep_get_t(theTimeStep)>diagnostics_tdiag_measure(theDiagnostics)){
     int num_r_points = sim_N(theSim,R_DIR)-sim_Nghost_min(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR);
@@ -53,9 +58,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     double * VectorDiag_reduce = malloc(sizeof(double) * num_r_points_global*NUM_VEC);
     double * ScalarDiag_temp = malloc(sizeof(double)*NUM_SCAL);
     double * ScalarDiag_reduce = malloc(sizeof(double)*NUM_SCAL);
-
-    double * TrVec_temp    = malloc(sizeof(double) * num_r_points_global); //DD: store Trqs each measure step 
-    
+    //
+    //double * TrVec_temp    = malloc(sizeof(double) * num_r_points_global); //DD: store Trqs each measure step 
+    //
     double TrScal_temp   = 0.0; // sum total trq each measure
     double TrScal_reduce = 0.0;
 
@@ -100,7 +105,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       ScalarDiag_reduce[n]=0.0;
     }
     for (i=0;i<num_r_points_global;++i){
-      TrVec_temp[i]=0.0;//DD - reset
+      //TrVec_temp[i]=0.0;//DD - reset
       for (n=0;n<NUM_VEC;++n){
         VectorDiag_temp[i*NUM_VEC+n]=0.0;
       }
@@ -115,6 +120,38 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
         }
       }
     }
+
+    /*   // Fictitious forces on the Binary
+    // FOR NOW ONLY FOR nu=cst and adv_arb movement 
+    double Mbh0 = gravMass_M(theGravMasses,0);
+    double Mbh1 = gravMass_M(theGravMasses,1);
+
+    double rbh0 = gravMass_r(theGravMasses,0);
+    double rbh1 = gravMass_r(theGravMasses,1);
+
+    double a = rbh0 + rbh1;
+
+    double nu = sim_EXPLICIT_VISCOSITY(theSim);
+    double vr_sec = -sim_vRate(theSim)* 1.5 * nu/rbh1;
+    double vr_prm = vr_sec * Mbh1/Mbh0;
+
+    double wp_a = sim_rOm_a(theSim,rbh0,a);
+    double rdrOmp_a = sim_rdrOm_a(theSim,rbh0,a);
+    double dtOmp_a = sim_dtOm_a(theSim,rbh0,a);
+
+    double ws_a = sim_rOm_a(theSim,rbh1,a);
+    double rdrOms_a = sim_rdrOm_a(theSim,rbh1,a);
+    double dtOms_a = sim_dtOm_a(theSim,rbh1,a);
+
+    double Fsec_coriolis_phi = -2.*ws_a*vr_sec/rbh1;
+    double Fsec_euler_phi =  -(rbh1*dtOms_a + vr_sec*rdrOms_a);
+    double Fprm_coriolis_phi = -2.*wp_a*vr_prm/rbh0;
+    double Fprm_euler_phi =  -(rbh0*dtOmp_a + vr_prm*rdrOmp_a);
+
+    TrScal_temp += rbh0*(Fprm_coriolis_phi + Fprm_euler_phi)*Mbh0;
+    TrScal_temp += rbh1*(Fsec_coriolis_phi + Fsec_euler_phi)*Mbh1;
+    */
+
     double Rcut = sim_Rcut(theSim); //DD - for cutting out unresolved trq close to binary components
     double mass_inside_1_temp=0.0;
     position=0;
@@ -133,7 +170,10 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
         double phi_bh1 = gravMass_phi(theGravMasses,1);
         double a = r_bh0 + r_bh1;        
         for (j=0;j<sim_N_p(theSim,i);++j){
-          double phi = cell_tiph(cell_single(theCells,i,j,k));
+	  //struct Cell * c = &(theCells[k][i][j]);
+	  //double phi = c->tiph-.5*c->dphi;
+	  //double dphi = c->dphi;
+          double phi = cell_tiph(cell_single(theCells,i,j,k)) - 0.5*cell_dphi(cell_single(theCells,i,j,k));
           double dphi = cell_dphi(cell_single(theCells,i,j,k));
           double rho = cell_prim(cell_single(theCells,i,j,k),RHO);
           double press = cell_prim(cell_single(theCells,i,j,k),PPP);
@@ -163,13 +203,27 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 	  double q = sim_MassRatio(theSim);       // Added Mass ratio DD 
           double t = timestep_get_t(theTimeStep);
           double eps = sim_G_EPS(theSim);
-          //double abhbin = sqrt(r_bh0*r_bh0 + r_bh1*r_bh1 - 2.*r_bh0*r_bh1*cos(phi_bh1-phi_bh0)); //Added abhbin DD
+          
+	  
+	  //double abhbin = sqrt(r_bh0*r_bh0 + r_bh1*r_bh1 - 2.*r_bh0*r_bh1*cos(phi_bh1-phi_bh0)); //Added abhbin DD
 	  double abhbin = r_bh0 + r_bh1;
 	  double Rhill = abhbin * pow((q/3.),(1./3.)); //DD; Secondary Hill sphere
 
-	  double dist_bh0 = sqrt(r_bh0*r_bh0 + r*r - 2.*r_bh0*r*cos(phi_bh0-phi));
-          double dist_bh1 = sqrt(r_bh1*r_bh1 + r*r - 2.*r_bh1*r*cos(phi_bh1-phi));
+	  double xbh0 = r_bh0*cos(phi_bh0);
+	  double ybh0 = r_bh0*sin(phi_bh0);
 
+	  double xbh1 = r_bh1*cos(phi_bh1);
+	  double ybh1 = r_bh1*sin(phi_bh1);
+
+	  double xpos = r*cos(phi);
+	  double ypos = r*sin(phi);
+
+	  double dist_bh0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
+	  double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
+
+	  //double dist_bh0 = sqrt(r_bh0*r_bh0 + r*r - 2.*r_bh0*r*cos(phi_bh0-phi));
+          //double dist_bh1 = sqrt(r_bh1*r_bh1 + r*r - 2.*r_bh1*r*cos(phi_bh1-phi));
+          
           // NOTE THIS IS THE derivative of the potential (add a -1/r for the force)                                                  
           double dPhi_dphi  =  abhbin*r/((1.+q)*(1.+1./q))*sin(phi-phi_bh0) * 
 	    ( pow( (eps*eps + dist_bh0*dist_bh0),-1.5)- pow( (eps*eps + dist_bh1*dist_bh1) ,-1.5) ) ;
@@ -180,9 +234,69 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           //Now get the angel between phi direction and the lever arm to teh secondary to get torque only on secondary
 	  double Cos_alph = (2.*r*r - 2.*r*abhbin/(1.+q) * cos(phi_bh1-phi))/dist_bh1;
 	  double Sin_alph = sin(acos(Cos_alph));
+	  
 
+	  //In terms of force (for when eps!=0)
+	  double fgrav( double M , double r , double eps, double n ){
+	    return( M*pow(r,n-1.)/pow( pow(r,n) + pow(eps,n) ,1.+1./n) );
+	  }
 
+	  void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p , double r , double phi , double * fr , double * fp ){
+	    double G_EPS=sim_G_EPS(theSim);
+	    double PHI_ORDER=sim_PHI_ORDER(theSim);
 
+	    double rp = gravMass_r(theGravMasses,p);
+	    double pp = gravMass_phi(theGravMasses,p);
+	    double cosp = cos(phi);
+	    double sinp = sin(phi);
+	    double dx = r*cosp-rp*cos(pp);
+	    double dy = r*sinp-rp*sin(pp);
+	    double script_r = sqrt(dx*dx+dy*dy);
+
+	    double cosa = dx/script_r;
+	    double sina = dy/script_r;
+
+	    double cosap = cosa*cosp+sina*sinp;
+	    double sinap = sina*cosp-cosa*sinp;
+
+	    double f1;
+	    if (sim_InitialDataType(theSim)==FIELDLOOP){
+	      f1 = -fgrav_neg_centrifugal( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );
+	    } else{
+	      f1 = -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );
+	    }
+	    *fr = cosap*f1;
+	    *fp = sinap*f1;
+	  }
+
+	  double fr;
+	  double fp;
+	  double fBin_phi = 0.0;
+	  double Fr = 0.0;
+	  int p;
+	  for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
+	    gravMassForce( theGravMasses , theSim , p , r , phi , &fr , &fp );
+	    Fr += fr;
+	    fBin_phi += fp;
+	  }
+	  
+	  
+	  //	  double fBin_phi = f0*sinap0 + f1*sinap1; //f1*sinap1;
+	  //double fr0;
+	  //double fp0;
+	  //double fr1;
+	  //double fp1;
+	  //gravMassForce( theGravMasses , theSim , 0 , r , phi , &fr0 , &fp0 );
+	  //gravMassForce( theGravMasses , theSim , 1 , r , phi , &fr1 , &fp1 );
+          if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
+            if (dist_bh1 > Rcut*Rhill){ //add 2pi to Trq to not azi average - see Scalar int below                                                  
+	      //TrScal_temp -= ( r_bh0*fp0 * rho*r*dphi*(rp-rm) );
+	      //TrScal_temp -= ( r_bh1*fp1 * rho*r*dphi*(rp-rm) );	      
+              TrScal_temp   -= (r*rho* (fBin_phi) * r*dphi*(rp-rm));
+            }
+	  }	  	    
+
+    
           if (dist_bh0<0.1){
             double dM = rho*dV;
             mass_near_bh0_r0p1_temp +=dM;
@@ -228,10 +342,11 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = rhoe;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+13] = 0.5*B2;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = Br*Bp;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = dist_bh1*rho*dPhi_dphi/r * Sin_alph; //divB;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = dist_bh1*rho*dPhi_dphi_s/r * Sin_alph; //divB;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+16] = 180./M_PI*0.5*asin(-Br*Bp/(0.5*B2));
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+17] = GradPsi_r;
-	    EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+18] = r*rho*dPhi_dphi/r; //DDwas 12
+	    EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+18] = -r*rho*(fBin_phi);//-(r_bh0*fp0+r_bh1*fp1)*rho;
+	                                                                                      //dPhi_dphi/r; //DDwas 12
             ++position;
           }
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
@@ -243,49 +358,68 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+5] += (vz/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+6] += (vp_minus_w/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+7] += (Cool/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+8] += (vr*rho/sim_N_p(theSim,i)*dz);//(Bz/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+8] += (r * vr*rho/sim_N_p(theSim,i));//(Bz/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (E_hydro/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (KE/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (rhoe/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (divB/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += (180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += 0.0;//(180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (GradPsi_r/sim_N_p(theSim,i)*dz) ; 
 	  // Don't count torques within a certain radius from secondary add r and 2pi for integration
 	  if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
-	    if (dist_bh1 > Rcut*Rhill && dist_bh0 > 0.06){ //add 2pi to Trq to not azi average - see Scalar int below
-	      VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz); 
+	    if (dist_bh1 > Rcut*Rhill){ //add 2pi to Trq to not azi average - see Scalar int below
+	      //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz);
+	      //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] -= (r*2.*M_PI*rho*r*fBin_phi/sim_N_p(theSim,i));
+	      VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] -= (r*rho*fBin_phi * r*dphi);//((r_bh0*fp0+r_bh1*fp1)*rho *r*dphi);
 	    //positive gives torque ON binary                 
-	      TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz);//2pi/Nphi = dphi
+	      //TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz);//2pi/Nphi = dphi
+	      //TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 -= (r*2.*M_PI*rho*r*fBin_phi/sim_N_p(theSim,i));
+	      //TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 -= (r*rho*fBin_phi * r*dphi);
+	      //TrScal_temp                                               -= (r*rho*fBin_phi * r*dphi*(rp-rm));
 	    }
-	    }else{
-	    VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += 0.0;
-	    TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 += 0.0;
+	    //}else{
+	    // VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += 0.0;
+	      //TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 += 0.0;
           }
 	  if (r<r_bh1){ ///Mass encolsed by binary               
-            VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+18] += (2*M_PI*rho/sim_N_p(theSim,i)*dz) ;
+            VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+18] += ( 2*M_PI*rho/sim_N_p(theSim,i) );
           }
           // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }
     }
 
+    
+     for (i=imin;i<imax;++i){
+      for (j=0;j<sim_N_p(theSim,i);++j){
+	k = 0;
+	double rho = cell_prim(cell_single(theCells,i,j,k),RHO);
+	VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17]/(2*M_PI*rho)/sim_N_p(theSim,i);
+      }    
+     }
+
 
     for (i=imin;i<imax;++i){
       double rp = sim_FacePos(theSim,i,R_DIR);
       double rm = sim_FacePos(theSim,i-1,R_DIR);
-      TrScal_temp += TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]*(rp-rm);
+      //TrScal_temp += TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]*(rp-rm);
       for (n=0;n<NUM_SCAL;++n){
         if (n==16){ // the vol. el. 'r' already added so dr not dr^2 - does not need extra 1/2 in /(dz) below
 	  ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp-rm);
         }else{
-          // mult by delta r^2 because we are doing an r integration (needs extra factor of 1/2 comes with /(dz) below)
+          // mult by delta r^2 because we are doing an r integration r(rp-rm) = (rp+rm)/2*(rp-rm) = 1/2(rp^2-rm^2)
 	  ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp*rp-rm*rm);
         }
 
       }
     }
+
+    // zero out vector array used to sum total Trq each timestep
+    //for (i=imin;i<imax;++i){
+    //  TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)] = 0.0;
+    //}
 
 
 
@@ -329,10 +463,10 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 
 
     for (n=0;n<NUM_SCAL;++n){
-      if (n!=16){ //Don't Vol avg Torques - only Z avg                     
+      if (n!=16 && n!=15){ //Don't Vol avg Torques - only Z avg                     
         ScalarDiag_reduce[n] *= dtout/((ZMAX-ZMIN)*(RMAX*RMAX-RMIN*RMIN));
-      }else if(n==16){
-        ScalarDiag_reduce[n] *= dtout/(ZMAX-ZMIN);
+	}else if(n==16 || n==15){
+           ScalarDiag_reduce[n] *= dtout; ///(ZMAX-ZMIN);
 	//TrScal_reduce        *= 1./(ZMAX-ZMIN);   don't volume average sigma = int{rho * dz}             
       }
     }
@@ -402,7 +536,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     //Binary params -DD ------ ADDED below DD---------//                      
     double t = timestep_get_t(theTimeStep);
     double r_bh0 = gravMass_r(theGravMasses,0);
-    //double r_bh1 = gravMass_r(theGravMasses,1);
+    //double r_bh1 = gravMass_r(theGravMasses,1); defined above
     double phi_bh0 = gravMass_phi(theGravMasses,0);
     double phi_bh1 = gravMass_phi(theGravMasses,1);
 
@@ -421,7 +555,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     //double Mdots = gravMass_Mdot(theGravMasses,1);
     //double Maccs = gravMass_Macc(theGravMasses,1);
 
-    double sim_trq = gravMass_total_torque(theGravMasses,0);
+    //double sim_trq = gravMass_total_torque(theGravMasses,0);
     //If CM of binary strays from r=0, then phi1-phi0 != pi                     
     //double a_bin = sqrt(r_bh0*r_bh0 + r_bh1*r_bh1 - 2.*r_bh0*r_bh1*cos(phi_bh1-phi_bh0));
     double a_bin = r_bh0+r_bh1;
@@ -432,9 +566,12 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagBPFilename[256];
       sprintf(DiagBPFilename,"BinaryParams.dat");
       FILE * DiagBpFile = fopen(DiagBPFilename,"a");
-      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, Om, Om, Om, sim_trq, TrScal_reduce);
+      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, Om, Om, Om, gravMass_total_torque(theGravMasses,0), TrScal_reduce);
       fclose(DiagBpFile);
     }
+
+    TrScal_reduce = 0.0;
+    TrScal_temp = 0.0;
     //----------------ADDED above DD-------------------------//                                                                                                                
 
 
@@ -463,7 +600,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     //update output time;
     theDiagnostics->toutprev = timestep_get_t(theTimeStep);
  
-    free(TrVec_temp); //DD
+    //free(TrVec_temp); //DD
     free(ScalarDiag_temp);
     free(ScalarDiag_reduce);
     free(VectorDiag_temp);

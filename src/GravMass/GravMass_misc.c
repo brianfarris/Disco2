@@ -35,76 +35,40 @@ void gravMass_copy(struct GravMass * theGravMasses,struct Sim * theSim){
 
 // Analytic uodate via Keplers Laws - now jsut e=0 circular orbits
 void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt ){
-  ////double Ms = thisGravMass->M;  //The mass of the secondary
-  //-double mt = Mp/pow(1.+Ms/Mp,2.);            // ??  
-  //-double E = thisGravMass->E;   // Etot                             
-  //double Ltot = thisGravMass->Ltot;           // Lsec/Msec
-  //-double Lp = Ls*Ms/Mp; // Omega the same right? 3 1/q's to convert 1M and 2 r's works out to one Ms/Mp
-  ////-double Ltot = Ls; //FOR NOW Ls is tot L - DD April 7 2014 *(1.+Ms/Mp);
-  //-double r1 = thisGravMass->r;
-  //-double phi = thisGravMass->phi;
-  //-double vr1 = thisGravMass->vr;
+    double Ms = thisGravMass->M; 
+    double Ltot = thisGravMass->Ltot;
+    double a = Ltot*Ltot/(Ms*Ms*Mp*Mp)*(Ms+Mp);
 
-  //- double rt = r1 + r1*Ms/Mp;
+    thisGravMass->r = a/(1.+Ms/Mp);
+    thisGravMass->omega = pow(a,(-3./2.));           //Is this a bad idea?
+}
 
-  //either update with Delta L
-  ////double a = Ltot*Ltot/(Ms*Ms*Mp*Mp)*(Ms+Mp);
+// Forced uodate
+void gravMass_adv_arb( struct Sim * theSim, struct GravMass * thisGravMass , double Mp , double t, double dt ){
+    double anew;
+    double Ms = thisGravMass->M;
+    double rs0 = 1./(1.+Ms/Mp);
+    double nu = sim_EXPLICIT_VISCOSITY(theSim);
+    //double drdt;
+    double rate = -sim_vRate(theSim)*1.5 * nu/rs0;
+    double dexp = 2./3.;
+    double aold = thisGravMass->r*(1.+Ms/Mp); 
+    double tmax = sim_tmaxOrb(theSim) * 2.*M_PI;
+    anew = pow( (1. + rate*sqrt(aold) * (t - tmax)/dexp), dexp);
+    //anew = pow( (1. + rate * (t - tmax))/dexp, dexp);
 
-  // Or update with Delta E                                
-  //double a = -.5*Ms*Mp/Enew;               // E = -G(M0+M1)/(2a) for elliptical orbit
-  // for e=0 only
-  //-double e=0.0;
-  //double cosE0 = 0.0;              
-  //-double cosE0 = (1.-r1/a)/e;    // from r=a(1-ecos(E))        
-  //-if( e <= 0.0 ) cosE0 = 0.0;   // circular orbit or imaginary e -> something weird? 
-  //-double sinE0 = sqrt(fabs(1.-cosE0*cosE0));
-  //-if( vr1 < 0.0 ) sinE0 = -sinE0; //???
-
-
-
-  //-double E0 = atan2( sinE0 , cosE0 );
-  //-if( E>0.0 ) E0 = log( sinE0 + cosE0 );
-
-  //-double phi0 = 2.*atan2( sqrt(1.+e)*sin(E0/2.) , sqrt(1.-e)*cos(E0/2.) );   //standard Newtonian formulae for phi
-  //if( E>0.0 ) phi0 = 2.*atan2( sqrt(1.+e)*sinh(E0/2.) , sqrt(fabs(1.-e))*cosh(E0/2.) ); //Paul
-  //-if( E>0.0 ) phi0 = 2.*atan2( sqrt(e+1.)*sinh(E0/2.) , sqrt(e-1.)*cosh(E0/2.) );//above unbound; why use fabs? - if unbound then e>=1 -Dan                        
- 
-  //-double M0 = E0 - e*sin(E0);   // Newtonian formulae for t(=M here) in terms of Eccentric anomaly E and eccentricity e
-  //-if( E>0.0 ) M0 = E0 - e*sinh(E0); // above unbound          
-
-  //-double M = M0 + dt*sqrt(mt)/pow(a,1.5);  // advance t
-  //-if( E>0.0 ) M = M0 - dt*sqrt(mt)/pow(-a,1.5);
-
-  //-double E1 = M;
-  //-double df = M-E1+e*sin(E1);
-  //-if( E>0.0 ) df = M-E1+e*sinh(E1);
-  //-while( fabs(df) > 1e-12 ){
-  //-  double dfdE = -1.+e*cos(E1);
-  //-  if( E>0.0 ) dfdE = -1.+e*cosh(E1);
-  //-  double dE = -df/dfdE;
-  //-  E1 += dE;
-  //-  df = M-E1+e*sin(E1);
-  //-  if( E>0.0 ) df = M-E1+e*sinh(E1);
-  //-}
-
-  //-rt = a*(1.-e*cos(E1));
-  //-if( E>0.0 ) rt = a*(1.-e*cosh(E1));
-  //-double phi1 = 2.*atan2( sqrt(1.+e)*sin(E1/2.) , sqrt(1.-e)*cos(E1/2.) );
-  //-if( E>0.0 )  phi1 = 2.*atan2( sqrt(1.+e)*sinh(E1/2.) , sqrt(fabs(1.-e))*cosh(E1/2.) );
-
-
-  //-thisGravMass->r = rt/(1.+Ms/Mp);
-  //-double vr = sqrt((Ms+Mp)*(2./rt - 1./a) - (Ms+Mp)/a/a/a * rt*rt); //0 for circ orbit
-
-  //-if((Ms+Mp)*(2./rt - 1./a) - (Ms+Mp)/a/a/a * rt*rt < 0.0 ) vr = 0.0;
-  //-if( sin(E1) < 0.0 ) vr = -vr; //???
-  //*vrt = vr2;
-  //-thisGravMass->vr = vr/(1.+Ms/Mp);
-  double Ms = thisGravMass->M; 
-  double Ltot = thisGravMass->Ltot;
-  double a = Ltot*Ltot/(Ms*Ms*Mp*Mp)*(Ms+Mp);
-  thisGravMass->r = a/(1.+Ms/Mp);
-  thisGravMass->omega = pow(a,(-3./2.));           //Is this a bad idea?
+    /*
+    if ( time_global > 2.*M_PI*sim_tmig_on(theSim) ){
+      drdt = -sim_vRate(theSim)*1.5 * nu/rs0;
+    }else{
+      drdt = 0.0;
+    }
+    */
+    //thisGravMass->r += drdt * dt;
+    //double a = thisGravMass->r*(1.+Ms/Mp);
+    //thisGravMass->omega = pow(a,(-3./2.));           //Is this a bad idea?                          
+    thisGravMass->r = anew/(1.+Ms/Mp);
+    thisGravMass->omega = pow(anew,-1.5);
 }
 
 
@@ -119,67 +83,23 @@ void gravMass_move( struct Sim * theSim, struct GravMass * theGravMasses, double
     double Ms = theGravMasses[1].M; //secondary
 
     //Here we need to analytically update a, phi, vr from Kepler's equations 
-    gravMass_adv_anly(&(theGravMasses[1]), Mp, dt);
+    //gravMass_adv_anly(&(theGravMasses[1]), Mp, dt);
     // Or just push the binary together arbitrarily for testing
-    //gravMass_adv_arb(&(theGravMasses[1]), Mp, dt); //TESTING 
+    gravMass_adv_arb(theSim, &(theGravMasses[1]), Mp, t, dt); //TESTING 
                                                                        
     theGravMasses[0].r   = theGravMasses[1].r*Ms/Mp;
-    //theGravMasses[0].vr  = theGravMasses[1].vr*Ms/Mp;
     theGravMasses[0].omega  = theGravMasses[1].omega;
 
     theGravMasses[1].phi += theGravMasses[1].omega*dt; //Instead of updating in adv_anly ONLY GOOD FOR CIRC?
     theGravMasses[0].phi = theGravMasses[1].phi + M_PI;
  }else{
     theGravMasses[1].phi += theGravMasses[1].omega*dt;
-    //theGravMasses[1].phi += theGravMasses[1].omega*dt               
     theGravMasses[0].phi = theGravMasses[1].phi + M_PI;
   }
 }
 
 
 
-
-/*
-void gravMass_move(struct Sim * theSim,struct GravMass * theGravMasses,double t,double dt){
-  double m0 = theGravMasses[0].M;
-  double m1 = theGravMasses[1].M;
-  double M = m0+m1;
-  double mu = m0*m1/M; 
-  double a_0 = 1.0;
-  double OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
-  double OrbShrinkT0 = sim_OrbShrinkT0(theSim);
-  double tau_0 = OrbShrinkTscale;
-  double a; 
-  double omega;
-  if ((t-OrbShrinkT0)/tau_0<1.){
-    a = a_0 * pow((1.0 - (t-OrbShrinkT0)/tau_0),0.25);
-    omega = pow(a/M,-1.5);
-  } else{
-    a = 0.0;
-    omega = 0.0;
-  }
-
-  //printf("a: %e, M: %e, omega: %e\n",a,M,omega);
-  double r0,r1;
-  if (M<1.e-12){
-    r0 = 0.0;
-    r1=0.0;
-  } else{
-    r0 = m1/M*a;
-    r1 = m0/M*a;
-  }
-     /*
-     theGravMasses[0].phi += theGravMasses[0].omega*dt;
-     theGravMasses[1].phi += theGravMasses[1].omega*dt;
-     */ /*
-  theGravMasses[0].phi += omega*dt;
-  theGravMasses[1].phi += omega*dt;
-  theGravMasses[0].r = r0;
-  theGravMasses[1].r = r1;
-  theGravMasses[0].omega = omega;
-  theGravMasses[1].omega = omega;
-}
-*/
 
 
 void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, double RK, double dt){
@@ -220,9 +140,3 @@ void gravMass_set_Macc( struct GravMass * theGravMasses, double Macc, int p){
 void gravMass_set_total_torque( struct GravMass * theGravMasses, double total_torque, int p){
   theGravMasses[p].total_torque = total_torque;
 }
-//void GravMass_set_omega( struct GravMass * theGravMasses, int p, double Om){
-//  theGravMasses[p].omega = Om;
-//}
-//void GravMass_set_Ltot( struct GravMass * theGravMasses, int p, double Ltot){
-//  theGravMasses[p].Ltot = Ltot;
-//}

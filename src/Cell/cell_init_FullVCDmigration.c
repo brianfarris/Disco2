@@ -8,7 +8,7 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
+void cell_single_init_FulVCDmigration(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
 
 	double rho   = 1.0;
 	
@@ -48,11 +48,13 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	double r = 0.5*(rm+rp);
 
 	
+	
 	double xbh0 = r0;
 	double xbh1 = -r1;
 	double ybh0 = 0.0;
 	double ybh1 = 0.0;
 			
+
 				
 	double phi = theCell->tiph-.5*theCell->dphi;
 	double xpos = r*cos(phi);
@@ -61,48 +63,17 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	double dist_bh0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
 	double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
 	
-	///```````````````````````````0
-	//double cs0,cs1;
-        //double PoRho0,PoRho1,PoRho;
-	
-	/*
-	double vp0,vp1;
-	if ( dist_bh0>sim_Rsink0(theSim) ){
-	  vp0 = pow(dist_bh0,-0.5) * sqrt(M0) ;
-	  cs0 = HoR*vp0;
-	  PoRho0 = cs0*cs0/Gam;
-        } else{
-	  vp0 = pow(sim_Rsink0(theSim),-0.5);
-	  cs0 = HoR*vp0;
-	  PoRho0 = cs0*cs0/Gam;
-	  //PoRho = T0 * exp(-r*r/(r_a*r_a));                                                                                             
-        }
-        if (dist_bh1>sim_Rsink1(theSim)){
-	  vp1 = pow(dist_bh1,-0.5) * sqrt(M1) ;
-	  cs1 = HoR*vp1;
-	  PoRho1 = cs1*cs1/Gam;
-        } else{
-	    vp1 = pow(sim_Rsink1(theSim),-0.5);
-	  cs1 = HoR*vp1;
-	  PoRho1 = cs1*cs1/Gam;
-	  //PoRho = T0 * exp(-r*r/(r_a*r_a));                                                                                             
-        }
 
-	*/
+	//double OmegaK = 1./pow(r,1.5);
 
-	double OmegaK = pow(r,-1.5);
+	//double cs = r*OmegaK/Mach;
+	//double cs2 = cs*cs;
 
-	double cs = r*OmegaK/Mach;
-	double cs2 = cs*cs;
+	double cs0 = pow((dist_bh0*dist_bh0 + 0.05*0.05),-0.5) * sqrt(M0) * HoR;
+	double cs1 = pow((dist_bh1*dist_bh1 + 0.05*0.05),-0.5) * sqrt(M1) * HoR;
 
-	//cs0 = pow((dist_bh0*dist_bh0 + 0.05*0.05),-0.5) * sqrt(M0) * HoR;
-	//cs1 = pow((dist_bh1*dist_bh1 + 0.05*0.05),-0.5) * sqrt(M1) * HoR;
-	//PoRho0 =  cs0*cs0/Gam;
-	//PoRho1 =  cs1*cs1/Gam; 
-	
-        //PoRho = PoRho0+PoRho1;
-   	//PoRho = (cs0*cs0 + cs1*cs1)/Gam;
-	double PoRho = cs*cs/Gam;
+   	double PoRho = (cs0*cs0 + cs1*cs1)/Gam;
+	//double PoRho = cs*cs/Gam;
 
 				
 	double n = sim_PHI_ORDER(theSim);
@@ -117,7 +88,7 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	//double drcs2 = - M0*(r-r0*cos(phi0 - phi))/pow((dist_bh0*dist_bh0 + 0.05*0.05), 1.5) - M1*(r-r1*cos(phi1 - phi))/pow((dist_bh1*dist_bh1 + 0.05*0.05), 1.5);
 
 
-        //double cs2 = (cs0*cs0 + cs1*cs1);
+        double cs2 = (cs0*cs0 + cs1*cs1);
 	double drcs2 = -1./(r*r)/Mach/Mach;
 
  
@@ -142,52 +113,51 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	  dr_nu = DISK_ALPHA * ( drcs2/Omeff - cs2/Omeff/Omeff * dr_Omeff);
 	  //0.5*disk_nu/r; //0.5*DISK_ALPHA*pow(r,-0.5)/Mach/Mach;  //same as 0.5*disk_nu/r;
         }
-
-	double omega;
-	//if (MMOm==1){
-	omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
-	double O2 = omega*omega + 1./2.*1/r * drcs2/Gam;    // 1/2 for rho -> sigma?- OmegaK*OmegaK/Mach/Mach/Gam;//add +1/(sigma r)*dP/dr trm 
-	//}
-	
-	//if (TAddV==1){
-	//double O2 = pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0 + pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1;
-	//}
-
-	omega = sqrt(O2);
-   
+	//double q = massratio;
+	//double a = sep;
+	//double omega = ((1 + q)*(r + q*r - a*cos(phi))*sqrt((2*M_PI*q + (1 -3*q)*atan((256*pow(pow(a/(1 + q) 
+	//	       - r*cos(phi),2) + pow(r,2)*pow(sin(phi),2),4))/390625.))/((1 + q)*sqrt(pow(a/(1 + q) 
+	//	       - r*cos(phi),2) + pow(r,2)*pow(sin(phi),2)))))/(sqrt(2*M_PI)*(pow(a,2) + pow(1 + q,2)*pow(r,2) 
+        //              - 2*a*(1 + q)*r*cos(phi))) + ((1 + q)*(r + q*r + a*q*cos(phi))*sqrt((2*M_PI + (-3 + q)*atan((256*pow(pow((a*q)/(1 + q)
+	//	       + r*cos(phi),2) + pow(r,2)*pow(sin(phi),2),4))/390625.))/((1. + q)*sqrt(pow((a*q)/(1 + q) + r*cos(phi),2) 
+	//	       + pow(r,2)*pow(sin(phi),2)))))/(sqrt(2*M_PI)*(pow(a,2)*pow(q,2) + pow(1 + q,2)*pow(r,2) 
+	//	       + 2*a*q*(1 + q)*r*cos(phi)));
+  
+	double omega = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
+ 
 
 	double vr;
         double vrout;
         double rout = sim_RDAMP_OUTER(theSim);
 	if (DISK_ALPHA > 0.0){
-	  vr = -3./2.*disk_nu/r - 3.*dr_nu;
-	  if ( sim_VISC_CONST(theSim)!=1 ){
-              vrout = -3*DISK_ALPHA/Mach/Mach * pow(rout,-0.5);
-              rho = rho/vr *vrout; // Choose rho so that we have constant Mdot in Damping region and rho =1.0 at rdamp_outer, less beyond
-	  }
-	}else{
-	  vr = 0.0;
+          vr = -3./2.*disk_nu/r - 3.*dr_nu;
+          if ( sim_VISC_CONST(theSim)!=1 ){
+	    vrout = -3*DISK_ALPHA/Mach/Mach * pow(rout,-0.5);
+	    rho = rho/vr *vrout; // Choose rho so that we have constant Mdot in Damping region and rho =1.0 at rdamp_outer, less beyond            
+          }
+        }else{
+          vr = 0.0;
 	}
+
 	
 	// st vr=0 inside a the cavity if it exists
 	if (  r < 3.*sep*( (log(1000.) + 2.*log(massratio))/log(10.) )   ) {//this function goes to 0 at q<0.04, =1 at q=0.1, =3 at q=1
 	  vr =0.0;
 	}
 
-	//if (r<sep){
-	//  omega = sqrt(O2);//*pow(r,2.);
-	//	vr = 0.0;
-	//	//vr = scaled SS;
-	//}else{
-	//	omega = sqrt(O2);
-	//	vr = 0.0;
-	//	//vr = scaled SS;
-	//}		  
+
+	//vr += (a*(1 + q)*sin(phi)*(-(sqrt ((2*M_PI*q + (1 - 3*q)*atan((256*pow(pow(a/(1 + q) - r*cos(phi),2) 
+	//   + pow(r,2)*pow(sin(phi),2),4))/390625.))/((1. + q)*sqrt(pow(a/(1 + q) - r*cos(phi),2) 						            //   + pow(r,2)*pow(sin(phi),2))))/(pow(a,2) + pow(1 + q,2)*pow(r,2) - 2*a*(1 + q)*r*cos(phi))) 
+        //   + (q*sqrt((2*M_PI + (-3. + q)*atan((256*pow(pow((a*q)/(1 + q) + r*cos(phi),2) 
+        //   + pow(r,2)*pow(sin(phi),2),4))/390625.))/((1 + q)*sqrt(pow((a*q)/(1 + q) 
+        //   + r*cos(phi),2) + pow(r,2)*pow(sin(phi),2)))))/(pow(a,2)*pow(q,2) 
+	//   + pow(1 + q,2)*pow(r,2) + 2*a*q*(1 + q)*r*cos(phi))))/sqrt(2*M_PI);
+
+
 	
 	if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
 				
-	//double Pp = 1./20.*1./20.*rho/Gam; //cs*cs*rho/Gam * r;	//mult by r to get cst Pressure
-	//double Pp = cs*cs*rho/Gam;
+
 	double Pp = PoRho * rho;
 
 
@@ -203,7 +173,7 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	theCell->GradPsi[2] = 0.0;	
 }
 
-void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
+void cell_init_FulVCDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 	
   double rho0   = 1.0;
 
@@ -262,48 +232,10 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
         double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
 
 
-
-	///```````````````````````````
-	// double cs0,cs1;
-	// double PoRho0,PoRho1,PoRho;
-
-	/*
-        double vp0,vp1;
-        if ( dist_bh0>sim_Rsink0(theSim) ){
-          vp0 = pow(dist_bh0,-0.5) * sqrt(M0) ;
-          cs0 = HoR*vp0;
-          PoRho0 = cs0*cs0/Gam;
-        } else{
-          vp0 = pow(sim_Rsink0(theSim),-0.5);
-          cs0 = HoR*vp0;
-          PoRho0 = cs0*cs0/Gam;
-        }
-        if (dist_bh1>sim_Rsink1(theSim)){
-	    vp1 = pow(dist_bh1,-0.5) * sqrt(M1) ;
-	    cs1 = HoR*vp1;
-	    PoRho1 = cs1*cs1/Gam;
-	  } else{
-            vp1 = pow(sim_Rsink1(theSim),-0.5);
-	    cs1 = HoR*vp1;
-	    PoRho1 = cs1*cs1/Gam;
-	}
-
-	PoRho = (cs0*cs0 + cs1*cs1)/Gam;
-	*/
-
-	double OmegaK = 1./pow(r,1.5);
-
-	double cs = r*OmegaK/Mach;
-	double cs2 = cs*cs;
-        //cs0 = pow((dist_bh0*dist_bh0 + 0.05*0.05),-0.5) * sqrt(M0) * HoR;
-        //cs1 = pow((dist_bh1*dist_bh1 + 0.05*0.05),-0.5) * sqrt(M1) * HoR;
-        //PoRho0 =  cs0*cs0/Gam;
-        //PoRho1 =  cs1*cs1/Gam;
-
-        //PoRho = PoRho0+PoRho1;
-	double PoRho = cs2/Gam;
-
-
+        double cs0 = pow((dist_bh0*dist_bh0 + 0.05*0.05),-0.5) * sqrt(M0) * HoR;
+        double cs1 = pow((dist_bh1*dist_bh1 + 0.05*0.05),-0.5) * sqrt(M1) * HoR;
+        
+        
         double n = sim_PHI_ORDER(theSim);
         double Pot0 = M0/pow( pow(dist_bh0,n) + pow(eps0,n) , 1./n );
         double Pot1 = M1/pow( pow(dist_bh1,n) + pow(eps1,n) , 1./n );
@@ -312,8 +244,10 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 	double rho = rho0;
 
 	
-	//double cs2 = (cs0*cs0 + cs1*cs1);
+	double cs2 = (cs0*cs0 + cs1*cs1);
 	double drcs2 = -1./(r*r)/Mach/Mach; 
+
+	double PoRho = cs2/Gam;
 
 
         double eps = sim_G_EPS(theSim);
@@ -340,25 +274,20 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
         }
 
 
-	double omega;
-        //if (MMOm==1){
-        omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
-        double O2 = omega*omega + 1./2.*1/r * drcs2/Gam;    // 1/2 for rho -> sigma?- OmegaK*OmegaK/Mach/Mach/Gam; // add +1/(sigma r)*dP/dr tr 
-	//	}
 
-	// if (TAddV==1){
-        //double O2 = pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0 + pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1;
-        //}
+        //double q = massratio;
+        //double a = sep;
+	//double omega = ((1 + q)*(r + q*r - a*cos(phi))*sqrt((2*M_PI*q + (1 -3*q)*atan((256*pow(pow(a/(1 + q)
+	//	       - r*cos(phi),2) + pow(r,2)*pow(sin(phi),2),4))/390625.))/((1 + q)*sqrt(pow(a/(1 + q)
+	//	       - r*cos(phi),2) + pow(r,2)*pow(sin(phi),2)))))/(sqrt(2*M_PI)*(pow(a,2) + pow(1 + q,2)*pow(r,2)
+	//	       - 2*a*(1 + q)*r*cos(phi))) + ((1 + q)*(r + q*r + a*q*cos(phi))*sqrt((2*M_PI + (-3 + q)*atan((256*pow(pow((a*q)/(1 + q)
+	//	       + r*cos(phi),2) + pow(r,2)*pow(sin(phi),2),4))/390625.))/((1. + q)*sqrt(pow((a*q)/(1 + q) + r*cos(phi),2)
+	//	       + pow(r,2)*pow(sin(phi),2)))))/(sqrt(2*M_PI)*(pow(a,2)*pow(q,2) + pow(1 + q,2)*pow(r,2)
+	//	       + 2*a*q*(1 + q)*r*cos(phi)));
 
-        omega = sqrt(O2);
 
+	double omega = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
 
-	//double omega;
-	// //if (massratio!=0.0){
-        //omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
-	////}
-        //double O2 = omega*omega + 1./2.*1/r * drcs2/Gam;    // 1/2 for rho -> sigma?- OmegaK*OmegaK/Mach/Mach/Gam; // add +1/(sigma r)*dP/dr term
-	//omega = sqrt(O2);
 
 
         double vr;
@@ -369,13 +298,19 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
         }
 	
 
-
       	  // st vr=0 inside a the cavity if it exists
 	if (  r < 3.*sep*( (log(1000.) + 2.*log(massratio))/log(10.) )   ) {//this function goes to 0 at q<0.04, =1 at q=0.1, =3 at q=1
           vr =0.0;
 	}
 
 
+	//vr += (a*(1 + q)*sin(phi)*(-(sqrt ((2*M_PI*q + (1 - 3*q)*atan((256*pow(pow(a/(1 + q) - r*cos(phi),2)
+	//   + pow(r,2)*pow(sin(phi),2),4))/390625.))/((1. + q)*sqrt(pow(a/(1 + q) - r*cos(phi),2)
+	//   + pow(r,2)*pow(sin(phi),2))))/(pow(a,2) + pow(1 + q,2)*pow(r,2) - 2*a*(1 + q)*r*cos(phi)))
+	//   + (q*sqrt((2*M_PI + (-3. + q)*atan((256*pow(pow((a*q)/(1 + q) + r*cos(phi),2)
+	//   + pow(r,2)*pow(sin(phi),2),4))/390625.))/((1 + q)*sqrt(pow((a*q)/(1 + q)
+       	//   + r*cos(phi),2) + pow(r,2)*pow(sin(phi),2)))))/(pow(a,2)*pow(q,2)
+	//   + pow(1 + q,2)*pow(r,2) + 2*a*q*(1 + q)*r*cos(phi))))/sqrt(2*M_PI);
 
 
 

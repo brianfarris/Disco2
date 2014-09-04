@@ -74,5 +74,5 @@ void gravMass_set_Macc( struct GravMass * , double, int );
 void gravMass_set_total_torque( struct GravMass * , double , int );
 //For moving Bin
 void gravMass_adv_anly(struct GravMass * , double, double ); 
-//void gravMass_adv_arb( struct GravMass * , double, double );
+void gravMass_adv_arb( struct Sim *, struct GravMass * , double, double, double );
 #endif 

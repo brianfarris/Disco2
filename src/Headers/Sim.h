@@ -79,6 +79,10 @@ struct Sim {
   double Mdsk_o_Ms;
   double tmig_on;
   double tramp;
+  double vRate;
+  double Rsink0;
+  double Rsink1;
+  double tmaxOrb;
 };
 #endif
 
@@ -147,8 +151,14 @@ double sim_Rcut(struct Sim *);
 double sim_Mdsk_o_Ms(struct Sim *);
 double sim_tmig_on(struct Sim *);
 double sim_tramp(struct Sim *);
-
+double sim_vRate(struct Sim *);
+double sim_Rsink0(struct Sim *);
+double sim_Rsink1(struct Sim *);
+double sim_tmaxOrb(struct Sim *);
 int sim_GravMassType(struct Sim * );
+//set Sink radii
+void sim_set_Rsink0(struct Sim * , double);
+void sim_set_Rsink1(struct Sim * , double);
 //set Grid data
 int sim_read_par_file(struct Sim * ,struct MPIsetup *, char * );
 void sim_set_N_p(struct Sim *);

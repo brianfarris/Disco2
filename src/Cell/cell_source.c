@@ -27,7 +27,7 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, 
   }
 
   double one_o_nu = 1.0/(alpha*P/rho)*sqrt(pow(r0,-3)*M0/Mtotal + pow(r1,-3)*M1/Mtotal);
-
+  //double one_o_nu1 = 1.0/(alpha*P/rho)*sqrt(pow(r1,-3)*M1/Mtotal);
 
   if (sim_VISC_CONST(theSim)==1){
     //alpha = sim_EXPLICIT_VISCOSITY(theSim);// / sim_HoR(theSim)/sim_HoR(theSim);
@@ -57,19 +57,21 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, 
 
   // double sink_size = fmin(Rhill, Rbondi);
   //sink_size = 0.5;
-  double sink_size = 1.0 * Rhill;
+  //double sink_size = 1.0*Rhill; //0.5;
   if (a<=0.0){
-    sink_size = 0.1;
+    //sink_size = 0.05;
+    sim_set_Rsink0(theSim, 0.05);
+    sim_set_Rsink1(theSim, 0.05);
   }
 
 
   if (rho > sim_RHO_FLOOR(theSim)){
     if (p==0){
-      if (r0<sink_size){
+      if (r0<sim_Rsink0(theSim)  ){
 	*drho_dt_sink = rho / t_visc0;
       }
     } else if (p==1){
-      if (r1<sink_size){
+      if (r1<sim_Rsink1(theSim)){
 	*drho_dt_sink = rho / t_visc1;
       }
 
@@ -126,7 +128,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
     dens_scale = 0.0;
   }
     
-
+  //dens_scale=1.0; //TESTING TESTING ************
 
   int GRAV2D=sim_GRAV2D(theSim);
   int POWELL=sim_POWELL(theSim);
@@ -145,12 +147,12 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
   int imax_noghost = sim_N(theSim,R_DIR) - sim_Nghost_max(theSim,R_DIR);
   int kmax_noghost = sim_N(theSim,Z_DIR) - sim_Nghost_max(theSim,Z_DIR);
 
-  double total_torque_temp = 0.0;
+  double ttorque_temp = 0.0;
   //  double total_Fr_temp = 0.0;
 
 
   double Mtotal = 1.0;
-  double sep = 1.0;
+  //double sep = 1.0;
   double M0 = gravMass_M(theGravMasses,0);
   double M1 = gravMass_M(theGravMasses,1);
 
@@ -167,6 +169,30 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
   double xbh1 = rbh1*cos(phi_bh1);
   double ybh1 = rbh1*sin(phi_bh1);
+
+  /*
+  // FOR NOW ONLY FOR nu=cst and adv_arb movement                                                                                              
+  double nu = sim_EXPLICIT_VISCOSITY(theSim);
+  double vr_sec = -sim_vRate(theSim) * 1.5 * nu/rbh1;
+  double vr_prm = vr_sec * M1/M0;
+
+  double wp_a = sim_rOm_a(theSim,rbh0,a);
+  double rdrOmp_a = sim_rdrOm_a(theSim,rbh0,a);
+  double dtOmp_a = sim_dtOm_a(theSim,rbh0,a);
+
+  double ws_a = sim_rOm_a(theSim,rbh1,a);
+  double rdrOms_a = sim_rdrOm_a(theSim,rbh1,a);
+  double dtOms_a = sim_dtOm_a(theSim,rbh1,a);
+
+  double Fsec_coriolis_phi = -2.*ws_a*vr_sec/rbh1;
+  double Fsec_euler_phi =  -(rbh1*dtOms_a + vr_sec*rdrOms_a);
+  double Fprm_coriolis_phi = -2.*wp_a*vr_prm/rbh0;
+  double Fprm_euler_phi =  -(rbh0*dtOmp_a + vr_prm*rdrOmp_a);
+
+  ttorque_temp += rbh0*(Fprm_coriolis_phi + Fprm_euler_phi)*M0;
+  ttorque_temp += rbh1*(Fsec_coriolis_phi + Fsec_euler_phi)*M1;
+  */
+
 
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
@@ -186,8 +212,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double vz  = c->prim[UZZ];
         double vp  = c->prim[UPP]*r;
         double dz = zp-zm;
-        double dV = dphi*.5*(rp*rp-rm*rm)*dz;
-	//double dVol = (rp-rm)*r*dphi*dz; -DD
+        //double dV = dphi*.5*(rp*rp-rm*rm)*dz;
+	double dV = (rp-rm)*r*dphi*dz; //-DD
 
         double xpos = r*cos(phi);
         double ypos = r*sin(phi);
@@ -216,9 +242,9 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double Fr = 0.0;
         double Fp = 0.0;
 	//double Fmr =0.0; // for torques
-	double Fmp = 0.0;
+	//double Fmp = 0.0;
 
-	double dm = dens_scale * fabs(rho*dV); // for torques - not3: dV contains a factor of dz=2
+	double dm = dens_scale * fabs(rho*dV/dz); // for torques - note: dV contains a factor of dz=2
  	
         int p;
         for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
@@ -226,7 +252,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           Fr += fr;
           Fp += fp;
 	  //Fmr -= fr*dm;
-	  Fmp -= fp*dm;
+	  //Fmp = -fp*dm;
         }
         double w_a = sim_rOm_a(theSim,r,a);
         double rdrOm_a = sim_rdrOm_a(theSim,r,a);
@@ -236,15 +262,27 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double dtOm_a = sim_dtOm_a(theSim,r,a);
         double F_euler_phi =  -(r*dtOm_a + vr*rdrOm_a);
 
+
         c->cons[SRR] += dt*dV*( rho*vp*vp + Pp )/r;
-        c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r/*+F_coriolis_r*/);
-        c->cons[LLL] += dt*dV*rho*(Fp/*+F_coriolis_phi+F_euler_phi*/ -r*dtOm_a)*r;
+        c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r/*+F_coriolis_r*/); //DD these terms are in split solver
+	//c->cons[SRR] += dt*dV*rho*(Fr*sint+F_centrifugal_r +F_coriolis_r);
+        c->cons[LLL] += dt*dV*rho*(Fp /*+F_coriolis_phi+F_euler_phi*/ -r*dtOm_a)*r; // these terms are in split
+	//c->cons[LLL] += dt*dV*rho*(Fp + F_coriolis_phi+F_euler_phi /*-r*dtOm_a*/)*r;
         c->cons[SZZ] += dt*dV*rho*Fr*cost;
         c->cons[TAU] += dt*dV*rho*( (Fr*sint+F_centrifugal_r)*vr+Fr*vz*cost + (Fp+F_euler_phi)*vp);
+	//double fpsec;
+	//double frsec;
+	//double fr0;
+	//double fp0;
+	//double fr1;
+	//double fp1;
         if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
-	  if (r1 > Rcut*Rhill && r0 > 0.06){
-	    total_torque_temp += Fmp*r;
-	    //total_Fr_temp += Fr;
+	  if (r1 > Rcut*Rhill){
+	    //gravMassForce( theGravMasses , theSim , 0 , gravdist , phi , &fr0 , &fp0 );
+	    //gravMassForce( theGravMasses , theSim , 1 , gravdist , phi , &fr1 , &fp1 );
+	    ttorque_temp -= r*Fp*dm;
+	    //ttorque_temp -= rbh0*fp0*dm;
+	    //ttorque_temp -= rbh1*fp1*dm;
 	  }
         }
 
@@ -314,22 +352,24 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
     }
   }
 
+
+
   double Mdot_reduce[2];
-  MPI_Allreduce( Mdot_temp,Mdot_reduce , 2, MPI_DOUBLE, MPI_SUM, sim_comm);
-  double total_torque_reduce;
-  MPI_Allreduce( &total_torque_temp,&total_torque_reduce, 1, MPI_DOUBLE, MPI_SUM, sim_comm);
+  MPI_Allreduce( Mdot_temp, Mdot_reduce , 2, MPI_DOUBLE, MPI_SUM, sim_comm);
+  double ttorque_reduce;
+  MPI_Allreduce(&ttorque_temp, &ttorque_reduce, 1, MPI_DOUBLE, MPI_SUM, sim_comm);
   int p;
   for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
     gravMass_set_Mdot(theGravMasses,Mdot_reduce[p],p);  //dont set for now DD
     double Macc_prev = gravMass_Macc(theGravMasses,p);
     gravMass_set_Macc(theGravMasses,Macc_prev+Mdot_reduce[p]*dt,p);
-    gravMass_set_total_torque(theGravMasses,total_torque_reduce,p);
+    gravMass_set_total_torque(theGravMasses,ttorque_reduce,p);
   }
 }
 
 void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses, double dt ){
   double Mtotal = 1.0;
-  double sep = 1.0;
+  //double sep = 1.0;
   double M0 = gravMass_M(theGravMasses,0);
   double M1 = gravMass_M(theGravMasses,1);
 

@@ -59,7 +59,11 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         double rm = sim_FacePos(theSim,i-1,R_DIR);
         double r = 0.5*(rm+rp);
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+	  //Kepler Motion
           theCells[k][i][j].wiph = pow(r,-0.5);
+	  //Cored Kepler
+	  ///double rc = 0.63;
+	  //theCells[k][i][j].wiph = r * (pow(r, 6.5) + pow(rc, 6.5) )/(pow(r, 8.) + pow(rc, 8.) ) - pow(r,-0.5);
         }
       }
     }

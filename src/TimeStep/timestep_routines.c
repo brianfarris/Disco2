@@ -81,6 +81,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       cell_add_visc_src( theCells ,theSim, theGravMasses,dt ); // add viscous source terms
     }
   }
+  // uncomment if take fict force terms out of cell_source
   cell_add_split_fictitious(theCells,theSim,theGravMasses,dt);
   //Bookkeeping
   cell_update_phi( theCells ,theSim, theGravMasses, theTimeStep->RK , dt ); // allow the cells to move in phi direction

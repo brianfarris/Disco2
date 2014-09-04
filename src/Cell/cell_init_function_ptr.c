@@ -36,6 +36,11 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_SStest);
   } else if (sim_InitialDataType(theSim)==CDMIGRATION){
     return(&cell_init_CDmigration);
+  } else if (sim_InitialDataType(theSim)==FULVCDMIGRATION){
+    return(&cell_init_FulVCDmigration);
+  } else if (sim_InitialDataType(theSim)==MMRINGCAV){
+    return(&cell_init_MMRingCav);
+
 
   } else{
     printf("ERROR, not a valid global initial data routine choice\n");
@@ -74,6 +79,10 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_SStest);
   } else if (sim_InitialDataType(theSim)==CDMIGRATION){
     return(&cell_single_init_CDmigration);
+  } else if (sim_InitialDataType(theSim)==FULVCDMIGRATION){
+    return(&cell_single_init_FulVCDmigration);
+  } else if (sim_InitialDataType(theSim)==MMRINGCAV){
+    return(&cell_single_init_MMRingCav);
   } else{
     printf("ERROR, not a valid single point initial data routine choice\n");
     exit(0);

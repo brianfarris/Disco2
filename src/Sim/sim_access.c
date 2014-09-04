@@ -203,3 +203,16 @@ double sim_tmig_on(struct Sim * theSim){
 double sim_tramp(struct Sim * theSim){
   return(theSim->tramp);
 }
+double sim_vRate(struct Sim * theSim){
+  return(theSim->vRate);
+}
+double sim_Rsink0(struct Sim * theSim){
+  return(theSim->Rsink0);
+}
+double sim_Rsink1(struct Sim * theSim){
+  return(theSim->Rsink1);
+}
+double sim_tmaxOrb(struct Sim * theSim){
+  return(theSim->tmaxOrb);
+}
+

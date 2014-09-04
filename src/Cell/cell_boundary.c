@@ -54,6 +54,10 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
             for( q=0 ; q<NUM_Q ; ++q ){
               cL->prim[q] += (cR->prim[q]-EXTRAP_BC*cR->grad[q]*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i-1,R_DIR))/2.)*face_dA(theFaces,n);
             }
+	    //cst Mdot update for vr assuming Sig cst (from BC copy)
+	    //cL->prim[URR] = cR->prim[URR] * ( r_face/r_face_m1 ) * face_dA(theFaces,n);
+	    //cst Mdot update for vr assuming Sig cst (from BC copy)
+	    // cL->prim[URR] = -(r_face * cL->prim[RHO] *cL->grad[URR]/(cL->prim[RHO] + r_face * cL->grad[RHO])  ) *face_dA(theFaces,n);
           }
         }
         for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -71,7 +75,7 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
             }
             if( theCells[k][i][j].prim[URR] > 0.0 && diode==1) theCells[k][i][j].prim[URR] = 0.0;
             if (KEP_BNDRY==1){
-              theCells[k][i][j].prim[UPP] = 0.0;// pow(r_cell,-1.5);          
+              theCells[k][i][j].prim[UPP] =  0.0;// pow(r_cell,-1.5);          
               //printf("hello rin. r_cell: %e\n",r_cell);
             }
           }

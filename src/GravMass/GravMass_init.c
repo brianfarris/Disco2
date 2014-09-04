@@ -54,7 +54,7 @@ void gravMass_init_single(struct GravMass * theGravMasses,struct Sim * theSim){
 
 void gravMass_init_binary(struct GravMass * theGravMasses,struct Sim * theSim){
   double Mtotal = 1.0;
-  double sep = 1.0;
+  double sep = sim_sep0(theSim);
   //double massratio = 1.0;
   double massratio = sim_MassRatio(theSim);
   theGravMasses[0].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
@@ -90,7 +90,7 @@ void gravMass_init_binary(struct GravMass * theGravMasses,struct Sim * theSim){
 
 void gravMass_init_livebinary(struct GravMass * theGravMasses,struct Sim * theSim){
   double Mtotal = 1.0;
-  double sep = sim_sep0(theSim);
+  double sep = 3.11392521195;//sim_sep0(theSim);
   double massratio = sim_MassRatio(theSim);
   //theGravMasses[0].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
   //theGravMasses[1].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);

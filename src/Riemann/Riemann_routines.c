@@ -355,7 +355,7 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct Gr
   double tiph = theRiemann->cm;
 
   double Mtotal = 1.0;
-  double sep = 1.0;
+  //double sep = 1.0;
   double M0 = gravMass_M(theGravMasses,0);
   double M1 = gravMass_M(theGravMasses,1);
 

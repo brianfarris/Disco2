@@ -7,6 +7,17 @@
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
+
+//ADDED BY DD
+void sim_set_Rsink0(struct Sim * theSim, double Rsink0){
+  theSim->Rsink0 = Rsink0;
+}
+void sim_set_Rsink1(struct Sim * theSim, double Rsink1){
+  theSim->Rsink1 = Rsink1;
+}
+
+
+
 void sim_set_N_p(struct Sim * theSim){
   int i;
   if (theSim->NP_CONST>0){
