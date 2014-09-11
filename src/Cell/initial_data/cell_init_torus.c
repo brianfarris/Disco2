@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "../Headers/Cell.h"
-#include "../Headers/Sim.h"
-#include "../Headers/Face.h"
-#include "../Headers/GravMass.h"
-#include "../Headers/MPIsetup.h"
-#include "../Headers/header.h"
+#include "../../Headers/Cell.h"
+#include "../../Headers/Sim.h"
+#include "../../Headers/Face.h"
+#include "../../Headers/GravMass.h"
+#include "../../Headers/MPIsetup.h"
+#include "../../Headers/header.h"
 
 void cell_single_init_torus(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
   printf("WARNING, YOU SHOULDNT BE HERE\n");

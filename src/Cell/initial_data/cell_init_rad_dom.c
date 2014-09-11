@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "../Headers/Cell.h"
-#include "../Headers/Sim.h"
-#include "../Headers/Face.h"
-#include "../Headers/GravMass.h"
-#include "../Headers/header.h"
+#include "../../Headers/Cell.h"
+#include "../../Headers/Sim.h"
+#include "../../Headers/Face.h"
+#include "../../Headers/GravMass.h"
+#include "../../Headers/header.h"
 
 double blah = 0.0;
 
