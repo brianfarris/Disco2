@@ -12,7 +12,7 @@ void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,int i,int j
   double rho = 1.0;
   double Pp  = 0.01;
   double v0  = 1.0;
-  double t0  = 0.25+time_global;
+  double t0  = 0.25;
 
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
