@@ -59,10 +59,6 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim, struct GravMas
                 double a  = maxvel( theCells[k][i][j].prim , w , r ,theSim);
                 double rho = theCells[k][i][j].prim[RHO]; 
                 double Pp  = theCells[k][i][j].prim[PPP]; 
-                double Br  = theCells[k][i][j].prim[BRR];
-                double Bp  = theCells[k][i][j].prim[BPP];
-                double Bz  = theCells[k][i][j].prim[BZZ];
-                double b2  = (Br*Br+Bp*Bp+Bz*Bz)/rho;
 
 
                 double dt = sim_CFL(theSim)*dx/a;
@@ -101,20 +97,9 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim, struct GravMas
                     double dt_visc = .25*dx*dx/nu;
                     dt = dt/( 1. + dt/dt_visc );
                 }
-                if( dt_m > dt ) {
-                    mag_vel_m = sqrt(b2);
-                    a_m = a;
-                    dx_m = dx;
-                    dt_m = dt;
-                    i_m = i;
-                    j_m = j;
-                    k_m = k;
-                    r_m = r;
-                }
             } 
         }
     }
-    //printf("r_m: %e, i_m: %d, j_m: %d, k_m: %d, a_m: %e, dx_m: %e, mag_vel_m: %e\n",r_m,i_m,j_m,k_m,a_m,dx_m,mag_vel_m);
     double dt2;
     MPI_Allreduce( &dt_m , &dt2 , 1 , MPI_DOUBLE , MPI_MIN , sim_comm );
     return( dt2 );

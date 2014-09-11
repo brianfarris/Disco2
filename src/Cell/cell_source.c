@@ -69,11 +69,7 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
     double sinap = sina*cosp-cosa*sinp;
 
     double f1;
-    if (sim_InitialDataType(theSim)==FIELDLOOP){
-        f1 = -fgrav_neg_centrifugal( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );
-    } else{
-        f1 = -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );
-    }
+    f1 = -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );
     //double rH = theGravMasses[p].r*pow(theGravMasses[p].M/theGravMasses[0].M/3.,1./3.);
     //double pd = 0.8;
     //double fd = 1./(1.+exp(-( script_r/rH-pd)/(pd/10.)));

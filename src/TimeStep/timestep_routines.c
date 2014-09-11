@@ -29,9 +29,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     cell_set_w( theCells ,theSim);
     // this is part of the runge-kutta method
     cell_adjust_RK_cons( theCells, theSim, theTimeStep->RK);
-    // divB and GradPsi are needed for Powell source terms in MHD eqns. Here we reset them to 0.
-    cell_clear_divB(theCells,theSim);
-    cell_clear_GradPsi(theCells,theSim);
     double r0 = sim_FacePos(theSim,0,R_DIR);
     double r1 = sim_FacePos(theSim,1,R_DIR);
     double r2 = sim_FacePos(theSim,2,R_DIR);
