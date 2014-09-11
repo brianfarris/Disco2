@@ -47,9 +47,6 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
             //cL->prim[UPP] += (cR->prim[UPP]-EXTRAP_BC*cR->grad[UPP]*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i-1,R_DIR))/2.)*face_dA(theFaces,n);
             cL->prim[UPP] += (cR->prim[UPP]/pow(r_cellR,-7./5.)*pow(r_cell,-7./5.))*face_dA(theFaces,n);
             //cL->prim[UPP] += ((cR->prim[UPP]-pow(r_cellR,-1.5)*exp(-pow(r_cellR/0.5,1.5)))/pow(r_cellR,-7./5.)*pow(r_cell,-7./5.) + pow(r_cell,-1.5)*exp(-pow(r_cell/0.5,1.5)))*face_dA(theFaces,n);
-            if (sim_ZeroPsiBndry(theSim)){
-              cL->prim[PSI] = 0.0;
-            }
           } else{
             for( q=0 ; q<NUM_Q ; ++q ){
               cL->prim[q] += (cR->prim[q]-EXTRAP_BC*cR->grad[q]*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i-1,R_DIR))/2.)*face_dA(theFaces,n);
@@ -93,9 +90,6 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
       struct Cell * cR = face_R_pointer(theFaces,n);
       for( q=0 ; q<NUM_Q ; ++q ){
         cR->prim[q] += cL->prim[q]*face_dA(theFaces,n);
-        if (sim_ZeroPsiBndry(theSim)){
-          cR->prim[PSI] = 0.0;
-        }
       }
     }
     //r_face = sim_FacePos(theSim,sim_N(theSim,R_DIR)-2,R_DIR);
@@ -129,9 +123,6 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
       struct Cell * cR = face_R_pointer(theFaces,n);
       for( q=0 ; q<NUM_Q ; ++q ){
         cR->prim[q] += cL->prim[q]*face_dA(theFaces,n);
-        if (sim_ZeroPsiBndry(theSim)){
-          cR->prim[PSI] = 0.0;
-        }
       }
     }
 
@@ -180,9 +171,6 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       struct Cell * cR = face_R_pointer(theFaces,n);
       for( q=0 ; q<NUM_Q ; ++q ){
         cL->prim[q] += cR->prim[q]*face_dA(theFaces,n);
-        if (sim_ZeroPsiBndry(theSim)){
-          cL->prim[PSI] = 0.0;
-        }
       }
     }
 
@@ -209,9 +197,6 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       struct Cell * cL = face_L_pointer(theFaces,n);
       struct Cell * cR = face_R_pointer(theFaces,n);
       for( q=0 ; q<NUM_Q ; ++q ){
-        if (sim_ZeroPsiBndry(theSim)){
-          cR->prim[PSI] = 0.0;
-        }
         cR->prim[q] += cL->prim[q]*face_dA(theFaces,n);
       }
     }

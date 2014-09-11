@@ -22,7 +22,6 @@ struct Sim {
   int GravMassType;
   int BoundTypeR;
   int BoundTypeZ;
-  int ZeroPsiBndry;
   int NoInnerBC;
   double HoR;
   int Restart;
@@ -50,11 +49,8 @@ struct Sim {
   double EXPLICIT_VISCOSITY;
   int VISC_CONST;
   double PoRho_r1;
-  double DIVB_CH;
-  double DIVB_L;
   double CFL;
   double PLM;
-  int POWELL;
   int GRAV2D;
   double G_EPS;
   int RhoSinkOn;

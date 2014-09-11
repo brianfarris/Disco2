@@ -28,8 +28,7 @@ void timestep_rk2(struct TimeStep * theTimeStep, struct Sim * theSim,
   // 2nd step of RK2
   timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,0.5);
   gravMass_move(theSim,theGravMasses,timestep_get_t(theTimeStep),0.5*timestep_dt(theTimeStep));
-  // Psi is updated in operator split manner
-  if (sim_runtype(theSim)==1) timestep_update_Psi(theTimeStep,theCells,theSim,theMPIsetup);
+  
   timestep_update_t(theTimeStep); 
 
   int p;
@@ -52,7 +51,7 @@ void timestep_forward_euler(struct TimeStep * theTimeStep, struct Sim * theSim,
   timestep_set_RK(theTimeStep,0.0);
   timestep_substep(theTimeStep,theCells,theSim,theGravMasses,theMPIsetup,1.0);
   gravMass_move(theSim,theGravMasses,timestep_get_t(theTimeStep),1.0*timestep_dt(theTimeStep));
-  if (sim_runtype(theSim)==1) timestep_update_Psi(theTimeStep,theCells,theSim,theMPIsetup);
+
   timestep_update_t(theTimeStep); 
 
 }

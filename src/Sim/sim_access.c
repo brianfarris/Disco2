@@ -44,9 +44,6 @@ int sim_BoundTypeR(struct Sim *theSim){
 int sim_BoundTypeZ(struct Sim *theSim){
   return(theSim->BoundTypeZ);
 }
-int sim_ZeroPsiBndry(struct Sim *theSim){
-  return(theSim->ZeroPsiBndry);
-}
 int sim_Ncells(struct Sim *theSim){
   return(theSim->Ncells);
 }
@@ -113,20 +110,11 @@ int sim_VISC_CONST(struct Sim *theSim){
 double sim_PoRho_r1(struct Sim *theSim){
     return(theSim->PoRho_r1);
 }
-double sim_DIVB_CH(struct Sim *theSim){
-  return(theSim->DIVB_CH);
-}
-double sim_DIVB_L(struct Sim *theSim) {
-  return(theSim->DIVB_L);
-}
 double sim_CFL(struct Sim *theSim){
   return(theSim->CFL);
 }
 double sim_PLM(struct Sim *theSim){
   return(theSim->PLM);
-}
-int sim_POWELL(struct Sim *theSim){
-  return(theSim->POWELL);
 }
 int sim_W_A_TYPE(struct Sim *theSim){
   return(theSim->W_A_TYPE);
@@ -172,9 +160,6 @@ int sim_NUM_DIAG_DUMP(struct Sim * theSim){
 }
 int sim_NUM_DIAG_MEASURE(struct Sim * theSim){
   return(theSim->NUM_DIAG_MEASURE);
-}
-int sim_runtype(struct Sim * theSim){
-  return(theSim->runtype);
 }
 int sim_InitialDataType(struct Sim * theSim){
   return(theSim->InitialDataType);

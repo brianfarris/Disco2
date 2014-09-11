@@ -30,7 +30,6 @@ void timestep_update_t(struct TimeStep *);
 void timestep_set_RK(struct TimeStep * ,double);
 //take a substep
 void timestep_substep(struct TimeStep * , struct Cell *** ,struct Sim * ,struct GravMass * ,struct MPIsetup *,double);
-void timestep_update_Psi( struct TimeStep * , struct Cell *** , struct Sim *,struct MPIsetup * );
 //access data 
 double timestep_get_t(struct TimeStep *);
 double timestep_dt(struct TimeStep * );
