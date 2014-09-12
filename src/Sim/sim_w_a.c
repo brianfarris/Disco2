@@ -16,7 +16,7 @@ double sim_rOm_a(struct Sim * theSim,double r,double a){
     //Cored Kepler
     //return( r*pow((r*r + 0.005*0.005/(r*r)),-0.75) );
     //Cored Kepler 2 
-    double rc = 0.5;
+    double rc = 1.0;
     return(r * (pow(r, 6.5) + pow(rc, 6.5) )/(pow(r, 8.) + pow(rc, 8.) )  );
   }else if (sim_W_A_TYPE(theSim)==A_OMEGA20){
     //rigid rotation with Omega = 20
@@ -46,7 +46,7 @@ double sim_rdrOm_a(struct Sim * theSim,double r,double a){
     //return( -1.5*r*r/pow((r*r + 0.1*0.1), -1.75) );
     //return( (5.*0.005*0.005 - r*r*r*r)/(2.*r*r* pow((r*r*r*r + 0.005*0.005)/(r*r), 1.75) ) );
     //Cored Kepler 2
-    double rc = 0.5;
+    double rc = 1.0;
     return(     -0.5*pow(r, 6.5)*(3.*pow(r, 8.) + 16.*pow(rc, 6.5)* pow(r, 1.5) - 13.*pow(rc, 8.) )/ ( pow(r, 8.) + pow(rc, 8.) ) / ( pow(r, 8.) 
 		 + pow(rc, 8.)  )         );
   }else if (sim_W_A_TYPE(theSim)==A_OMEGA20){
