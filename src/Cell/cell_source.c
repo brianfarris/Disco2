@@ -107,7 +107,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         }
         else if(sim_Background(theSim) == GR || sim_Background(theSim) == GRVISC1)
         {
-            int mu, nu, la;
+            int mu, nu, la, ka;
             double a, b[3], sqrtg, u[4], u_d[4], U[4], s, sk, rhoh, GAMMALAW;
             double v[3];
             struct Metric *g;
@@ -148,26 +148,14 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 visc[mu] = 0.0;
                 viscm[mu] = 0.0;
             }
-            if(sim_Background(theSim) == GRVISC1 && r > 3*M)
+            if(sim_Background(theSim) == GRVISC1)
             {
                 double du0;
                 double dv[12], du[16];
                 double cs2;
                 double alpha = sim_AlphaVisc(theSim);
 
-                double height = 2*sqrt(Pp*r*r*r*(1-3*M/r)/(rhoh*M));
-              
-                //Isotherm: drive to constant P/rho
-                if(sim_CoolingType(theSim) == COOL_ISOTHERM)
-                    cool = (Pp/rho - sim_CoolPar1(theSim)) / sim_CoolPar2(theSim);
-                //BlackBody - Electron-Scatter opacity
-                else if(sim_CoolingType(theSim) == COOL_BB_ES)
-                {
-                    double temp = Pp/rho;
-                    cool = sim_CoolPar1(theSim) * pow(temp,4) / (rho);
-                }
-                //free-free cooling
-                //cool = sim_CoolFac(theSim) * pow(temp,7.5) / (rho*rho*height);
+                double height = 2*sqrt(Pp*r*r*r/(rhoh*M))/u[0];
 
                 cs2 = GAMMALAW*Pp / rhoh;
                 if (alpha > 0)
@@ -197,6 +185,35 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                     for(nu=0; nu<4; nu++)
                         for(la=0; la<4; la++)
                             viscm[4*mu+nu] += metric_g_dd(g,nu,la)*visc[4*mu+la];
+                
+                //Isotherm: drive to constant P/rho
+                if(sim_CoolingType(theSim) == COOL_ISOTHERM)
+                    cool = (Pp/rho - sim_CoolPar1(theSim)) / sim_CoolPar2(theSim);
+                //BlackBody - Electron-Scatter opacity
+                else if(sim_CoolingType(theSim) == COOL_BB_ES)
+                {
+                    double temp = Pp/rho;
+                    cool = sim_CoolPar1(theSim) * pow(temp,4) / (rho);
+                }
+                //Cooling proportional to viscous heating
+                else if(sim_CoolingType(theSim) == COOL_VISC)
+                {
+                    double sig2 = 0.0;
+                    double partial;
+                    for(mu=0; mu<4; mu++)
+                        for(nu=0; nu<4; nu++)
+                        {
+                            partial = 0.0;
+                            for(la=0; la<4; la++)
+                                partial += visc[4*mu+la]*viscm[4*nu+la];
+                            sig2 += metric_g_dd(g,mu,nu)*partial;
+                        }
+                    sig2 /= -alpha;
+
+                    cool = 0.5*sim_CoolPar1(theSim)*sig2;
+                }
+                //free-free cooling
+                //cool = sim_CoolFac(theSim) * pow(temp,7.5) / (rho*rho*height);
             }
 
             //Momentum sources and contribution to energy source

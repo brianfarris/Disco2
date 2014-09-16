@@ -12,7 +12,7 @@
 void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
 {
     int i,j,k,dir;
-    double a, sqrtg, du0, hn, cs2, rhoh, visc, height, r;
+    double a, sqrtg, du0, hn, cs2, rhoh, visc, height, r, u0;
     double v[3], dv[12], b[3], u[4], du[16], shear[16], U[4], Ud[4];
     
     double alpha = sim_AlphaVisc(theSim);
@@ -94,6 +94,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g, i);
     sqrtg = metric_sqrtgamma(g)/r;
+    u0 = 1.0/sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
     for(i=0; i<4; i++)
     {
         Ud[i] = 0.0;
@@ -120,7 +121,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     //TODO: CHECK THIS!  Probably not relativistic and/or isothermal.
     rhoh = prim[RHO] + GAMMA*prim[PPP]/(GAMMA-1.0);
     cs2 = GAMMA*prim[PPP] / rhoh;
-    height = 2 * sqrt(prim[PPP]*r*r*r*(1-3*M/r)/(rhoh*M));
+    height = 2 * sqrt(prim[PPP]*r*r*r/(rhoh*M)) / u0;
     if(alpha > 0)
         visc = alpha * sqrt(cs2) * height * prim[RHO];
     else

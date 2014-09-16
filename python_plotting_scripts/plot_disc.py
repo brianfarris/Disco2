@@ -20,16 +20,16 @@ N = len(r)
 
 print("Loaded.\nT: {0:.12g}".format(t))
 
-xmin = 2.0
-xmax = 4.0
-ymin = -2.0
-ymax = 2.0
-
 #convert to cartesian
 x = r * np.cos(phi)
 y = r * np.sin(phi)
 vx = vr * np.cos(phi) - r*vp * np.sin(phi)
 vy = vr * np.sin(phi) + r*vp * np.cos(phi)
+
+xmin = x.min()
+xmax = x.max()
+ymin = y.min()
+ymax = y.max()
 
 num_colours = 1000
 

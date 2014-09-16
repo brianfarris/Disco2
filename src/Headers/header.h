@@ -18,7 +18,7 @@ enum{SR,SCHWARZSCHILD_SC,SCHWARZSCHILD_KS,SR_CART};
 //Frames
 enum{FR_EULER,FR_KEP};
 //Cooling Schemes
-enum{COOL_NONE,COOL_ISOTHERM,COOL_BB_ES};
+enum{COOL_NONE,COOL_ISOTHERM,COOL_BB_ES,COOL_VISC};
 
 #include "mpi.h"
 MPI_Comm sim_comm;

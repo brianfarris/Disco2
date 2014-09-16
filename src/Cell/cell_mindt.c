@@ -183,7 +183,8 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                     double maxdisp = 1.0e100; //Should be a fraction like 0.1
                     double dtl;
 
-                    if(sim_CoolingType(theSim) != COOL_NONE)
+                    if(sim_CoolingType(theSim) != COOL_NONE 
+                            && sim_CoolingType(theSim) != COOL_VISC)
                     {
                         double dV = 0.5*(rp+rm)*dr*dphi*dz;
                         double rho = theCells[k][i][j].prim[RHO];

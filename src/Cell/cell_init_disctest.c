@@ -93,6 +93,46 @@ void cell_init_disctest_kepler(struct Cell *c, double r, double phi, double z, s
     }
 }
 
+void cell_init_disctest_alphakepler(struct Cell *c, double r, double phi, double z, struct Sim *theSim)
+{
+    double rho, vr, vp, Pp;
+    double rho0 = sim_InitPar1(theSim);
+    double P0 = sim_InitPar2(theSim);
+    double GAM = sim_GAMMALAW(theSim);
+    double M  = sim_GravM(theSim);
+    double alpha = fabs(sim_AlphaVisc(theSim));
+
+    rho = rho0;
+    Pp = P0;
+
+    double nu = 2*alpha*sqrt(GAM)*Pp/(rho)*sqrt(r*r*r/M);
+
+    vr = -1.5*nu/r;
+    vp = exp(-M/(r-2*M)) * sqrt(M/(r*r*r));
+
+    while(1.0-2*M/r-vr*vr/(1-2*M/r)-r*r*vp*vp <= 0.0)
+        vr /= 2.0;
+
+    c->prim[RHO] = rho;
+    c->prim[PPP] = Pp;
+    c->prim[URR] = vr;
+    c->prim[UPP] = vp;
+    c->prim[UZZ] = 0.0;
+
+    if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) 
+    {
+        int i;
+        double x;
+        for(i=sim_NUM_C(theSim); i<sim_NUM_Q(theSim); i++)
+        {
+            if(r*cos(phi) < 0)
+                c->prim[i] = 0.0;
+            else
+                c->prim[i] = 1.0;
+        }
+    }
+}
+
 void cell_init_disctest_calc(struct Cell *c, double r, double phi, double z, struct Sim *theSim)
 {
     int test_num = sim_InitPar0(theSim);
@@ -101,6 +141,8 @@ void cell_init_disctest_calc(struct Cell *c, double r, double phi, double z, str
         cell_init_disctest_rigid(c, r, phi, z, theSim);
     else if(test_num == 1)
         cell_init_disctest_kepler(c, r, phi, z, theSim);
+    else if(test_num == 2)
+        cell_init_disctest_alphakepler(c, r, phi, z, theSim);
     else
         printf("ERROR: cell_init_disctest given bad option.\n");
 }
