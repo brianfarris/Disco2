@@ -18,7 +18,7 @@ MPI_Comm sim_comm;
 #define KEP_BNDRY 0
 #define BzZ 0
 #define BNORM_AVG 0
-#define CHECKPOINTING 
+//#define CHECKPOINTING 
 #define TVISC_FAC 1.0
 #define PHIMAX 2.0*M_PI
 #define diode 0

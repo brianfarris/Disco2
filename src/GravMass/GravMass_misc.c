@@ -24,9 +24,6 @@ void gravMass_copy(struct GravMass * theGravMasses,struct Sim * theSim){
     theGravMasses[p].RK_phi = theGravMasses[p].phi;
     theGravMasses[p].RK_M   = theGravMasses[p].M;
     theGravMasses[p].RK_omega   = theGravMasses[p].omega;
-//    theGravMasses[p].RK_E   = theGravMasses[p].E;
-//    theGravMasses[p].RK_L   = theGravMasses[p].L;
-//    theGravMasses[p].RK_vr  = theGravMasses[p].vr;
   }
 }
 
@@ -50,7 +47,6 @@ void gravMass_move(struct Sim * theSim,struct GravMass * theGravMasses,double t,
     omega = 0.0;
   }
 
-  //printf("a: %e, M: %e, omega: %e\n",a,M,omega);
   double r0,r1;
   if (M<1.e-12){
     r0 = 0.0;
@@ -59,10 +55,6 @@ void gravMass_move(struct Sim * theSim,struct GravMass * theGravMasses,double t,
     r0 = m1/M*a;
     r1 = m0/M*a;
   }
-  /*
-     theGravMasses[0].phi += theGravMasses[0].omega*dt;
-     theGravMasses[1].phi += theGravMasses[1].omega*dt;
-     */
   theGravMasses[0].phi += omega*dt;
   theGravMasses[1].phi += omega*dt;
   theGravMasses[0].r = r0;
@@ -80,9 +72,6 @@ void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, do
     theGravMasses[i].r   = (1.0-RK)*theGravMasses[i].r   + RK*theGravMasses[i].RK_r;
     theGravMasses[i].phi = (1.0-RK)*theGravMasses[i].phi + RK*theGravMasses[i].RK_phi;
     theGravMasses[i].M   = (1.0-RK)*theGravMasses[i].M   + RK*theGravMasses[i].RK_M;
-    //theGravMasses[i].L   = (1.0-RK)*theGravMasses[i].L   + RK*theGravMasses[i].RK_L;
-    //theGravMasses[i].E   = (1.0-RK)*theGravMasses[i].E   + RK*theGravMasses[i].RK_E;
-    //theGravMasses[i].vr  = (1.0-RK)*theGravMasses[i].vr  + RK*theGravMasses[i].RK_vr;
     theGravMasses[i].omega = (1.0-RK)*theGravMasses[i].omega  + RK*theGravMasses[i].RK_omega;
   }
 }
@@ -95,6 +84,3 @@ void gravMass_set_Macc( struct GravMass * theGravMasses, double Macc, int p){
   theGravMasses[p].Macc = Macc;
 }
 
-void gravMass_set_total_torque( struct GravMass * theGravMasses, double total_torque, int p){
-  theGravMasses[p].total_torque = total_torque;
-}

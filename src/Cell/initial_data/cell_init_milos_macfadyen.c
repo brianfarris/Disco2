@@ -9,7 +9,7 @@
 #include "../../Headers/header.h"
 
 void cell_single_init_milos_macfadyen(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
-  double Mach = 1./sim_HoR(theSim);
+  double Mach = 1./sqrt(sim_PoRho_r1(theSim));
   double Gam = sim_GAMMALAW(theSim);
   double rm = sim_FacePos(theSim,i-1,R_DIR);
   double rp = sim_FacePos(theSim,i,R_DIR);
@@ -38,7 +38,7 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
   double rs = 10.0;
 
   double rho0   = 1.0;
-  double Mach   = 1./sim_HoR(theSim);
+  double Mach   = 1./sqrt(sim_PoRho_r1(theSim));
 
   double delta_exp   = 3.0;
   double xi_exp = 2.0;

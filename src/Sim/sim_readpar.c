@@ -94,8 +94,6 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Cs_Floor"          , VAR_DOUB , &(theSim->CS_FLOOR)  );
       err += readvar( pfile , "Cs_Cap"            , VAR_DOUB , &(theSim->CS_CAP)  );
       err += readvar( pfile , "Vel_Cap"           , VAR_DOUB , &(theSim->VEL_CAP)  );
-      err += readvar( pfile , "SET_T"           , VAR_INT , &(theSim->SET_T)  );
-      err += readvar( pfile , "HoR"           , VAR_DOUB , &(theSim->HoR)  );
       err += readvar( pfile , "DAMP_TIME"           , VAR_DOUB , &(theSim->DAMP_TIME)  );
       err += readvar( pfile , "RDAMP_INNER"           , VAR_DOUB , &(theSim->RDAMP_INNER)  );
       err += readvar( pfile , "RDAMP_OUTER"           , VAR_DOUB , &(theSim->RDAMP_OUTER)  );

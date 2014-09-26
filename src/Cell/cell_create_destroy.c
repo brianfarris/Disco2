@@ -91,7 +91,6 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
             }
         }
     }
-
     return theCells;
 }
 

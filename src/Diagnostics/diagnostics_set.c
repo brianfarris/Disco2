@@ -246,7 +246,6 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       if (r>1.0 && req1_found==0){
         Mdot_near_req1 = VectorDiag_reduce[i*NUM_VEC+5]*2.*M_PI*r/(ZMAX-ZMIN);
         r_near_req1 = r;
-        //printf("req1_found i: %d, r: %e\n",i,r);
         req1_found = 1;
       }
       for (n=0;n<NUM_VEC;++n){
@@ -260,13 +259,6 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
       fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_inside_1_reduce,mass_inner_wedge_reduce,gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),gravMass_Macc(theGravMasses,0),gravMass_Macc(theGravMasses,1),mass_near_bh0_r0p2_reduce,mass_near_bh1_r0p2_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_r0p4_reduce);       
       fclose(DiagMdotFile);
-
-      char DiagTorqueFilename[256];
-      sprintf(DiagTorqueFilename,"DiagTorque.dat");
-      FILE * DiagTorqueFile = fopen(DiagTorqueFilename,"a");
-      fprintf(DiagTorqueFile,"%e %e\n",timestep_get_t(theTimeStep), gravMass_total_torque(theGravMasses,0));       
-      fclose(DiagTorqueFile);
-
     }
 
     //We are doing time averaged diagnostics, so mult by delta t and add it

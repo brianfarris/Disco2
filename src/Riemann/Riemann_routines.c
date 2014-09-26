@@ -9,159 +9,150 @@
 #include "../Headers/Face.h"
 #include "../Headers/header.h"
 
-
-// ********************************************************************************************
-// WE REALLY SHOULD IMPROVE THE COMMENTING OF ALL OF THESE ROUTINES. 
-// THERE IS SOME COMPLICATED STUFF HERE. 
-// LETS CHOOSE A REFERENCE SUCH AS TORO AND IDENTIFY LINES OF CODE WITH EQUATIONS IN THE BOOK.
-// ********************************************************************************************
-
 // this routine is only called by riemann_set_vel.
-// It is used to find various L/R quantities. 
-void LR_speed(double *prim,double r,int * n,double GAMMALAW,double * p_vn,double * p_cf2,double *Fm,double * p_mn){
-  double P   = prim[PPP];
-  double rho = prim[RHO];
-  double vr  =   prim[URR];
-  double vp  = r*prim[UPP];
-  double vz  =   prim[UZZ];
-  double vn  = vr*n[0] + vp*n[1] + vz*n[2];
-  double cf2  = GAMMALAW*(P/rho);
-  double mr = rho*vr;
-  double mp = rho*vp;
-  double mz = rho*vz;
-  double mn = mr*n[0]+mp*n[1]+mz*n[2];
+// It is used to find sound speed and normal velocity. 
+void LR_speed(double *prim,double r,int * n,double GAMMALAW,double * p_vn,double * p_cf2){
+    double P   = prim[PPP];
+    double rho = prim[RHO];
+    double vr  =   prim[URR];
+    double vp  = r*prim[UPP];
+    double vz  =   prim[UZZ];
+    double vn  = vr*n[0] + vp*n[1] + vz*n[2];
+    double cf2  = GAMMALAW*(P/rho);
 
-  Fm[0] = rho*vr*vn + P*n[0];
-  Fm[1] = rho*vp*vn + P*n[1];
-  Fm[2] = rho*vz*vn + P*n[2];
-
-  *p_vn = vn;
-  *p_cf2 = cf2;
-  *p_mn = mn;
+    //normal velocity
+    *p_vn = vn;
+    //sound speed squared
+    *p_cf2 = cf2;
 }
 
 // Find velocities needed for the Riemann problem
 void riemann_set_vel(struct Riemann * theRiemann,struct Sim * theSim,struct GravMass * theGravMasses, double r,double GAMMALAW){
-  double Sl, Sr, Ss;
+    double Sl, Sr, Ss;
 
-  double vnL,cf21,mnL,BnL,B2L;
-  double FL[3], FmL[3];
-  LR_speed(theRiemann->primL,r,theRiemann->n,GAMMALAW,&vnL,&cf21,FmL,&mnL);
-  Sl = vnL - sqrt( cf21 );
-  Sr = vnL + sqrt( cf21 );
+    double vnL,cf2L;
+    // get sound speed squared, normal velocity on L face
+    LR_speed(theRiemann->primL,r,theRiemann->n,GAMMALAW,&vnL,&cf2L);
+    Sl = vnL - sqrt( cf2L );
+    Sr = vnL + sqrt( cf2L );
 
-  double vnR,cf22,mnR,BnR,B2R;
-  double FR[3],FmR[3];
-  LR_speed(theRiemann->primR,r,theRiemann->n,GAMMALAW,&vnR,&cf22,FmR,&mnR);
-  if( Sl > vnR - sqrt( cf22 ) ) Sl = vnR - sqrt( cf22 );
-  if( Sr < vnR + sqrt( cf22 ) ) Sr = vnR + sqrt( cf22 );
+    // get sound speed squared, normal velocity on L face
+    double vnR,cf2R;
+    LR_speed(theRiemann->primR,r,theRiemann->n,GAMMALAW,&vnR,&cf2R);
 
-  double a = gravMass_r(theGravMasses,0) + gravMass_r(theGravMasses,1);
-  double wp_a = theRiemann->n[1]*sim_rOm_a(theSim,r,a);
+    //See Eqns 10.47 and 10.48 of Toro
+    if( Sl > vnR - sqrt( cf2R ) ) Sl = vnR - sqrt( cf2R );
+    if( Sr < vnR + sqrt( cf2R ) ) Sr = vnR + sqrt( cf2R );
 
+    // See Eq 10.37 of Toro
+    Ss = (theRiemann->primR[RHO]*vnR*(Sr-vnR)-theRiemann->primL[RHO]*vnL*(Sl-vnL)+theRiemann->primL[PPP]-theRiemann->primR[PPP])
+        /(theRiemann->primR[RHO]*(Sr-vnR)-theRiemann->primL[RHO]*(Sl-vnL));
 
-  double  mr = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[URR] + Sr*theRiemann->primR[RHO]*theRiemann->primR[URR] + FmL[0] - FmR[0] )/( Sr - Sl );
-  double  mp = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[UPP]*r + Sr*theRiemann->primR[RHO]*theRiemann->primR[UPP]*r + FmL[1] - FmR[1] )/( Sr - Sl );
-  double  mz = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[UZZ] + Sr*theRiemann->primR[RHO]*theRiemann->primR[UZZ] + FmL[2] - FmR[2] )/( Sr - Sl );
-  double rho = ( -Sl*theRiemann->primL[RHO] + Sr*theRiemann->primR[RHO] + mnL - mnR )/( Sr - Sl );
-
-  Ss = (theRiemann->primR[RHO]*vnR*(Sr-vnR)-theRiemann->primL[RHO]*vnL*(Sl-vnL)+theRiemann->primL[PPP]-theRiemann->primR[PPP])
-    /(theRiemann->primR[RHO]*(Sr-vnR)-theRiemann->primL[RHO]*(Sl-vnL));
-
-  theRiemann->Sl = Sl;
-  theRiemann->Sr = Sr;
-  theRiemann->Ss = Ss;
+    theRiemann->Sl = Sl;
+    theRiemann->Sr = Sr;
+    theRiemann->Ss = Ss;
 
 }
 
 // Which state of the riemann problem are we in?
+// See Eq 10.26 of Toro
 void riemann_set_state(struct Riemann * theRiemann,double w ){
-  if (w < theRiemann->Sl){
-    theRiemann->state=LEFT;
-  }else if( w > theRiemann->Sr ){
-    theRiemann->state=RIGHT;
-  }else{
-    if( w < theRiemann->Ss ){
-      theRiemann->state=LEFTSTAR;
+    if (w < theRiemann->Sl){
+        theRiemann->state=LEFT;
+    }else if( w > theRiemann->Sr ){
+        theRiemann->state=RIGHT;
     }else{
-      theRiemann->state=RIGHTSTAR;
+        if( w < theRiemann->Ss ){
+            theRiemann->state=LEFTSTAR;
+        }else{
+            theRiemann->state=RIGHTSTAR;
+        }
     }
-  }
 }
 
+// 
 void riemann_set_star_hll(struct Riemann * theRiemann,struct Sim * theSim){
-  double Sr =  theRiemann->Sr;
-  double Sl = theRiemann->Sl;
-  int q;
-  for( q=0 ; q<sim_NUM_Q(theSim) ; ++q ){
-    theRiemann->Ustar[q] = ( Sr*theRiemann->UR[q] - Sl*theRiemann->UL[q] + theRiemann->FL[q] - theRiemann->FR[q] )/( Sr - Sl );
-    theRiemann->Fstar[q] = ( Sr*theRiemann->FL[q] - Sl*theRiemann->FR[q] - Sr*Sl*( theRiemann->UL[q] - theRiemann->UR[q] ) )/( Sr - Sl );
-  }
+    double Sr =  theRiemann->Sr;
+    double Sl = theRiemann->Sl;
+    int q;
+    // don't be confused by the fact that we refer to these values as "star". We just don't want to store more stuff in memory than we need to.
+    for( q=0 ; q<sim_NUM_Q(theSim) ; ++q ){
+        //See Eq 10.13 of Toro
+        theRiemann->Ustar[q] = ( Sr*theRiemann->UR[q] - Sl*theRiemann->UL[q] + theRiemann->FL[q] - theRiemann->FR[q] )/( Sr - Sl );
+        //See Eq 10.20 of Toro
+        theRiemann->Fstar[q] = ( Sr*theRiemann->FL[q] - Sl*theRiemann->FR[q] - Sr*Sl*( theRiemann->UL[q] - theRiemann->UR[q] ) )/( Sr - Sl );
+    }
 }
 
 void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,double GAMMALAW){
-  double r = theRiemann->r;
-  double *prim;
-  double Sk;
-  double *Uk;
-  double *Fk;
-  if (theRiemann->state==LEFTSTAR){
-    prim = theRiemann->primL;
-    Sk = theRiemann->Sl;
-    Uk = theRiemann->UL;
-    Fk = theRiemann->FL;
-  }else{
-    prim = theRiemann->primR;
-    Sk = theRiemann->Sr;
-    Uk = theRiemann->UR;
-    Fk = theRiemann->FR;
-  }
-  double Ss=theRiemann->Ss;
+    double r = theRiemann->r;
+    double *prim;
+    double Sk;
+    double *Uk;
+    double *Fk;
+    // Set K values according to which state we are in
+    if (theRiemann->state==LEFTSTAR){
+        prim = theRiemann->primL;
+        Sk = theRiemann->Sl;
+        Uk = theRiemann->UL;
+        Fk = theRiemann->FL;
+    }else{
+        prim = theRiemann->primR;
+        Sk = theRiemann->Sr;
+        Uk = theRiemann->UR;
+        Fk = theRiemann->FR;
+    }
+    double Ss=theRiemann->Ss;
 
-  double rho = prim[RHO];
-  double vr  = prim[URR];
-  double vp  = prim[UPP]*r;
-  double vz  = prim[UZZ];
-  double Pp  = prim[PPP];
-  double v2 = vr*vr+vp*vp+vz*vz;
-  double vn = vr*theRiemann->n[0] + vp*theRiemann->n[1] + vz*theRiemann->n[2];
-  double rhoe = Pp/(GAMMALAW-1.);
-  double D  = rho;
-  double mr = rho*vr;
-  double mp = rho*vp;
-  double mz = rho*vz;
-  double E_hydro  = .5*rho*v2 + rhoe;
-  double Ps  = rho*( Sk - vn )*( Ss - vn ) + Pp;
-  double Dstar = ( Sk - vn )*D/( Sk - Ss );
-  double Msn = Dstar*Ss;
-  double Msr   = ( Sk - vn )*mr / ( Sk - Ss );
-  double Msp   = ( Sk - vn )*mp / ( Sk - Ss );
-  double Msz   = ( Sk - vn )*mz / ( Sk - Ss );
-  double Estar = ( ( Sk - vn )*E_hydro + Ps*Ss - Pp*vn ) / ( Sk - Ss );
+    // See Eq 10.39 of Toro
+    double rho = prim[RHO];
+    double vr  = prim[URR];
+    double vp  = prim[UPP]*r;
+    double vz  = prim[UZZ];
+    double Pp  = prim[PPP];
+    double v2 = vr*vr+vp*vp+vz*vz;
+    double vn = vr*theRiemann->n[0] + vp*theRiemann->n[1] + vz*theRiemann->n[2];
+    double rhoe = Pp/(GAMMALAW-1.);
+    double D  = rho;
+    double mr = rho*vr;
+    double mp = rho*vp;
+    double mz = rho*vz;
+    double E_hydro  = .5*rho*v2 + rhoe;
+    double Ps  = rho*( Sk - vn )*( Ss - vn ) + Pp;
+    double Dstar = ( Sk - vn )*D/( Sk - Ss );
+    double Msn = Dstar*Ss;
+    double Msr   = ( Sk - vn )*mr / ( Sk - Ss );
+    double Msp   = ( Sk - vn )*mp / ( Sk - Ss );
+    double Msz   = ( Sk - vn )*mz / ( Sk - Ss );
+    double Estar = ( ( Sk - vn )*E_hydro + Ps*Ss - Pp*vn ) / ( Sk - Ss );
 
-  double mn  = Msr*theRiemann->n[0] + Msp*theRiemann->n[1] + Msz*theRiemann->n[2];
+    double mn  = Msr*theRiemann->n[0] + Msp*theRiemann->n[1] + Msz*theRiemann->n[2];
 
-  Msr += theRiemann->n[0]*( Msn - mn );
-  Msp += theRiemann->n[1]*( Msn - mn );
-  Msz += theRiemann->n[2]*( Msn - mn );
+    Msr += theRiemann->n[0]*( Msn - mn );
+    Msp += theRiemann->n[1]*( Msn - mn );
+    Msz += theRiemann->n[2]*( Msn - mn );
 
-  theRiemann->Ustar[DDD] = Dstar;
-  theRiemann->Ustar[SRR] = Msr;
-  theRiemann->Ustar[LLL] = r*Msp;
-  theRiemann->Ustar[SZZ] = Msz;
-  theRiemann->Ustar[TAU] = Estar;
+    theRiemann->Ustar[DDD] = Dstar;
+    theRiemann->Ustar[SRR] = Msr;
+    theRiemann->Ustar[LLL] = r*Msp;
+    theRiemann->Ustar[SZZ] = Msz;
+    theRiemann->Ustar[TAU] = Estar;
 
-  int q;
-  for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q ){
-      theRiemann->Ustar[q] = prim[q]*theRiemann->Ustar[DDD];
-  }
+    int q;
+    
+    //Now set Fstar
+    // See Eq 10.38 of Toro
+    for (q=0;q<sim_NUM_Q(theSim);++q){
+        theRiemann->Fstar[q] = Fk[q] + Sk*( theRiemann->Ustar[q] - Uk[q] ) ;
+    }
 
-  //Now set Fstar
-  for (q=0;q<sim_NUM_Q(theSim);++q){
-      theRiemann->Fstar[q] = Fk[q] + Sk*( theRiemann->Ustar[q] - Uk[q] ) ;
-  }
+    // passive scalar stuff
+    for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q ){
+        theRiemann->Ustar[q] = prim[q]*theRiemann->Ustar[DDD];
+    }
 }
 
+// Here we compute the Fluxes on the L or R face, depending on what SetState is
 void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GAMMALAW,int SetState){
     double r = theRiemann->r;
     double *prim;
@@ -176,7 +167,6 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
         printf("ERROR\n");
         exit(0);
     }
-
     double rho = prim[RHO];
     double Pp  = prim[PPP];
     double vr  = prim[URR];
@@ -191,41 +181,13 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     F[SZZ] =     rho*vz*vn + Pp*theRiemann->n[2] ;
     F[TAU] = ( .5*rho*v2 + rhoe + Pp )*vn ;
 
+    //passive scalar stuff
     int q;
     for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q ){
         F[q] = prim[q]*F[DDD];
     }
 
 }
-
-/*
-   double Gradient_r2RhoNu_o_r2RhoNu(double * AvgPrim , double * Grad_prim, double r, double tiph, int IDtype, int direction){
-   if (direction==RDIRECTION){
-   if (sim_VISC_CONST(theSim)==1){
-   return(2./r + Grad_prim[RHO]/AvgPrim[RHO]);
-   } else{
-   if (IDtype==SHEAR){
-   return(4./r + Grad_prim[PPP]/AvgPrim[PPP]);
-   } else{
-   return(7./2./r + Grad_prim[PPP]/AvgPrim[PPP]);
-   } 
-   } 
-   } else if (direction==PDIRECTION){
-   if (sim_VISC_CONST(theSim)==1){
-   return(Grad_prim[RHO]/AvgPrim[RHO]);
-   } else{
-   if (IDtype==SHEAR){
-   return(Grad_prim[PPP]/AvgPrim[PPP] - 2.0/r * tan(tiph));
-   } else{
-   return(Grad_prim[PPP]/AvgPrim[PPP]);
-   } 
-   } 
-   } else{
-   printf("error in Gradient_r2RhoNu_o_r2RhoNu\n");
-   exit(1);
-   }
-   }
-   */
 
 void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct GravMass * theGravMasses ){
     int NUM_Q = sim_NUM_Q(theSim);
@@ -338,196 +300,30 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct Gr
     double om_cell = sim_rOm_a(theSim,r,a)/r;
     double rdr_om_cell = sim_rdrOm_a(theSim,r,a);
 
-    /*
-       if (sim_MOVE_CELLS(theSim)==C_FIXED){
-       om_cell = 0.0;
-       dr_om_cell = 0.0;
-       } else if (sim_MOVE_CELLS(theSim)==C_MILOS){
-       om_cell = (1.-exp(-pow(r,1.5)))/pow(r,1.5);
-       dr_om_cell = 1.5*pow(r,-2.5)*(-1.+(1.+pow(r,1.5))*exp(-pow(r,1.5)));
-       }else if (sim_MOVE_CELLS(theSim)==C_KEPLER){
-       om_cell = pow(r,-1.5);
-       dr_om_cell = -1.5*pow(r,-2.5);
-       }else{
-       printf("Problem with setting cell speed in riemann solver\n");
-       exit(1);
-       }
-       */
 
     //r direction
     if (theRiemann->n[0] ==1){
-        //    double Gp_r2RhoNu_o_r2RhoNu = Gradient_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_ph_prim,r,tiph,sim_InitialDataType(theSim),PDIRECTION);
-
-        /*
-           VFlux[SRR] = -nu*rho*( 
-           r*Gr_vr - vr + (om+om_cell)*r*r*Gp_r2RhoNu_o_r2RhoNu
-           );
-           VFlux[LLL] = -nu*rho*( 
-           r*r*Gr_om + r*r*dr_om_cell - vr*r*Gp_r2RhoNu_o_r2RhoNu
-           );
-           */
-        VFlux[SRR] = -nu*rho*(
-                r*Gr_vr - vr - r*r*Gp_om
-                );
-        VFlux[LLL] = -nu*rho*(
-                r*(r*Gr_om+rdr_om_cell) + r*Gp_vr
-                );
-
+        VFlux[SRR] = -nu*rho*(r*Gr_vr - vr - r*r*Gp_om);
+        VFlux[LLL] = -nu*rho*(r*(r*Gr_om+rdr_om_cell) + r*Gp_vr);
         VFlux[SZZ] = 0.0; //deal with this later
-
-        VFlux[TAU] = - nu * rho * (
-                vr*( Gr_vr - vr/r - r*Gp_om ) + r*om*( Gp_vr + (rdr_om_cell + r*Gr_om) )
-                );
-
-
+        VFlux[TAU] = - nu * rho * ( vr*( Gr_vr - vr/r - r*Gp_om ) + r*om*( Gp_vr + (rdr_om_cell + r*Gr_om) ));
     }
     //phi direction
     if (theRiemann->n[1] ==1){
-        //    double Gr_r2RhoNu_o_r2RhoNu = Gradient_r2RhoNu_o_r2RhoNu(AvgPrim,Grad_r_prim,r,tiph,sim_InitialDataType(theSim),RDIRECTION);
-
-        /*
-           VFlux[SRR] = -nu*rho*( 
-           -(om+om_cell)*r*r*Gr_r2RhoNu_o_r2RhoNu + r*Gp_vr 
-           );
-           VFlux[LLL] = -nu*rho*( 
-           r*r*Gp_om + vr*r*Gr_r2RhoNu_o_r2RhoNu
-           );
-           */
-        VFlux[SRR] = -nu*rho*(
-                r*(r*Gr_om+rdr_om_cell) + r*Gp_vr
-                );
-        VFlux[LLL] = -nu*rho*(
-                -r*Gr_vr + vr + r*r*Gp_om
-                );
-
+        VFlux[SRR] = -nu*rho*(r*(r*Gr_om+rdr_om_cell) + r*Gp_vr);
+        VFlux[LLL] = -nu*rho*(-r*Gr_vr + vr + r*r*Gp_om );
         VFlux[SZZ] = 0.0; //deal with this later
-
-        VFlux[TAU] = -nu * rho * (
-                -r*om*( Gr_vr - vr/r - r*Gp_om ) + vr*(Gp_vr + (rdr_om_cell + r*Gr_om ) )
-                );
+        VFlux[TAU] = -nu * rho * ( -r*om*( Gr_vr - vr/r - r*Gp_om ) + vr*(Gp_vr + (rdr_om_cell + r*Gr_om ) ));
     }
 
     for (q=0;q<NUM_Q;++q){
         theRiemann->Fvisc[q] = VFlux[q];
     }
+
     free(VFlux);
     free(Grad_r_prim);
     free(Grad_ph_prim);
     free(AvgPrim);
-}
-
-void riemann_visc_flux_old(struct Riemann * theRiemann,struct Sim * theSim ){
-    double nu = sim_EXPLICIT_VISCOSITY(theSim);
-    int NUM_Q = sim_NUM_Q(theSim);
-
-    double r = theRiemann->r;
-
-    double * VFlux = malloc(NUM_Q*sizeof(double));
-    double * AvgPrim = malloc(NUM_Q*sizeof(double));
-    double * Gprim = malloc(NUM_Q*sizeof(double));
-    int q;
-    for (q=0;q<NUM_Q;++q){
-        AvgPrim[q] = .5*(theRiemann->primL[q]+theRiemann->primR[q]);
-        if (theRiemann->n[1]==1){ 
-            Gprim[q] = .5*(cell_gradp(theRiemann->cL,q)+cell_gradp(theRiemann->cR,q));    
-        } else{
-            Gprim[q] = .5*(cell_grad(theRiemann->cL,q)+cell_grad(theRiemann->cR,q));
-        }
-        VFlux[q] = 0.0;
-    }
-
-    double rho = AvgPrim[RHO];
-    double vr  = AvgPrim[URR];
-    double om  = AvgPrim[UPP];
-    double vz  = AvgPrim[UZZ];
-
-    double dnvr = Gprim[URR];
-    double dnom = Gprim[UPP];
-    double dnvz = Gprim[UZZ];
-
-    VFlux[SRR] = -nu*rho*( dnvr - theRiemann->n[1]*2.*om );
-    VFlux[LLL] = -nu*rho*( r*r*dnom + theRiemann->n[0]*2.*vr );
-    VFlux[SZZ] = -nu*rho*dnvz;
-    VFlux[TAU] = -nu*rho*(vr*dnvr+r*r*om*dnom+vz*dnvz);  
-
-    for (q=0;q<NUM_Q;++q){
-        theRiemann->Fvisc[q] = VFlux[q];
-    }
-    free(VFlux);
-    free(Gprim);
-    free(AvgPrim);
-}
-
-
-void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct Sim * theSim,int FaceNumber,int direction){
-    theRiemann->n[direction]=1; // set
-    int NUM_Q = sim_NUM_Q(theSim);
-    double deltaL = face_deltaL(theFaces,FaceNumber);
-    double deltaR = face_deltaR(theFaces,FaceNumber);
-    theRiemann->cL = face_L_pointer(theFaces,FaceNumber);
-    theRiemann->cR = face_R_pointer(theFaces,FaceNumber);
-    double pL = cell_tiph(theRiemann->cL) - .5*cell_dphi(theRiemann->cL);
-    double pR = cell_tiph(theRiemann->cR) - .5*cell_dphi(theRiemann->cR);   
-    double dpL =  face_cm(theFaces,FaceNumber) - pL;
-    double dpR = -face_cm(theFaces,FaceNumber) + pR;
-    while( dpL >  PHIMAX/2. ) dpL -= PHIMAX;
-    while( dpL < -PHIMAX/2. ) dpL += PHIMAX;
-    while( dpR >  PHIMAX/2. ) dpR -= PHIMAX;
-    while( dpR < -PHIMAX/2. ) dpR += PHIMAX;
-    dpL = dpL;
-    dpR = dpR;
-    theRiemann->r = face_r(theFaces,FaceNumber);
-    theRiemann->dA = face_dA(theFaces,FaceNumber);
-    theRiemann->cm = face_cm(theFaces,FaceNumber);
-    if (direction==0){
-        theRiemann->r_cell_L = theRiemann->r-deltaL;
-        theRiemann->r_cell_R = theRiemann->r+deltaR;
-    } else{
-        theRiemann->r_cell_L = theRiemann->r;
-        theRiemann->r_cell_R = theRiemann->r;
-    }
-
-    int q;
-    for (q=0;q<NUM_Q;++q){
-        theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_grad(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
-        theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_grad(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
-    }
-}
-
-void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct Sim * theSim,int i,int j_low,int k,int direction){
-    theRiemann->n[direction]=1; // set
-    int NUM_Q = sim_NUM_Q(theSim);
-
-    int j_hi;
-    if (j_low == sim_N_p(theSim,i)-1){
-        j_hi = 0;
-    } else{
-        j_hi = j_low+1;
-    }
-    theRiemann->cL = cell_single(theCells,i,j_low,k);
-    theRiemann->cR = cell_single(theCells,i,j_hi ,k);
-    double dpL = cell_dphi(theRiemann->cL);
-    double dpR = cell_dphi(theRiemann->cR);
-    double zm = sim_FacePos(theSim,k-1,Z_DIR);
-    double zp = sim_FacePos(theSim,k,Z_DIR);
-    double dz = zp-zm;
-    double rm = sim_FacePos(theSim,i-1,R_DIR);
-    double rp = sim_FacePos(theSim,i,R_DIR);
-    double dr = rp-rm;
-    double r = .5*(rp+rm);
-    theRiemann->dA = dr*dz;
-    theRiemann->r = r; 
-    theRiemann->cm = cell_tiph(theRiemann->cL);
-
-    theRiemann->r_cell_L = r;
-    theRiemann->r_cell_R = r;
-
-    int q;
-    for (q=0;q<NUM_Q;++q){
-        theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + 0.5*cell_gradp(theRiemann->cL,q)*dpL;
-        theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - 0.5*cell_gradp(theRiemann->cR,q)*dpR;
-    }
-    
 }
 
 
@@ -540,12 +336,11 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,struct Grav
     double Bk_face,Psi_face;
     double w;
     if (theRiemann->n[PDIRECTION]){
-        //if( sim_MOVE_CELLS(theSim) == C_WRIEMANN ) cell_add_wiph(theRiemann->cL,theRiemann->Ss);
         w = cell_wiph(theRiemann->cL);
-        //w = 0.0;
     } else{
         w = 0.0;
     }
+
     // which state of the riemann problem are we in?
     riemann_set_state(theRiemann,w);
 
@@ -592,11 +387,12 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,struct Grav
     }
 
 
-    // viscous flux terms
+    // compute viscous flux terms
     if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
         riemann_visc_flux(theRiemann,theSim,theGravMasses );  
     }
 
+    // Now actually update the conserved quantities using to the fluxes we have computed
     int q;
     for( q=0 ; q<NUM_Q ; ++q ){
         cell_add_cons(theRiemann->cL,q,-dt*theRiemann->dA*theRiemann->F[q]);
