@@ -11,3 +11,5 @@ bin*
 *.dat
 *.h5
 .DS_store
+res/
+python_plotting_scripts/

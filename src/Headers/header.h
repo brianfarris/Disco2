@@ -28,3 +28,9 @@ MPI_Comm sim_comm;
 double time_global;
 
 #define PRINTTOOMUCH 0
+
+#define RHO_REF 1.0e10
+#define C_REF 2.99792458e10
+#define SOLAR_RG 1.4766250385e5
+#define KB 1.3806488e-16
+#define MASS_PROTON 1.672621777e-24 
