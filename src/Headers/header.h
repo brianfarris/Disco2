@@ -16,13 +16,11 @@ MPI_Comm sim_comm;
 #define farris_mpi_factorization 0
 #define NO_W_IN_CFL 0
 #define KEP_BNDRY 0
-#define BzZ 0
 #define BNORM_AVG 0
 //#define CHECKPOINTING 
 #define TVISC_FAC 1.0
 #define PHIMAX 2.0*M_PI
 #define diode 0
-#define zero_bfields 0
 #define EXTRAP_BC 0
 #define SS_BCS 0
 #define w_a_milos_index 8

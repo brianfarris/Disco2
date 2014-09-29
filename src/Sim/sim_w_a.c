@@ -7,7 +7,7 @@
 
 double sim_rOm_a(struct Sim * theSim,double r,double a){
   if (sim_W_A_TYPE(theSim)==A_FIXED){
-    //no w_analytic
+      //no w_analytic
     return(0.0);
   } else if (sim_W_A_TYPE(theSim)==A_KEPLER){
     //keplerian rotation

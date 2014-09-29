@@ -97,6 +97,9 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim, struct GravMas
                     double dt_visc = .25*dx*dx/nu;
                     dt = dt/( 1. + dt/dt_visc );
                 }
+                if( dt_m > dt ) {
+                    dt_m = dt;
+                }
             } 
         }
     }

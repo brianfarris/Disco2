@@ -1,7 +1,7 @@
 
 //Disco Parameter File//
 
-InitialDataType         1               // 0 Flock, 1 Shear
+InitialDataType         0               // 0 Flock, 1 Shear
 GravMassType            0               // 0 none, 1 single, 2 binary
 MassRatio               0.0
 Restart			0		//If this=1 restart using input.h5
@@ -10,7 +10,7 @@ OrbShrinkTscale         10000000000000000000.0
 OrbShrinkT0             0.0  
 
 //Computational Grid
-NumR			256			//Radial Zones
+NumR			128			//Radial Zones
 NumZ			1			//Vertical Zones
 ng                      2
 R_Min			1.0
@@ -25,8 +25,8 @@ NUM_C                   5
 NUM_N                   0
 Time_Max                2.0
 Num_Checkpoints	        1	
-Num_Diag_Dump           10
-Num_Diag_Measure        10
+Num_Diag_Dump           1
+Num_Diag_Measure        1
 
 NoInnerBC               0
 BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
@@ -36,21 +36,17 @@ ZeroPsiBndry          1
 Move_Cells              0
 RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index         1.3333333333333
-Cooling                 0
+Cooling                 1
 Explicit_Viscosity      0.05
 ViscConst               1
 RhoSinkOn               0
-SET_T                   0
-HoR                     -1.0
+PoRho_r1                1.0
 
-DivB_Ch			0.0		//Dedner divergence cleaning
-DivB_l			1000000.0
 //Numerical Parameters
 CFL			0.1
 PLM			1.0
 
-POWELL                  0
-w_a_type                1
+w_a_type                0
 Grav_2D			1
 G_EPS			0.0
 
@@ -61,8 +57,6 @@ Rho_Floor		0.00001
 Cs_Floor		0.0001		
 Cs_Cap			100.0
 Vel_Cap			100.0
-
-runtype                 0
 
 DAMP_TIME               -1.0        // Set negative to turn off
 RDAMP_INNER             0.0
