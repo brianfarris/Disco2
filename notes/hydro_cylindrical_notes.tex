@@ -1,0 +1,94 @@
+\documentclass[landscape]{article}
+\usepackage[landscape]{geometry}
+\begin{document}
+\begin{eqnarray*}
+  \partial_t  \left(
+  \begin{array}{c}
+    \rho\\
+    \rho v_r\\
+    \rho r v_{\phi}\\
+    \rho v_z\\
+    E\\
+  \end{array}
+  \right) 
+  &+& \frac{1}{r} \partial_r \left(
+  \begin{array}{c}
+    r \rho v_r\\
+    r (\rho v_r v_r  P)\\
+    r^2 (\rho v_r v_{\phi} )\\
+    r (\rho v_r v_z )\\
+    r((E+P)v_r)\\
+    \end{array}
+  \right) + \frac{1}{r} \partial_{\phi} \left(
+    \begin{array}{c}
+      \rho v_{\phi}\\
+      \rho v_r v_{\phi}\\
+      r(\rho v_{\phi} v_{\phi}  + P )\\
+      \rho v_z v_{\phi} \\
+      (E+P)v_{\phi}\\
+    \end{array}
+    \right)+ \partial_z \left(
+    \begin{array}{c}
+      \rho v_z\\
+      \rho v_r v_z \\
+      r(\rho v_z v_{\phi} )\\
+      \rho v_z v_z + P\\
+      (E+P)v_z\\
+    \end{array}
+    \right)\\
+    &=&\left(
+    \begin{array}{c}
+      0\\
+      (\rho v_{\phi} v_{\phi}+P)/r\\
+      0\\
+      0\\
+    \end{array}
+    \right)
+\end{eqnarray*}
+
+\begin{eqnarray*}
+  \partial_t  \left(
+  \begin{array}{c}
+    \int dV \ \rho\\
+    \int dV \ \rho v_r\\
+    \int dV \ \rho r v_{\phi}\\
+    \int dV \ \rho v_z\\
+    \int dV \ E\\
+  \end{array}
+  \right)
+  &+&   \left(
+  \begin{array}{c}
+    \int r d\phi dz \ \rho v_r\ \\
+    \int r d\phi dz (\rho v_r v_r+ P)\\
+    \int r d\phi dz \ r(\rho v_r v_{\phi} )\\
+    \int r d\phi dz (\rho v_r v_z)\\
+    \int r d\phi dz ((E+P)v_r)\\
+    \end{array}
+  \right)^{r+\delta r}_r + \left(
+    \begin{array}{c}
+      \int dr dz \ \rho v_{\phi}\\
+      \int dr dz (\rho v_r v_{\phi} )\\
+      \int dr dz \ r(\rho v_{\phi} v_{\phi}  + P )\\
+      \int dr dz (\rho v_z v_{\phi} )\\
+      \int dr dz ((E+P)v_{\phi})\\
+    \end{array}
+    \right)^{\phi + \delta \phi}_{\phi}\\
+    &+& \left(
+    \begin{array}{c}
+      \int r dr d \phi \ \rho v_z\\
+      \int r dr d \phi (\rho v_r v_z )\\
+      \int r dr d \phi r(\rho v_z v_{\phi} )\\
+      \int r dr d \phi (\rho v_z v_z + P)\\
+      \int r dr d \phi ((E+P)v_z)\\
+    \end{array}
+    \right)^{z+\delta z}_{z} 
+    =\left(
+    \begin{array}{c}
+      0\\
+      \int dV (\rho v_{\phi} v_{\phi} +P)/r\\
+      0\\
+      0\\
+      0\\
+    \end{array}
+    \right)
+\end{eqnarray*}\end{document}
