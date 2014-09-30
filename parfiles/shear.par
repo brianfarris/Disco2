@@ -25,8 +25,8 @@ NUM_C                   5
 NUM_N                   0
 Time_Max                2.0
 Num_Checkpoints	        1	
-Num_Diag_Dump           1
-Num_Diag_Measure        1
+Num_Diag_Dump           20
+Num_Diag_Measure        20
 
 NoInnerBC               0
 BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
