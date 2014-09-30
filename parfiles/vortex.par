@@ -29,10 +29,10 @@ NPCAP                   100000
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                2.0
-Num_Checkpoints	        50	
-Num_Diag_Dump           50
-Num_Diag_Measure        50
+Time_Max                20.0
+Num_Checkpoints	        10	
+Num_Diag_Dump           10
+Num_Diag_Measure        10
 
 
 NoInnerBC               1
