@@ -1,4 +1,10 @@
-
+ZeroPsiBndry = 0
+DivB_Ch = 0
+DivB_l = 0
+POWELL = 0
+SET_T = 0
+HoR = 1.
+runtype = 0
 //Disco Parameter File//
 
 InitialDataType         1
@@ -10,7 +16,7 @@ OrbShrinkTscale         10000000000000000000.0
 OrbShrinkT0             0.0 
 
 //Computational Grid
-NumR			128			//Radial Zones
+NumR			64			//Radial Zones
 NumZ			1			//Vertical Zones
 ng                      2
 R_Min		        0.015	
@@ -23,17 +29,17 @@ NPCAP                   100000
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                .2
-Num_Checkpoints	        50	
-Num_Diag_Dump           50
-Num_Diag_Measure        50
+Time_Max                20.0
+Num_Checkpoints	        10	
+Num_Diag_Dump           10
+Num_Diag_Measure        10
 
 
 NoInnerBC               1
 BoundTypeR           0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
 
-Move_Cells              0
+Move_Cells              2
 RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index		1.6666666666
 Cooling                 0
@@ -59,9 +65,9 @@ Cs_Cap			100.0
 Vel_Cap			100.0
 
 //DAMPING
-DAMP_TIME               -1.0        // Set negative to turn off
-RDAMP_INNER             0.0
-RDAMP_OUTER             0.0
+DAMP_TIME               -0.00001        // Set negative to turn off
+RDAMP_INNER             -0.1
+RDAMP_OUTER             10.8
 
 RLogScale               100000.0
 ZLogScale               100000.0

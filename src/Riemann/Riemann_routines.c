@@ -139,17 +139,18 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
     theRiemann->Ustar[TAU] = Estar;
 
     int q;
-    
+   
+    // passive scalar stuff
+    for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q ){
+        theRiemann->Ustar[q] = prim[q]*theRiemann->Ustar[DDD];
+    }
+
     //Now set Fstar
     // See Eq 10.38 of Toro
     for (q=0;q<sim_NUM_Q(theSim);++q){
         theRiemann->Fstar[q] = Fk[q] + Sk*( theRiemann->Ustar[q] - Uk[q] ) ;
     }
 
-    // passive scalar stuff
-    for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q ){
-        theRiemann->Ustar[q] = prim[q]*theRiemann->Ustar[DDD];
-    }
 }
 
 // Here we compute the Fluxes on the L or R face, depending on what SetState is
