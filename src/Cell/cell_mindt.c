@@ -23,19 +23,8 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim){
   double cs  = sqrt(sim_GAMMALAW(theSim)*Pp/rho);
   double cf2 = cs*cs;
 
-  if (sim_runtype(theSim)==MHD){
-    double Br  = prim[BRR];
-    double Bp  = prim[BPP];
-    double Bz  = prim[BZZ];
-    double b2  = (Br*Br+Bp*Bp+Bz*Bz)/rho;
-    cf2 += b2;
-  }
   double maxv = sqrt(cf2) + sqrt( vr*vr + vp*vp + vz*vz );
 
-  if (sim_runtype(theSim)==MHD){
-    double ch = sim_DIVB_CH(theSim); 
-    if( maxv < ch ) maxv = ch;
-  }
   return(maxv);
 
 }

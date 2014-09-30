@@ -73,10 +73,6 @@ void cell_single_init_viscring_cstnu(struct Cell *theCell, struct Sim *theSim,in
 	theCell->prim[UPP] = omega;
 	theCell->prim[UZZ] = 0.0;
 	theCell->wiph = 0.0;
-	theCell->divB = 0.0;
-	theCell->GradPsi[0] = 0.0;
-	theCell->GradPsi[1] = 0.0;
-	theCell->GradPsi[2] = 0.0;	
 		
 }
 
@@ -146,10 +142,6 @@ void cell_init_viscring_cstnu(struct Cell ***theCells,struct Sim *theSim,struct 
           theCells[k][i][j].prim[UPP] = omega;
           theCells[k][i][j].prim[UZZ] = 0.0;
           theCells[k][i][j].wiph = 0.0;
-          theCells[k][i][j].divB = 0.0;
-          theCells[k][i][j].GradPsi[0] = 0.0;
-          theCells[k][i][j].GradPsi[1] = 0.0;
-          theCells[k][i][j].GradPsi[2] = 0.0;
       }
     }
   }

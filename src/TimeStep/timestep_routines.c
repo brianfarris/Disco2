@@ -29,9 +29,6 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_set_w( theCells ,theSim);
   // this is part of the runge-kutta method
   cell_adjust_RK_cons( theCells, theSim, theTimeStep->RK);
-  // divB and GradPsi are needed for Powell source terms in MHD eqns. Here we reset them to 0.
-  cell_clear_divB(theCells,theSim);
-  cell_clear_GradPsi(theCells,theSim);
   double r0 = sim_FacePos(theSim,0,R_DIR);
   double r1 = sim_FacePos(theSim,1,R_DIR);
   double r2 = sim_FacePos(theSim,2,R_DIR);
@@ -75,11 +72,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   //Source Terms
   cell_add_src( theCells ,theSim, theGravMasses , dt ); // add source terms
   if (sim_EXPLICIT_VISCOSITY(theSim)>0.0){
-    if (VISC_OLD==1){
-      cell_add_visc_src_old( theCells ,theSim,dt ); // add viscous source terms
-    } else{
       cell_add_visc_src( theCells ,theSim, theGravMasses,dt ); // add viscous source terms
-    }
   }
   cell_add_split_fictitious(theCells,theSim,theGravMasses,dt);
   //Bookkeeping
@@ -123,32 +116,5 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_calc_cons( theCells,theSim );
 }
 
-void timestep_update_Psi( struct TimeStep * theTimeStep, struct Cell *** theCells , struct Sim * theSim,struct MPIsetup * theMPIsetup){
-  double DIVB_CH = sim_DIVB_CH(theSim);
-  double DIVB_L = sim_DIVB_L(theSim);
-
-  int i,j,k;
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
-      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-        // we are handling Psi equation in an operator splitting manner. 
-        // For this step the solution is analytic. See Dedner paper for discussion.
-        cell_mult_psi(cell_single(theCells,i,j,k),exp(-theTimeStep->dt*DIVB_CH/DIVB_L)); 
-      }
-    }
-  }
-
-  //SHOULD WE APPLY BCs on PSI NOW?
-
-  //Bookkeeping. Is this really necessary?
-  cell_calc_prim( theCells,theSim );
-  cell_calc_cons( theCells,theSim );
-
-  //inter-processor syncs
-  cell_syncproc_r(theCells,theSim,theMPIsetup);
-  if (sim_N_global(theSim,Z_DIR)>1){
-    cell_syncproc_z(theCells,theSim,theMPIsetup);
-  }
-}
 
 

@@ -99,10 +99,6 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
           theCells[k][i][j].RKcons[PSI] = 0.0;
         }
         theCells[k][i][j].wiph = 0.0;
-        theCells[k][i][j].divB = 0.0;
-        theCells[k][i][j].GradPsi[0] = 0.0;
-        theCells[k][i][j].GradPsi[1] = 0.0;
-        theCells[k][i][j].GradPsi[2] = 0.0;
         theCells[k][i][j].tiph = tiph;
         theCells[k][i][j].RKtiph = tiph;
         theCells[k][i][j].dphi = dphi;

@@ -30,10 +30,6 @@ void cell_single_init_milos_macfadyen(struct Cell *theCell, struct Sim *theSim,i
   theCell->prim[UPP] = 0.0;
   theCell->prim[UZZ] = 0.0;
   theCell->wiph = 0.0;
-  theCell->divB = 0.0;
-  theCell->GradPsi[0] = 0.0;
-  theCell->GradPsi[1] = 0.0;
-  theCell->GradPsi[2] = 0.0;
   //printf("ERROR. cell_single_init_shear isnt set up right now\n");
   //exit(0);
 }
@@ -150,11 +146,6 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
         theCells[k][i][j].prim[UPP] = omega-sqrt(1.)/pow(r,1.5);
         theCells[k][i][j].prim[UZZ] = 0.0;
         theCells[k][i][j].wiph = 0.0;
-        theCells[k][i][j].divB = 0.0;
-        theCells[k][i][j].GradPsi[0] = 0.0;
-        theCells[k][i][j].GradPsi[1] = 0.0;
-        theCells[k][i][j].GradPsi[2] = 0.0;
-        //      printf("%e %e %e %e %e\n",r,theCells[k][i][j].prim[RHO],theCells[k][i][j].prim[PPP],theCells[k][i][j].prim[URR],theCells[k][i][j].prim[UPP]);
       }
     }
   }

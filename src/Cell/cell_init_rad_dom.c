@@ -36,10 +36,6 @@ void cell_single_init_rad_dom(struct Cell *theCell, struct Sim *theSim,int i,int
   theCell->prim[UPP] = omega-1./pow(r,1.5);
   theCell->prim[UZZ] = 0.0;
   theCell->wiph = pow(r,-.5);
-  theCell->divB = 0.0;
-  theCell->GradPsi[0] = 0.0;
-  theCell->GradPsi[1] = 0.0;
-  theCell->GradPsi[2] = 0.0;
 
   //printf("ERROR. cell_single_init_rad_dom isnt set up right now\n");
   //exit(0);
@@ -76,10 +72,6 @@ void cell_init_rad_dom(struct Cell ***theCells,struct Sim *theSim,struct MPIsetu
         theCells[k][i][j].prim[UPP] = omega-sqrt(1.)/pow(r,1.5);
         theCells[k][i][j].prim[UZZ] = 0.0;
         theCells[k][i][j].wiph = pow(r,-1.5);
-        theCells[k][i][j].divB = 0.0;
-        theCells[k][i][j].GradPsi[0] = 0.0;
-        theCells[k][i][j].GradPsi[1] = 0.0;
-        theCells[k][i][j].GradPsi[2] = 0.0;
       }
     }
   }

@@ -26,19 +26,6 @@ void cell_prim2cons( double * prim , double * cons , double r , double dV ,struc
   cons[SZZ] = rho*vz*dV;
   cons[TAU] = ( .5*rho*v2 + rhoe )*dV;
 
-  if (runtype==MHD){
-    double Br  = prim[BRR];
-    double Bp  = prim[BPP];
-    double Bz  = prim[BZZ];
-    double B2 = Br*Br + Bp*Bp + Bz*Bz;
-
-    cons[TAU] += .5*B2*dV;
-    cons[BRR] = Br*dV;
-    cons[BPP] = Bp*dV/r; // note that the conserved variable is Bp/r. This helps us reduce geometric source terms
-    cons[BZZ] = Bz*dV;
-    cons[PSI] = prim[PSI]*dV;
-  }
-
   int q;
   for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q ){
     cons[q] = prim[q]*cons[DDD];
@@ -90,18 +77,7 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
   double KE = .5*( Sr*vr + Sp*vp + Sz*vz );
   double v_magnitude = sqrt(2.*KE/rho);
 
-  double B2 = 0.0;
-  if (runtype==MHD){
-    double Br  = cons[BRR]/dV;
-    double Bp  = cons[BPP]/dV*r;
-    double Bz  = cons[BZZ]/dV;
-    B2 = Br*Br+Bp*Bp+Bz*Bz;
-    prim[BRR] = Br;
-    prim[BPP] = Bp;
-    prim[BZZ] = Bz;
-    prim[PSI] = cons[PSI]/dV;
-  }
-  double rhoe = E - KE - .5*B2;
+  double rhoe = E - KE;
   double Pp = (GAMMALAW-1.)*rhoe;
 
   if( Pp < CS_FLOOR*CS_FLOOR*rho/GAMMALAW ) {
