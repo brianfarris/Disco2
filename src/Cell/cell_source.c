@@ -132,8 +132,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 double r0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
                 double r1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
 
-                double dist_bh0 = gravMass_dist(theGravMasses,0,r,tiph,0.);
-                double dist_bh1 = gravMass_dist(theGravMasses,1,r,tiph,0.);
+                double dist_bh0 = gravMass_dist(theGravMasses,0,r,phi,0.);
+                double dist_bh1 = gravMass_dist(theGravMasses,1,r,phi,0.);
 
                 double z  = .5*(zp+zm);
                 double R  = sqrt(r*r+z*z);
