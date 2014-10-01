@@ -38,6 +38,7 @@ Adiabatic_Index         1.666666666666666666666666666666666666
 Cooling                 1
 Explicit_Viscosity      0.1
 ViscConst               0
+PoRho_r1                0.01
 
 RhoSinkOn        	1
 HoR                     0.1
