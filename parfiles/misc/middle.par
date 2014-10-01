@@ -1,7 +1,7 @@
 
 //Disco Parameter File//
 
-InitialDataType         13               // 0 Flock, 1 Shear
+InitialDataType         2               // 0 Flock, 1 Shear
 GravMassType            1               // 0 none, 1 single, 2 binary
 MassRatio               0.0
 OrbShrinkTscale         1000000000000.0
