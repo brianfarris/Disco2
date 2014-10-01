@@ -6,3 +6,4 @@
 *.pdf
 html
 latex
+.DS_Store

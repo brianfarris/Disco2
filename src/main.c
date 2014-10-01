@@ -55,7 +55,7 @@
 
 int main(int argc, char **argv) {
   char* inputfilename = argv[1];
-  
+
   // start MPI 
   struct MPIsetup * theMPIsetup = mpisetup_create(argc,argv);
   mpisetup_setprocs(theMPIsetup,inputfilename);
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
   sim_set_rz(theSim,theMPIsetup);
   sim_set_N_p(theSim);
   sim_set_misc(theSim,theMPIsetup);
-  
+
   //allocate memory for gravitating masses
   struct GravMass *theGravMasses = gravMass_create(sim_NumGravMass(theSim));
 
@@ -84,26 +84,32 @@ int main(int argc, char **argv) {
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);
 
+
+
   // create TimeStep struct
   struct TimeStep * theTimeStep = timestep_create(theSim);
 
   // create IO struct
   struct IO *theIO = io_create(theSim);
 
-  // set initial data 
   if (sim_Restart(theSim)==1){ // getting initial data from checkpoint file
+#ifdef CHECKPOINTING   
     io_allocbuf(theIO,theSim); // allocate memory for a buffer to store checkpoint data
     io_hdf5_in(theIO,theSim,theTimeStep); // read from hdf5 file into buffer
     io_readbuf(theIO,theCells,theSim,theGravMasses); // read from buffer into theCells and theGravMasses
     io_deallocbuf(theIO); // get rid of buffer
+#endif
   }else{
-    (*gravMass_init_ptr(theSim))(theGravMasses); // set up gravitating masses. 
+    (*gravMass_init_ptr(theSim))(theGravMasses,theSim); // set up gravitating masses. 
     (*cell_init_ptr(theSim))(theCells,theSim,theMPIsetup); // setup initial data using routine specified in .par file
   }
   gravMass_clean_pi(theGravMasses,theSim); // make sure GravMasses have phi between 0 and 2 pi.
 
+#ifdef CHECKPOINTING
   // set tcheck, dtcheck, and nfile. Needs to be done after ID because it depends on current time.
   io_setup(theIO,theSim,theTimeStep);
+#endif
+
 
   // inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
@@ -113,17 +119,17 @@ int main(int argc, char **argv) {
   cell_calc_cons(theCells,theSim);
 
   // set up diagnostics struct
-  struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep);
+  struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep,theMPIsetup);
 
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
     // here the actual timestep is taken
     timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
-
     // calculate diagnostics
-    diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep);
+    diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep,theMPIsetup,theGravMasses);
     //write diagnostics to file
+    MPI_Barrier(sim_comm);    
     diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
-
+#ifdef CHECKPOINTING
     // checkpointing
     if( timestep_get_t(theTimeStep)>io_tcheck(theIO)){ // time to write checkpoint file
       io_allocbuf(theIO,theSim); // allocate memory for a buffer to store simulation data
@@ -131,18 +137,19 @@ int main(int argc, char **argv) {
       io_hdf5_out(theIO,theSim,theTimeStep); // write contents to file
       io_deallocbuf(theIO); // get rid of buffer
     }
+#endif
   }
-
   //inter-processor syncs
   cell_syncproc_r(theCells,theSim,theMPIsetup);
   cell_syncproc_z(theCells,theSim,theMPIsetup);
-
   // clean up
   diagnostics_destroy(theDiagnostics,theSim);
   cell_destroy(theCells,theSim);
   sim_destroy(theSim);
   gravMass_destroy(theGravMasses);
+#ifdef CHECKPOINTING
   io_destroy(theIO);
+#endif
   timestep_destroy(theTimeStep);
   mpisetup_destroy(theMPIsetup);
   return(0);

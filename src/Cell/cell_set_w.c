@@ -12,6 +12,8 @@
 void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
   int i,j,k;
   if (sim_MOVE_CELLS(theSim) == C_WCELL){
+    printf("THIS OPTION SHOULD NOT BE USED RIGHT NOW. WE NEED TO KNOW THE ANALYTIC RADIAL DERIV OF W\n");
+    exit(1);
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
         double rp = sim_FacePos(theSim,i,R_DIR);
@@ -27,6 +29,8 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
     }
 
   } else if( sim_MOVE_CELLS(theSim) == C_RIGID ) {
+    //printf("THIS OPTION SHOULD NOT BE USED RIGHT NOW. WE NEED TO KNOW THE ANALYTIC RADIAL DERIV OF W\n");
+    //exit(1);
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
         double w=0.0;
@@ -43,8 +47,56 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
           theCells[k][i][j].wiph = w/Mring;   
         }
+        //printf("%e %e\n",r,w/Mring);
+      }
+      //exit(1);
+    }
+
+  } else if (sim_MOVE_CELLS(theSim) == C_KEPLER ) {
+    for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+      for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+        double rp = sim_FacePos(theSim,i,R_DIR);
+        double rm = sim_FacePos(theSim,i-1,R_DIR);
+        double r = 0.5*(rm+rp);
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+          theCells[k][i][j].wiph = pow(r,-0.5);
+        }
+      }
+    }
+  } else if (sim_MOVE_CELLS(theSim) == C_OMEGA20) {
+    for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+      for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+        double rp = sim_FacePos(theSim,i,R_DIR);
+        double rm = sim_FacePos(theSim,i-1,R_DIR);
+        double r = 0.5*(rm+rp);
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+          theCells[k][i][j].wiph = r*20.;
+        }
+      }
+    }
+  } else if (sim_MOVE_CELLS(theSim) == C_MILOS) {
+    for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+      for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+        double rp = sim_FacePos(theSim,i,R_DIR);
+        double rm = sim_FacePos(theSim,i-1,R_DIR);
+        double r = 0.5*(rm+rp);
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+          theCells[k][i][j].wiph = (1.-exp(-pow(r,1.5)))/sqrt(r);
+        }
+      }
+    }
+  } else if (sim_MOVE_CELLS(theSim) == C_POWERLAW){
+    for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+      for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+        double rp = sim_FacePos(theSim,i,R_DIR);
+        double rm = sim_FacePos(theSim,i-1,R_DIR);
+        double r = 0.5*(rm+rp);
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+          theCells[k][i][j].wiph = pow(r,-1.0);
+        }
       }
     }
 
   }
+
 }

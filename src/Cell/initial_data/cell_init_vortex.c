@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "../Headers/Cell.h"
-#include "../Headers/Sim.h"
-#include "../Headers/Face.h"
-#include "../Headers/GravMass.h"
-#include "../Headers/header.h"
+#include "../../Headers/Cell.h"
+#include "../../Headers/Sim.h"
+#include "../../Headers/Face.h"
+#include "../../Headers/GravMass.h"
+#include "../../Headers/header.h"
 
 void cell_single_init_vortex(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
   double rho  = 1.0;
@@ -32,10 +32,6 @@ void cell_single_init_vortex(struct Cell *theCell, struct Sim *theSim,int i,int 
     theCell->prim[URR] = 0.0;
     theCell->prim[UPP] = vp/r;
     theCell->prim[UZZ] = 0.0;
-    theCell->divB = 0.0;
-    theCell->GradPsi[0] = 0.0;
-    theCell->GradPsi[1] = 0.0;
-    theCell->GradPsi[2] = 0.0;
     if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = Qq;
   }
 }
@@ -69,10 +65,6 @@ void cell_init_vortex(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup
           theCells[k][i][j].prim[URR] = 0.0;
           theCells[k][i][j].prim[UPP] = vp/r;
           theCells[k][i][j].prim[UZZ] = 0.0;
-          theCells[k][i][j].divB = 0.0;
-          theCells[k][i][j].GradPsi[0] = 0.0;
-          theCells[k][i][j].GradPsi[1] = 0.0;
-          theCells[k][i][j].GradPsi[2] = 0.0;
           if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCells[k][i][j].prim[sim_NUM_C(theSim)] = Qq;
 
         }

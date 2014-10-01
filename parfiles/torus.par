@@ -1,0 +1,72 @@
+
+//Disco Parameter File//
+
+InitialDataType         3
+GravMassType            1               // 0 none, 1 single, 2 binary
+Restart			0		//If this=1 restart using input.h5
+
+//Computational Grid
+NumR			80			//Radial Zones
+NumZ			80			//Vertical Zones
+ng                      2
+R_Min			0.2
+R_Max			3.0
+Z_Min			-1.0
+Z_Max			1.0
+NP_CONST                -1 
+aspect                  1.0
+
+
+NUM_C                   5
+NUM_N                   0
+Time_Max                100.0
+Num_Checkpoints	        10	
+Num_Diag_Dump           100
+Num_Diag_Measure        100
+
+MassRatio               0.0
+OrbShrinkTscale         1000000000000.0
+OrbShrinkT0             1000000000000.0
+NPCAP                   20 
+w_a_type                4
+
+NoInnerBC               0
+BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
+ZeroPsiBndry          0
+
+Move_Cells              6
+RiemannSolver           0           // 0 hllc, 1 hll
+Adiabatic_Index		1.66666666666666666666666
+Cooling                 0
+Explicit_Viscosity      -1.0
+ViscConst               0
+RhoSinkOn               0
+PoRho_r1                1.0
+
+//Numerical Parameters
+CFL			0.5
+PLM			1.0
+
+Grav_2D			0
+G_EPS			0.1
+
+PHI_ORDER               2
+
+//Atmosphere Parameters
+Rho_Floor   0.0000001
+Cs_Floor    0.000001    
+Cs_Cap      2.0
+Vel_Cap     2.0
+
+
+DAMP_TIME               -1.0        // Set negative to turn off
+RDAMP_INNER             1.0
+RDAMP_OUTER             4.0
+
+RLogScale               10000.0
+ZLogScale               10000.0
+HiResSigma              10000.0
+HiResR0a                10000.0
+HiResR0b                10000.0
+HiResFac                0.0

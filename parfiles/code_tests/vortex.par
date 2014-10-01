@@ -1,9 +1,12 @@
-
 //Disco Parameter File//
 
-InitialDataType         2               // 0 Flock, 1 Shear, 2 vortex
+InitialDataType         1
 GravMassType            0               // 0 none, 1 single, 2 binary
+MassRatio               1.0
 Restart			0		//If this=1 restart using input.h5
+
+OrbShrinkTscale         10000000000000000000.0
+OrbShrinkT0             0.0 
 
 //Computational Grid
 NumR			64			//Radial Zones
@@ -15,12 +18,13 @@ Z_Min			-1.0
 Z_Max			1.0
 NP_CONST                -1
 aspect                  1.0
+NPCAP                   100000
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                20.
-Num_Checkpoints	        50	
-Num_Diag_Dump           5
+Time_Max                20.0
+Num_Checkpoints	        10	
+Num_Diag_Dump           10
 Num_Diag_Measure        10
 
 
@@ -28,18 +32,20 @@ NoInnerBC               1
 BoundTypeR           0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
 
-Move_Cells              3
+Move_Cells              2
 RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index		1.6666666666
+Cooling                 0
 Explicit_Viscosity      -1.0
+ViscConst               0
+RhoSinkOn               0
+PoRho_r1                1.0
 
-DivB_Ch			0.06		//Dedner divergence cleaning
-DivB_l			0.1
 //Numerical Parameters
 CFL			0.5
 PLM			1.0
 
-POWELL                  1
+w_a_type                0
 Grav_2D			1
 G_EPS			0.0
 
@@ -51,16 +57,15 @@ Cs_Floor		0.0001
 Cs_Cap			100.0
 Vel_Cap			100.0
 
-runtype                 0
-
 //DAMPING
-DAMP_TIME               -1.0        // Set negative to turn off
-RDAMP_INNER             0.0
-RDAMP_OUTER             0.0
+DAMP_TIME               -0.00001        // Set negative to turn off
+RDAMP_INNER             -0.1
+RDAMP_OUTER             10.8
 
-RLogScale               1000.0
-ZLogScale               1000.0
-HiResSigma              1000.0
-HiResR0                 1000.0
+RLogScale               100000.0
+ZLogScale               100000.0
+HiResSigma              100000.0
+HiResR0a                100000.0
+HiResR0b                100000.0
 HiResFac                0.0
 

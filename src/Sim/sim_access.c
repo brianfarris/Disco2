@@ -25,6 +25,7 @@ int sim_N_p(struct Sim *theSim,int i){
 //}
 double sim_FacePos(struct Sim *theSim,int index,int direction){
   if (direction==R_DIR){
+    //printf("index: %d, theSim->r_faces[index+1]: %e\n",index,theSim->r_faces[index+1]);
     return(theSim->r_faces[index+1]);
   } else if (direction==Z_DIR){
     return(theSim->z_faces[index+1]);
@@ -82,20 +83,32 @@ int sim_MOVE_CELLS(struct Sim *theSim){
 int sim_NumGravMass(struct Sim *theSim){
   return(theSim->NumGravMass);
 }
+double sim_MassRatio(struct Sim *theSim){
+  return(theSim->MassRatio);
+}
+double sim_OrbShrinkTscale(struct Sim *theSim){
+  return(theSim->OrbShrinkTscale);
+}
+double sim_OrbShrinkT0(struct Sim *theSim){
+  return(theSim->OrbShrinkT0);
+}
 int sim_Riemann(struct Sim *theSim){
   return(theSim->Riemann);
 }
 double sim_GAMMALAW(struct Sim *theSim){
   return(theSim->GAMMALAW);
 }
+int sim_COOLING(struct Sim *theSim){
+  return(theSim->COOLING);
+}
 double sim_EXPLICIT_VISCOSITY(struct Sim *theSim){
   return(theSim->EXPLICIT_VISCOSITY);
 }
-double sim_DIVB_CH(struct Sim *theSim){
-  return(theSim->DIVB_CH);
+int sim_VISC_CONST(struct Sim *theSim){
+  return(theSim->VISC_CONST);
 }
-double sim_DIVB_L(struct Sim *theSim) {
-  return(theSim->DIVB_L);
+double sim_PoRho_r1(struct Sim *theSim){
+    return(theSim->PoRho_r1);
 }
 double sim_CFL(struct Sim *theSim){
   return(theSim->CFL);
@@ -103,14 +116,17 @@ double sim_CFL(struct Sim *theSim){
 double sim_PLM(struct Sim *theSim){
   return(theSim->PLM);
 }
-int sim_POWELL(struct Sim *theSim){
-  return(theSim->POWELL);
+int sim_W_A_TYPE(struct Sim *theSim){
+  return(theSim->W_A_TYPE);
 }
 int sim_GRAV2D(struct Sim *theSim){
   return(theSim->GRAV2D);
 }
 double sim_G_EPS(struct Sim *theSim){
   return(theSim->G_EPS);
+}
+int sim_RhoSinkOn(struct Sim *theSim){
+  return(theSim->RhoSinkOn);
 }
 double sim_PHI_ORDER(struct Sim *theSim){
   return(theSim->PHI_ORDER);
@@ -124,7 +140,7 @@ double sim_CS_FLOOR(struct Sim *theSim){
 double sim_CS_CAP(struct Sim *theSim){
   return(theSim->CS_CAP);
 }
-double sim_VEL_CAP(struct Sim *theSim) {
+double sim_VEL_CAP(struct Sim *theSim){
   return(theSim->VEL_CAP);
 }
 double sim_get_T_MAX(struct Sim * theSim){
@@ -138,9 +154,6 @@ int sim_NUM_DIAG_DUMP(struct Sim * theSim){
 }
 int sim_NUM_DIAG_MEASURE(struct Sim * theSim){
   return(theSim->NUM_DIAG_MEASURE);
-}
-int sim_runtype(struct Sim * theSim){
-  return(theSim->runtype);
 }
 int sim_InitialDataType(struct Sim * theSim){
   return(theSim->InitialDataType);

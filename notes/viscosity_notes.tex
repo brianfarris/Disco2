@@ -1,0 +1,261 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{empheq}
+\title{Viscosity Notes}
+\author{Brian Farris}
+\begin{document}
+\maketitle
+\section{Viscous stress tensor}
+\subsection{Derivation}
+When viscosity is considered, we must include the viscous stress tensor in the stress energy tensor
+\begin{equation*}
+  T^{ij} = T^{ij}_{perfect} - \sigma^{ij}
+\end{equation*}
+The viscous stress tensor should be gallilean invariant and we can assume velocity gradients are small so that $\sigma^{ij}$ is composed of a linear combination of $\nabla_i v_j$, i.e. 
+\begin{equation*}
+  \sigma^{ij} = K^{ijmn}\nabla_{m}v_n
+\end{equation*}
+We can demand that $K^{ijmn}$ be isotropic, which means it must be of the form:
+\begin{equation*}
+  K^{ijmn} = \lambda g^{ij}g^{mn} + \mu g^{im}g^{jn}+\gamma g^{in}g^{jm}
+\end{equation*}
+Further, we demand that $\sigma_{ij}$ vanish for uniform rotation (i.e. $v=\Omega \times r$)
+\begin{eqnarray*}
+  0 &=& (\lambda g^{ij}g^{mn} + \mu g^{im}g^{jn}+\gamma g^{in}g^{jm})\nabla_{m}(\epsilon_{kln}\Omega^k x^l)\\
+  &=&\epsilon_{kln}\Omega^k(\lambda g^{ij}g^{mn} + \mu g^{im}g^{jn}+\gamma g^{in}g^{jm})\delta^{l}_{m}\\
+  &=&\epsilon_{kln}\Omega^k(\lambda g^{ij}g^{ln} + \mu g^{il}g^{jn}+\gamma g^{in}g^{jl})\\
+&=&\Omega^k(\mu \epsilon_{k}{}^{ij}+\gamma \epsilon_{k}^{ji})\\
+&=&\epsilon_{k}{}^{ij}\Omega^k(\mu -\gamma)\\
+\end{eqnarray*}
+\begin{equation*}
+  \Rightarrow \mu=\lambda
+\end{equation*}
+
+So the most general form of the viscous stress tensor is:
+\begin{equation*}
+  \sigma_{ij} = \lambda g_{ij}\nabla \cdot v + \mu(\nabla_iv_j + \nabla_j v_i)
+\end{equation*}
+Note that the trace of $\sigma_{ij}$ is
+\begin{equation*}
+  \delta_{ij}\sigma_{ij} = (\lambda d + 2 \mu)\nabla \cdot v
+\end{equation*}
+where $d$ is the number of spatial dimensions. Let us define $\rho \nu \equiv \mu$ and $\rho \zeta \equiv \lambda  + 2 \mu/d$, so that
+\begin{eqnarray*}
+  \sigma_{ij} = \rho\left[
+  \nu(\nabla_iv_j + \nabla_j v_i) +(\zeta-2\nu/d) g_{ij}\nabla \cdot v
+  \right]
+\end{eqnarray*}
+For simplicity, let's also set the bulk viscosity $\zeta=0$, and assume that we are working in two dimensions. We now write the viscous stress tensor as:
+\begin{eqnarray}
+  \boxed{\sigma_{ij} = \rho \nu \left[
+      \nabla_iv_j + \nabla_j v_i - g_{ij}\nabla \cdot v
+  \right]}
+\end{eqnarray}
+
+Now let's write this in cylindrical coordinates. For any vector $\mathbf{A}$,
+\begin{equation*}
+  \nabla_j A_i = \partial_j A_i - \Gamma^k_{ij}A_k
+\end{equation*}
+\begin{eqnarray*}
+  \sigma_{ij} &=& \rho \nu \left[
+  \partial_iv_j + \partial_j v_i - 2\Gamma^k_{ij}v_k - g_{ij}\nabla \cdot v
+  \right]
+\end{eqnarray*}
+In cylindrical coordinates, the only nonvanishing connection coefficients are:
+\begin{eqnarray*}
+  \Gamma^r_{\phi\phi}&=&-r\\
+  \Gamma^{\phi}_{r\phi}=\Gamma^{\phi}_{\phi r} &=&1/r 
+\end{eqnarray*}
+Also,
+\begin{equation*}
+  \nabla \cdot v = \frac{1}{r}\partial_r(r v_r) + \partial_{\phi} \Omega \ .
+\end{equation*}
+Note that we are working in a coordinate basis, so $v_{\phi} = r^2 \Omega$, and $g_{\phi \phi} = r^2$. We find that the components of $\sigma$ are:
+\begin{eqnarray*}
+  \sigma_{rr} &=& \mathcal{V}_1\\
+\sigma_{r\phi} &=& r\mathcal{V}_2\\
+\sigma_{\phi \phi} &=& -r^2\mathcal{V}_1
+\end{eqnarray*}
+Where we have defined,
+\begin{eqnarray*}
+  \mathcal{V}_1 &\equiv& r \rho \nu \left[ \partial_r \left(\frac{v_r}{r}\right) - \frac{1}{r}\partial_{\phi} \Omega \right]\\
+  \mathcal{V}_2 &\equiv& r \rho \nu \left[ \partial_r \Omega + \frac{1}{r}\partial_{\phi} \left(\frac{v_r}{r}\right) \right]
+\end{eqnarray*}
+\subsection{$\nabla \cdot \sigma$}
+We can now find the components of $\nabla \cdot \sigma$ in cylindrical coordinates.
+\begin{eqnarray*}
+  (\nabla \cdot \sigma)^{j} = \partial_{i} \sigma^{i j} + \Gamma^{i}_{k i}\sigma^{k j}+\Gamma^{j}_{k i}\sigma^{k i} 
+\end{eqnarray*}
+\begin{eqnarray*}
+  (\nabla \cdot \sigma)^r &=&  \partial_{r} \sigma^{r r} + \partial_{\phi} \sigma^{\phi r}+ \frac{1}{r}\sigma^{r r} -r \sigma^{\phi \phi}\\
+                          &=& \partial_{r} \sigma_{r r} + \frac{1}{r^2} \partial_{\phi} \sigma_{\phi r}+ \frac{1}{r}\sigma_{r r} - \frac{1}{r^3} \sigma_{\phi \phi}\\
+                          &=& \frac{1}{r^2}\partial_{r}(r^2 \mathcal{V}_1) + \frac{1}{r} \partial_{\phi} \mathcal{V}_2\\
+   (\nabla \cdot \sigma)^{\phi} &=&  \partial_{r} \sigma^{r \phi} +\partial_{\phi} \sigma^{\phi \phi} + \frac{3}{r}\sigma^{r\phi}\\
+                                &=& \frac{1}{r^3}\partial_{r}(r^3 \sigma^{r \phi}) +\partial_{\phi} \sigma^{\phi \phi} \\
+                                &=& \frac{1}{r^3}\partial_{r}(r \sigma_{r \phi}) +\frac{1}{r^4}\partial_{\phi} \sigma_{\phi \phi} \\
+                                &=& \frac{1}{r^3}\partial_{r}(r^2 \mathcal{V}_2) -\frac{1}{r^2}\partial_{\phi} \mathcal{V}_1 \\
+\end{eqnarray*}
+Now, if $(\hat{r},\hat{\phi})$ indicate components in an orthonormal basis, we can express:
+\begin{equation}
+  \boxed{(\nabla \cdot \sigma)_{\hat{r}} = \frac{1}{r^2}\partial_{r}(r^2 \mathcal{V}_1) + \frac{1}{r} \partial_{\phi} \mathcal{V}_2}
+\end{equation}
+\begin{equation}
+  \boxed{ r (\nabla \cdot \sigma)_{\hat{\phi}} =  \frac{1}{r}\partial_{r}(r^2 \mathcal{V}_2) -\partial_{\phi} \mathcal{V}_1 }
+\end{equation}
+
+\subsection{$\nabla \cdot(v \cdot \sigma)$}
+\begin{eqnarray*}
+  (v \cdot \sigma)_r &=& v^r \sigma_{rr} + v^{\phi} \sigma_{r\phi}\\
+                     &=& v_r \mathcal{V}_1 + \Omega r \mathcal{V}_2\\
+  (v \cdot \sigma)_{\phi} &=& v^r \sigma_{r\phi} + v^{\phi} \sigma_{\phi \phi}\\
+                          &=& r(v_r  \mathcal{V}_2 - \Omega r \mathcal{V}_1)
+\end{eqnarray*}
+\begin{eqnarray*}
+  \nabla \cdot(v \cdot \sigma) &=& \frac{1}{r}\partial_r\left[r(v\cdot \sigma)_r\right] +\partial_{\phi}\left[ \frac{1}{r^{2}} (v\cdot \sigma)_{\phi}\right] \\
+                               &=& \frac{1}{r}\partial_r\left[r( v_r \mathcal{V}_1 + \Omega r \mathcal{V}_2)\right] +\frac{1}{r}\partial_{\phi}\left[  (v_r  \mathcal{V}_2 - \Omega r \mathcal{V}_1)\right] 
+\end{eqnarray*}
+
+\subsection{Decompose $\Omega$}
+Let $\Omega \equiv \Omega_0 + \omega$. Then we have,
+\begin{eqnarray*}
+  \nabla \cdot(v \cdot \sigma) &=& \frac{1}{r}\partial_r\left[r( v_r \mathcal{V}_1 + (\Omega_0+\omega) r \mathcal{V}_2)\right] +\frac{1}{r}\partial_{\phi}\left[  (v_r  \mathcal{V}_2 - (\Omega_0+\omega) r \mathcal{V}_1)\right]\\
+                               &=& r \Omega_0 (\nabla \cdot \sigma)_{\hat{\phi}}  + r \mathcal{V}_2 \partial_r \Omega_0\\
+                               &+&  \frac{1}{r}\partial_r\left[r( v_r \mathcal{V}_1 + \omega r \mathcal{V}_2)\right] +\frac{1}{r}\partial_{\phi}\left[  (v_r  \mathcal{V}_2 - \omega r \mathcal{V}_1)\right]\\
+\end{eqnarray*}
+So,
+\begin{equation}
+  \boxed{\nabla \cdot(v \cdot \sigma) -  r \Omega_0 (\nabla \cdot \sigma)_{\hat{\phi}} =  \frac{1}{r}\partial_r\left[r( v_r \mathcal{V}_1 + \omega r \mathcal{V}_2)\right] +\frac{1}{r}\partial_{\phi}\left[  (v_r  \mathcal{V}_2 - \omega r \mathcal{V}_1)\right] + r \mathcal{V}_2 \partial_r \Omega_0} 
+\end{equation}
+
+\section{Viscous hydrodynamics}
+\subsection{Continutity}
+\begin{eqnarray*}
+  0 &=&\partial_t \rho + \nabla_i (\rho v^i)\\
+    &=& \partial_t \rho + \frac{1}{r}\partial_r(r \rho v_r) + \frac{1}{r}\partial_{\phi}(r \rho \Omega)\\
+    &=&  \partial_t \rho + \Omega_0 \partial_{\phi}\rho + \frac{1}{r}\partial_r(r \rho v_r) + \frac{1}{r}\partial_{\phi}(r \rho \omega)\\
+    &=& \partial_{t'} \rho + \frac{1}{r}\partial_r(r \rho v_r) + \frac{1}{r}\partial_{\phi}(r \rho \omega)
+\end{eqnarray*}
+where we have defined $\partial_{t'}\equiv \partial_t + \Omega_0 \partial_{\phi}$.
+\begin{equation}
+  \boxed{\partial_{t'} \rho + \frac{1}{r}\partial_r(r \rho v_r) + \frac{1}{r}\partial_{\phi}(r \rho \omega) = 0}
+\end{equation}
+\subsection{Momentum}
+\begin{eqnarray*}
+  \mathbf{F}^{grav} &=& \partial_t (\rho \mathbf{v}) + \nabla \cdot \mathbf{T}  \\
+                    &=& \partial_t (\rho \mathbf{v}) + \nabla \cdot (\rho \mathbf{u} \mathbf{u} + P \mathbf{g} -\mathbf{\sigma})  
+\end{eqnarray*}
+\subsubsection{radial}
+\begin{eqnarray*}
+    F^{grav}_r &=& \partial_t (\rho v_r) + \frac{1}{r}\partial_r\left[r (\rho u_r^2 + P)\right] + \frac{1}{r}\partial_{\phi}(r\rho v_r \Omega) - (\nabla \cdot \sigma)_r - \frac{\rho (r\Omega)^2 + P}{r}\\
+             &=& \partial_{t'}(\rho v_r) + \frac{1}{r}\partial_r \left[r(\rho u_r^2 + P)\right] + \frac{1}{r}\partial_{\phi}(r\rho v_r \omega) - \frac{1}{r^2}\partial_{r}(r^2 \mathcal{V}_1) - \frac{1}{r} \partial_{\phi} \mathcal{V}_2\\
+             &&- \frac{\rho [(r\Omega_0)^2 + 2r\Omega_0 \omega + (r\omega)^2] + P}{r}
+\end{eqnarray*}
+\begin{equation}
+    \boxed{\partial_{t'}(\rho v_r) + \frac{1}{r}\partial_r \left[r(\rho u_r^2 + P)\right] + \frac{1}{r}\partial_{\phi}(r\rho v_r \omega) - \frac{1}{r^2}\partial_{r}(r^2 \mathcal{V}_1) - \frac{1}{r} \partial_{\phi} \mathcal{V}_2 = F^{tot}_r + \frac{\rho(r\omega)^2 + P}{r}}
+\end{equation}
+where $F^{tot}_r \equiv F^{grav}_r + F^{cent}_r + F^{cor}_r$, centrifugal force $F^{cent}_r \equiv r \rho \Omega_0^2$, and radial coriolis force $F^{cor}_r \equiv 2 r \rho \Omega_0 \omega$.
+\subsubsection{azimuthal}
+\begin{eqnarray*}
+  r F^{grav}_{\phi} &=& \partial_t (\rho r^2 \Omega) + \frac{1}{r}\partial_r (r^3 \rho u_r \Omega ) + \frac{1}{r}\partial_{\phi}(r^3\rho \Omega^2+P) - r(\nabla \cdot \sigma)_{\hat{\phi}} \\
+                    &=& r^2\Omega_0\partial_t \rho  + \partial_t (\rho r^2 \omega)  + \frac{1}{r}\partial_r (r^3 \rho u_r (\Omega_0 + \omega) ) + \frac{1}{r}\partial_{\phi}(r^3\rho (\Omega_0 + \omega)^2+P) - r(\nabla \cdot \sigma)_{\hat{\phi}} \\
+                    &=& r^2\Omega_0(\partial_{t'} \rho + \frac{1}{r}\partial_r (r \rho u_r )+\frac{1}{r}\partial_{\phi}(r \rho \omega)) \\
+                    &&+ \partial_{t'} (\rho r^2 \omega)  + r \rho u_r \frac{1}{r}\partial_r (r^2 \Omega_0 ) + \frac{1}{r}\partial_r (r^3 \rho u_r  \omega )  + \frac{1}{r}\partial_{\phi}(r^3\rho \omega^2+P) - r(\nabla \cdot \sigma)_{\hat{\phi}} \\
+                    &=& - r(F^{cor}_{\phi}+F^{eul}_{\phi}) + \partial_{t'} (\rho r^2 \omega)  + \frac{1}{r}\partial_r (r^3 \rho u_r  \omega )  + \frac{1}{r}\partial_{\phi}(r^3\rho \omega^2+P) - \frac{1}{r}\partial_{r}(r^2 \mathcal{V}_2) +\partial_{\phi} \mathcal{V}_1 
+\end{eqnarray*}
+\begin{equation}
+  \boxed{\partial_{t'} (\rho r^2 \omega)  + \frac{1}{r}\partial_r (r^3 \rho u_r  \omega )  + \frac{1}{r}\partial_{\phi}(r^3\rho \omega^2+P) - \frac{1}{r}\partial_{r}(r^2 \mathcal{V}_2) +\partial_{\phi} \mathcal{V}_1 = rF^{tot}_{\phi}}
+\end{equation}
+where  $F^{tot}_{\phi} \equiv F^{grav}_{\phi} + F^{cor}_{\phi} + F^{eul}_{\phi}$, azimuthal coriolis force $F^{cor}_{\phi} \equiv -2 \rho \Omega_0 v_r$, and azimuthal euler force $F^{eul}_{\phi} \equiv - r\rho v_r\partial_r\Omega_0  $.
+
+\subsection{Energy}
+We begin with the first law of thermodynamics, including a heating term that corresponds to viscous dissipation. For a microscopic derivation of this term see Dan's notes,
+\begin{equation*}
+  \frac{d}{dt} \left( \frac{\rho \epsilon}{\rho} \right) + P \frac{d}{dt} \left( \frac{1}{\rho} \right) = \frac{1}{\rho} \sigma_{ij} \partial_i v_j
+\end{equation*}
+
+\begin{eqnarray*}
+  0 &=& \frac{1}{\rho} \frac{d}{dt}(\rho \epsilon) - \frac{\rho \epsilon}{\rho^2} \frac{d \rho}{dt} - \frac{P}{\rho^2}\frac{d\rho}{dt}-\frac{1}{\rho} \sigma_{ij} \partial_i v_j\\
+  0 &=& \partial_t (\rho \epsilon) + v_i \partial_i (\rho \epsilon) - (\epsilon + P/\rho)(\partial_t \rho + v_i \partial_i \rho)- \sigma_{ij} \partial_i v_j\\
+    &=& \partial_t(\rho \epsilon) + \partial_i(\rho \epsilon v_i) + \frac{P}{\rho} \partial_i(\rho v_i)  -  \frac{P}{\rho} v_i \partial_i \rho- \sigma_{ij} \partial_i v_j\\
+    &=&  \partial_t(\rho \epsilon) + \partial_i(\rho \epsilon v_i) + P\partial_i v_i- \sigma_{ij} \partial_i v_j
+\end{eqnarray*}
+
+Now use the momentum equation with the viscous terms included to show that:
+\begin{eqnarray*}
+  \partial_t  (1/2 \rho v^2) &=&1/2v^2 \partial_t \rho + \rho v_i \partial_t v_i\\
+                             &=&1/2v^2 \partial_t \rho +  v_i \partial_t (\rho v_i) - v^2 \partial_t \rho\\
+                             &=& -1/2 v^2 \partial_t \rho + v_i \partial_t (\rho v_i)\\
+                             &=& 1/2 v^2 \partial_i(\rho v_i) - v_i \partial_j(\rho v_i v_j + P \delta_{ij} - \sigma_{ij})\\
+                             &=& \partial_i(1/2 \rho v^2 v_i) - \partial_j(\rho v^2 v_j) - v_i \partial_i P + v_i \partial_j \sigma_{ij}\\
+                             &=& - \partial_i(1/2 \rho v^2 v_i) - v_i \partial_i P + v_i \partial_j \sigma_{ij}
+\end{eqnarray*}
+
+\begin{equation*}
+  \Rightarrow  \partial_t(\rho \epsilon + 1/2 \rho v^2) + \partial_i \left[(\rho \epsilon + 1/2 \rho v^2 + P)v_i\right] = \partial_i(v_j \sigma_{ij}) 
+\end{equation*}
+Let us now denote $E \equiv \rho \epsilon + 1/2 \rho v^2$, $e \equiv \rho \epsilon + 1/2 \rho (v_r^2 + r^2(\Omega-\Omega_0)^2)$, and let us add in the missing gravitational source term to the above expression.
+
+\begin{eqnarray*}
+  F^{grav}_rv^r+ F^{grav}_{\phi}r( \Omega_0
+  + \omega) &&\\
+  + \nabla \cdot(v\cdot \sigma)  &=&
+  \partial_t E +\frac{1}{r}\partial_r \left[r((E+P)v_r )\right]+\frac{1}{r}\partial_{\phi} \left[(E+P)(r \Omega_0 + r \omega) \right]  \\
+                   &=& \partial_{t'} E +\frac{1}{r}\partial_r \left[r((E+P)v_r )\right]+\frac{1}{r}\partial_{\phi} \left[(E+P)r\omega \right]+  \Omega_0 \partial_{\phi} P   \\
+                   &=& \partial_{t'} e +\frac{1}{r}\partial_r \left[r((e+P)v_r )\right]+\frac{1}{r}\partial_{\phi} \left[(e+P)r\omega \right] \\
+                   &&+ \partial_{t'} (E-e) +\frac{1}{r}\partial_r \left[r(E-e)v_r \right]+\frac{1}{r}\partial_{\phi} \left[(E-e)r\omega\right] + r \Omega_0 \frac{1}{r}\partial_{\phi} P  \\
+                   &=& \partial_{t'} e +\frac{1}{r}\partial_r \left[r((e+P)v_r )\right]+\frac{1}{r}\partial_{\phi} \left[(e+P)r\omega\right] \\
+                   &&+ \partial_{t'} (1/2 \rho (r\Omega_0)^2+\rho r\Omega_0 r\omega) \\
+                   &&+\frac{1}{r}\partial_r \left[r(1/2 \rho (r\Omega_0)^2+\rho r\Omega_0 r\omega)v_r \right]+\frac{1}{r}\partial_{\phi} \left[(1/2 \rho (r\Omega_0)^2+\rho r\Omega_0 r\omega)r\omega\right] \\
+                   &&+ r \Omega_0 \frac{1}{r}\partial_{\phi} P \\
+                   &=& \partial_{t'} e +\frac{1}{r}\partial_r \left[r((e+P)v_r)\right]+\frac{1}{r}\partial_{\phi} \left[(e+P)r\omega \right] \\
+                   &&+ 1/2 \rho (r \Omega_0)^2\left[\partial_{t'} \rho +\frac{1}{r}\partial_r (r \rho v_r) +\frac{1}{r} \partial_{\phi}(\rho r\omega)\right] \\
+                   &&+  \partial_{t'}(\rho r\Omega_0 r\omega) + \rho v_r \partial_r \left[(1/2 (r\Omega_0)^2\right]\\
+                   &&+\frac{1}{r}\partial_r \left[\rho r^2\Omega_0 r\omega v_r \right]+\frac{1}{r}\partial_{\phi} \left[\rho r\Omega_0 r\omega r\omega\right]  + r \Omega_0 \frac{1}{r}\partial_{\phi} P \\
+                   &=& \partial_{t'} e +\frac{1}{r}\partial_r \left[r((e+P)v_r )\right]+\frac{1}{r}\partial_{\phi} \left[(e+P)r\omega\right] \\
+                   &&+ \Omega_0\left[ \partial_{t'}l +  \frac{1}{r}\partial_r (r^2 \rho r\omega v_r - ) + \frac{1}{r}\partial_{\phi} \left[r(\rho r\omega r\omega + P )\right]\right]\\
+                   &&+ \rho v_r \partial_r \left[(1/2 (r\Omega_0)^2\right]+\rho  r\omega v_r\partial_r \Omega_0  \\
+                   &=& \partial_{t'} e +\frac{1}{r}\partial_r \left[r((e+P)v_r)\right]+\frac{1}{r}\partial_{\phi} \left[(e+P)r\omega\right]\\
+                   && \Omega_0 (rF^{grav}_{\phi}-2r\rho\Omega_0 v_r-r^2\rho v_r \partial_r \Omega_0 + r (\nabla \cdot \sigma)_{\hat{\phi}})\\
+                   &&+\rho v_r \partial_r \left[(1/2 (r\Omega_0)^2\right]+\rho  r\omega v_r\partial_r \Omega_0   
+\end{eqnarray*}
+\begin{eqnarray*}
+  F^{grav}_rv^r+ F^{grav}_{\phi}  v^{\phi}  + \nabla \cdot(v\cdot \sigma) -  r\Omega_0(\nabla \cdot \sigma)_{\hat{\phi}}
+                                                         &=& \partial_{t'} e +\frac{1}{r}\partial_r \left[r((e+P)v_r)\right]+\frac{1}{r}\partial_{\phi} \left[(e+P)r\omega \right]\\
+                                                        &&-v_r F_{cent}^r - r\omega F_{eul}^{\phi}   
+\end{eqnarray*}
+
+\begin{empheq}[box=\fbox]{align}
+  &&\partial_{t'} e +\frac{1}{r}\partial_r \left[r(e+P)v_r \right]+\frac{1}{r}\partial_{\phi} \left[(e+P)r\omega \right]\nonumber\\
+  &&-\frac{1}{r}\partial_r\left[r( v_r \mathcal{V}_1 + \omega r \mathcal{V}_2)\right] - \frac{1}{r}\partial_{\phi}\left[  (v_r  \mathcal{V}_2 - \omega r \mathcal{V}_1)\right] = v \cdot F^{tot}
+  +  r \mathcal{V}_2 \partial_r \Omega_0
+\end{empheq}
+ 
+where $F^{tot} \equiv F^{cent}+F^{eul}+F^{grav}$.
+
+\section{$\alpha$-law for a binary}
+Before we write down a viscosity law, let's derive an expression for scale height $h$ near a binary. We can do the same thing one normally does for a single BH, i.e. assume vertical hydrostatic equilibrium and work in the limit that $h/r << 1$. The condition for vertical hydrostatic equilibrium is:
+\begin{eqnarray*}
+  \frac{1}{\rho}\partial_z P &=& \partial_z\left( \frac{G m_1}{(r_1^2+z^2)^{1/2}} \right) + \partial_z\left( \frac{G m_2}{(r_2^2+z^2)^{1/2}} \right)\\
+                             &=& -\frac{G m_1 z}{(r_1^2+z^2)^{3/2}} - \frac{G m_2 z}{(r_2^2+z^2)^{3/2}}\\
+                             &\approx& -z\left( \frac{G m_1}{r_1^3} + \frac{G m_2}{r_2^3} \right)
+\end{eqnarray*}
+Now make the approximation that $z \approx h$ and $\partial_z P \approx P/h$.
+\begin{equation*}
+  h \approx \left(\frac{P}{\rho}\right)^{1/2}\left(\frac{G m_1}{r_1^3}+\frac{G m_2}{r_2^3}\right)^{-1/2}
+\end{equation*}
+Now, let's insert this into the usual expression for an $\alpha$-viscosity.
+\begin{eqnarray*}
+  \nu &=& \alpha c_s h\\
+      &=& \alpha \frac{P}{\rho}\left(\frac{G m_1}{r_1^3}+\frac{G m_2}{r_2^3}\right)^{-1/2}
+\end{eqnarray*}
+Let's rewrite in non-dimensional form:
+\begin{equation*}
+  \boxed{
+  \frac{\nu}{a v_a} = \alpha \frac{P}{\rho v_a^2}\left[\left(\frac{r_1}{a}\right)^{-3}\frac{m_1}{M}+\left(\frac{r_2}{a}\right)^{-3}\frac{m_2}{M}\right]^{-1/2}
+}
+\end{equation*}
+
+
+
+\end{document}

@@ -17,6 +17,7 @@ struct Riemann *riemann_create(struct Sim *theSim){
   theRiemann->FR = malloc(sizeof(double)*sim_NUM_Q(theSim));
   theRiemann->Fstar = malloc(sizeof(double)*sim_NUM_Q(theSim));
   theRiemann->F = malloc(sizeof(double)*sim_NUM_Q(theSim));
+  theRiemann->Fvisc = malloc(sizeof(double)*sim_NUM_Q(theSim));
   int q;
   for (q=0;q<sim_NUM_Q(theSim);++q){
     theRiemann->primL[q]=0.;
@@ -28,6 +29,7 @@ struct Riemann *riemann_create(struct Sim *theSim){
     theRiemann->FR[q]=0.;
     theRiemann->Fstar[q]=0.;
     theRiemann->F[q]=0.;
+    theRiemann->Fvisc[q]=0.;
   }
   int iter;
   for (iter=0;iter<3;++iter){
@@ -38,6 +40,7 @@ struct Riemann *riemann_create(struct Sim *theSim){
 
 void riemann_destroy(struct Riemann * theRiemann){
   free(theRiemann->F);
+  free(theRiemann->Fvisc);
   free(theRiemann->Fstar);
   free(theRiemann->FR);
   free(theRiemann->FL);

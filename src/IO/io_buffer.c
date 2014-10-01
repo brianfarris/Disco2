@@ -65,6 +65,9 @@ void io_readbuf(struct IO *theIO,struct Cell ***theCells,struct Sim *theSim,stru
         for (q=0;q<NUM_Q;q++){
           cell_set_prim(theCells,i,j,k,q,theIO->buffer[index][q+3]);
         }
+        if( sim_N_global(theSim,Z_DIR) == 1 ){
+          cell_set_prim(theCells,i,j,k,UZZ,0.0);
+        }
         index += 1;
       }
     }

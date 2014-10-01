@@ -7,9 +7,10 @@
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/TimeStep.h"
+#include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
-void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * theFaces , struct TimeStep * theTimeStep , int direction ){
+void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * theFaces , struct TimeStep * theTimeStep , struct MPIsetup * theMPIsetup ,  int direction ){
   int NUM_Q = sim_NUM_Q(theSim);
   double PLM = sim_PLM(theSim);
 
@@ -35,16 +36,16 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
     double pL = cL->tiph - .5*cL->dphi;
     double pR = cR->tiph - .5*cR->dphi;
     double dpL = face_cm(theFaces,n) - pL;
-    while( dpL >  M_PI ) dpL -= 2.*M_PI;
-    while( dpL < -M_PI ) dpL += 2.*M_PI;
+    while( dpL >  PHIMAX/2. ) dpL -= PHIMAX;
+    while( dpL < -PHIMAX/2. ) dpL += PHIMAX;
     double dpR = pR - face_cm(theFaces,n);
-    while( dpR >  M_PI ) dpR -= 2.*M_PI;
-    while( dpR < -M_PI ) dpR += 2.*M_PI;
+    while( dpR >  PHIMAX/2. ) dpR -= PHIMAX;
+    while( dpR < -PHIMAX/2. ) dpR += PHIMAX;
     double dA  = face_dA(theFaces,n);
+    double face_rad = face_r(theFaces,n);
     for( q=0 ; q<NUM_Q ; ++q ){
       double WL = cL->prim[q] + dpL*cL->gradp[q];
       double WR = cR->prim[q] - dpR*cR->gradp[q];
-
       double S = (WR-WL)/(deltaR+deltaL);
       cL->grad[q] += S*dA;
       cR->grad[q] += S*dA; 
@@ -60,14 +61,23 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
         double dp = theCells[k][i][j].dphi;
         double dAtot;
-        if( direction==R_DIR ) dAtot = dz*(rp+rm)*dp; else dAtot = 2.*.5*(rp*rp-rm*rm)*dp;
+        if( direction==R_DIR ){
+          if (mpisetup_check_rin_bndry(theMPIsetup) && i==0){
+            dAtot = dz*rp*dp;
+          } else if(mpisetup_check_rout_bndry(theMPIsetup) && i==sim_N(theSim,R_DIR)-1){
+            dAtot = dz*rm*dp; 
+          }else {
+            dAtot = dz*(rp+rm)*dp;
+          }
+        } else{
+          dAtot = 2.*.5*(rp*rp-rm*rm)*dp;
+        }
         for( q=0 ; q<NUM_Q ; ++q ){
           theCells[k][i][j].grad[q] /= dAtot;
         }
       }
     }
   }
-
   for( n=0 ; n<Nf ; ++n ){
     struct Cell * cL = face_L_pointer(theFaces,n);
     struct Cell * cR = face_R_pointer(theFaces,n);
@@ -76,11 +86,12 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
     double pL = cL->tiph - .5*cL->dphi;
     double pR = cR->tiph - .5*cR->dphi;
     double dpL = face_cm(theFaces,n) - pL;
-    while( dpL >  M_PI ) dpL -= 2.*M_PI;
-    while( dpL < -M_PI ) dpL += 2.*M_PI;
+    while( dpL >  PHIMAX/2. ) dpL -= PHIMAX;
+    while( dpL < -PHIMAX/2. ) dpL += PHIMAX;
     double dpR = pR - face_cm(theFaces,n);
-    while( dpR >  M_PI ) dpR -= 2.*M_PI;
-    while( dpR < -M_PI ) dpR += 2.*M_PI;
+    while( dpR >  PHIMAX/2. ) dpR -= PHIMAX;
+    while( dpR < -PHIMAX/2. ) dpR += PHIMAX;
+
     for( q=0 ; q<NUM_Q ; ++q ){
       double WL = cL->prim[q] + dpL*cL->gradp[q];
       double WR = cR->prim[q] - dpR*cR->gradp[q];
@@ -89,7 +100,7 @@ void cell_plm_rz( struct Cell *** theCells ,struct Sim *theSim, struct Face * th
       double SL = cL->grad[q];
       double SR = cR->grad[q];
       if( S*SL < 0.0 ){
-        cL->grad[q] = 0.0;
+        cL->grad[q] =0.0;
       }else if( fabs(PLM*S) < fabs(SL) ){
         cL->grad[q] = PLM*S;
       }
@@ -141,10 +152,12 @@ void cell_plm_p( struct Cell *** theCells ,struct Sim * theSim){
           c->gradp[q] = s;
 
         } 
+        double rp = sim_FacePos(theSim,i,R_DIR);
+        double rm = sim_FacePos(theSim,i-1,R_DIR);
+        double r = .5*(rp+rm);
       }
     }
   }   
-
 }
 
 

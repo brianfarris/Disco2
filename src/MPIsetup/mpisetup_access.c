@@ -11,7 +11,7 @@ int mpisetup_check_rout_bndry(struct MPIsetup * theMPIsetup){
   return(theMPIsetup->dim_MyProc[0]== (theMPIsetup->dim_NumProcs[0]-1));
 }
 int mpisetup_check_zbot_bndry(struct MPIsetup * theMPIsetup){
-  return(theMPIsetup->dim_MyProc[1]==1);
+  return(theMPIsetup->dim_MyProc[1]==0);
 }
 int mpisetup_check_ztop_bndry(struct MPIsetup * theMPIsetup){
   return(theMPIsetup->dim_MyProc[1]== (theMPIsetup->dim_NumProcs[1]-1));

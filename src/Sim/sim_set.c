@@ -16,17 +16,28 @@ void sim_set_N_p(struct Sim * theSim){
   }else{
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       double r = sim_FacePos(theSim,i,R_DIR);
+      double r_cell = 0.5*(sim_FacePos(theSim,i-1,R_DIR)+sim_FacePos(theSim,i,R_DIR));
       double dr = sim_FacePos(theSim,i,R_DIR)-sim_FacePos(theSim,i-1,R_DIR);
-      theSim->N_p[i] = (int)( 2.*M_PI*( 1. + (r/dr-1.)/theSim->aspect ) ) ;
+      if (r_cell<sim_MIN(theSim,R_DIR)){
+        double dr_plus = sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i,R_DIR);
+        theSim->N_p[i] = (int)( PHIMAX*( 1. + (r_cell/dr_plus-1.)/theSim->aspect ) ) ;
+      }else{
+        theSim->N_p[i] = (int)( PHIMAX*( 1. + (r_cell/dr-1.)/theSim->aspect ) ) ;
+      }
+      if (theSim->NPCAP>0){
+        if (theSim->N_p[i]>theSim->NPCAP) theSim->N_p[i] = theSim->NPCAP;
+      }
+      //printf("%e %e %e %d\n",r_cell,dr,2.*M_PI*r_cell/theSim->N_p[i],theSim->N_p[i]);
     }
   }
 }
 
 //used by root finder
-double r_func( double r, double r2, double fac,double sigma, double r0){
-  double F = r+fac*sigma*sqrt(M_PI/4.0)*(erf((r-r0)/sigma)+1.0)-r2;
-  return(F);
-}
+  double r_func( double r, double r2, double fac,double sigma, double r0a, double r0b){
+    double F = r+fac*sigma*sqrt(M_PI/4.0)*(erf((r-r0a)/sigma)+1.0)
+      +fac*sigma*sqrt(M_PI/4.0)*(erf((r-r0b)/sigma)+1.0)-r2;
+    return(F);
+  }
 
 //find the sign
 int sgn(double x) {
@@ -36,7 +47,7 @@ int sgn(double x) {
 }
 
 //root finder
-double get_r(double r2,double RMIN,double RMAX,double r0,double sigma,double fac){
+double get_r(double r2,double RMIN,double RMAX,double r0a,double r0b,double sigma,double fac){
   double r;
   int n=1;
   int NMAX = 1000;
@@ -45,12 +56,12 @@ double get_r(double r2,double RMIN,double RMAX,double r0,double sigma,double fac
   double TOL=1.0e-12;
   while (n <= NMAX) { 
     double c = (a + b)/2.;
-    if ((r_func(c,r2,fac,sigma,r0) == 0.0)||((b-a)/2.<TOL)){
+    if ((r_func(c,r2,fac,sigma,r0a,r0b) == 0.0)||((b-a)/2.<TOL)){
       r=c;
       break;
     }
     n=n+1;
-    if (sgn(r_func(c,r2,fac,sigma,r0)) == sgn(r_func(a,r2,fac,sigma,r0))){
+    if (sgn(r_func(c,r2,fac,sigma,r0a,r0b)) == sgn(r_func(a,r2,fac,sigma,r0a,r0b))){
       a = c;
     }else {
       b = c;
@@ -87,13 +98,16 @@ void sim_set_rz(struct Sim * theSim,struct MPIsetup * theMPIsetup){
   //sigma is the approx size of the hi-res region
   double sigma = theSim->HiResSigma;
   // r0 is the radius at which we center a hi-res region
-  double r0 = theSim->HiResR0;
+  double r0a = theSim->HiResR0a;
+  double r0b = theSim->HiResR0b;
   // how much the res increases. res changes by factor of 1+fac at r0.
   double fac = theSim->HiResFac;
 
   // r1 is a different coordinate in which the cells are evenly spaced. Here we find the max/min of r1.
-  double r2_max = RMAX + fac*sigma*sqrt(M_PI/4.0)*(erf((RMAX-r0)/sigma)+1.0);
-  double r2_min = RMIN + fac*sigma*sqrt(M_PI/4.0)*(erf((RMIN-r0)/sigma)+1.0);
+  double r2_max = RMAX + fac*sigma*sqrt(M_PI/4.0)*(erf((RMAX-r0a)/sigma)+1.0) 
+    + fac*sigma*sqrt(M_PI/4.0)*(erf((RMAX-r0b)/sigma)+1.0);
+  double r2_min = RMIN + fac*sigma*sqrt(M_PI/4.0)*(erf((RMIN-r0a)/sigma)+1.0)
+    + fac*sigma*sqrt(M_PI/4.0)*(erf((RMIN-r0b)/sigma)+1.0);
   double r1_max = Rscale*log(1.0+r2_max/Rscale);
   double r1_min = Rscale*log(1.0+r2_min/Rscale);
 
@@ -105,8 +119,13 @@ void sim_set_rz(struct Sim * theSim,struct MPIsetup * theMPIsetup){
     double r1 = r1_min+(double)ig*delta;
     double r2 = Rscale*(exp(r1/Rscale)-1.0);
 
-    theSim->r_faces[i] = get_r(r2,0.,2.*RMAX,r0,sigma,fac);
+    theSim->r_faces[i] = get_r(r2,0.,2.*RMAX,r0a,r0b,sigma,fac);
 
+  }
+
+  // if we have no inner BC, then the inner zones should extend to the origin
+  if ((theSim->NoInnerBC == 1)&&(mpisetup_check_rin_bndry(theMPIsetup))){
+    theSim->r_faces[0] = 0.0;
   }
 
   // Zscale is the scale at which the points begin to get logarithmically spaced

@@ -13,12 +13,11 @@
 #include "../Headers/MPIsetup.h"
 #include "../Headers/header.h"
 
-void timestep_set_dt(struct TimeStep * theTimeStep, struct Cell *** theCells, struct Sim * theSim){
-  theTimeStep->dt = cell_mindt(theCells,theSim);
+void timestep_set_dt(struct TimeStep * theTimeStep, struct Cell *** theCells, struct Sim * theSim, struct GravMass * theGravMasses){
+  theTimeStep->dt = cell_mindt(theCells,theSim,theGravMasses);
   if( theTimeStep->t+theTimeStep->dt > sim_get_T_MAX(theSim) ) {
     theTimeStep->dt = sim_get_T_MAX(theSim)-theTimeStep->t;
   }
-  printf("t: %e, dt: %e\n",theTimeStep->t,theTimeStep->dt);
 }
 void timestep_update_t(struct TimeStep * theTimeStep){
   theTimeStep->t += theTimeStep->dt;
