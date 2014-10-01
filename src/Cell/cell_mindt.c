@@ -106,7 +106,7 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim, struct GravMas
               double alpha = sim_EXPLICIT_VISCOSITY(theSim);
               double eps = sim_G_EPS(theSim);
               //nu = sim_EXPLICIT_VISCOSITY(theSim)*sim_GAMMALAW(theSim)*Pp/rho*pow(r,1.5);
-              double nu = alpha*Pp/rho/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
+              nu = alpha*Pp/rho/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
             }
           }
           double dt_visc = .25*dx*dx/nu;
