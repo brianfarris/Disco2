@@ -22,10 +22,10 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   0
-Time_Max                1000000.0
+Time_Max                100000.0
 Num_Checkpoints	        1	
-Num_Diag_Dump           1000
-Num_Diag_Measure        1000
+Num_Diag_Dump           100
+Num_Diag_Measure        100
 
 NoInnerBC               1
 BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
