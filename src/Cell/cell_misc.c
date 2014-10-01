@@ -129,4 +129,14 @@ void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,voi
     }
 }
 
+void cell_clear_w(struct Cell ***theCells,struct Sim * theSim){
+    int i,j,k,q;
+    for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+        for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+            for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+                theCells[k][i][j].wiph = 0.0;
+            }
+        }
+    }
+}
 

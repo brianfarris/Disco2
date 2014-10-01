@@ -36,6 +36,7 @@ double gravMass_M(struct GravMass * ,int);
 double gravMass_omega(struct GravMass * ,int );
 double gravMass_Mdot(struct GravMass *,int);
 double gravMass_Macc(struct GravMass *,int); 
+double gravMass_dist(struct GravMass *,int,double, double, double );
 //miscellaneous
 void gravMass_clean_pi(struct GravMass *,struct Sim *);
 void gravMass_copy(struct GravMass *,struct Sim *);
