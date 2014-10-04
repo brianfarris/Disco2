@@ -102,7 +102,7 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	
         //PoRho = PoRho0+PoRho1;
    	//PoRho = (cs0*cs0 + cs1*cs1)/Gam;
-	double PoRho = cs*cs/Gam;
+	double PoRho = cs*cs/Gam;   //for any gamma law eqn of state (adiabatic or iso)
 
 				
 	double n = sim_PHI_ORDER(theSim);
@@ -191,16 +191,26 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	double Pp = PoRho * rho;
 
 
+	double passive_scalar;
+	if (r<1.0){
+	  passive_scalar = 1.;	  
+	}else{
+	  passive_scalar = 0.000000001;
+	}
+
+
 	theCell->prim[RHO] = rho*exp(fac*(Pot0+Pot1)*Gam/cs2);
 	theCell->prim[PPP] = Pp*exp(fac*(Pot0+Pot1)*Gam/cs2);
 	theCell->prim[URR] = vr;
 	theCell->prim[UPP] = omega - sim_rOm_a(theSim,r,sep)/r; //initial sep set to 1.
 	theCell->prim[UZZ] = 0.0;
+	//	theCell->prim[5] = passive_scalar;
 	theCell->wiph = 0.0;
 	theCell->divB = 0.0;
 	theCell->GradPsi[0] = 0.0;
 	theCell->GradPsi[1] = 0.0;
-	theCell->GradPsi[2] = 0.0;	
+	theCell->GradPsi[2] = 0.0;
+	if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = passive_scalar;	
 }
 
 void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
@@ -379,23 +389,36 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 
 
 
-
-
         if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
         
 	 //double Pp = cs*cs * rho/Gam;
 	double Pp = PoRho * rho;
+
+
+
+	double passive_scalar;
+        if (r<1.0){
+          passive_scalar = 1.;
+	}else{
+	  passive_scalar = 0.000000001;;
+	}
+
+
+
+
 
         theCells[k][i][j].prim[RHO] = rho*exp(fac*(Pot0+Pot1)/cs2);
         theCells[k][i][j].prim[PPP] = Pp*exp(fac*(Pot0+Pot1)/cs2);
         theCells[k][i][j].prim[URR] = vr;
         theCells[k][i][j].prim[UPP] = omega -  sim_rOm_a(theSim,r,sep)/r; //initial sep set to 1. 
         theCells[k][i][j].prim[UZZ] = 0.0;
+	//theCells[k][i][j].prim[5] = passive_scalar;
         theCells[k][i][j].wiph = 0.0;
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;
         theCells[k][i][j].GradPsi[1] = 0.0;
         theCells[k][i][j].GradPsi[2] = 0.0;
+	if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCells[k][i][j].prim[sim_NUM_C(theSim)] = passive_scalar;
       }
     }
   }

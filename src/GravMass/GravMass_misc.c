@@ -27,7 +27,7 @@ void gravMass_copy(struct GravMass * theGravMasses,struct Sim * theSim){
     theGravMasses[p].RK_E      = theGravMasses[p].E;
     theGravMasses[p].RK_L      = theGravMasses[p].L;
     theGravMasses[p].RK_Ltot   = theGravMasses[p].Ltot;
-    //theGravMasses[p].RK_vr     = theGravMasses[p].vr;
+    theGravMasses[p].RK_vr     = theGravMasses[p].vr;
   }
 }
 
@@ -52,9 +52,9 @@ void gravMass_adv_arb( struct Sim * theSim, struct GravMass * thisGravMass , dou
     //double drdt;
     double rate = -sim_vRate(theSim)*1.5 * nu/rs0;
     double dexp = 2./3.;
-    double aold = thisGravMass->r*(1.+Ms/Mp); 
+    //double aold = thisGravMass->r*(1.+Ms/Mp); 
     double tmax = sim_tmaxOrb(theSim) * 2.*M_PI;
-    anew = pow( (1. + rate*sqrt(aold) * (t - tmax)/dexp), dexp);
+    anew = pow( (1. + rate * (t - tmax)/dexp), dexp);
     //anew = pow( (1. + rate * (t - tmax))/dexp, dexp);
 
     /*
@@ -114,7 +114,7 @@ void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, do
     theGravMasses[i].L     = (1.0-RK)*theGravMasses[i].L      + RK*theGravMasses[i].RK_L;
     theGravMasses[i].Ltot  = (1.0-RK)*theGravMasses[i].Ltot   + RK*theGravMasses[i].RK_Ltot;
     theGravMasses[i].E     = (1.0-RK)*theGravMasses[i].E      + RK*theGravMasses[i].RK_E;
-    //theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr     + RK*theGravMasses[i].RK_vr;
+    theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr     + RK*theGravMasses[i].RK_vr;
     theGravMasses[i].omega = (1.0-RK)*theGravMasses[i].omega  + RK*theGravMasses[i].RK_omega;
   }
   if ( (sim_GravMassType(theSim)==LIVEBINARY)  && (time_global > 2.*M_PI*sim_tmig_on(theSim)) ){

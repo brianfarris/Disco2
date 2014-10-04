@@ -40,6 +40,8 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_FulVCDmigration);
   } else if (sim_InitialDataType(theSim)==MMRINGCAV){
     return(&cell_init_MMRingCav);
+  } else if (sim_InitialDataType(theSim)==SIMPKEP){
+    return(&cell_init_SimpleKepler);
 
 
   } else{
@@ -83,6 +85,8 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_FulVCDmigration);
   } else if (sim_InitialDataType(theSim)==MMRINGCAV){
     return(&cell_single_init_MMRingCav);
+  } else if (sim_InitialDataType(theSim)==SIMPKEP){
+    return(&cell_single_init_SimpleKepler);
   } else{
     printf("ERROR, not a valid single point initial data routine choice\n");
     exit(0);

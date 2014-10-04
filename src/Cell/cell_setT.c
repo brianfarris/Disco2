@@ -112,15 +112,16 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim, struct GravMass *
         //PoRho1 =  cs1*cs1/Gam;
 	//double cs2 = (cs0*cs0 + cs1*cs1);
 
-	double fac = 0.0001;
-	double n = sim_PHI_ORDER(theSim);
-	double Pot0 = M0/pow( pow(dist_bh0,n) + pow(eps0,n) , 1./n );
-	double Pot1 = M1/pow( pow(dist_bh1,n) + pow(eps1,n) , 1./n );
+	//double fac = 0.0001;
+	//double n = sim_PHI_ORDER(theSim);
+	//double Pot0 = M0/pow( pow(dist_bh0,n) + pow(eps0,n) , 1./n );
+	//double Pot1 = M1/pow( pow(dist_bh1,n) + pow(eps1,n) , 1./n );
 	
 
 	double OmegaK = pow(r,-1.5);
-	double cs = r*OmegaK*HoR;
-	double PoRho = cs*cs/Gam *exp(fac*(Pot0+Pot1)/cs/cs);
+	//double cs = r*OmegaK*HoR; //cst MAch
+	double cs = HoR; //cst cs
+	double PoRho = cs*cs/Gam;// *exp(fac*(Pot0+Pot1)/cs/cs);
 
 	//PoRho = (PoRho0+PoRho1)*exp(fac*(Pot0+Pot1)/cs2);
 	

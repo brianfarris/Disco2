@@ -176,6 +176,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double phi = cell_tiph(cell_single(theCells,i,j,k)) - 0.5*cell_dphi(cell_single(theCells,i,j,k));
           double dphi = cell_dphi(cell_single(theCells,i,j,k));
           double rho = cell_prim(cell_single(theCells,i,j,k),RHO);
+
+	  //	  double rhoC = rho + cell_prim(cell_single(theCells,i,j,k),RHO);
+
           double press = cell_prim(cell_single(theCells,i,j,k),PPP);
           double vr = cell_prim(cell_single(theCells,i,j,k),URR);
           double vp_minus_w = cell_prim(cell_single(theCells,i,j,k),UPP)*r;
@@ -231,7 +234,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double dPhi_dphi_s  =  -abhbin*r/((1.+q)*(1.+1./q))*sin(phi-phi_bh0) *
             (pow( (eps*eps + dist_bh1*dist_bh1) ,-1.5) ) ;
 	  // above for secondary only
-          //Now get the angel between phi direction and the lever arm to teh secondary to get torque only on secondary
+          //Now get the angle between phi direction and the lever arm to the secondary to get torque only on secondary
 	  double Cos_alph = (2.*r*r - 2.*r*abhbin/(1.+q) * cos(phi_bh1-phi))/dist_bh1;
 	  double Sin_alph = sin(acos(Cos_alph));
 	  
@@ -240,46 +243,54 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 	  double fgrav( double M , double r , double eps, double n ){
 	    return( M*pow(r,n-1.)/pow( pow(r,n) + pow(eps,n) ,1.+1./n) );
 	  }
-
+	  
+	  //define  gravity force from binary
 	  void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p , double r , double phi , double * fr , double * fp ){
-	    double G_EPS=sim_G_EPS(theSim);
-	    double PHI_ORDER=sim_PHI_ORDER(theSim);
+	      double G_EPS=sim_G_EPS(theSim);
+	      double PHI_ORDER=sim_PHI_ORDER(theSim);
 
-	    double rp = gravMass_r(theGravMasses,p);
-	    double pp = gravMass_phi(theGravMasses,p);
-	    double cosp = cos(phi);
-	    double sinp = sin(phi);
-	    double dx = r*cosp-rp*cos(pp);
-	    double dy = r*sinp-rp*sin(pp);
-	    double script_r = sqrt(dx*dx+dy*dy);
-
-	    double cosa = dx/script_r;
-	    double sina = dy/script_r;
-
-	    double cosap = cosa*cosp+sina*sinp;
-	    double sinap = sina*cosp-cosa*sinp;
-
-	    double f1;
-	    if (sim_InitialDataType(theSim)==FIELDLOOP){
-	      f1 = -fgrav_neg_centrifugal( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );
-	    } else{
-	      f1 = -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );
-	    }
-	    *fr = cosap*f1;
-	    *fp = sinap*f1;
+	      double rp = gravMass_r(theGravMasses,p);
+	      double pp = gravMass_phi(theGravMasses,p);
+	      double cosp = cos(phi);
+	      double sinp = sin(phi);
+	      double dx = r*cosp-rp*cos(pp);
+	      double dy = r*sinp-rp*sin(pp);
+	      double script_r = sqrt(dx*dx+dy*dy);
+	      
+	      double cosa = dx/script_r;
+	      double sina = dy/script_r;
+	      
+	      double cosap = cosa*cosp+sina*sinp;
+	      double sinap = sina*cosp-cosa*sinp;
+	      
+	      double f1;
+	      if (sim_InitialDataType(theSim)==FIELDLOOP){
+		f1 = -fgrav_neg_centrifugal( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );
+	      } else{
+		f1 = -fgrav( gravMass_M(theGravMasses,p) , script_r , G_EPS, PHI_ORDER );
+	      }
+	      *fr = cosap*f1;
+	      *fp = sinap*f1;
 	  }
 
+
+	  // Compute force at each cell 
 	  double fr;
 	  double fp;
+	  double fsec_r;
+	  double fsec_phi;
 	  double fBin_phi = 0.0;
 	  double Fr = 0.0;
 	  int p;
+	  // r and phi above are at center of cell
 	  for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
 	    gravMassForce( theGravMasses , theSim , p , r , phi , &fr , &fp );
 	    Fr += fr;
 	    fBin_phi += fp;
 	  }
-	  
+	  gravMassForce(theGravMasses ,theSim ,1 ,r ,phi ,&fsec_r ,&fsec_phi );
+
+
 	  
 	  //	  double fBin_phi = f0*sinap0 + f1*sinap1; //f1*sinap1;
 	  //double fr0;
@@ -291,8 +302,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
             if (dist_bh1 > Rcut*Rhill){ //add 2pi to Trq to not azi average - see Scalar int below                                                  
 	      //TrScal_temp -= ( r_bh0*fp0 * rho*r*dphi*(rp-rm) );
-	      //TrScal_temp -= ( r_bh1*fp1 * rho*r*dphi*(rp-rm) );	      
-              TrScal_temp   -= (r*rho* (fBin_phi) * r*dphi*(rp-rm));
+	      TrScal_temp -= ( r_bh1*fsec_phi * (rho-1.0) *r*dphi*(rp-rm) );	      
+              //TrScal_temp   -= (r*rho* (fBin_phi) * r*dphi*(rp-rm));
             }
 	  }	  	    
 
@@ -344,8 +355,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = Br*Bp;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = dist_bh1*rho*dPhi_dphi_s/r * Sin_alph; //divB;
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+16] = 180./M_PI*0.5*asin(-Br*Bp/(0.5*B2));
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+17] = GradPsi_r;
+            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+17] = passive_scalar;  //DD//GradPsi_r;
 	    EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+18] = -r*rho*(fBin_phi);//-(r_bh0*fp0+r_bh1*fp1)*rho;
+	    EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+19] = -r_bh1*rho*(fsec_phi);
 	                                                                                      //dPhi_dphi/r; //DDwas 12
             ++position;
           }
@@ -367,13 +379,17 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (divB/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += 0.0;//(180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (GradPsi_r/sim_N_p(theSim,i)*dz) ; 
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+20] += (passive_scalar/sim_N_p(theSim,i)*dz) ;
+	  //
+	  //
 	  // Don't count torques within a certain radius from secondary add r and 2pi for integration
 	  if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
 	    if (dist_bh1 > Rcut*Rhill){ //add 2pi to Trq to not azi average - see Scalar int below
 	      //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz);
 	      //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] -= (r*2.*M_PI*rho*r*fBin_phi/sim_N_p(theSim,i));
 	      VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] -= (r*rho*fBin_phi * r*dphi);//((r_bh0*fp0+r_bh1*fp1)*rho *r*dphi);
-	    //positive gives torque ON binary                 
+	      VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+19] -= (r_bh1*rho*fsec_phi * r*dphi);
+	      //positive gives torque ON binary                 
 	      //TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz);//2pi/Nphi = dphi
 	      //TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 -= (r*2.*M_PI*rho*r*fBin_phi/sim_N_p(theSim,i));
 	      //TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 -= (r*rho*fBin_phi * r*dphi);
@@ -383,6 +399,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 	    // VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += 0.0;
 	      //TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]                 += 0.0;
           }
+	  //
+	  //
 	  if (r<r_bh1){ ///Mass encolsed by binary               
             VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+18] += ( 2*M_PI*rho/sim_N_p(theSim,i) );
           }
@@ -566,7 +584,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagBPFilename[256];
       sprintf(DiagBPFilename,"BinaryParams.dat");
       FILE * DiagBpFile = fopen(DiagBPFilename,"a");
-      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, Om, Om, Om, gravMass_total_torque(theGravMasses,0), TrScal_reduce);
+      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e  \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, Om, Om, Om, gravMass_total_torque(theGravMasses,0), TrScal_reduce);
       fclose(DiagBpFile);
     }
 
