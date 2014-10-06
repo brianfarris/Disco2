@@ -85,13 +85,13 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     if (sim_BoundTypeR(theSim)==BOUND_OUTFLOW){
         cell_boundary_outflow_r( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
     }else if (sim_BoundTypeR(theSim)==BOUND_FIXED){
-        cell_boundary_fixed_r(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+        cell_boundary_fixed_r(theCells,theSim,theGravMasses,theMPIsetup,(*cell_single_init_ptr(theSim)));    
     }
     if (sim_N_global(theSim,Z_DIR)>1){
         if (sim_BoundTypeZ(theSim)==BOUND_OUTFLOW){
             cell_boundary_outflow_z( theCells , theFaces_z ,theSim,theMPIsetup, theTimeStep );
         }else if (sim_BoundTypeZ(theSim)==BOUND_FIXED){
-            cell_boundary_fixed_z(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+            cell_boundary_fixed_z(theCells,theSim,theGravMasses,theMPIsetup,(*cell_single_init_ptr(theSim)));    
         } else if (sim_BoundTypeZ(theSim)==BOUND_PERIODIC){
             //do nothing, this is already handled by the syncing routine
         }
@@ -102,7 +102,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
         face_destroy(theFaces_z);
     }
     // if DAMP_TIME is set to a positive number, apply damping near boundary
-    if (sim_DAMP_TIME(theSim)>0.0) cell_bc_damp( theCells , theSim, dt,(*cell_single_init_ptr(theSim)) );
+    if (sim_DAMP_TIME(theSim)>0.0) cell_bc_damp( theCells , theSim,theGravMasses, dt,(*cell_single_init_ptr(theSim)) );
     //inter-processor syncs
     cell_syncproc_r(theCells,theSim,theMPIsetup);
     cell_syncproc_z(theCells,theSim,theMPIsetup);

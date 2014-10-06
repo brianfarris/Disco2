@@ -95,7 +95,7 @@ void cell_update_dphi( struct Cell *** theCells,struct Sim * theSim ){
     }
 }
 
-void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int) ){
+void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim,struct GravMass * theGravMasses, double dt,void (*single_init_ptr)(struct Cell *,struct Sim *,struct GravMass *,int,int,int) ){
     int NUM_Q = sim_NUM_Q(theSim);
 
     double RMIN = sim_MIN(theSim,R_DIR);
@@ -118,7 +118,7 @@ void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,voi
 
             for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
                 for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-                    (*single_init_ptr)(initialCell,theSim,i,j,k);
+                    (*single_init_ptr)(initialCell,theSim,theGravMasses,i,j,k);
                     for( q=0 ; q<NUM_Q ; ++q ){
                         double dprim = initialCell->prim[q] - theCells[k][i][j].prim[q];
                         theCells[k][i][j].prim[q] += (1.-exp(-rate*dt))*dprim;

@@ -8,7 +8,7 @@
 #include "../../Headers/GravMass.h"
 #include "../../Headers/header.h"
 
-void cell_single_init_milos_macfadyen(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
+void cell_single_init_milos_macfadyen(struct Cell *theCell, struct Sim *theSim,struct GravMass * theGravMasses,int i,int j,int k){
   double Mach = 1./sqrt(sim_PoRho_r1(theSim));
   double Gam = sim_GAMMALAW(theSim);
   double rm = sim_FacePos(theSim,i-1,R_DIR);
@@ -34,7 +34,7 @@ void cell_single_init_milos_macfadyen(struct Cell *theCell, struct Sim *theSim,i
   //exit(0);
 }
 
-void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
+void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct GravMass * theGravMasses, struct MPIsetup * theMPIsetup) {
   double rs = 10.0;
 
   double rho0   = 1.0;
@@ -91,27 +91,25 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
       for (j = 0; j < sim_N_p(theSim,i); j++) {
 
         double phi = theCells[k][i][j].tiph - 0.5*theCells[k][i][j].dphi;
-        double xpos = r*cos(phi);
-        double ypos = r*sin(phi);
 
-        double dist_bh0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
-        double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
+        double dist_bh0 = gravMass_dist(theGravMasses,0,r,phi,0.);
+        double dist_bh1 = gravMass_dist(theGravMasses,1,r,phi,0.);
 
         double cs0;
         double cs1;
 
         //printf("M0: %e, M1: %e, xbh0: %e, xbh1: %e, dist_bh0: %e, dist_bh1: %e\n",M0,M1,xbh0,xbh1,dist_bh0,dist_bh1);
         if (1==1){
-          if (dist_bh0<0.5){
-            cs0 = sqrt(1./.5)/Mach * sqrt(M0);
-          }else{
-            cs0 = sqrt(1./dist_bh0)/Mach* sqrt(M0);
-          }
-          if (dist_bh1<0.5){
-            cs1 = sqrt(1./.5)/Mach * sqrt(M1);
-          }else{
-            cs1 = sqrt(1./dist_bh1)/Mach* sqrt(M1);
-          }
+            if (dist_bh0<0.5){
+                cs0 = sqrt(1./.5)/Mach * sqrt(M0);
+            }else{
+                cs0 = sqrt(1./dist_bh0)/Mach* sqrt(M0);
+            }
+            if (dist_bh1<0.5){
+                cs1 = sqrt(1./.5)/Mach * sqrt(M1);
+            }else{
+                cs1 = sqrt(1./dist_bh1)/Mach* sqrt(M1);
+            }
         }
 
         //double PoRho = 1./Mach/Mach/Gam;
@@ -127,13 +125,13 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
         double O2 = omega*omega + cs*cs/r/r*( 2.*rs*rs/r/r - 3. );
         double vr;
         if (r<3.0){
-          omega = 1./pow(r,1.5);//sqrt(O2);
-          vr = 0.0;
-          //vr = (-3.0*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(1./rs,-xi_exp)))*pow(r,2.);
+            omega = 1./pow(r,1.5);//sqrt(O2);
+            vr = 0.0;
+            //vr = (-3.0*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(1./rs,-xi_exp)))*pow(r,2.);
         }else{
-          omega = sqrt(O2);
-          //vr = 0.0;
-          vr = -3.0/sqrt(r)*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(r/rs,-xi_exp));
+            omega = sqrt(O2);
+            //vr = 0.0;
+            vr = -3.0/sqrt(r)*DISK_ALPHA*(1.0/Mach)*(1.0/Mach)*(1.0-delta_exp+xi_exp*pow(r/rs,-xi_exp));
         }
 
         if( rho<(100.*sim_RHO_FLOOR(theSim)) ) rho = 100.*sim_RHO_FLOOR(theSim);

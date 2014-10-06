@@ -9,7 +9,7 @@
 #include "../../Headers/header.h"
 
 
-void cell_single_init_middle(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
+void cell_single_init_middle(struct Cell *theCell, struct Sim *theSim,struct GravMass * theGravMasses,int i,int j,int k){
 
 
   double rm = sim_FacePos(theSim,i-1,R_DIR);
@@ -46,7 +46,7 @@ void cell_single_init_middle(struct Cell *theCell, struct Sim *theSim,int i,int 
 
 }
 
-void cell_init_middle(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
+void cell_init_middle(struct Cell ***theCells,struct Sim *theSim,struct GravMass * theGravMasses,struct MPIsetup * theMPIsetup) {
 
   double alpha = sim_EXPLICIT_VISCOSITY(theSim);
   double Gam = sim_GAMMALAW(theSim);

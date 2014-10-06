@@ -8,7 +8,7 @@
 #include "../../Headers/GravMass.h"
 #include "../../Headers/header.h"
 
-void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
+void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,struct GravMass * theGravMasses,int i,int j,int k){
   double rho = 1.0;
   double Pp  = 0.01;
   double v0  = 1.0;
@@ -54,7 +54,7 @@ void cell_single_init_shear(struct Cell *theCell, struct Sim *theSim,int i,int j
   theCell->wiph = 0.0;
 }
 
-void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
+void cell_init_shear(struct Cell ***theCells,struct Sim *theSim,struct GravMass * theGravMasses,struct MPIsetup * theMPIsetup) {
 
   double rho = 1.0;
   double Pp  = 0.01;

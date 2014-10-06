@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
 #endif
   }else{
     (*gravMass_init_ptr(theSim))(theGravMasses,theSim); // set up gravitating masses. 
-    (*cell_init_ptr(theSim))(theCells,theSim,theMPIsetup); // setup initial data using routine specified in .par file
+    (*cell_init_ptr(theSim))(theCells,theSim,theGravMasses,theMPIsetup); // setup initial data using routine specified in .par file
   }
   gravMass_clean_pi(theGravMasses,theSim); // make sure GravMasses have phi between 0 and 2 pi.
 

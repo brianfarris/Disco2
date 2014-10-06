@@ -9,12 +9,12 @@
 #include "../../Headers/MPIsetup.h"
 #include "../../Headers/header.h"
 
-void cell_single_init_torus(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
+void cell_single_init_torus(struct Cell *theCell, struct Sim *theSim,struct GravMass * theGravMasses,int i,int j,int k){
   printf("WARNING, YOU SHOULDNT BE HERE\n");
   exit(0);
 }
 
-void cell_init_torus(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
+void cell_init_torus(struct Cell ***theCells,struct Sim *theSim,struct GravMass * theGravMasses,struct MPIsetup * theMPIsetup) {
   double GAMMALAW = sim_GAMMALAW(theSim);
   double M = 1.0; 
   double r_inner = 0.7;

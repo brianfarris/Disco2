@@ -8,7 +8,7 @@
 #include "../../Headers/GravMass.h"
 #include "../../Headers/header.h"
 
-void cell_single_init_vortex(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
+void cell_single_init_vortex(struct Cell *theCell, struct Sim *theSim,struct GravMass * theGravMasses,int i,int j,int k){
   double rho  = 1.0;
   double P0   = 1.0;
   double R    = 1.0;
@@ -36,7 +36,7 @@ void cell_single_init_vortex(struct Cell *theCell, struct Sim *theSim,int i,int 
   }
 }
 
-void cell_init_vortex(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
+void cell_init_vortex(struct Cell ***theCells,struct Sim *theSim,struct GravMass * theGravMasses,struct MPIsetup * theMPIsetup) {
 
   double rho  = 1.0;
   double P0   = 1.0;

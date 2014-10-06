@@ -88,8 +88,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
         double phi_bh1 = gravMass_phi(theGravMasses,1);
         double a = r_bh0 + r_bh1;        
         for (j=0;j<sim_N_p(theSim,i);++j){
-          double phi = cell_tiph(cell_single(theCells,i,j,k));
           double dphi = cell_dphi(cell_single(theCells,i,j,k));
+          double phi = cell_tiph(cell_single(theCells,i,j,k)) - 0.5*dphi;
           double rho = cell_prim(cell_single(theCells,i,j,k),RHO);
           double press = cell_prim(cell_single(theCells,i,j,k),PPP);
           double vr = cell_prim(cell_single(theCells,i,j,k),URR);
@@ -113,58 +113,59 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
               pow(r*r+.25-r*cos(phi-Omega*t),-1.5) -  
               pow(r*r+.25+r*cos(phi-Omega*t),-1.5));
 
-          double dist_bh0 = sqrt(r_bh0*r_bh0 + r*r - 2.*r_bh0*r*cos(phi_bh0-phi));
-          double dist_bh1 = sqrt(r_bh1*r_bh1 + r*r - 2.*r_bh1*r*cos(phi_bh1-phi));
+
+          double dist_bh0 = gravMass_dist(theGravMasses,0,r,phi,0.);
+          double dist_bh1 = gravMass_dist(theGravMasses,1,r,phi,0.);
 
           if (dist_bh0<0.1){
-            double dM = rho*dV;
-            mass_near_bh0_r0p1_temp +=dM;
+              double dM = rho*dV;
+              mass_near_bh0_r0p1_temp +=dM;
           }
           if (dist_bh1<0.1){
-            double dM = rho*dV;
-            mass_near_bh1_r0p1_temp +=dM;
+              double dM = rho*dV;
+              mass_near_bh1_r0p1_temp +=dM;
           }
 
           if (dist_bh0<0.2){
-            double dM = rho*dV;
-            mass_near_bh0_r0p2_temp +=dM;
+              double dM = rho*dV;
+              mass_near_bh0_r0p2_temp +=dM;
           }
           if (dist_bh1<0.2){
-            double dM = rho*dV;
-            mass_near_bh1_r0p2_temp +=dM;
+              double dM = rho*dV;
+              mass_near_bh1_r0p2_temp +=dM;
           }
 
           if (dist_bh0<0.4){
-            double dM = rho*dV;
-            mass_near_bh0_r0p4_temp +=dM;
+              double dM = rho*dV;
+              mass_near_bh0_r0p4_temp +=dM;
           }
           if (dist_bh1<0.4){
-            double dM = rho*dV;
-            mass_near_bh1_r0p4_temp +=dM;
+              double dM = rho*dV;
+              mass_near_bh1_r0p4_temp +=dM;
           }
 
 
 
           if ((fabs(zp)<0.0000001)||(fabs(z)<0.0000001)){
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+0] = r;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+1] = phi;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+2] = rho;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+3] = press;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+4] = vr;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+5] = vp;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+6] = vz;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+7] = vp_minus_w;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+8] = Cool;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+9] = passive_scalar;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+10] = E_hydro;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+11] = KE;            
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = rhoe;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+13] = 0.0;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = 0.0;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = 0.0;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+16] = 0.0;
-            EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+17] = 0.0;
-            ++position;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+0] = r;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+1] = phi;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+2] = rho;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+3] = press;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+4] = vr;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+5] = vp;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+6] = vz;            
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+7] = vp_minus_w;            
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+8] = Cool;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+9] = passive_scalar;            
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+10] = E_hydro;            
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+11] = KE;            
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+12] = rhoe;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+13] = 0.0;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+14] = 0.0;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+15] = 0.0;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+16] = 0.0;
+              EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+17] = 0.0;
+              ++position;
           }
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+0] += (r/sim_N_p(theSim,i)*dz) ;
@@ -191,25 +192,25 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 
 
     for (i=imin;i<imax;++i){
-      double rp = sim_FacePos(theSim,i,R_DIR);
-      double rm = sim_FacePos(theSim,i-1,R_DIR);
-      for (n=0;n<NUM_SCAL;++n){
-        // mult by delta r^2 because we are doing an r integration
-        ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1] * (rp*rp-rm*rm); 
-      }
+        double rp = sim_FacePos(theSim,i,R_DIR);
+        double rm = sim_FacePos(theSim,i-1,R_DIR);
+        for (n=0;n<NUM_SCAL;++n){
+            // mult by delta r^2 because we are doing an r integration
+            ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1] * (rp*rp-rm*rm); 
+        }
     }
 
     double mass_inner_wedge_temp = 0.0;
     if (mpisetup_MyProc(theMPIsetup)==0){
-      //printf("myproc: %d, rm(0): %e, rp(0): %e\n",mpisetup_MyProc(theMPIsetup),sim_FacePos(theSim,-1,R_DIR),sim_FacePos(theSim,0,R_DIR));
-      double rp = sim_FacePos(theSim,0,R_DIR);
-      double rm = sim_FacePos(theSim,-1,R_DIR);
-      for (j=0;j<sim_N_p(theSim,i);++j){
-        double dphi = cell_dphi(cell_single(theCells,0,j,0));
-        double dV = 0.5*(rp*rp-rm*rm)*dphi;
-        double rho = cell_prim(cell_single(theCells,0,j,0),RHO);
-        mass_inner_wedge_temp += rho*dV;
-      }
+        //printf("myproc: %d, rm(0): %e, rp(0): %e\n",mpisetup_MyProc(theMPIsetup),sim_FacePos(theSim,-1,R_DIR),sim_FacePos(theSim,0,R_DIR));
+        double rp = sim_FacePos(theSim,0,R_DIR);
+        double rm = sim_FacePos(theSim,-1,R_DIR);
+        for (j=0;j<sim_N_p(theSim,i);++j){
+            double dphi = cell_dphi(cell_single(theCells,0,j,0));
+            double dV = 0.5*(rp*rp-rm*rm)*dphi;
+            double rho = cell_prim(cell_single(theCells,0,j,0),RHO);
+            mass_inner_wedge_temp += rho*dV;
+        }
     }
     MPI_Allreduce( ScalarDiag_temp,ScalarDiag_reduce , NUM_SCAL, MPI_DOUBLE, MPI_SUM, sim_comm);
     MPI_Allreduce( VectorDiag_temp,VectorDiag_reduce , num_r_points_global*NUM_VEC, MPI_DOUBLE, MPI_SUM, sim_comm);
@@ -236,50 +237,50 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     double ZMAX = sim_MAX(theSim,Z_DIR);
 
     for (n=0;n<NUM_SCAL;++n){
-      ScalarDiag_reduce[n] *= dtout/((ZMAX-ZMIN)*(RMAX*RMAX-RMIN*RMIN));
+        ScalarDiag_reduce[n] *= dtout/((ZMAX-ZMIN)*(RMAX*RMAX-RMIN*RMIN));
     }
 
     int req1_found = 0;
     double Mdot_near_req1,r_near_req1;
     for (i=0;i<num_r_points_global;++i){
-      double r = VectorDiag_reduce[i*NUM_VEC]/(ZMAX-ZMIN);
-      if (r>1.0 && req1_found==0){
-        Mdot_near_req1 = VectorDiag_reduce[i*NUM_VEC+5]*2.*M_PI*r/(ZMAX-ZMIN);
-        r_near_req1 = r;
-        req1_found = 1;
-      }
-      for (n=0;n<NUM_VEC;++n){
-        VectorDiag_reduce[i*NUM_VEC+n] *= dtout/(ZMAX-ZMIN);
-      }
+        double r = VectorDiag_reduce[i*NUM_VEC]/(ZMAX-ZMIN);
+        if (r>1.0 && req1_found==0){
+            Mdot_near_req1 = VectorDiag_reduce[i*NUM_VEC+5]*2.*M_PI*r/(ZMAX-ZMIN);
+            r_near_req1 = r;
+            req1_found = 1;
+        }
+        for (n=0;n<NUM_VEC;++n){
+            VectorDiag_reduce[i*NUM_VEC+n] *= dtout/(ZMAX-ZMIN);
+        }
     }
 
     if(mpisetup_MyProc(theMPIsetup)==0){
-      char DiagMdotFilename[256];
-      sprintf(DiagMdotFilename,"DiagMdot.dat");
-      FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
-      fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_inside_1_reduce,mass_inner_wedge_reduce,gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),gravMass_Macc(theGravMasses,0),gravMass_Macc(theGravMasses,1),mass_near_bh0_r0p2_reduce,mass_near_bh1_r0p2_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_r0p4_reduce);       
-      fclose(DiagMdotFile);
+        char DiagMdotFilename[256];
+        sprintf(DiagMdotFilename,"DiagMdot.dat");
+        FILE * DiagMdotFile = fopen(DiagMdotFilename,"a");
+        fprintf(DiagMdotFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e\n",timestep_get_t(theTimeStep), Mdot_near_req1,r_near_req1,mass_inside_1_reduce,mass_inner_wedge_reduce,gravMass_Mdot(theGravMasses,0),gravMass_Mdot(theGravMasses,1),gravMass_Macc(theGravMasses,0),gravMass_Macc(theGravMasses,1),mass_near_bh0_r0p2_reduce,mass_near_bh1_r0p2_reduce,mass_near_bh0_r0p4_reduce,mass_near_bh1_r0p4_reduce);       
+        fclose(DiagMdotFile);
     }
 
     //We are doing time averaged diagnostics, so mult by delta t and add it
     //We will divide by the total delta next time we save to disk;
     for (i=0;i<num_r_points_global;++i){
-      for (n=0;n<NUM_VEC;++n){
-        theDiagnostics->VectorDiag[i][n] += VectorDiag_reduce[i*NUM_VEC+n] ;
-      }
+        for (n=0;n<NUM_VEC;++n){
+            theDiagnostics->VectorDiag[i][n] += VectorDiag_reduce[i*NUM_VEC+n] ;
+        }
     }
     for (n=0;n<NUM_SCAL;++n){
-      theDiagnostics->ScalarDiag[n] += ScalarDiag_reduce[n] ;
+        theDiagnostics->ScalarDiag[n] += ScalarDiag_reduce[n] ;
     }
 
     position=0;
     for (i=0;i<num_r_points_global;++i){
-      for(j = 0; j < theDiagnostics->N_p_global[i]; j++){
-        for (n=0;n<NUM_EQ;++n){
-          theDiagnostics->EquatDiag[position][n] = EquatDiag_reduce[position*NUM_EQ+n];
+        for(j = 0; j < theDiagnostics->N_p_global[i]; j++){
+            for (n=0;n<NUM_EQ;++n){
+                theDiagnostics->EquatDiag[position][n] = EquatDiag_reduce[position*NUM_EQ+n];
+            }
+            ++position;
         }
-        ++position;
-      }
     }
 
     //update output time;
