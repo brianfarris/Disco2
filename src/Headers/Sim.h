@@ -53,7 +53,7 @@ struct Sim {
   int GRAV2D;
   double G_EPS;
   int RhoSinkOn;
-  double PHI_ORDER;
+  int PHI_ORDER;
   double RHO_FLOOR;
   double CS_FLOOR;
   double CS_CAP;
@@ -111,7 +111,7 @@ int sim_W_ANALYTIC_TYPE(struct Sim *);
 int sim_GRAV2D(struct Sim *);
 double sim_G_EPS(struct Sim *);
 int sim_RhoSinkOn(struct Sim *);
-double sim_PHI_ORDER(struct Sim *);
+int sim_PHI_ORDER(struct Sim *);
 double sim_RHO_FLOOR(struct Sim *);
 double sim_CS_FLOOR(struct Sim *);
 double sim_CS_CAP(struct Sim *);

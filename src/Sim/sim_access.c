@@ -128,7 +128,7 @@ double sim_G_EPS(struct Sim *theSim){
 int sim_RhoSinkOn(struct Sim *theSim){
   return(theSim->RhoSinkOn);
 }
-double sim_PHI_ORDER(struct Sim *theSim){
+int sim_PHI_ORDER(struct Sim *theSim){
   return(theSim->PHI_ORDER);
 }
 double sim_RHO_FLOOR(struct Sim *theSim) {

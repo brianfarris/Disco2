@@ -115,7 +115,7 @@ void cell_init_milos_macfadyen(struct Cell ***theCells,struct Sim *theSim,struct
         //double PoRho = 1./Mach/Mach/Gam;
         double PoRho = (cs0*cs0+cs1*cs1)/Gam;
 
-        double n = sim_PHI_ORDER(theSim);
+        int n = sim_PHI_ORDER(theSim);
         double Pot1 = M0/pow( pow(dist_bh0,n) + pow(eps0,n) , 1./n );
         double Pot2 = M1/pow( pow(dist_bh1,n) + pow(eps1,n) , 1./n );
 

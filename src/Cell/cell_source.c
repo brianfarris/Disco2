@@ -8,7 +8,7 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-double fgrav( double M , double r , double eps, double n ){
+double fgrav( double M , double r , double eps, int n ){
     return( M*pow(r,n-1.)/pow( pow(r,n) + pow(eps,n) ,1.+1./n) );
 }
 
@@ -48,7 +48,7 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, 
 
 void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p , double r , double phi , double * fr , double * fp ){
     double G_EPS=sim_G_EPS(theSim);
-    double PHI_ORDER=sim_PHI_ORDER(theSim);
+    int PHI_ORDER=sim_PHI_ORDER(theSim);
 
     double rp = gravMass_r(theGravMasses,p);
     double pp = gravMass_phi(theGravMasses,p);
