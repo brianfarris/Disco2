@@ -77,8 +77,8 @@ int sim_NUM_Q(struct Sim *theSim){
 int sim_NUM_C(struct Sim *theSim){
   return(theSim->NUM_C);
 }
-int sim_MOVE_CELLS(struct Sim *theSim){
-  return(theSim->MOVE_CELLS);
+int sim_W_NUMERIC_TYPE(struct Sim *theSim){
+  return(theSim->W_NUMERIC_TYPE);
 }
 int sim_NumGravMass(struct Sim *theSim){
   return(theSim->NumGravMass);
@@ -116,8 +116,8 @@ double sim_CFL(struct Sim *theSim){
 double sim_PLM(struct Sim *theSim){
   return(theSim->PLM);
 }
-int sim_W_A_TYPE(struct Sim *theSim){
-  return(theSim->W_A_TYPE);
+int sim_W_ANALYTIC_TYPE(struct Sim *theSim){
+  return(theSim->W_ANALYTIC_TYPE);
 }
 int sim_GRAV2D(struct Sim *theSim){
   return(theSim->GRAV2D);

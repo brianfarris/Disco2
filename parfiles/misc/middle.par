@@ -32,7 +32,7 @@ BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry          0
 
-Move_Cells              0
+w_numeric_type          0
 RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index         1.666666666666666666666666666666666666
 Cooling                 1
@@ -49,7 +49,7 @@ CFL			0.1
 PLM			1.0
 
 POWELL                  1
-w_a_type                1
+w_analytic_type         1
 Grav_2D			1
 G_EPS			0.0
 

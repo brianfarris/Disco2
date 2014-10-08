@@ -32,7 +32,7 @@ NoInnerBC               0
 BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
 
-Move_Cells              0
+w_numeric_type          0
 RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index         1.3333333333333
 Cooling                 1
@@ -45,7 +45,7 @@ PoRho_r1                1.0
 CFL			0.1
 PLM			1.0
 
-w_a_type                0
+w_analytic_type         0
 Grav_2D			1
 G_EPS			0.0
 

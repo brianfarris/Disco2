@@ -11,7 +11,7 @@
 
 void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
   int i,j,k;
-  if (sim_MOVE_CELLS(theSim) == C_WCELL){
+  if (sim_W_NUMERIC_TYPE(theSim) == C_WCELL){
     printf("THIS OPTION SHOULD NOT BE USED RIGHT NOW. WE NEED TO KNOW THE ANALYTIC RADIAL DERIV OF W\n");
     exit(1);
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -28,7 +28,7 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
       }
     }
 
-  } else if( sim_MOVE_CELLS(theSim) == C_RIGID ) {
+  } else if( sim_W_NUMERIC_TYPE(theSim) == C_RIGID ) {
     //printf("THIS OPTION SHOULD NOT BE USED RIGHT NOW. WE NEED TO KNOW THE ANALYTIC RADIAL DERIV OF W\n");
     //exit(1);
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -52,7 +52,7 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
       //exit(1);
     }
 
-  } else if (sim_MOVE_CELLS(theSim) == C_KEPLER ) {
+  } else if (sim_W_NUMERIC_TYPE(theSim) == C_KEPLER ) {
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
         double rp = sim_FacePos(theSim,i,R_DIR);
@@ -63,7 +63,7 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         }
       }
     }
-  } else if (sim_MOVE_CELLS(theSim) == C_OMEGA20) {
+  } else if (sim_W_NUMERIC_TYPE(theSim) == C_OMEGA20) {
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
         double rp = sim_FacePos(theSim,i,R_DIR);
@@ -74,7 +74,7 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         }
       }
     }
-  } else if (sim_MOVE_CELLS(theSim) == C_MILOS) {
+  } else if (sim_W_NUMERIC_TYPE(theSim) == C_MILOS) {
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
         double rp = sim_FacePos(theSim,i,R_DIR);
@@ -85,7 +85,7 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         }
       }
     }
-  } else if (sim_MOVE_CELLS(theSim) == C_POWERLAW){
+  } else if (sim_W_NUMERIC_TYPE(theSim) == C_POWERLAW){
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
         double rp = sim_FacePos(theSim,i,R_DIR);

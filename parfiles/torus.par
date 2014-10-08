@@ -28,14 +28,14 @@ MassRatio               0.0
 OrbShrinkTscale         1000000000000.0
 OrbShrinkT0             1000000000000.0
 NPCAP                   20 
-w_a_type                4
+w_analytic_type         4
 
 NoInnerBC               0
 BoundTypeR           1               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry          0
 
-Move_Cells              6
+w_numeric_type          6
 RiemannSolver           0           // 0 hllc, 1 hll
 Adiabatic_Index		1.66666666666666666666666
 Cooling                 0

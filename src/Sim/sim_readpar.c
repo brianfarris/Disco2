@@ -77,7 +77,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Num_Checkpoints"   , VAR_INT  , &(theSim->NUM_CHECKPOINTS)  );
       err += readvar( pfile , "Num_Diag_Dump"   , VAR_INT  , &(theSim->NUM_DIAG_DUMP)  );
       err += readvar( pfile , "Num_Diag_Measure"   , VAR_INT  , &(theSim->NUM_DIAG_MEASURE)  );
-      err += readvar( pfile , "Move_Cells"        , VAR_INT  , &(theSim->MOVE_CELLS)  );
+      err += readvar( pfile , "w_numeric_type"        , VAR_INT  , &(theSim->W_NUMERIC_TYPE)  );
       err += readvar( pfile , "RiemannSolver"   , VAR_INT , &(theSim->Riemann)  );
       err += readvar( pfile , "Adiabatic_Index"   , VAR_DOUB , &(theSim->GAMMALAW)  );
       err += readvar( pfile , "Cooling"   , VAR_INT , &(theSim->COOLING)  );
@@ -103,7 +103,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "HiResR0a"           , VAR_DOUB , &(theSim->HiResR0a)  );
       err += readvar( pfile , "HiResR0b"           , VAR_DOUB , &(theSim->HiResR0b)  );
       err += readvar( pfile , "HiResFac"           , VAR_DOUB , &(theSim->HiResFac)  );
-      err += readvar( pfile , "w_a_type"            , VAR_INT , &(theSim->W_A_TYPE));
+      err += readvar( pfile , "w_analytic_type"            , VAR_INT , &(theSim->W_ANALYTIC_TYPE));
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }

@@ -23,7 +23,6 @@ struct Sim {
   int BoundTypeR;
   int BoundTypeZ;
   int NoInnerBC;
-  double HoR;
   int Restart;
   int N_global[2];
   int NP_CONST;
@@ -38,7 +37,7 @@ struct Sim {
   int NUM_C;
   int NUM_N;
   int NUM_Q;
-  int MOVE_CELLS;   
+  int W_NUMERIC_TYPE;   
   int NumGravMass;
   double MassRatio;
   double OrbShrinkTscale;
@@ -68,7 +67,7 @@ struct Sim {
   double HiResR0a;
   double HiResR0b;
   double HiResFac;
-  int W_A_TYPE;
+  int W_ANALYTIC_TYPE;
 };
 #endif
 
@@ -95,7 +94,7 @@ int sim_offset(struct Sim *);
 int sim_ng(struct Sim *);
 int sim_Nghost_min(struct Sim *,int);
 int sim_Nghost_max(struct Sim *,int);
-int sim_MOVE_CELLS(struct Sim *);
+int sim_W_NUMERIC_TYPE(struct Sim *);
 int sim_NumGravMass(struct Sim *);
 double sim_MassRatio(struct Sim *);
 double sim_OrbShrinkTscale(struct Sim *);
@@ -108,7 +107,7 @@ int sim_VISC_CONST(struct Sim *);
 double sim_PoRho_r1(struct Sim *);
 double sim_CFL(struct Sim *);
 double sim_PLM(struct Sim *);
-int sim_W_A_TYPE(struct Sim *);
+int sim_W_ANALYTIC_TYPE(struct Sim *);
 int sim_GRAV2D(struct Sim *);
 double sim_G_EPS(struct Sim *);
 int sim_RhoSinkOn(struct Sim *);
