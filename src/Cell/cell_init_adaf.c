@@ -27,8 +27,10 @@ void cell_init_adaf_nocool(struct Cell *c, double r, double phi, double z, struc
 
     rho = rho0 * pow(r/r0, -0.5);
     Pp = P0 * pow(r/r0, -1.5);
-    vr = vr0 * pow(r/r0, -0.5);
-    vp = vp0 * pow(r/r0, -1.5);
+    vr = vr0 * pow((r+M)/(r0+M), -0.5);
+    vp = vp0 * pow((r+M)/(r0+M), -1.5);
+
+
 /*
     if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
