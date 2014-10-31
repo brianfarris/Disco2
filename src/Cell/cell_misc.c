@@ -102,22 +102,28 @@ void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,voi
   double ZMAX = sim_MAX(theSim,Z_DIR);
 
   struct Cell * initialCell = cell_single_create(theSim);
-  double R0 = 1./sim_DAMP_TIME(theSim)/2./M_PI;
+  double R0 = 1./(2.0*M_PI*sim_DAMP_TIME(theSim));
 
   int i,j,k,q;
-  for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+  for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i )
+  {
     double rp = sim_FacePos(theSim,i,R_DIR);
     double rm = sim_FacePos(theSim,i-1,R_DIR);
     double r = .5*(rp+rm);
 
-    if( r < sim_RDAMP_INNER(theSim) || r > sim_RDAMP_OUTER(theSim) ){
+    if( r < sim_RDAMP_INNER(theSim) || r > sim_RDAMP_OUTER(theSim) )
+    {
       double rate = R0*(r-sim_RDAMP_INNER(theSim))/(RMIN-sim_RDAMP_INNER(theSim));
-      if( r > sim_RDAMP_OUTER(theSim) ) rate = R0*(r-sim_RDAMP_OUTER(theSim))/(RMAX-sim_RDAMP_OUTER(theSim));
+      if( r > sim_RDAMP_OUTER(theSim) ) 
+        rate = R0*(r-sim_RDAMP_OUTER(theSim))/(RMAX-sim_RDAMP_OUTER(theSim));
 
-      for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
+      for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k )
+      {
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j )
+        {
           (*single_init_ptr)(initialCell,theSim,i,j,k);
-          for( q=0 ; q<NUM_Q ; ++q ){
+          for( q=0 ; q<NUM_Q ; ++q )
+          {
             double dprim = initialCell->prim[q] - theCells[k][i][j].prim[q];
             theCells[k][i][j].prim[q] += (1.-exp(-rate*dt))*dprim;
           }

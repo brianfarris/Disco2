@@ -133,7 +133,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     c[4] = E*E-s2;
     if(c[4] <= 0)
     {
-        printf("ERROR: E2 <= s2!: e^2 = %lg, s^2 = %lg\n",e*e,s2);
+        printf("ERROR: E2 <= s2!: e^2 = %lg, s^2 = %lg\n",E*E,s2);
         printf("r = %lg, dV = %lg\n", r, dV);
         printf("rho = %lg, P = %lg, vr = %lg, vp = %lg, vz = %lg\n",prim[RHO],prim[PPP],prim[URR],prim[UPP],prim[UZZ]);
         printf("rhostar = %lg, tau = %lg, Sr = %lg, Sp = %lg, Sz = %lg\n",cons[DDD],cons[TAU],cons[SRR],cons[LLL],cons[SZZ]);
@@ -189,18 +189,18 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     if(rho < RHO_FLOOR)
     {
         rho = RHO_FLOOR;
-        printf("Whoa, not enough density pal!\n");
+        printf("Whoa, not enough density pal! (r=%.12g)\n", r);
     }
     Pp = gam * rho * hmo;
     if(Pp < CS_FLOOR*CS_FLOOR*rho*(hmo+1)/GAMMALAW)
     {
         Pp = CS_FLOOR*CS_FLOOR*rho*(hmo+1)/GAMMALAW;
-        printf("Whoa, that's a pretty low pressure bub!\n");
+        printf("Whoa, that's a pretty low pressure bub! (r=%.12g)\n", r);
     }
     if(Pp > CS_CAP*CS_CAP*rho*(hmo+1)/GAMMALAW)
     {
         Pp = CS_CAP*CS_CAP*rho*(hmo+1)/GAMMALAW;
-        printf("Whoa, that's a really high pressure chum!\n");
+        printf("Whoa, that's a really high pressure chum! (r=%.12g)\n", r);
     }
 
     for(i=0; i<3; i++)

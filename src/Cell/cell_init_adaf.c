@@ -27,24 +27,35 @@ void cell_init_adaf_nocool(struct Cell *c, double r, double phi, double z, struc
 
     rho = rho0 * pow(r/r0, -0.5);
     Pp = P0 * pow(r/r0, -1.5);
-    vr = vr0 * pow((r+M)/(r0+M), -0.5);
-    vp = vp0 * pow((r+M)/(r0+M), -1.5);
+    if(r > 2*M)
+    {
+        vr = vr0 * pow((r+4*M)/(r0+4*M), -0.5);
+        vp = vp0 * pow((r+4*M)/(r0+4*M), -1.5);
+    }
+    else
+    {
+        vr = vr0 * pow((6*M)/(r0+4*M), -0.5);
+        vp = vp0 * pow((6*M)/(r0+4*M), -1.5);
+    }
 
 
-/*
     if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
-        if(r < 10)
-            vr = -2*M/(r+2*M);
-        else
-            vr = -Mdot/(2*M_PI*rho*r);
+        double fac = 1.0/(1.0 + 2*M*vr/(r-2*M));
+        vr *= fac;
+        vp *= fac;
 
-        if(r>2*M)
-            vp = exp(-1.0/(r/M-2.0)) * sqrt(M/(r*r*r));
-        else
+        if(1.0-2*M/r-4*M*vr/r-vr*vr*(1+2*M/r)-vp*vp*r*r < 0.0)
+        {
             vp = 0.0;
+            //vr = -2*M/(r+2*M);
+            if(r < 2*M)
+                vr = (r/(2*M))*((r-2*M)/(r+2*M)-0.1) + (1-r/(2*M))*(-1.0);
+            else
+                vr = (r-2*M)/(r+2*M)-0.1;
+        }
     }
-  */  
+
     c->prim[RHO] = rho;
     c->prim[PPP] = Pp;
     c->prim[URR] = vr;

@@ -169,7 +169,7 @@ double metric_frame_U_u_euler(struct Metric *g, int mu, struct Sim *theSim)
     if(mu == 0)
         return 1.0/metric_lapse(g);
     else if (mu > 0 && mu < 4)
-        return metric_shift_u(g,mu-1) / metric_lapse(g);
+        return -metric_shift_u(g,mu-1) / metric_lapse(g);
     return 0.0;
 }
 

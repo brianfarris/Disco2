@@ -9,7 +9,7 @@ InitialDataType        19       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 18 Accreting Disc, 19 ADAF
 GravMassType            0       // 0 none, 1 single, 2 binary
 Background              2       // 0 Newtonian, 1 GR, 2 GRvisc
-Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
+Metric                  2       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS
 Frame                   0       // 0 Euler, 1 Keplerian
 Restart                 0       // If this=1 restart using input.h5
@@ -18,7 +18,7 @@ Restart                 0       // If this=1 restart using input.h5
 NumR			100			//Radial Zones
 NumZ			1           //Vertical Zones
 ng              2
-R_Min		    2.5
+R_Min		    1.0
 R_Max			1.0e2
 Z_Min			-1.0
 Z_Max			1.0
@@ -27,7 +27,7 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                2.0e4
+Time_Max                1.0e3
 Num_Checkpoints	        1000
 Num_Diag_Dump           20
 Num_Diag_Measure        20
@@ -40,12 +40,12 @@ BoundTypeZTop           2       // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2       // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry            1
 
-Move_Cells              2       // 0 None, 2 Keplerian
+Move_Cells              0       // 0 None, 2 Keplerian
 RiemannSolver           1           // 0 hllc, 1 hll
 Adiabatic_Index         1.3333333333
 
 //Numerical Parameters
-CFL			0.5
+CFL			0.1
 PLM			1.0
 
 Grav_2D			1
@@ -77,9 +77,9 @@ Vel_Cap			100.0
 runtype                 0
 
 //DAMPING
-DAMP_TIME               -1.0        // Set negative to turn off
-RDAMP_INNER             0.0
-RDAMP_OUTER             0.0
+DAMP_TIME               1.0e-1        // Set negative to turn off
+RDAMP_INNER             1.5
+RDAMP_OUTER             1.0e100
 
 RLogScale               0.001
 ZLogScale               1000.0

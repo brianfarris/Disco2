@@ -102,6 +102,7 @@ int main(int argc, char **argv) {
   metric_init_background(theSim);
   if(sim_Background(theSim)==GR || sim_Background(theSim)==GRVISC1)
     metric_init_metric(theSim);
+  eos_init(theSim);
 
   printf("Setting initial conditions.\n");
   // set initial data 
