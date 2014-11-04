@@ -119,9 +119,10 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim, struct GravMass *
 	
 
 	double OmegaK = pow(r,-1.5);
-	//double cs = r*OmegaK*HoR; //cst MAch
-	double cs = HoR; //cst cs
-	double PoRho = cs*cs/Gam;// *exp(fac*(Pot0+Pot1)/cs/cs);
+	double cs = r*OmegaK*HoR; //cst MAch
+	//double cs = HoR; //cst cs
+	
+	double PoRho = cs*cs/Gam;//*exp(fac*(Pot0+Pot1)/cs/cs);
 
 	//PoRho = (PoRho0+PoRho1)*exp(fac*(Pot0+Pot1)/cs2);
 	

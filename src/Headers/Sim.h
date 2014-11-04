@@ -83,6 +83,7 @@ struct Sim {
   double Rsink0;
   double Rsink1;
   double tmaxOrb;
+  int Lim_InZone;
 };
 #endif
 
@@ -155,6 +156,7 @@ double sim_vRate(struct Sim *);
 double sim_Rsink0(struct Sim *);
 double sim_Rsink1(struct Sim *);
 double sim_tmaxOrb(struct Sim *);
+int sim_Lim_InZone(struct Sim *);
 int sim_GravMassType(struct Sim * );
 //set Sink radii
 void sim_set_Rsink0(struct Sim * , double);

@@ -38,6 +38,12 @@ void sim_set_N_p(struct Sim * theSim){
       if (theSim->NPCAP>0){
         if (theSim->N_p[i]>theSim->NPCAP) theSim->N_p[i] = theSim->NPCAP;
       }
+      // Add ability to change number of cells in r<rmin region when not using inner BC
+      if (theSim->NoInnerBC == 1 ){
+      	if (sim_FacePos(theSim,i-1,R_DIR) < 0.0501){
+      	  if (theSim->Lim_InZone > 0) theSim->N_p[i] = theSim->Lim_InZone;
+      	}
+      }
       //printf("%e %e %e %d\n",r_cell,dr,2.*M_PI*r_cell/theSim->N_p[i],theSim->N_p[i]);
     }
   }

@@ -119,6 +119,7 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Rsink0"            , VAR_DOUB , &(theSim->Rsink0));
       err += readvar( pfile , "Rsink1"            , VAR_DOUB , &(theSim->Rsink1));
       err += readvar( pfile , "tmaxOrb"            , VAR_DOUB , &(theSim->tmaxOrb));
+      err += readvar( pfile , "Lim_InZone"            , VAR_INT , &(theSim->Lim_InZone));
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }

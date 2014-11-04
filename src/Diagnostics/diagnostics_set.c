@@ -32,11 +32,12 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     //Rot Frame or no here
     double tramp  = sim_tramp(theSim);
     double vRate  = sim_vRate(theSim);
+    int Np = sim_N_p(theSim,0);
     if(mpisetup_MyProc(theMPIsetup)==0){
       char CstParamFilename[256];
       sprintf(CstParamFilename,"CstParam.dat");
       FILE * CstParamFile = fopen(CstParamFilename,"a");
-      fprintf(CstParamFile,"%e %e %e %e %e %e %e %e %e %e %i %e %e %e %e %e %e \n", q, sep0, alpha, Mach0, MdoMs, rmin, rmax, tmigon, tacc, eps, nu_cst, Rcut, Gam, tramp, vRate, Rsink0, Rsink1);
+      fprintf(CstParamFile,"%e %e %e %e %e %e %e %e %e %e %i %e %e %e %e %e %e \n", q, sep0, alpha, Mach0, MdoMs, rmin, rmax, tmigon, tacc, eps, nu_cst, Rcut, Gam, tramp, vRate, Rsink0, Rsink1, Np);
       fclose(CstParamFile);
     }
   }
@@ -63,6 +64,10 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     //
     double TrScal_temp   = 0.0; // sum total trq each measure
     double TrScal_reduce = 0.0;
+    double Pow_temp   = 0.0; // sum total trq each measure
+    double Pow_reduce = 0.0;
+
+
 
     double mass_near_bh0_r0p1_temp = 0.0;
     double mass_near_bh1_0p5RH_temp = 0.0;
@@ -201,7 +206,27 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           if (rp<=1.0){
             mass_inside_1_temp += rho*dV;
           }
-          double passive_scalar = cell_prim(cell_single(theCells,i,j,k),5);
+
+	  //double passive_scalar;
+	  //double passive_scalar2;
+	  //double passive_scalar3;
+	  //if (sim_NUM_Q(theSim) > sim_NUM_C(theSim)){
+	  //  passive_scalar   = cell_prim(cell_single(theCells,i,j,k),5);
+	  //}
+	  
+          //if (sim_NUM_Q(theSim) > (sim_NUM_C(theSim) + 1) ){
+	  //  passive_scalar   = cell_prim(cell_single(theCells,i,j,k),5);
+	  //  passive_scalar2  = cell_prim(cell_single(theCells,i,j,k),6);
+	  //}
+
+          //if (sim_NUM_Q(theSim) > (sim_NUM_C(theSim) + 2) ){
+	  double passive_scalar   = cell_prim(cell_single(theCells,i,j,k),5);
+	  double passive_scalar2  = cell_prim(cell_single(theCells,i,j,k),6);
+	  double passive_scalar3  = cell_prim(cell_single(theCells,i,j,k),7);
+          //}
+
+
+
           double Omega = gravMass_omega(theGravMasses,1); //DD: changed from double Omega = 1.
 	  double q = sim_MassRatio(theSim);       // Added Mass ratio DD 
           double t = timestep_get_t(theTimeStep);
@@ -300,10 +325,11 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 	  //gravMassForce( theGravMasses , theSim , 0 , r , phi , &fr0 , &fp0 );
 	  //gravMassForce( theGravMasses , theSim , 1 , r , phi , &fr1 , &fp1 );
           if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
-            if (dist_bh1 > Rcut*Rhill){ //add 2pi to Trq to not azi average - see Scalar int below                                                  
+            if (dist_bh1 > Rcut*Rhill){ //add 2pi to Trq to not azi average - see Scalar int below
 	      //TrScal_temp -= ( r_bh0*fp0 * rho*r*dphi*(rp-rm) );
-	      TrScal_temp -= ( r_bh1*fsec_phi * (rho-1.0) *r*dphi*(rp-rm) );	      
-              //TrScal_temp   -= (r*rho* (fBin_phi) * r*dphi*(rp-rm));
+	      //TrScal_temp -= ( r_bh1*fsec_phi * (rho-1.0) *r*dphi*(rp-rm) );	      
+              TrScal_temp   -= (r*rho* (fBin_phi) * r*dphi*(rp-rm));
+	      Pow_temp      -= rho* (vp*fBin_phi + vr*Fr)* r*dphi*(rp-rm); // E/s change of bin
             }
 	  }	  	    
 
@@ -358,7 +384,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+17] = passive_scalar;  //DD//GradPsi_r;
 	    EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+18] = -r*rho*(fBin_phi);//-(r_bh0*fp0+r_bh1*fp1)*rho;
 	    EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+19] = -r_bh1*rho*(fsec_phi);
-	                                                                                      //dPhi_dphi/r; //DDwas 12
+	    EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+20] = passive_scalar2;
+	    EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+21] = passive_scalar3;
             ++position;
           }
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
@@ -380,6 +407,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += 0.0;//(180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (GradPsi_r/sim_N_p(theSim,i)*dz) ; 
 	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+20] += (passive_scalar/sim_N_p(theSim,i)*dz) ;
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+21] += (passive_scalar2/sim_N_p(theSim,i)*dz) ;
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+22] += (passive_scalar3/sim_N_p(theSim,i)*dz) ;
 	  //
 	  //
 	  // Don't count torques within a certain radius from secondary add r and 2pi for integration
@@ -458,6 +487,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     MPI_Allreduce( EquatDiag_temp,EquatDiag_reduce ,theDiagnostics->N_eq_cells*NUM_EQ, MPI_DOUBLE, MPI_SUM, sim_comm);
 
     MPI_Allreduce( &TrScal_temp, &TrScal_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm); //DD
+    MPI_Allreduce( &Pow_temp, &Pow_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm); //DD
 
     MPI_Allreduce( &mass_near_bh0_r0p1_temp,&mass_near_bh0_r0p1_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
     MPI_Allreduce( &mass_near_bh1_0p5RH_temp, &mass_near_bh1_0p5RH_reduce , 1, MPI_DOUBLE, MPI_SUM, sim_comm);
@@ -584,7 +614,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagBPFilename[256];
       sprintf(DiagBPFilename,"BinaryParams.dat");
       FILE * DiagBpFile = fopen(DiagBPFilename,"a");
-      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e  \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, Om, Om, Om, gravMass_total_torque(theGravMasses,0), TrScal_reduce);
+      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e  \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, Om, Om, Pow_reduce, gravMass_total_torque(theGravMasses,0), TrScal_reduce);
       fclose(DiagBpFile);
     }
 

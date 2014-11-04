@@ -12,7 +12,7 @@ void cell_single_init_SimpleKepler(struct Cell *theCell, struct Sim *theSim,int 
 
 	double rho   = 1.0;
 	double Gam = sim_GAMMALAW(theSim);
-	
+	double sep = sim_sep0(theSim);
 
 	double HoR = sim_HoR(theSim);
 	double Mach   = 1./HoR;                   //For uniform Mach	
@@ -70,9 +70,9 @@ void cell_single_init_SimpleKepler(struct Cell *theCell, struct Sim *theSim,int 
 	theCell->prim[RHO] = rho;
 	theCell->prim[PPP] = Pp;
 	theCell->prim[URR] = vr;
-	theCell->prim[UPP] = omega;// - sim_rOm_a(theSim,r,sep)/r; //initial sep set to 1.
+	theCell->prim[UPP] = omega - sim_rOm_a(theSim,r,sep)/r; //initial sep set to 1.
 	theCell->prim[UZZ] = 0.0;
-	theCell->wiph = r*OmegaK;
+	theCell->wiph = 0.0;  //r*OmegaK;
 	if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = passive_scalar;	
 }
 
@@ -84,7 +84,7 @@ void cell_init_SimpleKepler(struct Cell ***theCells,struct Sim *theSim,struct MP
 
   //printf("rbh1: %e, rbh2: %e, mbh1: %e, mbh2: %e\n",gravMass_r(theGravMasses,0),gravMass_r(theGravMasses,1),gravMass_M(theGravMasses,0),gravMass_M(theGravMasses,1));
 
-
+  double sep = sim_sep0(theSim);
   double HoR = sim_HoR(theSim);   // for uniform Mach
   double Mach   = 1./HoR;
   
@@ -160,9 +160,9 @@ void cell_init_SimpleKepler(struct Cell ***theCells,struct Sim *theSim,struct MP
         theCells[k][i][j].prim[RHO] = rho;
         theCells[k][i][j].prim[PPP] = Pp;
         theCells[k][i][j].prim[URR] = vr;
-        theCells[k][i][j].prim[UPP] = omega;// -  sim_rOm_a(theSim,r,sep)/r; //initial sep set to 1. 
+        theCells[k][i][j].prim[UPP] = omega -  sim_rOm_a(theSim,r,sep)/r; //initial sep set to 1. 
         theCells[k][i][j].prim[UZZ] = 0.0;
-        theCells[k][i][j].wiph = r*OmegaK;
+        theCells[k][i][j].wiph = 0.0; //r*OmegaK;
 	if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCells[k][i][j].prim[sim_NUM_C(theSim)] = passive_scalar;
       }
     }

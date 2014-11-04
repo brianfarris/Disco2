@@ -61,34 +61,6 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	double dist_bh0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
 	double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
 	
-	///```````````````````````````0
-	//double cs0,cs1;
-        //double PoRho0,PoRho1,PoRho;
-	
-	/*
-	double vp0,vp1;
-	if ( dist_bh0>sim_Rsink0(theSim) ){
-	  vp0 = pow(dist_bh0,-0.5) * sqrt(M0) ;
-	  cs0 = HoR*vp0;
-	  PoRho0 = cs0*cs0/Gam;
-        } else{
-	  vp0 = pow(sim_Rsink0(theSim),-0.5);
-	  cs0 = HoR*vp0;
-	  PoRho0 = cs0*cs0/Gam;
-	  //PoRho = T0 * exp(-r*r/(r_a*r_a));                                                                                             
-        }
-        if (dist_bh1>sim_Rsink1(theSim)){
-	  vp1 = pow(dist_bh1,-0.5) * sqrt(M1) ;
-	  cs1 = HoR*vp1;
-	  PoRho1 = cs1*cs1/Gam;
-        } else{
-	    vp1 = pow(sim_Rsink1(theSim),-0.5);
-	  cs1 = HoR*vp1;
-	  PoRho1 = cs1*cs1/Gam;
-	  //PoRho = T0 * exp(-r*r/(r_a*r_a));                                                                                             
-        }
-
-	*/
 
 	double OmegaK = pow(r,-1.5);
 
@@ -102,7 +74,7 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	
         //PoRho = PoRho0+PoRho1;
    	//PoRho = (cs0*cs0 + cs1*cs1)/Gam;
-	double PoRho = cs*cs/Gam;   //for any gamma law eqn of state (adiabatic or iso)
+	double PoRho = cs2/Gam;   //for any gamma law eqn of state (adiabatic or iso)
 
 				
 	double n = sim_PHI_ORDER(theSim);
@@ -145,16 +117,21 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 
 	double omega;
 	//if (MMOm==1){
-	omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
-	double O2 = omega*omega + 1./2.*1/r * drcs2/Gam;    // 1/2 for rho -> sigma?- OmegaK*OmegaK/Mach/Mach/Gam;//add +1/(sigma r)*dP/dr trm 
+	//omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
+	//double O2 = omega*omega + 1./2.*1/r * drcs2/Gam;    // 1/2 for rho -> sigma?- OmegaK*OmegaK/Mach/Mach/Gam;//add +1/(sigma r)*dP/dr trm 
 	//}
 	
 	//if (TAddV==1){
 	//double O2 = pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0 + pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1;
 	//}
+	//omega = sqrt(O2);
 
-	omega = sqrt(O2);
-   
+	//if (VirialV==1){
+	double vp_vir = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-0.5)*M0 + pow(dist_bh1*dist_bh1+eps*eps,-0.5)*M1);
+	omega = vp_vir/r;
+	//}
+
+
 
 	double vr;
         double vrout;
@@ -170,7 +147,7 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	}
 	
 	// st vr=0 inside a the cavity if it exists
-	if (  r < 3.*sep*( (log(1000.) + 2.*log(massratio))/log(10.) )   ) {//this function goes to 0 at q<0.04, =1 at q=0.1, =3 at q=1
+	if (  r < (3. + 2.146*log10(massratio))   ) {//this function goes to 0 at q<0.04, =.9 at q=0.1, =3 at q=1
 	  vr =0.0;
 	}
 
@@ -187,16 +164,71 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
 				
 	//double Pp = 1./20.*1./20.*rho/Gam; //cs*cs*rho/Gam * r;	//mult by r to get cst Pressure
-	//double Pp = cs*cs*rho/Gam;
 	double Pp = PoRho * rho;
 
+	//R3B STUFF
+	double xx = r*cos(phi);
+	double yy = r*sin(phi);
 
-	double passive_scalar;
-	if (r<1.0){
-	  passive_scalar = 1.;	  
-	}else{
-	  passive_scalar = 0.000000001;
+	double u2 = sep*massratio/(1.+massratio);
+	double u1 = sep - u2;
+
+
+	double TU = xx*xx + yy*yy + 2.*(u1/dist_bh0 + u2/dist_bh1) ;
+	double CJ = TU - pow((vp_vir - r*pow(sep,-1.5)),2.); 
+	
+
+	double CJcrit = 100.0;
+	double xL2 = 1.1;
+	if (massratio == 1.0){
+          CJcrit = 3.4568;
+	  xL2 = 1.19841;
+        }
+        if (massratio == 0.1){
+          CJcrit = 3.45154;
+          xL2 = 1.25608;
+        }
+	if (massratio == 0.05){
+	  CJcrit = 3.34669;
+	  xL2 = 1.22557;
 	}
+	if (massratio == 0.01){
+	  CJcrit = 3.15345;
+	  xL2 = 1.14632;
+	}
+        if (massratio == 0.001){
+          CJcrit = 3.03859;
+	  xL2 = 1.06989;
+        }
+
+
+	double passive_scalar=0.000000001;
+        if (r< xL2 && CJ>CJcrit){
+            passive_scalar = 1.;
+            //printf("Setting Passive Scalar1");
+        }
+
+        double passive_scalar2=0.000000001;
+        if (r > xL2 && CJ>CJcrit){
+            passive_scalar2 = 1.;
+            //printf("Setting Passive Scalar1");
+        }
+
+	double passive_scalar3=0.000000001;
+        if (CJ<CJcrit){
+	  passive_scalar3 = 1.;
+        }
+
+
+
+	//        double passive_scalar2=0.000000001;
+	// if (r>1.4 && r<1.5){
+        //  if (phi<M_PI*(1./16.) && phi > -M_PI*(1./16.)){
+        //    passive_scalar2 = 1.;
+	//    //printf("Setting Passive Scalar1");
+        //  }
+        //}
+
 
 
 	theCell->prim[RHO] = rho*exp(fac*(Pot0+Pot1)*Gam/cs2);
@@ -204,14 +236,19 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	theCell->prim[URR] = vr;
 	theCell->prim[UPP] = omega - sim_rOm_a(theSim,r,sep)/r; //initial sep set to 1.
 	theCell->prim[UZZ] = 0.0;
-	//	theCell->prim[5] = passive_scalar;
+	theCell->prim[5] = passive_scalar;
+	theCell->prim[6] = passive_scalar2;
+	theCell->prim[7] = passive_scalar3;
 	theCell->wiph = 0.0;
 	theCell->divB = 0.0;
 	theCell->GradPsi[0] = 0.0;
 	theCell->GradPsi[1] = 0.0;
 	theCell->GradPsi[2] = 0.0;
-	if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = passive_scalar;	
+	//if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[5] = passive_scalar;
+	//if((sim_NUM_C(theSim)+1)<sim_NUM_Q(theSim)) theCell->prim[6] = passive_scalar2;
+	//if((sim_NUM_C(theSim)+2)<sim_NUM_Q(theSim)) theCell->prim[7] = passive_scalar3;
 }
+
 
 void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
 	
@@ -262,6 +299,13 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
       double ybh0 = 0.0;
       double ybh1 = 0.0;
 
+      double xx;
+      double yy;
+      double u1;
+      double u2;
+      double TU;
+      double CJ;
+
       for (j = 0; j < sim_N_p(theSim,i); j++) {
 
         double phi = theCells[k][i][j].tiph - 0.5*theCells[k][i][j].dphi;
@@ -273,44 +317,10 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 
 
 
-	///```````````````````````````
-	// double cs0,cs1;
-	// double PoRho0,PoRho1,PoRho;
-
-	/*
-        double vp0,vp1;
-        if ( dist_bh0>sim_Rsink0(theSim) ){
-          vp0 = pow(dist_bh0,-0.5) * sqrt(M0) ;
-          cs0 = HoR*vp0;
-          PoRho0 = cs0*cs0/Gam;
-        } else{
-          vp0 = pow(sim_Rsink0(theSim),-0.5);
-          cs0 = HoR*vp0;
-          PoRho0 = cs0*cs0/Gam;
-        }
-        if (dist_bh1>sim_Rsink1(theSim)){
-	    vp1 = pow(dist_bh1,-0.5) * sqrt(M1) ;
-	    cs1 = HoR*vp1;
-	    PoRho1 = cs1*cs1/Gam;
-	  } else{
-            vp1 = pow(sim_Rsink1(theSim),-0.5);
-	    cs1 = HoR*vp1;
-	    PoRho1 = cs1*cs1/Gam;
-	}
-
-	PoRho = (cs0*cs0 + cs1*cs1)/Gam;
-	*/
-
 	double OmegaK = 1./pow(r,1.5);
 
 	double cs = r*OmegaK/Mach;
 	double cs2 = cs*cs;
-        //cs0 = pow((dist_bh0*dist_bh0 + 0.05*0.05),-0.5) * sqrt(M0) * HoR;
-        //cs1 = pow((dist_bh1*dist_bh1 + 0.05*0.05),-0.5) * sqrt(M1) * HoR;
-        //PoRho0 =  cs0*cs0/Gam;
-        //PoRho1 =  cs1*cs1/Gam;
-
-        //PoRho = PoRho0+PoRho1;
 	double PoRho = cs2/Gam;
 
 
@@ -321,8 +331,7 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 
 	double rho = rho0;
 
-	
-	//double cs2 = (cs0*cs0 + cs1*cs1);
+       
 	double drcs2 = -1./(r*r)/Mach/Mach; 
 
 
@@ -352,23 +361,22 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 
 	double omega;
         //if (MMOm==1){
-        omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
-        double O2 = omega*omega + 1./2.*1/r * drcs2/Gam;    // 1/2 for rho -> sigma?- OmegaK*OmegaK/Mach/Mach/Gam; // add +1/(sigma r)*dP/dr tr 
+        //omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
+        //double O2 = omega*omega + 1./2.*1/r * drcs2/Gam;    // 1/2 for rho -> sigma?- OmegaK*OmegaK/Mach/Mach/Gam; // add +1/(sigma r)*dP/dr tr 
 	//	}
 
 	// if (TAddV==1){
         //double O2 = pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0 + pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1;
         //}
-
-        omega = sqrt(O2);
-
-
-	//double omega;
-	// //if (massratio!=0.0){
-        //omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
-	////}
-        //double O2 = omega*omega + 1./2.*1/r * drcs2/Gam;    // 1/2 for rho -> sigma?- OmegaK*OmegaK/Mach/Mach/Gam; // add +1/(sigma r)*dP/dr term
 	//omega = sqrt(O2);
+
+	//if (VirialV==1){
+	double vp_vir = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-0.5)*M0 + pow(dist_bh1*dist_bh1+eps*eps,-0.5)*M1);
+	omega = vp_vir/r; 
+        //}  
+
+	
+
 
 
         double vr;
@@ -381,7 +389,7 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 
 
       	  // st vr=0 inside a the cavity if it exists
-	if (  r < 3.*sep*( (log(1000.) + 2.*log(massratio))/log(10.) )   ) {//this function goes to 0 at q<0.04, =1 at q=0.1, =3 at q=1
+	if (  r <  (3. + 2.146*log10(massratio))   ) {//this function goes to 0 at q<0.04, =1 at q=0.1, =3 at q=1
           vr =0.0;
 	}
 
@@ -394,16 +402,57 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 	 //double Pp = cs*cs * rho/Gam;
 	double Pp = PoRho * rho;
 
+        xx = r*cos(phi);
+        yy = r*sin(phi);
+
+        u2 = sep*massratio/(1.+massratio);
+        u1 = sep - u2;
 
 
-	double passive_scalar;
-        if (r<1.0){
-          passive_scalar = 1.;
-	}else{
-	  passive_scalar = 0.000000001;;
+        TU = xx*xx + yy*yy + 2.*(u1/dist_bh0 + u2/dist_bh1) ;
+	CJ = TU - pow((vp_vir - r*pow(sep,-1.5)),2);
+
+
+        double CJcrit = 100.0;
+	double xL2 = 1.1;
+        if (massratio == 1.0){
+          CJcrit = 3.4568;
+          xL2 =1.19841;
+	}
+        if (massratio == 0.1){
+          CJcrit = 3.45154;
+          xL2 = 1.25608;
+        }
+        if (massratio == 0.05){
+	  CJcrit = 3.34669;
+          xL2 =1.22557;
+	}
+        if (massratio == 0.01){
+          CJcrit = 3.15345;
+          xL2 = 1.14632;
+        }
+        if (massratio == 0.001){
+          CJcrit = 3.03859;
+          xL2 =1.06989;
 	}
 
 
+	double passive_scalar=0.000000001;
+        if (r< xL2 && CJ>CJcrit){
+	  passive_scalar = 1.;
+	  //printf("Setting Passive Scalar1");                                                                                                     
+        }
+
+        double passive_scalar2=0.000000001;
+        if (r > xL2 && CJ>CJcrit){
+	  passive_scalar2 = 1.;
+	  //printf("Setting Passive Scalar1");                                                                                                     
+        }
+
+        double passive_scalar3=0.000000001;
+        if (CJ<CJcrit){
+          passive_scalar3 = 1.;
+        }
 
 
 
@@ -412,13 +461,17 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
         theCells[k][i][j].prim[URR] = vr;
         theCells[k][i][j].prim[UPP] = omega -  sim_rOm_a(theSim,r,sep)/r; //initial sep set to 1. 
         theCells[k][i][j].prim[UZZ] = 0.0;
-	//theCells[k][i][j].prim[5] = passive_scalar;
+	theCells[k][i][j].prim[5] = passive_scalar;
+	theCells[k][i][j].prim[6] = passive_scalar2;
+	theCells[k][i][j].prim[7] = passive_scalar3;
         theCells[k][i][j].wiph = 0.0;
         theCells[k][i][j].divB = 0.0;
         theCells[k][i][j].GradPsi[0] = 0.0;
         theCells[k][i][j].GradPsi[1] = 0.0;
         theCells[k][i][j].GradPsi[2] = 0.0;
-	if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCells[k][i][j].prim[sim_NUM_C(theSim)] = passive_scalar;
+	//if((sim_NUM_C(theSim))<sim_NUM_Q(theSim)) theCells[k][i][j].prim[5] = passive_scalar;
+	//if((sim_NUM_C(theSim)+1)<sim_NUM_Q(theSim)) theCells[k][i][j].prim[6] = passive_scalar2;
+	//if((sim_NUM_C(theSim)+2)<sim_NUM_Q(theSim)) theCells[k][i][j].prim[7] = passive_scalar3;
       }
     }
   }

@@ -215,4 +215,7 @@ double sim_Rsink1(struct Sim * theSim){
 double sim_tmaxOrb(struct Sim * theSim){
   return(theSim->tmaxOrb);
 }
+int sim_Lim_InZone(struct Sim * theSim){
+  return(theSim->Lim_InZone);
+}
 
