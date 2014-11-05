@@ -73,7 +73,6 @@ void cell_single_init_SimpleKepler(struct Cell *theCell, struct Sim *theSim,int 
 	theCell->prim[UPP] = omega - sim_rOm_a(theSim,r,sep)/r; //initial sep set to 1.
 	theCell->prim[UZZ] = 0.0;
 	theCell->wiph = 0.0;//r*OmegaK;
->>>>>>> fdcf1c6801e932c8fa1f2a128c51a205b4fc4d44
 	if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) theCell->prim[sim_NUM_C(theSim)] = passive_scalar;	
 }
 

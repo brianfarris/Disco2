@@ -27,7 +27,7 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	double phi1 = M_PI; 
 	double eps0 = sim_G_EPS(theSim) * r0;
         double eps1 = sim_G_EPS(theSim) * r1;	
-
+	double eps = eps0/r0;
 
 	if (massratio == 0.0){
 	  sep = 0.0;
@@ -38,7 +38,7 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	  eps1 = eps0;
 	}
 
-	//double Mach   = 10.0 *pow(sep,(-0.5)) ; //For uniform cs
+
 	double HoR = sim_HoR(theSim);
 	double Mach   = 1./HoR;                   //For uniform Mach	
 
@@ -61,19 +61,14 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	double dist_bh0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
 	double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
 	
-
+	//-------------------------
+	//SET CS
+	//------------------------
 	double OmegaK = pow(r,-1.5);
+	double Omeff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1); // For HS EQL in binary potential
 
-	double cs = r*OmegaK/Mach;
+	double cs = r*Omeff/Mach;
 	double cs2 = cs*cs;
-
-	//cs0 = pow((dist_bh0*dist_bh0 + 0.05*0.05),-0.5) * sqrt(M0) * HoR;
-	//cs1 = pow((dist_bh1*dist_bh1 + 0.05*0.05),-0.5) * sqrt(M1) * HoR;
-	//PoRho0 =  cs0*cs0/Gam;
-	//PoRho1 =  cs1*cs1/Gam; 
-	
-        //PoRho = PoRho0+PoRho1;
-   	//PoRho = (cs0*cs0 + cs1*cs1)/Gam;
 	double PoRho = cs2/Gam;   //for any gamma law eqn of state (adiabatic or iso)
 
 				
@@ -81,30 +76,19 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	double Pot0 = M0/pow( pow(dist_bh0,n) + pow(eps0,n) , 1./n );
 	double Pot1 = M1/pow( pow(dist_bh1,n) + pow(eps1,n) , 1./n );
 				
-
-
-        //double cs    = sqrt(PoRho*Gam);//r*omega/Mach;
-	//double scr_1 = sqrt(r1*r1 + r*r - 2.*r1*r*cos(phi1-phi));
-	//double scr_0 = sqrt(r0*r0 + r*r - 2.*r0*r*cos(phi0-phi));
-	//double drcs2 = - M0*(r-r0*cos(phi0 - phi))/pow((dist_bh0*dist_bh0 + 0.05*0.05), 1.5) - M1*(r-r1*cos(phi1 - phi))/pow((dist_bh1*dist_bh1 + 0.05*0.05), 1.5);
-
-
-        //double cs2 = (cs0*cs0 + cs1*cs1);
-	double drcs2 = -1./(r*r)/Mach/Mach;
-
- 
-	double eps = sim_G_EPS(theSim);
+	//-------------------------
+	//SET dnu/dr to compute VR
+	//------------------------
+	double drcs2 = -1./(r*r)/Mach/Mach; //WRONG FOR Omeff
         double disk_nu;
 	double dr_nu;
 	double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
-	double Omeff;
 	double dr_Omeff;
 	double numer;
         if (sim_VISC_CONST(theSim)==1){
           disk_nu = DISK_ALPHA;
 	  dr_nu   = 0.0;
 	}else{
-	  Omeff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
           disk_nu = DISK_ALPHA*cs2/Omeff;
 	  //
 	  numer = ( (r-r0 * cos(phi-phi0)) * pow(dist_bh0,-5.) )/(1.+massratio) + (  (r-r1 * cos(phi-phi1)) * pow(dist_bh1,-5.) )/(1.+1./massratio);
@@ -112,9 +96,13 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	  dr_Omeff = - 1.5* numer / sqrt( pow(dist_bh0,-3.)/(1.+massratio) + pow(dist_bh1,-3.)/(1.+1./massratio)   );
 	  //
 	  dr_nu = DISK_ALPHA * ( drcs2/Omeff - cs2/Omeff/Omeff * dr_Omeff);
-	  //0.5*disk_nu/r; //0.5*DISK_ALPHA*pow(r,-0.5)/Mach/Mach;  //same as 0.5*disk_nu/r;
         }
 
+
+
+	//-------------------------
+	//SET OMEGA
+	//------------------------
 	double omega;
 	//if (MMOm==1){
 	//omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
@@ -132,7 +120,9 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	//}
 
 
-
+	//-------------------------
+	//SET VR
+	//------------------------
 	double vr;
         double vrout;
         double rout = sim_RDAMP_OUTER(theSim);
@@ -150,23 +140,16 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	if (  r < (3. + 2.146*log10(massratio))   ) {//this function goes to 0 at q<0.04, =.9 at q=0.1, =3 at q=1
 	  vr =0.0;
 	}
-
-	//if (r<sep){
-	//  omega = sqrt(O2);//*pow(r,2.);
-	//	vr = 0.0;
-	//	//vr = scaled SS;
-	//}else{
-	//	omega = sqrt(O2);
-	//	vr = 0.0;
-	//	//vr = scaled SS;
-	//}		  
 	
+	//-------------------------
+	//SET PRESSURE
+	//------------------------
 	if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
-				
-	//double Pp = 1./20.*1./20.*rho/Gam; //cs*cs*rho/Gam * r;	//mult by r to get cst Pressure
 	double Pp = PoRho * rho;
 
+	//---------------------------
 	//R3B STUFF
+	//---------------------------
 	double xx = r*cos(phi);
 	double yy = r*sin(phi);
 
@@ -221,16 +204,6 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 
 
 
-	//        double passive_scalar2=0.000000001;
-	// if (r>1.4 && r<1.5){
-        //  if (phi<M_PI*(1./16.) && phi > -M_PI*(1./16.)){
-        //    passive_scalar2 = 1.;
-	//    //printf("Setting Passive Scalar1");
-        //  }
-        //}
-
-
-
 	theCell->prim[RHO] = rho*exp(fac*(Pot0+Pot1)*Gam/cs2);
 	theCell->prim[PPP] = Pp*exp(fac*(Pot0+Pot1)*Gam/cs2);
 	theCell->prim[URR] = vr;
@@ -270,6 +243,7 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
   double phi1 = M_PI;
   double eps0 = sim_G_EPS(theSim) * r0;
   double eps1 = sim_G_EPS(theSim) * r1;
+  double eps = eps0/r0;
 
   if (massratio == 0.0){
     sep = 0.0;
@@ -281,10 +255,8 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
   }
 
 
- // double Mach   =  10.0 *pow(sep,(-0.5)) ; //For uniform cs
   double HoR = sim_HoR(theSim);   // for uniform Mach
-  double Mach   = 1./HoR;
-  
+  double Mach   = 1./HoR;  
   double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
 
   int i, j,k;
@@ -316,10 +288,12 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
         double dist_bh1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
 
 
-
+	//-------------------------
+	//SET SOND SPEED FOR VERTICAL HYDROSTATIC EQLB for binary 
+	//------------------------
 	double OmegaK = 1./pow(r,1.5);
-
-	double cs = r*OmegaK/Mach;
+	double Omeff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
+	double cs = r*Omeff/Mach;
 	double cs2 = cs*cs;
 	double PoRho = cs2/Gam;
 
@@ -327,27 +301,22 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
         double n = sim_PHI_ORDER(theSim);
         double Pot0 = M0/pow( pow(dist_bh0,n) + pow(eps0,n) , 1./n );
         double Pot1 = M1/pow( pow(dist_bh1,n) + pow(eps1,n) , 1./n );
-
-
 	double rho = rho0;
 
-       
-	double drcs2 = -1./(r*r)/Mach/Mach; 
-
-
+	//-------------------------
+	//FIND dnu/dr to set VR
+	//------------------------
+	double drcs2 = -1./(r*r)/Mach/Mach; // WRONG FOR Omeff
         double eps = sim_G_EPS(theSim);
         double disk_nu;
         double dr_nu;
         double DISK_ALPHA = sim_EXPLICIT_VISCOSITY(theSim);
-        double Omeff;
         double dr_Omeff;
 	double numer;
         if (sim_VISC_CONST(theSim)==1){
           disk_nu = DISK_ALPHA;
           dr_nu   = 0.0;
         }else{
-          Omeff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
-	  //
           disk_nu = DISK_ALPHA*cs2/Omeff;
 	  //
           numer = (  (r-r0 * cos(phi-phi0)) * pow(dist_bh0,-5.) )/(1.+massratio) + (  (r-r1 * cos(phi-phi1)) * pow(dist_bh1,-5.) )/(1.+1./massratio);
@@ -355,10 +324,12 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
           dr_Omeff = - 1.5* numer / sqrt( pow(dist_bh0,-3.)/(1.+massratio) + pow(dist_bh1,-3.)/(1.+1./massratio)   );
 	  //
 	  dr_nu = DISK_ALPHA * ( drcs2/Omeff - cs2/Omeff/Omeff * dr_Omeff);
-          //0.5*disk_nu/r; //0.5*DISK_ALPHA*pow(r,-0.5)/Mach/Mach;  //same as 0.5*disk_nu/r;
-        }
+	}
 
-
+	
+	//-------------------------
+	//SET OMEGA
+	//-------------------------
 	double omega;
         //if (MMOm==1){
         //omega = OmegaK*( 1.+3./4.*(sep*sep/r/r*(massratio/((1.+massratio)*(1.+massratio)))) );
@@ -367,7 +338,7 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 
 	// if (TAddV==1){
         //double O2 = pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0 + pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1;
-        //}
+        //}	
 	//omega = sqrt(O2);
 
 	//if (VirialV==1){
@@ -377,8 +348,9 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 
 	
 
-
-
+	//-------------------------
+	//SET VR
+	//-------------------------
         double vr;
 	if (DISK_ALPHA > 0.0){
           vr = -3./2.*disk_nu/r - 3.*dr_nu;
@@ -386,22 +358,23 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
           vr = 0.0;
         }
 	
-
-
-      	  // st vr=0 inside a the cavity if it exists
+        //Set vr=0 inside a the cavity if it exists
 	if (  r <  (3. + 2.146*log10(massratio))   ) {//this function goes to 0 at q<0.04, =1 at q=0.1, =3 at q=1
           vr =0.0;
 	}
 
 
 
-
-
+	//-------------------------
+	//SET PRESSURE
+	//-------------------------
         if( rho<sim_RHO_FLOOR(theSim) ) rho = sim_RHO_FLOOR(theSim);
-        
-	 //double Pp = cs*cs * rho/Gam;
 	double Pp = PoRho * rho;
 
+
+	//--------------------------------
+	// R3B stuff for Passive Scalar
+	//-------------------------------
         xx = r*cos(phi);
         yy = r*sin(phi);
 
