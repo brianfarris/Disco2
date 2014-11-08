@@ -66,8 +66,10 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	//------------------------
 	double OmegaK = pow(r,-1.5);
 	double Omeff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1); // For HS EQL in binary potential
+	double Veff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-0.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-0.5)*M1); //Virial Thm
 
-	double cs = r*Omeff/Mach;
+	//double cs = r*Omeff/Mach;
+	double cs = Veff/Mach;
 	double cs2 = cs*cs;
 	double PoRho = cs2/Gam;   //for any gamma law eqn of state (adiabatic or iso)
 
@@ -175,6 +177,10 @@ void cell_single_init_CDmigration(struct Cell *theCell, struct Sim *theSim,int i
 	  CJcrit = 3.34669;
 	  xL2 = 1.22557;
 	}
+        if (massratio == 0.03){
+          CJcrit = 3.27402;
+          xL2 =1.19963;
+        }
 	if (massratio == 0.01){
 	  CJcrit = 3.15345;
 	  xL2 = 1.14632;
@@ -293,7 +299,10 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 	//------------------------
 	double OmegaK = 1./pow(r,1.5);
 	double Omeff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
-	double cs = r*Omeff/Mach;
+	double Veff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-0.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-0.5)*M1); //Virial Thm
+
+        //double cs = r*Omeff/Mach;
+	double cs = Veff/Mach;
 	double cs2 = cs*cs;
 	double PoRho = cs2/Gam;
 
@@ -400,6 +409,10 @@ void cell_init_CDmigration(struct Cell ***theCells,struct Sim *theSim,struct MPI
 	  CJcrit = 3.34669;
           xL2 =1.22557;
 	}
+        if (massratio == 0.03){
+          CJcrit = 3.27402;
+          xL2 =1.19963;
+        }
         if (massratio == 0.01){
           CJcrit = 3.15345;
           xL2 = 1.14632;

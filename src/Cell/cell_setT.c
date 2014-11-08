@@ -61,7 +61,10 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim, struct GravMass *
 
 	//double OmegaK = pow(r,-1.5);	
 	double Omeff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
-	double cs = r*Omeff*HoR; //cst MAch
+	double Veff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-0.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-0.5)*M1); //Virial Thm 
+
+	double cs = Veff*HoR;
+	//double cs = r*Omeff*HoR; //cst MAch
 	//double cs = HoR; //cst cs	
 	double PoRho = cs*cs/Gam;
 	
