@@ -14,6 +14,7 @@ struct Cell{
   double * RKcons;
   double * grad;
   double * gradp;
+//  double * P_components;
   double tiph;
   double RKtiph;
   double dphi;
@@ -41,6 +42,9 @@ void cell_init_middle(struct Cell ***,struct Sim *,struct GravMass *, struct MPI
 void cell_single_init_middle(struct Cell *, struct Sim *,struct GravMass *,int ,int ,int );
 void cell_init_SStest(struct Cell ***,struct Sim *,struct GravMass *, struct MPIsetup *);
 void cell_single_init_SStest(struct Cell *, struct Sim *,struct GravMass *,int ,int ,int );
+void cell_init_beta(struct Cell ***,struct Sim *,struct GravMass * ,struct MPIsetup * ); 
+void cell_single_init_beta(struct Cell *, struct Sim *,struct GravMass * ,int,int,int);
+
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct GravMass *,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,struct GravMass *,int,int,int );
 ///retrieve data
@@ -52,6 +56,7 @@ double cell_tiph(struct Cell *);
 double cell_dphi(struct Cell *);
 double cell_wiph(struct Cell *);
 double cell_Cool(struct Cell ***,int,int,int);
+double cell_P_components(struct Cell *,int);
 //modify cell data
 void cell_add_cons(struct Cell *, int, double);
 void cell_add_src( struct Cell *** ,struct Sim * , struct GravMass * , double );
@@ -78,10 +83,10 @@ void cell_boundary_fixed_r( struct Cell ***, struct Sim *,struct GravMass *,stru
 void cell_boundary_fixed_z( struct Cell ***, struct Sim *,struct GravMass *,struct MPIsetup *,void (*)(struct Cell *,struct Sim *,struct GravMass *,int,int,int));
 void cell_bc_damp( struct Cell *** , struct Sim * , struct GravMass *, double ,void (*)(struct Cell *,struct Sim *,struct GravMass *,int,int,int));
 //primitive-conservative conversion routines
-void cell_calc_prim( struct Cell ***,struct Sim *);
-void cell_prim2cons( double * , double * , double , double ,struct Sim *);
-void cell_calc_cons(struct Cell ***,struct Sim *); 
-void cell_cons2prim( double * , double * , double , double ,struct Sim *);
+void cell_calc_prim( struct Cell ***,struct Sim *, struct GravMass *);
+void cell_prim2cons( double * , double * , double , double ,double, struct Sim *, struct GravMass *);
+void cell_calc_cons(struct Cell ***,struct Sim *, struct GravMass *); 
+//void cell_cons2prim( double * , double * , double , double ,struct Sim *);
 //miscellaneous
 double cell_mindt( struct Cell *** , struct Sim * , struct GravMass *);
 void cell_copy(struct Cell ***,struct Sim * );

@@ -116,27 +116,30 @@ int main(int argc, char **argv) {
   cell_syncproc_z(theCells,theSim,theMPIsetup);
 
   // set conserved quantities
-  cell_calc_cons(theCells,theSim);
+  cell_calc_cons(theCells,theSim,theGravMasses);
+  cell_calc_prim( theCells ,theSim,theGravMasses); // calculate primitives
+  cell_calc_cons(theCells,theSim,theGravMasses);
+
 
   // set up diagnostics struct
   struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep,theMPIsetup);
 
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
-    // here the actual timestep is taken
-    timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
-    // calculate diagnostics
-    diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep,theMPIsetup,theGravMasses);
-    //write diagnostics to file
-    MPI_Barrier(sim_comm);    
-    diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
+      // here the actual timestep is taken
+      timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
+      // calculate diagnostics
+      diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep,theMPIsetup,theGravMasses);
+      //write diagnostics to file
+      MPI_Barrier(sim_comm);    
+      diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
 #ifdef CHECKPOINTING
-    // checkpointing
-    if( timestep_get_t(theTimeStep)>io_tcheck(theIO)){ // time to write checkpoint file
-      io_allocbuf(theIO,theSim); // allocate memory for a buffer to store simulation data
-      io_setbuf(theIO,theCells,theSim,theGravMasses); // fill the buffer
-      io_hdf5_out(theIO,theSim,theTimeStep); // write contents to file
-      io_deallocbuf(theIO); // get rid of buffer
-    }
+      // checkpointing
+      if( timestep_get_t(theTimeStep)>io_tcheck(theIO)){ // time to write checkpoint file
+          io_allocbuf(theIO,theSim); // allocate memory for a buffer to store simulation data
+          io_setbuf(theIO,theCells,theSim,theGravMasses); // fill the buffer
+          io_hdf5_out(theIO,theSim,theTimeStep); // write contents to file
+          io_deallocbuf(theIO); // get rid of buffer
+      }
 #endif
   }
   //inter-processor syncs

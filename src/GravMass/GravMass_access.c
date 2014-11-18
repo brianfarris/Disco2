@@ -29,3 +29,13 @@ double gravMass_dist(struct GravMass * theGravMasses,int p,double r, double phi,
     double y = r * sin(phi);
     return(sqrt((x-xbh)*(x-xbh) + (y-ybh)*(y-ybh) + z*z));
 }
+double gravMass_Omega_eff(double r, double phi,int NumGravMass, struct GravMass * theGravMasses){
+    double Omega2_eff = 0.0;
+    int p;
+    for (p=0;p<NumGravMass; ++p ){
+        double m = gravMass_M(theGravMasses,p);
+        double dist_bh = gravMass_dist(theGravMasses,p,r,phi,0.);
+        Omega2_eff += m/pow(dist_bh,3);
+    }
+    return(sqrt(Omega2_eff));
+}

@@ -259,7 +259,8 @@ void riemann_visc_flux(struct Riemann * theRiemann,struct Sim * theSim,struct Gr
             //nu = alpha*Gamma*AvgPrim[PPP]/AvgPrim[RHO]*pow(r,1.5);
             //nu = alpha*Gamma*AvgPrim[PPP]/AvgPrim[RHO]*(sqrt(M0)+sqrt(M1))/(sqrt(M0)*pow(dist_bh0,-1.5)+sqrt(M1)*pow(dist_bh1,-1.5));
             double eps = sim_G_EPS(theSim);
-            nu = alpha*AvgPrim[PPP]/AvgPrim[RHO]/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
+            //nu = alpha*AvgPrim[PPP]/AvgPrim[RHO]/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
+            nu = alpha*AvgPrim[PGAS]/AvgPrim[RHO]/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
         }
     }
 
@@ -331,14 +332,14 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,struct Grav
 
     if (theRiemann->state==LEFT){
         riemann_set_flux( theRiemann , theSim, GAMMALAW,LEFT);//in this case, we only need FL
-        cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
+        cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r ,theRiemann->cm, 1.0 ,theSim,theGravMasses);
         int q;
         for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
             theRiemann->F[q] = theRiemann->FL[q] - w*theRiemann->UL[q];// w is only nonzero when we are in phi direction
         }
     } else if (theRiemann->state==RIGHT){
         riemann_set_flux( theRiemann , theSim, GAMMALAW,RIGHT);//in this case, we only need FR
-        cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
+        cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , theRiemann->cm , 1.0 ,theSim,theGravMasses);
         int q;
         for (q=0;q<sim_NUM_Q(theSim) ; ++q ){
             theRiemann->F[q] = theRiemann->FR[q] - w*theRiemann->UR[q];// w is only nonzero when we are in phi direction
@@ -347,17 +348,17 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,struct Grav
         if (sim_Riemann(theSim)==HLL){
             riemann_set_flux( theRiemann , theSim, GAMMALAW,LEFT);  //we need both
             riemann_set_flux( theRiemann , theSim, GAMMALAW,RIGHT);    
-            cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);//we need both
-            cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
+            cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r ,theRiemann->cm, 1.0 ,theSim,theGravMasses);//we need both
+            cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r ,theRiemann->cm, 1.0 ,theSim,theGravMasses);
             riemann_set_star_hll(theRiemann,theSim);// get Ustar and Fstar
         } else if (sim_Riemann(theSim)==HLLC){
             if (theRiemann->state==LEFTSTAR){
                 riemann_set_flux( theRiemann , theSim, GAMMALAW,LEFT);//in this case, we only need FL
-                cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r , 1.0 ,theSim);
+                cell_prim2cons( theRiemann->primL , theRiemann->UL , theRiemann->r ,theRiemann->cm, 1.0 ,theSim,theGravMasses);
                 riemann_set_star_hllc(theRiemann,theSim,GAMMALAW);// get Ustar and Fstar
             } else if (theRiemann->state==RIGHTSTAR){
                 riemann_set_flux( theRiemann , theSim, GAMMALAW,RIGHT);//in this case, we only need FR      
-                cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r , 1.0 ,theSim);
+                cell_prim2cons( theRiemann->primR , theRiemann->UR , theRiemann->r ,theRiemann->cm, 1.0 ,theSim,theGravMasses);
                 riemann_set_star_hllc(theRiemann,theSim,GAMMALAW);// get Ustar and Fstar
             }
         } else{

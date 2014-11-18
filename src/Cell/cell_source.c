@@ -6,6 +6,7 @@
 #include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
+#include "../Headers/Tsolve.h"
 #include "../Headers/header.h"
 
 double fgrav( double M , double r , double eps, int n ){
@@ -30,7 +31,7 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, 
     }
 
     *drho_dt_sink = 0.0;
-    double sink_size = 0.5; //only apply the sink within a given radius.
+    double sink_size = 0.05; //only apply the sink within a given radius.
 
     if (p==0){
         if (r0<sink_size){
@@ -119,6 +120,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
                 double rho = c->prim[RHO];
                 double Pp  = c->prim[PPP];
+                double Pgas  = c->prim[PGAS];
                 double r   = .5*(rp+rm);
                 double vr  = c->prim[URR];
                 double vz  = c->prim[UZZ];
@@ -176,7 +178,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                     double drho_dt_sink;
                     int num_sinks = sim_GravMassType(theSim);
                     for( p=0 ; p<num_sinks; ++p ){
-                        get_rho_sink( theGravMasses, theSim,p,dt,r0,r1,M0,M1,rho,Pp, &drho_dt_sink);
+                        //get_rho_sink( theGravMasses, theSim,p,dt,r0,r1,M0,M1,rho,Pp, &drho_dt_sink);
+                        get_rho_sink( theGravMasses, theSim,p,dt,r0,r1,M0,M1,rho,Pgas, &drho_dt_sink);
                         c->cons[RHO] -= drho_dt_sink * dt * dV;
                         if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
                             Mdot_temp[p] += drho_dt_sink*dV;
@@ -184,22 +187,68 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                     }
                 }
 
+                /*
                 //cooling
                 if (sim_COOLING(theSim)==1){
-                    if (sim_InitialDataType(theSim)==SHEAR){
-                        double cooling_term = (Pp-.01)/(sim_GAMMALAW(theSim)-1.)*dV/1.e-2;
-                        if (cooling_term<0.0) cooling_term = 0.0;
-                        c->cons[TAU] -= cooling_term*dt;
-                        c->Cool = cooling_term/dV;
-                    }else{
-                        double numfac = 1.0;
-                        double alpha = sim_EXPLICIT_VISCOSITY(theSim);
-                        double cooling_cap = c->cons[TAU]*numfac;
-                        double cooling_term = 9./4.*alpha*pow(sim_PoRho_r1(theSim),-3)/rho*pow(Pp/rho,4.)*dt*dV;
-                        if (cooling_term>cooling_cap) cooling_term = cooling_cap;
-                        c->cons[TAU] -= cooling_term;
-                        c->Cool = cooling_term/dt/dV;
-                    }
+                if (sim_InitialDataType(theSim)==SHEAR){
+                double cooling_term = (Pp-.01)/(sim_GAMMALAW(theSim)-1.)*dV/1.e-2;
+                if (cooling_term<0.0) cooling_term = 0.0;
+                c->cons[TAU] -= cooling_term*dt;
+                c->Cool = cooling_term/dV;
+                }else{
+                double numfac = 1.0;
+                double alpha = sim_EXPLICIT_VISCOSITY(theSim);
+                double cooling_cap = c->cons[TAU]*numfac;
+                double cooling_term = 9./4.*alpha*pow(sim_PoRho_r1(theSim),-3)/rho*pow(Pp/rho,4.)*dt*dV;
+                if (cooling_term>cooling_cap) cooling_term = cooling_cap;
+                c->cons[TAU] -= cooling_term;
+                c->Cool = cooling_term/dt/dV;
+                }
+                }
+                */
+
+
+                //cooling
+                if (sim_COOLING(theSim)==SHEAR_COOL){
+                    double cooling_term = (Pp-.01)/(sim_GAMMALAW(theSim)-1.)*dV/1.e-2;
+                    if (cooling_term<0.0) cooling_term = 0.0;
+                    c->cons[TAU] -= cooling_term*dt;
+                    c->Cool = cooling_term/dV;
+                } else if (sim_COOLING(theSim)==MIDDLE_COOL){
+                    double numfac = 1.0;
+                    double alpha = sim_EXPLICIT_VISCOSITY(theSim);
+                    double cooling_cap = c->cons[TAU]*numfac;
+                    double cooling_term = 9./4.*alpha*pow(sim_PoRho_r1(theSim),-3)/rho*pow(Pp/rho,4.)*dt*dV;
+                    if (cooling_term>cooling_cap) cooling_term = cooling_cap;
+                    c->cons[TAU] -= cooling_term;
+                    c->Cool = cooling_term/dt/dV;
+                } else if (sim_COOLING(theSim)==BETA_COOL){
+                    double numfac = 1.0;
+                    double alpha = sim_EXPLICIT_VISCOSITY(theSim);
+                    double cooling_cap = c->cons[TAU]*numfac;
+                    double Pg_o_Rho_r1 = sim_PoRho_r1(theSim);
+                    double P_gas = c->prim[PGAS];
+                    double cooling_term = 9./4.*alpha*pow(sim_PoRho_r1(theSim),-3)/rho*pow(P_gas/rho,4.)*dt*dV;
+                    if (cooling_term>cooling_cap) cooling_term = cooling_cap;
+                    c->cons[TAU] -= cooling_term;
+                    c->Cool = cooling_term/dt/dV;
+
+                    // INSERT BETA COOLING METHOD HERE
+                    /*
+                    double E = c->cons[TAU];
+                    double Sigma = c->cons[RHO];
+                    double Gamma = sim_GAMMALAW(theSim);
+                    double xi_g = 0.1;
+                    double xi_r_times_xi_g_pow_8 = 1.e-1;
+                    double xi_r =  xi_r_times_xi_g_pow_8*pow(xi_g,-8);
+
+                    double Omega_eff = gravMass_Omega_eff(r,phi,theGravMasses); 
+                    struct Tsolve * params = tsolve_create(E,Sigma,Gamma,xi_r,Omega_eff,0.5);
+                    double Temp = tsolve_findroot(params);
+                    tsolve_destroy(params);
+                    */
+                } else if (sim_COOLING(theSim)==NO_COOL){
+                    // Do Nothing
                 }
             }
         }
@@ -245,7 +294,8 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, struct Gr
                 struct Cell * c = &(theCells[k][i][j]);
                 double dphi = c->dphi;
                 double rho = c->prim[RHO];
-                double P = c->prim[PPP];
+              //  double P = c->prim[PPP];
+                double Pgas = c->prim[PGAS];
                 double r   = .5*(rp+rm);
                 double vr  = c->prim[URR];
                 double dz = zp-zm;
@@ -268,7 +318,7 @@ void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, struct Gr
                 if (sim_VISC_CONST(theSim)==1){
                     Sigma_nu = rho*alpha;
                 }else{
-                    Sigma_nu = alpha*P/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
+                    Sigma_nu = alpha*Pgas/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
                 }
                 c->cons[TAU] += dt*dV*Sigma_nu*rdrOm_a*(rdrOm_a + r*c->grad[UPP] + c->gradp[URR] );
             }

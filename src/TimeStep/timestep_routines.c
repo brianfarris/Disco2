@@ -79,7 +79,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     cell_update_phi( theCells ,theSim, theGravMasses, theTimeStep->RK , dt ); // allow the cells to move in phi direction
     cell_update_dphi( theCells ,theSim); // all the cells to change size
     gravMass_update_RK( theGravMasses ,theSim, theTimeStep->RK ); // allow the GravMasses to move
-    cell_calc_prim( theCells ,theSim); // calculate primitives
+    cell_calc_prim( theCells ,theSim,theGravMasses); // calculate primitives
 
     //Boundary Data
     if (sim_BoundTypeR(theSim)==BOUND_OUTFLOW){
@@ -109,7 +109,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
 
     //re-calculate conserved quantities. 
     //things may have changed due to syncing and/or caps/floors applied in primitive solver.
-    cell_calc_cons( theCells,theSim );
+    cell_calc_cons( theCells,theSim,theGravMasses );
 }
 
 

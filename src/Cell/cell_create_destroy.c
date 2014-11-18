@@ -55,6 +55,7 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
                 theCells[k][i][j].RKcons = malloc(NUM_Q*sizeof(double));
                 theCells[k][i][j].grad = malloc(NUM_Q*sizeof(double));
                 theCells[k][i][j].gradp = malloc(NUM_Q*sizeof(double));
+               // theCells[k][i][j].P_components= malloc(2*sizeof(double));
                 ++Ncells;
             }
         }
@@ -74,20 +75,28 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
                 theCells[k][i][j].prim[URR] = 0.0;
                 theCells[k][i][j].prim[UPP] = 0.0;
                 theCells[k][i][j].prim[UZZ] = 0.0;
+                theCells[k][i][j].prim[PGAS] = 0.0;
+                theCells[k][i][j].prim[PRAD] = 0.0;
                 theCells[k][i][j].cons[DDD] = 0.0;
                 theCells[k][i][j].cons[TAU] = 0.0;
                 theCells[k][i][j].cons[SRR] = 0.0;
                 theCells[k][i][j].cons[LLL] = 0.0;
                 theCells[k][i][j].cons[SZZ] = 0.0;
+                theCells[k][i][j].cons[PGAS] = 0.0;
+                theCells[k][i][j].cons[PRAD] = 0.0;
                 theCells[k][i][j].RKcons[DDD] = 0.0;
                 theCells[k][i][j].RKcons[TAU] = 0.0;
                 theCells[k][i][j].RKcons[SRR] = 0.0;
                 theCells[k][i][j].RKcons[LLL] = 0.0;
                 theCells[k][i][j].RKcons[SZZ] = 0.0;
+                theCells[k][i][j].RKcons[PGAS] = 0.0;
+                theCells[k][i][j].RKcons[PRAD] = 0.0;
                 theCells[k][i][j].wiph = 0.0;
                 theCells[k][i][j].tiph = tiph;
                 theCells[k][i][j].RKtiph = tiph;
                 theCells[k][i][j].dphi = dphi;
+             //   theCells[k][i][j].P_components[GAS] = 0.0;
+             //   theCells[k][i][j].P_components[RAD] = 0.0;
             }
         }
     }
@@ -99,6 +108,7 @@ void cell_destroy(struct Cell ***theCells,struct Sim *theSim){
     for (k=0; k<sim_N(theSim,Z_DIR); k++) {
         for (i=0; i<sim_N(theSim,R_DIR);i++){
             for(j = 0; j < sim_N_p(theSim,i); j++){
+             //   free(theCells[k][i][j].P_components);
                 free(theCells[k][i][j].gradp);
                 free(theCells[k][i][j].grad);
                 free(theCells[k][i][j].RKcons);
