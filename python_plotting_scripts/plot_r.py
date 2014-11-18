@@ -58,7 +58,7 @@ def plot_r_profile(filename, sca='linear'):
     plt.subplot(235)
     plot_r_profile_single(r, vp, sca, r"$v^\phi$", R, UPP)
     plt.subplot(236)
-    plot_r_profile_single(r, mach, sca, r"$\mathfrak{M}$", R, MACH)
+    plot_r_profile_single(r, mach, sca, r"$\mathcal{M}$", R, MACH)
     plt.subplot(233)
     plot_r_profile_single(r, P/rho, sca, r"$T = P/\rho_0$", R, PPP/RHO)
 

@@ -15,11 +15,11 @@ Frame                   0       // 0 Euler, 1 Keplerian
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR			100			//Radial Zones
+NumR			200			//Radial Zones
 NumZ			1           //Vertical Zones
 ng              2
 R_Min		    1.0
-R_Max			1.0e2
+R_Max			1.0e4
 Z_Min			-1.0
 Z_Max			1.0
 NP_CONST        3
@@ -51,7 +51,7 @@ PLM			1.0
 Grav_2D			1
 G_EPS			0.0
 GravM           1.0
-AlphaVisc       0.01
+AlphaVisc       0.1
 
 //Cooling
 CoolingType         0       //0 None, 1 Isothermal, 2 Blackbody-Thompson, 
@@ -63,7 +63,7 @@ CoolPar2            0.0
 InitPar0        0           // 0 No Cooling
 InitPar1        1.0e2       // R0
 InitPar2        1.0e-2      // P0
-InitPar3        -2.5e-3     // VR0
+InitPar3        -0.5e-2     // VR0
 InitPar4        1.0e-3      // VP0
 
 PHI_ORDER               2

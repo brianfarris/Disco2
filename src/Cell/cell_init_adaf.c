@@ -49,10 +49,10 @@ void cell_init_adaf_nocool(struct Cell *c, double r, double phi, double z, struc
         {
             vp = 0.0;
             //vr = -2*M/(r+2*M);
-            if(r < 2*M)
-                vr = (r/(2*M))*((r-2*M)/(r+2*M)-0.1) + (1-r/(2*M))*(-1.0);
-            else
-                vr = (r-2*M)/(r+2*M)-0.1;
+            //if(r < 2*M)
+            //    vr = (r/(2*M))*((r-2*M)/(r+2*M)) + (1-r/(2*M))*(-1.0);
+            //else
+                vr = 0.9*(r-2*M)/(r+2*M) + 0.1*(-1.0);
         }
     }
 

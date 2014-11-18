@@ -117,6 +117,7 @@ double cell_mindt_newt( struct Cell *** theCells, struct Sim * theSim ){
 double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
 {
     double dt_m = 1.e100;//HUGE_VAL;
+    double M = sim_GravM(theSim);
     int i,j,k;
     for(k = sim_Nghost_min(theSim,Z_DIR); k < sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR); ++k)
     {
@@ -132,6 +133,10 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
             double dr = rp-rm;
             double r = .5*(rp+rm);
             
+            //TODO: cleaner way of doing this?
+            if(r < 2*M)
+                continue;
+
             for(j = 0; j < sim_N_p(theSim,i); ++j)
             {
                 int jm = j-1;
@@ -172,7 +177,6 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                         double rho = theCells[k][i][j].prim[RHO];
                         double Pp = theCells[k][i][j].prim[PPP];
                         double GAM = sim_GAMMALAW(theSim);
-                        double M = sim_GravM(theSim);
                         double rhoh = rho + GAM/(GAM-1)*Pp;
 
                         nu = alpha * 2.0 * sqrt(GAM*r*r*r*(1-3.0*M/r)/M) * Pp/rhoh;
