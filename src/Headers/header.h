@@ -22,6 +22,6 @@ MPI_Comm sim_comm;
 #define TVISC_FAC 1.0
 #define PHIMAX 2.0*M_PI
 #define diode 0
-#define EXTRAP_BC 0
+#define EXTRAP_BC 1
 #define SS_BCS 0
 #define w_a_milos_index 8

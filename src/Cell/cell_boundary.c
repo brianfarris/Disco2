@@ -42,7 +42,8 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
                             cL->prim[q] += (cR->prim[q]-EXTRAP_BC*cR->grad[q]*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i-1,R_DIR))/2.)*face_dA(theFaces,n);
                         }
                         cL->prim[RHO] += (cR->prim[RHO]/pow(r_cellR,-3./5.)*pow(r_cell,-3./5.))*face_dA(theFaces,n);
-                        cL->prim[PPP] += (cR->prim[PPP]/pow(r_cellR,-3./2.)*pow(r_cell,-3./2.))*face_dA(theFaces,n);
+                        cL->prim[PPP] += (cR->prim[PPP]/pow(r_cellR,-3-3./5.)*pow(r_cell,-3-3./5.))*face_dA(theFaces,n);
+                        //cL->prim[PPP] += (cR->prim[PPP]/pow(r_cellR,-3./2.)*pow(r_cell,-3./2.))*face_dA(theFaces,n);
                         cL->prim[URR] += (cR->prim[URR]-EXTRAP_BC*cR->grad[URR]*(sim_FacePos(theSim,i+1,R_DIR)-sim_FacePos(theSim,i-1,R_DIR))/2.)*face_dA(theFaces,n);
                         cL->prim[UPP] += (cR->prim[UPP]/pow(r_cellR,-7./5.)*pow(r_cell,-7./5.))*face_dA(theFaces,n);
                     } else{
