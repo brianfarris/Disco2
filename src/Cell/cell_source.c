@@ -54,7 +54,7 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, 
 
   //double Rbondi = 2.*gravMass_M(theGravMasses,p)/ (P/rho);
   double Rhill = a * pow(sim_MassRatio(theSim)/3., (1./3.));
-  double Rsink1 = fmin(Rhill, 0.25);
+  double Rsink1 = fmin(Rhill, sim_Rsink1(theSim));
 
   // double sink_size = fmin(Rhill, Rbondi);
   //sink_size = 0.5;
