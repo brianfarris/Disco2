@@ -11,7 +11,7 @@ M = 1.0
 
 def plot_r_profile_single(r, f, sca, ylabel, R=None, F=None):
 
-    if sca == 'log' and (f < 0).all():
+    if sca == 'log' and (f < 0).any():
         plt.plot(r, -f, 'k+')
         if R != None and F != None:
             plt.plot(R, -F, 'r')
