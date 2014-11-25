@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Cell.h"
+#include "../Headers/EOS.h"
 #include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
@@ -185,7 +186,9 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                     for(nu=0; nu<4; nu++)
                         for(la=0; la<4; la++)
                             viscm[4*mu+nu] += metric_g_dd(g,nu,la)*visc[4*mu+la];
-                
+               
+                cool = eos_cool(c->prim, height, theSim);
+               /* 
                 //Isotherm: drive to constant P/rho
                 if(sim_CoolingType(theSim) == COOL_ISOTHERM)
                     cool = (Pp/rho - sim_CoolPar1(theSim)) / sim_CoolPar2(theSim);
@@ -214,6 +217,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                 }
                 //free-free cooling
                 //cool = sim_CoolFac(theSim) * pow(temp,7.5) / (rho*rho*height);
+                */
+                
             }
 
             //Momentum sources and contribution to energy source
@@ -293,7 +298,10 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
             else
                 c->cons[SZZ] -= dt*dV*sqrtg*a* cool*u_d[3];
             if(fabs(c->cons[TAU]) < fabs(dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3])))
+            {
                 c->cons[TAU] /= 1.1;
+                printf("That's pretty cool!\n");
+            }
             else
                 c->cons[TAU] += dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]); 
             if(PRINTTOOMUCH)

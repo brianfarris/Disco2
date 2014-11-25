@@ -178,6 +178,15 @@ double sim_InitPar4(struct Sim *theSim){
 double sim_AlphaVisc(struct Sim *theSim){
   return(theSim->AlphaVisc);
 }
+int sim_EOSType(struct Sim *theSim){
+  return(theSim->EOSType);
+}
+double sim_EOSPar1(struct Sim *theSim){
+  return(theSim->EOSPar1);
+}
+double sim_EOSPar2(struct Sim *theSim){
+  return(theSim->EOSPar2);
+}
 int sim_CoolingType(struct Sim *theSim){
   return(theSim->CoolingType);
 }

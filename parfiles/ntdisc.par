@@ -17,8 +17,8 @@ Restart                 0       // If this=1 restart using input.h5
 NumR			100			//Radial Zones
 NumZ			1           //Vertical Zones
 ng              2
-R_Min		    2.5
-R_Max			1000.0
+R_Min		    10.0
+R_Max			100.0
 Z_Min			-1.0
 Z_Max			1.0
 NP_CONST        3
@@ -58,10 +58,10 @@ CoolPar1            1.0e28
 CoolPar2            0.0
 
 //Initial Condition Parameters
-InitPar0        0           //0 Thompson Cooling
+InitPar0        0        //0 Thompson Cooling
 InitPar1        1.0e8    // Accretion Rate
-InitPar2        200.0       // R0
-InitPar3        100.0    // DR Cavity width (negative to turn off)
+InitPar2        200.0    // R0
+InitPar3        -5.0     // DR Cavity width (negative to turn off)
 InitPar4        0.0
 
 PHI_ORDER               2

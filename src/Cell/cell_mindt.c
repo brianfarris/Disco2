@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Cell.h"
+#include "../Headers/EOS.h"
 #include "../Headers/Metric.h"
 #include "../Headers/Sim.h"
 #include "../Headers/header.h"
@@ -168,34 +169,35 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                 if(sim_Background(theSim) == GRVISC1)
                 {
                     //TODO: Incorporate proper alpha viscosity
+                    double rho = theCells[k][i][j].prim[RHO];
+                    double Pp = theCells[k][i][j].prim[PPP];
+                    double GAM = sim_GAMMALAW(theSim);
+                    double rhoh = rho + GAM/(GAM-1)*Pp;
                     double nu;
                     double alpha = sim_AlphaVisc(theSim);
+                    double height = 2.0 * sqrt(r*r*r*(1-3.0*M/r)/M) * sqrt(GAM*Pp/rhoh);
                     if(alpha < 0.0)
                         nu = -alpha;
                     else
                     {
-                        double rho = theCells[k][i][j].prim[RHO];
-                        double Pp = theCells[k][i][j].prim[PPP];
-                        double GAM = sim_GAMMALAW(theSim);
-                        double rhoh = rho + GAM/(GAM-1)*Pp;
-
-                        nu = alpha * 2.0 * sqrt(GAM*r*r*r*(1-3.0*M/r)/M) * Pp/rhoh;
+                        nu = alpha * sqrt(GAM*Pp/rhoh) * height;
                     }
                     double dtv = 0.25*dx*dx/nu;
                     
                     //Luminosity Time
-                    double maxdisp = 1.0e100; //Should be a fraction like 0.1
+                    double maxdisp = 0.1; //Should be a fraction like 0.1
                     double dtl;
 
-                    if(sim_CoolingType(theSim) != COOL_NONE 
-                            && sim_CoolingType(theSim) != COOL_VISC)
+                    if(sim_CoolingType(theSim) != COOL_NONE)
                     {
                         double dV = 0.5*(rp+rm)*dr*dphi*dz;
                         double rho = theCells[k][i][j].prim[RHO];
                         double Pp = theCells[k][i][j].prim[PPP];
                         double U[4];
                         double cool;
-                    
+
+                        cool = eos_cool(theCells[k][i][j].prim, height, theSim);
+                    /*
                         if(sim_CoolingType(theSim) == COOL_ISOTHERM)
                         {
                             cool = (Pp/rho - sim_CoolPar1(theSim)) / sim_CoolPar2(theSim);
@@ -205,7 +207,7 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                             double temp = Pp/rho;
                             cool = sim_CoolPar1(theSim) * pow(temp, 4) / rho;
                         }
-
+                    */
                         struct Metric *g;
                         int mu;
                         g = metric_create(time_global, r, phi, z, theSim);
@@ -233,7 +235,7 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                         metric_destroy(g);
 
                         double dtl_min;
-                        dtl = maxdisp * fabs(theCells[k][i][j].cons[TAU] / dV*sqrtg*al* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]));
+                        dtl = maxdisp * fabs(theCells[k][i][j].cons[TAU] / (dV*sqrtg*al* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3])));
                         dtl = fabs(dtl);
                         if (dtl < 0)
                             printf("WHAT.");

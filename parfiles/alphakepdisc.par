@@ -17,8 +17,8 @@ Restart                 0       // If this=1 restart using input.h5
 NumR		    128			//Radial Zones
 NumZ			1          //Vertical Zones
 ng              2
-R_Min		    1.0e6
-R_Max			1.0e9
+R_Min		    0.1
+R_Max			1.0
 Z_Min			-1.0e6
 Z_Max			1.0e6
 NP_CONST        3
@@ -26,7 +26,7 @@ aspect          1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                1.0e7
+Time_Max                1.0e3
 Num_Checkpoints	        1000
 Num_Diag_Dump           20
 Num_Diag_Measure        20
@@ -49,26 +49,26 @@ PLM			1.0
 
 Grav_2D			1
 G_EPS			0.0
-GravM           1.0
-AlphaVisc       0.01
+GravM           1.0e-6
+AlphaVisc       0.1
 
 //Cooling
-CoolingType         3       //0 None, 1 Isothermal, 2 Blackbody-Thompson, 3 Vis
-CoolPar1            0.5
+CoolingType         2       //0 None, 1 Isothermal, 2 Blackbody-Thompson, 3 Vis
+CoolPar1            1.0e-30
 CoolPar2            0.0
 
 //Initial Condition Parameters
 InitPar0        2         // Keplerian Alpha-Disc
-InitPar1        1.0       // rho0
-InitPar2        1.0e-2    // P0
+InitPar1        1.0e+0    // rho0
+InitPar2        1.0e-6    // P0
 InitPar3        0.0       // 
 InitPar4        0.0       // 
 
 PHI_ORDER               2
 
 //Atmosphere Parameters
-Rho_Floor		0.000001
-Cs_Floor		0.000001		
+Rho_Floor		0.000000001
+Cs_Floor		0.00000001		
 Cs_Cap			10000.0
 Vel_Cap			100.0
 

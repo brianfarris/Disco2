@@ -17,8 +17,10 @@ enum{NEWTON,GR,GRVISC1};
 enum{SR,SCHWARZSCHILD_SC,SCHWARZSCHILD_KS,SR_CART};
 //Frames
 enum{FR_EULER,FR_KEP};
+//Equations of State
+enum{EOS_IDEAL_NEWT,EOS_IDEAL_GR};
 //Cooling Schemes
-enum{COOL_NONE,COOL_ISOTHERM,COOL_BB_ES,COOL_VISC};
+enum{COOL_NONE,COOL_ISOTHERM,COOL_BB_ES,COOL_BB_FF,COOL_NU};
 
 #include "mpi.h"
 MPI_Comm sim_comm;
