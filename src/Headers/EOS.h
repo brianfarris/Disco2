@@ -14,6 +14,7 @@ const static double eos_k = 1.3806488e-16;      //Boltzmann (erg/K)
 const static double eos_sb = 1.56055371e59;     //Stefan-Boltzmann
 const static double eos_mp = 1.672621777e-24;   //Proton Mass
 const static double eos_rho_scale = 1.0;
+const static double eos_r_scale = 1.4766250385e5;
 #endif
 
 //Initialize

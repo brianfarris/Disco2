@@ -28,11 +28,11 @@ void eos_init(struct Sim *theSim)
         eos_cool = &eos_cool_none;
     else if(coolType == COOL_ISOTHERM)
         eos_cool = &eos_cool_isotherm;
-    else if(sim_Background(theSim) == COOL_BB_ES)
+    else if(coolType == COOL_BB_ES)
         eos_cool = &eos_cool_bb_es;
-    else if(sim_Background(theSim) == COOL_BB_FF)
+    else if(coolType == COOL_BB_FF)
         eos_cool = &eos_cool_bb_ff;
-    else if(sim_Background(theSim) == COOL_NU)
+    else if(coolType == COOL_NU)
         eos_cool = &eos_cool_neutrino;
 }
 

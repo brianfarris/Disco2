@@ -186,7 +186,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
                     for(nu=0; nu<4; nu++)
                         for(la=0; la<4; la++)
                             viscm[4*mu+nu] += metric_g_dd(g,nu,la)*visc[4*mu+la];
-               
+              
                 cool = eos_cool(c->prim, height, theSim);
                /* 
                 //Isotherm: drive to constant P/rho

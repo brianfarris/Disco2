@@ -7,7 +7,7 @@ import numpy as np
 import readChkpt as rc
 
 GAM = 1.3333333333
-M = 1.0e-6
+M = 1.0
 scale = 'linear'
 
 def plot_r_profile_single(r, f, sca, ylabel, R=None, F=None):
@@ -22,7 +22,10 @@ def plot_r_profile_single(r, f, sca, ylabel, R=None, F=None):
             plt.plot(R, F, 'r')
     
     plt.gca().set_xscale(sca)
-    plt.gca().set_yscale(sca)
+    if (f == 0.0).all():
+        plt.gca().set_yscale('linear')
+    else:
+        plt.gca().set_yscale(sca)
     plt.xlabel(r"$r$")
     plt.ylabel(ylabel)
 

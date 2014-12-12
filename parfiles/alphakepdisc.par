@@ -52,15 +52,21 @@ G_EPS			0.0
 GravM           1.0e-6
 AlphaVisc       0.1
 
+//EoS
+EOSType             1       //0 Ideal-Newtonian, 1 Ideal-GR
+EOSPar1            0.0
+EOSPar2            0.0
+
 //Cooling
-CoolingType         2       //0 None, 1 Isothermal, 2 Blackbody-Thompson, 3 Vis
-CoolPar1            1.0e-30
+CoolingType         2       //0 None, 1 Isothermal, 2 Blackbody-Thompson, 
+                            //3 Blackbody-freefree, 4 Neutrino
+CoolPar1            1.0
 CoolPar2            0.0
 
 //Initial Condition Parameters
 InitPar0        2         // Keplerian Alpha-Disc
-InitPar1        1.0e+0    // rho0
-InitPar2        1.0e-6    // P0
+InitPar1        1.0e-3    // rho0
+InitPar2        1.0e-9    // P0
 InitPar3        0.0       // 
 InitPar4        0.0       // 
 

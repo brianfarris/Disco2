@@ -52,6 +52,11 @@ G_EPS			0.0
 GravM           1.0
 AlphaVisc       0.01
 
+//EoS
+EOSType             1       //0 Ideal-Newtonian, 1 Ideal-GR
+EOSPar1            0.0
+EOSPar2            0.0
+
 //Cooling
 CoolingType         2       //0 None, 1 Isothermal, 2 Blackbody-Thompson
 CoolPar1            1.0e28

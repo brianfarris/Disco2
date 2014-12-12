@@ -24,24 +24,38 @@ double eos_cool_bb_es(double *prim, double H, struct Sim *theSim)
 {
     //TODO: Work in 2D and 3D?
     double kappa = 0.2;
-    double rho = prim[RHO]*eos_rho_scale;
-    double P = prim[PPP]*eos_rho_scale;
+    double h = H*eos_r_scale;
+    double rho = (prim[RHO]/H)*eos_rho_scale;
+    double P = (prim[PPP]/H)*eos_rho_scale;
     double temp = 0.5 * eos_mp * P / rho * eos_c * eos_c;
     double q0 = sim_CoolPar1(theSim);
-    double q = q0 * 8.0*eos_sb * temp*temp*temp*temp/(3.0*kappa*rho);
+    double q = q0 * 8.0*eos_sb * temp*temp*temp*temp/(3.0*kappa*rho*h);
+    double Q = q / (eos_c*eos_c*eos_c * eos_rho_scale);
 
-    return q / eos_rho_scale;
+    return Q;
 }
 
 double eos_cool_bb_ff(double *prim, double H, struct Sim *theSim)
 {
-    return 0;
+    //TODO: Work in 2D and 3D?
+    double h = H*eos_r_scale;
+    double rho = (prim[RHO]/H)*eos_rho_scale;
+    double P = (prim[PPP]/H)*eos_rho_scale;
+    double temp = 0.5 * eos_mp * P / rho * eos_c * eos_c; //in ergs
+    double kappa = 6.6e22 * rho * pow(temp/eos_k, -3.5);
+    double q0 = sim_CoolPar1(theSim);
+    double q = q0 * 8.0*eos_sb * temp*temp*temp*temp/(3.0*kappa*rho*h);
+    double Q = q / (eos_c*eos_c*eos_c * eos_rho_scale);
+
+    return Q;
 }
 
 double eos_cool_neutrino(double *prim, double H, struct Sim *theSim)
 {
-    double rho = prim[RHO]*eos_rho_scale;
-    double P = prim[PPP]*eos_rho_scale;
+    double rho = (prim[RHO]/H)*eos_rho_scale;
+    double P = (prim[PPP]/H)*eos_rho_scale;
+    double h = H * eos_r_scale;
     double t11 = 0.5 * eos_mp * P / rho * eos_c * eos_c / (1.0e11 * eos_k);
-    return 5.0e33 * pow(t11,9) * H;
+    double q = 5.0e33 * pow(t11,9) * h;
+    double Q = q / (eos_c*eos_c*eos_c * eos_rho_scale);
 }
