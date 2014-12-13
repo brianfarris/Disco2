@@ -229,6 +229,8 @@ double metric_frame_U_u_kep(struct Metric *g, int mu, struct Sim *theSim)
             return u0*vp;
         return 0.0;
     }
+    
+    return 0.0;
 }
 
 double metric_frame_dU_du_kep(struct Metric *g, int mu, int nu, struct Sim *theSim)
@@ -292,4 +294,6 @@ double metric_frame_dU_du_kep(struct Metric *g, int mu, int nu, struct Sim *theS
             return du0*vp + u0*dvp;
         return 0.0;
     }
+
+    return 0.0;
 }

@@ -12,7 +12,6 @@
 
 void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCells,struct Sim * theSim,struct TimeStep * theTimeStep,struct MPIsetup * theMPIsetup,struct GravMass * theGravMasses){
   if (timestep_get_t(theTimeStep)>=diagnostics_tdiag_measure(theDiagnostics)){
-    int num_r_points = sim_N(theSim,R_DIR)-sim_Nghost_min(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR);
     int num_r_points_global = sim_N_global(theSim,R_DIR);
 
     int NUM_SCAL = theDiagnostics->NUM_DIAG;
@@ -67,14 +66,11 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
         double r = 0.5*(rm+rp);
         for (j=0;j<sim_N_p(theSim,i);++j){
           double phi = cell_tiph(cell_single(theCells,i,j,k));
-          double dphi = cell_dphi(cell_single(theCells,i,j,k));
           double rho = cell_prim(cell_single(theCells,i,j,k),RHO);
           double press = cell_prim(cell_single(theCells,i,j,k),PPP);
           double vr = cell_prim(cell_single(theCells,i,j,k),URR);
           double vp = cell_prim(cell_single(theCells,i,j,k),UPP)*r;
-          double vz = cell_prim(cell_single(theCells,i,j,k),UZZ);
-          double v2   = vr*vr + vp*vp + vz*vz;
-          double rhoe = press/(sim_GAMMALAW(theSim)-1.);
+          //double vz = cell_prim(cell_single(theCells,i,j,k),UZZ);
 
           double passive_scalar = cell_prim(cell_single(theCells,i,j,k),5);
 

@@ -19,7 +19,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     struct Sim * theSim,struct GravMass * theGravMasses,
     struct MPIsetup * theMPIsetup,double timestep_fac){
 
-  int i,j,k,q;
+  int i,j,k;
   double dt = timestep_fac*theTimeStep->dt;
 
   // figure out what all the faces need to be and set them up

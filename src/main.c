@@ -1,3 +1,4 @@
+/*
 //                         ...WWn+,....
 //                     ..JWyyZyZZXyyyZWL
 //                   .XyZyZZZyyXyyZZyZyWWl
@@ -39,12 +40,14 @@
 //    ?&.^.J`J.JJ:^^^^^^^^^^:^J;7wv'  ?7$^^^^JJ^
 //       .777=! `1+J.:^:^^:^:.J!     .  7777?t
 //                   `?P777?`       .^       r
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "Headers/MPIsetup.h"
 #include "Headers/Cell.h"
 #include "Headers/Sim.h"
+#include "Headers/EOS.h"
 #include "Headers/Face.h"
 #include "Headers/GravMass.h"
 #include "Headers/IO.h"

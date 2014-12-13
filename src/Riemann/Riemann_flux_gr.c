@@ -5,7 +5,6 @@
 #include "../Headers/Riemann.h"
 #include "../Headers/Sim.h"
 #include "../Headers/Cell.h"
-#include "../Headers/EOS.h"
 #include "../Headers/Face.h"
 #include "../Headers/Metric.h"
 #include "../Headers/header.h"
@@ -28,8 +27,6 @@ void LR_speed_gr(double *prim, double r, int *n ,double GAMMALAW, double *p_vn, 
     double vp  = prim[UPP];
     double vz  = prim[UZZ];
     double vn  = vr*n[0] + vp*n[1] + vz*n[2];
-    //TODO: Add in Scale Height.
-//    double cf2  = eos_cs2_prim(prim, -1, theSim);
     double cf2  = GAMMALAW*P/(rho + GAMMALAW*P/(GAMMALAW-1.0));
 
     *p_vn = vn;
@@ -64,7 +61,7 @@ void riemann_set_vel_gr(struct Riemann *theRiemann, struct Sim *theSim, double r
     gam = metric_gamma_uu(g, dir, dir);
 
     double vnL, cf21, mnL;
-    double FL[3], FmL[3];
+    double FmL[3];
     LR_speed_gr(theRiemann->primL, r, theRiemann->n, GAMMALAW, &vnL, &cf21, FmL, &mnL);
 
     v[0] = theRiemann->primL[URR];
@@ -84,7 +81,7 @@ void riemann_set_vel_gr(struct Riemann *theRiemann, struct Sim *theSim, double r
 //    Sr1 = 1.0;
 
     double vnR,cf22,mnR;
-    double FR[3],FmR[3];
+    double FmR[3];
     LR_speed_gr(theRiemann->primR, r, theRiemann->n, GAMMALAW, &vnR, &cf22, FmR, &mnR);
 
     v[0] = theRiemann->primR[URR];
@@ -157,7 +154,7 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
     double a, b[3], sqrtg, U[4];
     double u0, u[4]; //u0 = u^0, u[i] = u_i
     double rho, Pp, v[3];
-    double eps, rhoh, vn, bn, hn, Un;
+    double rhoh, vn, bn, hn, Un;
 
     //Get hydro primitives
     rho = prim[RHO];
@@ -198,8 +195,6 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
     else
         hn = 1.0;
    
-    //TODO: Include Scale Height.
-//    eps = eos_eps_prim(prim, -1, theSim);
     rhoh = rho + GAMMALAW/(GAMMALAW-1.0)*Pp;
     
     //Fluxes

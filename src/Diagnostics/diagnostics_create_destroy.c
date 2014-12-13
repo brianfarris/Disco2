@@ -35,11 +35,7 @@ struct Diagnostics *diagnostics_create(struct Sim * theSim, struct TimeStep * th
     double zp = sim_FacePos(theSim,k,Z_DIR);
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     double z = 0.5*(zm+zp);
-    double dz = zp-zm;
     for (i=imin;i<imax;++i){
-      double rp = sim_FacePos(theSim,i,R_DIR);
-      double rm = sim_FacePos(theSim,i-1,R_DIR);
-      double r = 0.5*(rm+rp);
       for (j=0;j<sim_N_p(theSim,i);++j){
         if ((fabs(zp)<0.0000001)||(fabs(z)<0.0000001)){
           ++Ncells_eq; 

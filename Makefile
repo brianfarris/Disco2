@@ -19,10 +19,10 @@ SRCS    := $(shell find $(SRCDIR) -name '*.$(SRCEXT)')
 SRCDIRS := $(shell find . -name '*.$(SRCEXT)' -exec dirname {} \; | uniq)
 OBJS    := $(patsubst %.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
 
-DEBUG    = -g
+DEBUG    = -g -Wall
 INCLUDES = -I$(H55)/include
-CFLAGS   = -O3 -c $(INCLUDES)
-#CFLAGS   = -c $(DEBUG) $(INCLUDES)
+#CFLAGS   = -O3 -c $(INCLUDES)
+CFLAGS   = -c $(DEBUG) $(INCLUDES)
 LDFLAGS  = -lm -lz -L$(H55)/lib -lhdf5
 
 CC       = mpicc

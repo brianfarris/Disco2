@@ -10,7 +10,6 @@
 
 
 void cell_clean_pi(struct Cell *** theCells,struct Sim *theSim){
-  int NUM_Q = sim_NUM_Q(theSim);
 
   int i,j,k;
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -98,8 +97,8 @@ void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,voi
 
   double RMIN = sim_MIN(theSim,R_DIR);
   double RMAX = sim_MAX(theSim,R_DIR);
-  double ZMIN = sim_MIN(theSim,Z_DIR);
-  double ZMAX = sim_MAX(theSim,Z_DIR);
+  //double ZMIN = sim_MIN(theSim,Z_DIR);
+  //double ZMAX = sim_MAX(theSim,Z_DIR);
 
   struct Cell * initialCell = cell_single_create(theSim);
   double R0 = 1./(2.0*M_PI*sim_DAMP_TIME(theSim));

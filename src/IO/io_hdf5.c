@@ -13,8 +13,6 @@
 
 void io_hdf5_out(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeStep){
   int NUM_Q = sim_NUM_Q(theSim);
-  int Ncells = sim_Ncells(theSim);
-  int i,q;
   // HDF5 APIs definitions
   hid_t       file_id, dset_id;         /* file and dataset identifiers */
   hid_t       filespace, memspace;      /* file and memory dataspace identifiers */
@@ -159,7 +157,6 @@ void io_hdf5_out(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeS
 
 void io_hdf5_in(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeStep){
   int NUM_Q = sim_NUM_Q(theSim);
-  int Ncells = sim_Ncells(theSim);
   hid_t       file;                        /* handles */
   hid_t       dataset;  
   hid_t       filespace;                   
@@ -172,7 +169,7 @@ void io_hdf5_in(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeSt
   hsize_t     block[2];
   hsize_t     stride[2];
   herr_t      status, status_n;                             
-  int         rank, rank_chunk;
+  int         rank;
   //int         i, j,k;
 
   // Open the file and the dataset.

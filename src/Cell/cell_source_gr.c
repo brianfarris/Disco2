@@ -37,16 +37,12 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                 double rho = c->prim[RHO];
                 double Pp  = c->prim[PPP];
                 double r   = .5*(rp+rm);
-                double vr  = c->prim[URR];
-                double vz  = c->prim[UZZ];
-                double vp  = c->prim[UPP]*r;
+                double z  = .5*(zp+zm);
                 double dz = zp-zm;
                 double dV = dphi*.5*(rp*rp-rm*rm)*dz;
 
-                double z  = .5*(zp+zm);
-                double R  = sqrt(r*r+z*z);
        
-                int mu, nu, la, ka;
+                int mu, nu, la;
                 double a, b[3], sqrtg, u[4], u_d[4], U[4], s, sk, rhoh, GAMMALAW;
                 double v[3];
                 struct Metric *g;
@@ -89,8 +85,7 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                 }
                 if(sim_Background(theSim) == GRVISC1)
                 {
-                    double du0;
-                    double dv[12], du[16];
+                    double dv[12];
                     double cs2;
                     double alpha = sim_AlphaVisc(theSim);
 

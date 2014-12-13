@@ -58,4 +58,6 @@ double eos_cool_neutrino(double *prim, double H, struct Sim *theSim)
     double t11 = 0.5 * eos_mp * P / rho * eos_c * eos_c / (1.0e11 * eos_k);
     double q = 5.0e33 * pow(t11,9) * h;
     double Q = q / (eos_c*eos_c*eos_c * eos_rho_scale);
+
+    return 0*Q;
 }

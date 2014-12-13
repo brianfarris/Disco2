@@ -5,16 +5,15 @@
 #include "../Headers/Riemann.h"
 #include "../Headers/Sim.h"
 #include "../Headers/Cell.h"
-#include "../Headers/EOS.h"
 #include "../Headers/Face.h"
 #include "../Headers/Metric.h"
 #include "../Headers/header.h"
 
 void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
 {
-    int i,j,k,dir;
-    double a, sqrtg, du0, hn, cs2, eps, rhoh, visc, height, r, u0;
-    double v[3], dv[12], b[3], u[4], du[16], shear[16], U[4], Ud[4];
+    int i,j,dir;
+    double a, sqrtg, hn, cs2, rhoh, visc, height, r, u0;
+    double v[3], dv[12], b[3], shear[16], U[4], Ud[4];
     
     double alpha = sim_AlphaVisc(theSim);
     double GAMMA = sim_GAMMALAW(theSim);
@@ -192,9 +191,9 @@ void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
 
 void riemann_visc_flux_LR_gr(struct Riemann *theRiemann, struct Sim *theSim, int state, double *F)
 {
-    int i,j,k,dir;
-    double a, sqrtg, du0, hn, cs2, rhoh, visc, height, r;
-    double v[3], dv[12], b[3], u[4], du[16], shear[16];
+    int i,j,dir;
+    double a, sqrtg, hn, cs2, rhoh, visc, height, r;
+    double v[3], dv[12], b[3], shear[16];
     
     double alpha = sim_AlphaVisc(theSim);
     double GAMMA = sim_GAMMALAW(theSim);

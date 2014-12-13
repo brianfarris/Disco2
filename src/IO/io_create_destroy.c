@@ -12,7 +12,6 @@
 
 struct IO *io_create(struct Sim *theSim) {
   struct IO *theIO = (struct IO *) malloc(sizeof(struct IO));
-  int NUM_Q = sim_NUM_Q(theSim);
 
   return(theIO);
 }

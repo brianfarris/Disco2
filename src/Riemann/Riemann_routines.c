@@ -251,7 +251,6 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
   }
 
   //Add viscous flux
-  double M = sim_GravM(theSim);
   if(sim_Background(theSim) == GRVISC1)
     riemann_visc_flux_gr(theRiemann, theSim);
   else if(sim_Background(theSim) == GRDISC)

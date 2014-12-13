@@ -9,23 +9,23 @@
 double eos_cs2_gammalaw(double *prim, struct Sim *theSim)
 {
     double GAM = sim_EOSPar1(theSim);
-    return GAM * prim[PPP] / (1.0 + GAM*prim[PPP]/(GAM-1.0));
+    return GAM * prim[TTT] / (1.0 + GAM*prim[TTT]/(GAM-1.0));
 }
 
 double eos_eps_gammalaw(double *prim, struct Sim *theSim)
 {
     double GAM = sim_EOSPar1(theSim);
-    return prim[PPP] / (GAM-1.0);
+    return prim[TTT] / (GAM-1.0);
 }
 
 double eos_ppp_gammalaw(double *prim, struct Sim *theSim)
 {
-    return prim[RHO] * prim[PPP];
+    return prim[RHO] * prim[TTT];
 }
 
 double eos_dpppdrho_gammalaw(double *prim, struct Sim *theSim)
 {
-    return prim[PPP];
+    return prim[TTT];
 }
 
 double eos_dpppdttt_gammalaw(double *prim, struct Sim *theSim)

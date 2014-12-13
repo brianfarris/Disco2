@@ -49,7 +49,6 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
 void cell_add_src_newt( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses , double dt ){
   int GRAV2D=sim_GRAV2D(theSim);
   int i,j,k;
-  FILE *sourcefile;
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     double zm = sim_FacePos(theSim,k-1,Z_DIR);
     double zp = sim_FacePos(theSim,k,Z_DIR);

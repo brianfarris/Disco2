@@ -17,7 +17,6 @@ void get_proc_factorization(int N_r_global,int N_z_global,int numprocs,int * fac
 
 void mpisetup_setprocs(struct MPIsetup * theMPIsetup,char * filename){
   int readvar(char *,char *, int,void *);
-  int err=0;
   int N_r_global,N_z_global;
   readvar( filename , "NumR" , VAR_INT  , &(N_r_global) );
   readvar( filename , "NumZ" , VAR_INT  , &(N_z_global  ));
