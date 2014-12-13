@@ -21,17 +21,29 @@ const static double eos_r_scale = 1.4766250385e5;
 void eos_init(struct Sim *);
 
 //Equations of State
-double (*eos_cs2_prim)(double *, double, struct Sim *);
-double (*eos_eps_prim)(double *, double, struct Sim *);
-double (*eos_temp_prim)(double *, double, struct Sim *);
+double (*eos_cs2)(double *, struct Sim *);
+double (*eos_eps)(double *, struct Sim *);
+double (*eos_ppp)(double *, struct Sim *);
+double (*eos_dpppdrho)(double *, struct Sim *);
+double (*eos_dpppdttt)(double *, struct Sim *);
+double (*eos_depsdrho)(double *, struct Sim *);
+double (*eos_depsdttt)(double *, struct Sim *);
 
-double eos_cs2_prim_ideal_newt(double *prim, double H, struct Sim *theSim);
-double eos_eps_prim_ideal_newt(double *prim, double H, struct Sim *theSim);
-double eos_temp_prim_ideal_newt(double *prim, double H, struct Sim *theSim);
+double eos_cs2_gammalaw(double *, struct Sim *);
+double eos_eps_gammalaw(double *, struct Sim *);
+double eos_ppp_gammalaw(double *, struct Sim *);
+double eos_dpppdrho_gammalaw(double *, struct Sim *);
+double eos_dpppdttt_gammalaw(double *, struct Sim *);
+double eos_depsdrho_gammalaw(double *, struct Sim *);
+double eos_depsdttt_gammalaw(double *, struct Sim *);
 
-double eos_cs2_prim_ideal_gr(double *prim, double H, struct Sim *theSim);
-double eos_eps_prim_ideal_gr(double *prim, double H, struct Sim *theSim);
-double eos_temp_prim_ideal_gr(double *prim, double H, struct Sim *theSim);
+double eos_cs2_gasrad(double *, struct Sim *);
+double eos_eps_gasrad(double *, struct Sim *);
+double eos_ppp_gasrad(double *, struct Sim *);
+double eos_dpppdrho_gasrad(double *, struct Sim *);
+double eos_dpppdttt_gasrad(double *, struct Sim *);
+double eos_depsdrho_gasrad(double *, struct Sim *);
+double eos_depsdttt_gasrad(double *, struct Sim *);
 
 //Cooling
 double (*eos_cool)(double *, double, struct Sim *);
