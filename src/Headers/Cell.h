@@ -83,10 +83,13 @@ double cell_wiph(struct Cell *);
 //modify cell data
 void cell_add_cons(struct Cell *, int, double);
 void cell_add_wiph(struct Cell *, double);
-void cell_add_src( struct Cell *** ,struct Sim * , struct GravMass * , double );
 void cell_clean_pi(struct Cell *** ,struct Sim *);
 void cell_update_phi( struct Cell *** , struct Sim * , double , double );
 void cell_update_dphi( struct Cell *** ,struct Sim * );
+void (*cell_add_src)( struct Cell *** ,struct Sim * , struct GravMass * , double );
+void cell_add_src_newt( struct Cell *** ,struct Sim * , struct GravMass * , double );
+void cell_add_src_gr( struct Cell *** ,struct Sim * , struct GravMass * , double );
+void cell_add_src_grdisc( struct Cell *** ,struct Sim * , struct GravMass * , double );
 //clear
 void cell_clear_w(struct Cell ***,struct Sim * );
 //set w
@@ -118,11 +121,14 @@ void cell_prim2cons_newt( double * , double * , double * , double ,struct Sim *)
 void cell_cons2prim_newt( double * , double * , double * , double ,struct Sim *);
 void cell_prim2cons_gr( double * , double * , double * , double ,struct Sim *);
 void cell_cons2prim_gr( double * , double * , double * , double ,struct Sim *);
+void cell_prim2cons_grdisc( double * , double * , double * , double ,struct Sim *);
+void cell_cons2prim_grdisc( double * , double * , double * , double ,struct Sim *);
 //miscellaneous
 double (*cell_mindt)( struct Cell *** , struct Sim * );
 double cell_mindt_newt( struct Cell *** , struct Sim * );
 double cell_mindt_gr( struct Cell *** , struct Sim * );
 double cell_mindt_grvisc1( struct Cell *** , struct Sim * );
+double cell_mindt_grdisc( struct Cell *** , struct Sim * );
 void cell_copy(struct Cell ***,struct Sim * );
 void cell_adjust_RK_cons( struct Cell *** , struct Sim * , double );
 void cell_set_prim(struct Cell ***,int,int,int,int,double);//this will morph into a checkpoint restart routine

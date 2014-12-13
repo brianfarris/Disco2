@@ -76,6 +76,12 @@ double cell_maxvel_gr(double *prim, int dir, double w, double r, double phi, dou
     return maxv;
 }
 
+//TODO: WRITE THIS.
+double cell_maxvel_grdisc(double *prim, int dir, double w, double r, double phi, double z, struct Sim *theSim)
+{
+    return 0.0;
+}
+
 double cell_mindt_newt( struct Cell *** theCells, struct Sim * theSim ){
   double dt_m = 1.e100;//HUGE_VAL;
   int i,j,k;
@@ -277,3 +283,8 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
     return dt2;
 }
 
+//TODO: WRITE THIS
+double cell_mindt_grdisc(struct Cell ***theCells, struct Sim *theSim)
+{
+    return 0.0;
+}

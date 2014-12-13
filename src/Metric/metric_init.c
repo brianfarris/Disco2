@@ -13,6 +13,7 @@ void metric_init_background(struct Sim *theSim)
     {
         cell_prim2cons = &cell_prim2cons_newt;
         cell_cons2prim = &cell_cons2prim_newt;
+        cell_add_src = &cell_add_src_newt;
         cell_mindt = &cell_mindt_newt;
         riemann_set_flux = &riemann_set_flux_newt;
         riemann_set_vel = &riemann_set_vel_newt;
@@ -21,6 +22,7 @@ void metric_init_background(struct Sim *theSim)
     {
         cell_prim2cons = &cell_prim2cons_gr;
         cell_cons2prim = &cell_cons2prim_gr;
+        cell_add_src = &cell_add_src_gr;
         cell_mindt = &cell_mindt_gr;
         riemann_set_flux = &riemann_set_flux_gr;
         riemann_set_vel = &riemann_set_vel_gr;
@@ -29,9 +31,19 @@ void metric_init_background(struct Sim *theSim)
     {
         cell_prim2cons = &cell_prim2cons_gr;
         cell_cons2prim = &cell_cons2prim_gr;
+        cell_add_src = &cell_add_src_gr;
         cell_mindt = &cell_mindt_gr;
         riemann_set_flux = &riemann_set_flux_gr;
         riemann_set_vel = &riemann_set_vel_gr;
+    }
+    else if(sim_Background(theSim) == GRDISC)
+    {
+        cell_prim2cons = &cell_prim2cons_grdisc;
+        cell_cons2prim = &cell_cons2prim_grdisc;
+        cell_add_src = &cell_add_src_grdisc;
+        cell_mindt = &cell_mindt_grdisc;
+        riemann_set_flux = &riemann_set_flux_grdisc;
+        riemann_set_vel = &riemann_set_vel_grdisc;
     }
 
     if(sim_Frame(theSim) == FR_EULER)

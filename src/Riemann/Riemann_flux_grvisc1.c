@@ -10,7 +10,7 @@
 #include "../Headers/Metric.h"
 #include "../Headers/header.h"
 
-void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
+void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
 {
     int i,j,k,dir;
     double a, sqrtg, du0, hn, cs2, eps, rhoh, visc, height, r, u0;
@@ -190,7 +190,7 @@ void riemann_visc_flux(struct Riemann *theRiemann, struct Sim *theSim)
     metric_destroy(g);
 }
 
-void riemann_visc_flux_LR(struct Riemann *theRiemann, struct Sim *theSim, int state, double *F)
+void riemann_visc_flux_LR_gr(struct Riemann *theRiemann, struct Sim *theSim, int state, double *F)
 {
     int i,j,k,dir;
     double a, sqrtg, du0, hn, cs2, rhoh, visc, height, r;

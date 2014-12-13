@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
 
   //Point Cell & Riemann to Newtonian/GR versions
   metric_init_background(theSim);
-  if(sim_Background(theSim)==GR || sim_Background(theSim)==GRVISC1)
+  if(sim_Background(theSim) != NEWTON)
     metric_init_metric(theSim);
   eos_init(theSim);
 
