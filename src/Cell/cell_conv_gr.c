@@ -82,7 +82,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     int i,j;
     struct Metric *g;
     double a, b[3], sqrtg, U[4];
-    double GAMMALAW, rhoh, u0, hmo;
+    double GAMMALAW, u0, hmo;
     double rho, v[3], Pp;
     double rhostar, S[3], tau;
     double w, wmo, wmo0, wmo1; //w = lapse * u^0, wmo = w-1

@@ -7,10 +7,10 @@ InitialDataType        13       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 14 NTDisc, 15 ConstantDisc,
                                 // 16 Cartesian-Shear, 17 Disc Tests
 GravMassType            0       // 0 none, 1 single, 2 binary
-Background              2       // 0 Newtonian, 1 GR, 2 GRvisc
+Background              3       // 0 Newtonian, 1 GR, 2 GRvisc
 Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS
-Frame                   1       // 0 Euler, 1 Keplerian
+Frame                   0       // 0 Euler, 1 Keplerian
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
@@ -53,8 +53,8 @@ GravM           1.0e-6
 AlphaVisc       0.1
 
 //EoS
-EOSType             1       //0 Ideal-Newtonian, 1 Ideal-GR
-EOSPar1            0.0
+EOSType             0       //0 Ideal-Newtonian, 1 Ideal-GR
+EOSPar1            1.3333333333
 EOSPar2            0.0
 
 //Cooling
@@ -72,7 +72,7 @@ InitPar4        0.0
 PHI_ORDER               2
 
 //Atmosphere Parameters
-Rho_Floor		0.000001
+Rho_Floor		0.0000001
 Cs_Floor		1.0e-7		
 Cs_Cap			1.0
 Vel_Cap			100.0
