@@ -7,7 +7,7 @@ InitialDataType        13       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 14 NTDisc, 15 ConstantDisc,
                                 // 16 Cartesian-Shear, 17 Disc Tests
 GravMassType            0       // 0 none, 1 single, 2 binary
-Background              3       // 0 Newtonian, 1 GR, 2 GRvisc
+Background              2       // 0 Newtonian, 1 GR, 2 GRvisc
 Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS
 Frame                   0       // 0 Euler, 1 Keplerian
