@@ -222,7 +222,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
         prim[i] = cons[i]/cons[DDD];
 
     metric_destroy(g);
-
+/*
     if(PRINTTOOMUCH)
     {
         double cons2[sim_NUM_Q(theSim)];
@@ -232,5 +232,6 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
         printf("prim: rho=%.12g, vr=%.12g, vp=%.12g, vz=%.12g, P=%.12g\n", prim[RHO],prim[URR],prim[UPP],prim[UZZ],prim[PPP]);
         printf("cons2: rhostar=%.12g, Sr=%.12g, Sp=%.12g, Sz=%.12g, tau=%.12g\n", cons2[DDD],cons2[SRR],cons2[LLL],cons2[SZZ],cons2[TAU]);
     }
+*/
 }
 

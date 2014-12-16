@@ -72,22 +72,22 @@ double eos_cool_bb_ff(double *prim, double H, struct Sim *theSim)
 
 double eos_cool_neutrino(double *prim, double H, struct Sim *theSim)
 {
-    double rho, t11;
+    double rho10, t11;
     if(sim_Background(theSim) != GRDISC)
     {
         double P;
-        rho = (prim[RHO]/H)*eos_rho_scale;
+        rho10 = (prim[RHO]/H)*eos_rho_scale / (1.0e10);
         P = (prim[PPP]/H)*eos_rho_scale;
-        t11 = 0.5 * P / rho * eos_mp*eos_c*eos_c/(1.0e11*eos_k);
+        t11 = 0.5 * P / prim[RHO] * eos_mp*eos_c*eos_c/(1.0e11*eos_k);
     }
     else
     {
-        rho = prim[RHO] * eos_rho_scale;
+        rho10 = prim[RHO] * eos_rho_scale / (1.0e10);
         t11 = 0.5 * prim[TTT] * eos_mp*eos_c*eos_c/(1.0e11*eos_k);
     }
     double h = H * eos_r_scale;
-    double q = 5.0e33 * pow(t11,9) * h;
+    double q = (5.0e33*pow(t11,9) + 9.0e33*rho10*pow(t11,6)) * h;
     double Q = q / (eos_c*eos_c*eos_c * eos_rho_scale);
 
-    return 0*Q;
+    return Q;
 }

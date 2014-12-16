@@ -12,21 +12,28 @@
 void cell_single_init_cnstdisc(struct Cell *theCell, struct Sim *theSim,int i,int j,int k)
 {
     double rho, Pp, vr, vp;
-    double GAMMALAW = sim_GAMMALAW(theSim);
+    double GAM = sim_GAMMALAW(theSim);
     double M = sim_GravM(theSim);
-    double R0 = sim_InitPar1(theSim);
-    double cs20 = sim_InitPar2(theSim);
+    double rho0 = sim_InitPar1(theSim);
+    double T = sim_InitPar2(theSim);
 
     double rm = sim_FacePos(theSim,i-1,R_DIR);
     double rp = sim_FacePos(theSim,i,R_DIR);
     double r = 0.5*(rm+rp);
-    double zm = sim_FacePos(theSim,k-1,Z_DIR);
-    double zp = sim_FacePos(theSim,k,Z_DIR);
-    double z = 0.5*(zm+zp);
-    double t = theCell->tiph-.5*theCell->dphi;
 
-    rho = R0;
-    Pp = R0 * cs20;
+    double H = sqrt((1-3*M/r)*r*r*r*T/(M*(1.0+GAM*T/(GAM-1.0))));
+
+    if(sim_Background(theSim) != GRDISC)
+    {
+        rho = rho0*H;
+        Pp = rho0 * T *H;
+    }
+    else
+    {
+        rho = rho0;
+        Pp = T;
+    }
+    
     vr = 0.0; 
     vp = sqrt(M/(r*r*r));
 
@@ -45,33 +52,38 @@ void cell_init_cnstdisc(struct Cell ***theCells,struct Sim *theSim,struct MPIset
 {
 
     double rho, Pp, vr, vp;
-    double GAMMALAW = sim_GAMMALAW(theSim);
+    double GAM = sim_GAMMALAW(theSim);
     double M = sim_GravM(theSim);
-    double R0 = sim_InitPar1(theSim);
-    double cs20 = sim_InitPar2(theSim);
+    double rho0 = sim_InitPar1(theSim);
+    double T = sim_InitPar2(theSim);
 
     int i, j, k;
     for (k = 0; k < sim_N(theSim,Z_DIR); k++) 
     {
-        double zm = sim_FacePos(theSim,k-1,Z_DIR);
-        double zp = sim_FacePos(theSim,k,Z_DIR);
-        double z = 0.5*(zm+zp);
-        
         for (i = 0; i < sim_N(theSim,R_DIR); i++) 
         {
             double rm = sim_FacePos(theSim,i-1,R_DIR);
             double rp = sim_FacePos(theSim,i,R_DIR);
             double r = 0.5*(rm+rp);
-         
-            rho = R0;
-            Pp = R0 * cs20;
+            
+            double H = sqrt((1-3*M/r)*r*r*r*T/(M*(1.0+GAM*T/(GAM-1.0))));
+
+            if(sim_Background(theSim) != GRDISC)
+            {
+                rho = rho0*H;
+                Pp = rho0 * T *H;
+            }
+            else
+            {
+                rho = rho0;
+                Pp = T;
+            }
+            
             vr = 0.0; 
             vp = sqrt(M/(r*r*r));
 
             for (j = 0; j < sim_N_p(theSim,i); j++) 
             {
-                double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
-             
                 theCells[k][i][j].prim[RHO] = rho;
                 theCells[k][i][j].prim[PPP] = Pp;
                 theCells[k][i][j].prim[URR] = vr;

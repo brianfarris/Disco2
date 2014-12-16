@@ -155,7 +155,7 @@ void riemann_set_flux_grdisc(struct Riemann *theRiemann, struct Sim *theSim, dou
         u_d[i] = 0.0;
         for(j=0; j<3; j++)
             u_d[i] += metric_gamma_dd(g,i-1,j) * (v[j] + b[j]);
-        u_d[i] /= u0;
+        u_d[i] *= u0;
     }
 
     if(-metric_g_dd(g,0,0)-2*metric_dot3_u(g,b,v)-metric_square3_u(g,v) < 0)
@@ -164,7 +164,7 @@ void riemann_set_flux_grdisc(struct Riemann *theRiemann, struct Sim *theSim, dou
     //Calculate beta & v normal to face.
     vn = v[0]*theRiemann->n[0] + v[1]*theRiemann->n[1] + v[2]*theRiemann->n[2];
     bn = b[0]*theRiemann->n[0] + b[1]*theRiemann->n[1] + b[2]*theRiemann->n[2];
-    Un = U[0]*theRiemann->n[0] + U[1]*theRiemann->n[1] + U[2]*theRiemann->n[2];
+    Un = U[1]*theRiemann->n[0] + U[2]*theRiemann->n[1] + U[3]*theRiemann->n[2];
     if(theRiemann->n[1] == 1)
         hn = r;
     else
@@ -183,7 +183,7 @@ void riemann_set_flux_grdisc(struct Riemann *theRiemann, struct Sim *theSim, dou
     F[LLL] = hn*sqrtg*a*(u0*rhoh*u_d[2]*vn + Pp*theRiemann->n[1])*H;
     F[SZZ] = hn*sqrtg*a*(u0*rhoh*u_d[3]*vn + Pp*theRiemann->n[2])*H;
     F[TAU] = hn*sqrtg*a*(-u0*rhoh*(U[0]*u_d[0]+U[1]*u_d[1]+U[2]*u_d[2]
-                        +U[3]*u_d[3])*vn- u0*rho*vn - Un*Pp) * H;
+                        +U[3]*u_d[3])*vn - u0*rho*vn - Un*Pp) * H;
 
     //Passive Fluxes.
     for(i=sim_NUM_C(theSim); i<sim_NUM_Q(theSim); i++)

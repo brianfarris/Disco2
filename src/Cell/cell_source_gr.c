@@ -89,7 +89,7 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                     double cs2;
                     double alpha = sim_AlphaVisc(theSim);
 
-                    double height = 2*sqrt(Pp*r*r*r/(rhoh*M))/u[0];
+                    double height = sqrt(Pp*r*r*r/(rhoh*M))/u[0];
 
                     cs2 = GAMMALAW*Pp / rhoh;
                     if (alpha > 0)

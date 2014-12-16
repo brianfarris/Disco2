@@ -57,8 +57,8 @@ double cell_maxvel_gr(double *prim, int dir, double w, double r, double phi, dou
 
     if(dir == PDIRECTION)
     {
-        vm = fabs((vn - sig*bn - dv) / (1.0+sig) - w);
-        vp = fabs((vn - sig*bn + dv) / (1.0+sig) - w);
+        vm = fabs((vn - sig*bn - dv) / (1.0+sig) - w/r);
+        vp = fabs((vn - sig*bn + dv) / (1.0+sig) - w/r);
     }
     else
     {
@@ -109,8 +109,8 @@ double cell_maxvel_grdisc(double *prim, int dir, double w, double r, double phi,
 
     if(dir == PDIRECTION)
     {
-        vm = fabs((vn - sig*bn - dv) / (1.0+sig) - w);
-        vp = fabs((vn - sig*bn + dv) / (1.0+sig) - w);
+        vm = fabs((vn - sig*bn - dv) / (1.0+sig) - w/r);
+        vp = fabs((vn - sig*bn + dv) / (1.0+sig) - w/r);
     }
     else
     {
@@ -203,7 +203,7 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                 ar = cell_maxvel_gr(theCells[k][i][j].prim, 0, w, r, phi, z, theSim);
                 ap = cell_maxvel_gr(theCells[k][i][j].prim, 1, w, r, phi, z, theSim);
                 az = cell_maxvel_gr(theCells[k][i][j].prim, 2, w, r, phi, z, theSim);
-                
+
                 double dx = dr;
                 double dt = dr/ar;
                 if(dt > dphi/ap)
@@ -221,20 +221,36 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                 if(sim_Background(theSim) == GRVISC1)
                 {
                     //TODO: Incorporate proper alpha viscosity
+                    int mu;
                     double rho = theCells[k][i][j].prim[RHO];
                     double Pp = theCells[k][i][j].prim[PPP];
                     double GAM = sim_GAMMALAW(theSim);
+                    double u0, b[3], v[3];
                     double rhoh = rho + GAM/(GAM-1)*Pp;
                     double nu;
                     double alpha = sim_AlphaVisc(theSim);
-                    double height = 2.0 * sqrt(r*r*r*(1-3.0*M/r)/M) * sqrt(GAM*Pp/rhoh);
+                    struct Metric *g;
+
+                    v[0] = theCells[k][i][j].prim[URR];
+                    v[1] = theCells[k][i][j].prim[UPP];
+                    v[2] = theCells[k][i][j].prim[UZZ];
+                    g = metric_create(time_global, r, phi, z, theSim);
+                    for(mu=0; mu<3; mu++)
+                        b[mu] = metric_shift_d(g,mu);
+                    u0 = 1.0 / sqrt(-metric_g_dd(g,0,0)-metric_square3_u(g,v)
+                                    - 2*(v[0]*b[0]+v[1]*b[1]+v[2]*b[2]));
+                    metric_destroy(g);
+                    double H = sqrt(r*r*r*Pp / (M*rhoh)) / u0;
+
                     if(alpha < 0.0)
                         nu = -alpha;
                     else
                     {
-                        nu = alpha * sqrt(GAM*Pp/rhoh) * height;
+                        nu = alpha * sqrt(GAM*Pp/rhoh) * H;
                     }
                     double dtv = 0.25*dx*dx/nu;
+                    if(alpha == 0.0)
+                        dtv = 1.0e100; //HUGE
                     
                     //Luminosity Time
                     double maxdisp = 0.1; //Should be a fraction like 0.1
@@ -246,7 +262,7 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                         double U[4];
                         double cool;
 
-                        cool = eos_cool(theCells[k][i][j].prim, height, theSim);
+                        cool = eos_cool(theCells[k][i][j].prim, H, theSim);
                         struct Metric *g;
                         int mu;
                         g = metric_create(time_global, r, phi, z, theSim);
@@ -401,6 +417,8 @@ double cell_mindt_grdisc(struct Cell ***theCells, struct Sim *theSim)
                 else
                     nu_visc = alpha * sqrt(cs2) * H;
                 double dtv = 0.25*dx*dx/nu_visc;
+                if(alpha == 0.0)
+                    dtv = 1.0e100; //HUGE
                 
                 //Luminosity Time
                 double maxdisp = 0.1; //Should be a fraction like 0.1

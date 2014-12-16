@@ -56,7 +56,7 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
         double rm = sim_FacePos(theSim,i-1,R_DIR);
         double r = 0.5*(rm+rp);
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-          theCells[k][i][j].wiph = sqrt(M/r);
+            theCells[k][i][j].wiph = sqrt(M/r);
         }
       }
     }

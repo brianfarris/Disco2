@@ -34,67 +34,71 @@ def plot_r_profile(filename, sca='linear'):
     t = dat[0]
     r = dat[1]
     rho = dat[4]
-    P = dat[5]
+    T = dat[5]
     vr = dat[6]
     vp = dat[7]
 
     real = r>2*M
     r = r[real]
     rho = rho[real]
-    P = P[real]
+    T = T[real]
     vr = vr[real]
     vp = vp[real]
     
     i = r.argmax()
-    R = np.logspace(np.log10(r.min()), np.log10(r.max()), 100)
+    R = np.linspace(r.min(), r.max(), 100)
+    #R = np.logspace(np.log10(r.min()), np.log10(r.max()), 100)
     RHO = rho[i] * np.power(R/r[i], -0.5)
-    PPP = P[i] * np.power(R/r[i], -1.5)
+    TTT = T[i] * np.power(R/r[i], -1.0)
     URR = vr[i] * np.power(R/r[i], -0.5)
     UPP = vp[i] * np.power(R/r[i], -1.5)
 
-    rhoh = rho + GAM*P/(GAM-1.0)
-    RHOH = RHO + GAM*PPP/(GAM-1.0)
+    rhoh = rho*(1.0 + GAM/(GAM-1.0)*T)
+    RHOH = RHO*(1.0 + GAM/(GAM-1.0)*TTT)
 
-    #u0 = 1.0/np.sqrt(1.0-2*M/r-vr*vr/(1-2*M/r)-r*r*vp*vp)
-    #U00 = 1.0/np.sqrt(1.0-2*M/R-URR*URR/(1-2*M/R)-R*R*UPP*UPP)
-    u0 = 1.0/np.sqrt(1.0-2*M/r-4*M/r*vr-(1+2*M/r)*vr*vr-r*r*vp*vp)
-    U00 = 1.0/np.sqrt(1.0-2*M/R-4*M/R*URR-(1+2*M/R)*URR*URR-R*R*UPP*UPP)
+    u0 = 1.0/np.sqrt(1.0-2*M/r-vr*vr/(1-2*M/r)-r*r*vp*vp)
+    U00 = 1.0/np.sqrt(1.0-2*M/R-URR*URR/(1-2*M/R)-R*R*UPP*UPP)
+    #u0 = 1.0/np.sqrt(1.0-2*M/r-4*M/r*vr-(1+2*M/r)*vr*vr-r*r*vp*vp)
+    #U00 = 1.0/np.sqrt(1.0-2*M/R-4*M/R*URR-(1+2*M/R)*URR*URR-R*R*UPP*UPP)
 
-    fac = 1.0/(1.0-2*M/(r-2*M)*vr)
-    vr = vr*fac
-    vp = vp*fac
+    #fac = 1.0/(1.0-2*M/(r-2*M)*vr)
+    #vr = vr*fac
+    #vp = vp*fac
 
-    V = u0*vr / np.sqrt(1-2*M/r+u0*u0*vr*vr)
-    VVV = U00*URR / np.sqrt(1-2*M/R+U00*U00*URR*URR)
+    #V = u0*vr / np.sqrt(1-2*M/r+u0*u0*vr*vr)
+    #VVV = U00*URR / np.sqrt(1-2*M/R+U00*U00*URR*URR)
 
-    mach = np.sqrt((vr*vr/(1-2*M/r)+r*r*vp*vp)/(GAM*P/rhoh))
-    MACH = np.sqrt((URR*URR/(1-2*M/R)+R*R*UPP*UPP)/(GAM*PPP/RHOH))
+    #mach = np.sqrt((vr*vr/(1-2*M/r)+r*r*vp*vp)/(GAM*P/rhoh))
+    #MACH = np.sqrt((URR*URR/(1-2*M/R)+R*R*UPP*UPP)/(GAM*PPP/RHOH))
 
-    T = P/rho
-    TTT = PPP/RHO
+    P = rho*T
+    PPP = RHO*TTT
 
-    H = 2*np.sqrt(P*r*r*r/(rhoh*M))/u0
-    HHH = 2*np.sqrt(PPP*R*R*R/(RHOH*M))/U00
+    H = np.sqrt(P*r*r*r/(rhoh*M))/u0
+    HHH = np.sqrt(PPP*R*R*R/(RHOH*M))/U00
 
     print("Plotting t = {0:g}".format(t))
 
     #Plot.
     fig = plt.figure(figsize=(12,9))
+
     plt.subplot(331)
-    plot_r_profile_single(r, rho/H, sca, r"$\rho_0$", R, RHO/HHH)
+    plot_r_profile_single(r, rho, sca, r"$\rho_0$", R, RHO)
+
     plt.subplot(332)
-    plot_r_profile_single(r, P/H, sca, r"$P$", R, PPP/HHH)
+    plot_r_profile_single(r, P, sca, r"$P = \rho_0 T$", R, PPP)
+    
     plt.subplot(333)
-    plot_r_profile_single(r, T, sca, r"$T = P/\rho_0$", R, TTT)
+    plot_r_profile_single(r, T, sca, r"$T$", R, TTT)
     
     plt.subplot(334)
-    plot_r_profile_single(r, V, sca, r"$V$", R, VVV)
-#    plt.plot(R, -np.ones(R.shape), 'b')
-#    plt.plot(R, -(2.0-R)/(2.0+R), 'b')
+    plot_r_profile_single(r, vr, sca, r"$v^r$", R, URR)
+    
     plt.subplot(335)
     plot_r_profile_single(r, vp, sca, r"$v^\phi$", R, UPP)
-    plt.subplot(336)
-    plot_r_profile_single(r, mach, sca, r"$\mathcal{M}$", R, MACH)
+
+    #plt.subplot(336)
+    #plot_r_profile_single(r, mach, sca, r"$\mathcal{M}$", R, MACH)
 
     plt.subplot(337)
     plot_r_profile_single(r, H, sca, r"$\mathcal{H}$", R, HHH)

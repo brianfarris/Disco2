@@ -6,9 +6,10 @@ InitialDataType        15       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 11 Equilibrium1, 12 Equilibrium2, 13 SSDisc
                                 // 14 NTDisc, 15 Constant Disc
 GravMassType            0       // 0 none, 1 single, 2 binary
-Background              2       // 0 Newtonian, 1 GR, 2 GRvisc
+Background              2       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
 Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS
+Frame                   0       // 0 Euler, 1 Keplerian
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
@@ -16,43 +17,42 @@ NumR			100			//Radial Zones
 NumZ			1          //Vertical Zones
 ng              2
 R_Min		    1.0e4
-R_Max			6.6666e4
-Z_Min			-1.0e4
-Z_Max			1.0e4
+R_Max			2.0e4
+Z_Min			-1.0e6
+Z_Max			1.0e6
 NP_CONST        3
 aspect                  1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                1.0e7
-Num_Checkpoints	        10000
+Time_Max                1.0e8
+Num_Checkpoints	        101
 Num_Diag_Dump           20
 Num_Diag_Measure        20
-
 
 NoInnerBC               0
 BoundTypeRIn            1               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeROut           0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZTop           2               // 0 fixed, 1 outflow, 2 periodic
-ZeroPsiBndry         1
+ZeroPsiBndry            1
 
 Move_Cells              4           //0 No movement, 4 Kepler
 RiemannSolver           1           // 0 hllc, 1 hll
 Adiabatic_Index         1.33
 
 //Numerical Parameters
-CFL			0.5
+CFL			0.1
 PLM			1.0
 
 Grav_2D			1
 G_EPS			0.0
 GravM           1.0
-AlphaVisc       1.0e-1
+AlphaVisc       0.0
 
 //EoS
-EOSType             1       //0 Ideal-Newtonian, 1 Ideal-GR
-EOSPar1            0.0
+EOSType            0       //0 Gammalaw, 1 Gas+Rad
+EOSPar1            1.33
 EOSPar2            0.0
 
 //Cooling
@@ -64,8 +64,8 @@ CoolPar2            0.0
 
 //Initial Condition Parameters
 InitPar0        0 
-InitPar1        5.2          // rho0
-InitPar2        1.0e-6       // P0/rho0
+InitPar1        1.0          // rho0
+InitPar2        1.0e-6       // T
 InitPar3        0.0
 InitPar4        0.0
 
