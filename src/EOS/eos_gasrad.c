@@ -9,15 +9,15 @@
 double eos_cs2_gasrad(double *prim, struct Sim *theSim)
 {
     double rho = prim[RHO];
-    double T = prim[TTT];
     double P = eos_ppp_gasrad(prim, theSim);
     double e = eos_eps_gasrad(prim, theSim);
+    double dedr = eos_depsdrho_gasrad(prim, theSim);
     double dedt = eos_depsdttt_gasrad(prim, theSim);
     double dpdr = eos_dpppdrho_gasrad(prim, theSim);
     double dpdt = eos_dpppdttt_gasrad(prim, theSim);
     double h = 1.0 + e + P/rho;
 
-    double cs2 = (dpdr*dedt + T*dpdt*dpdt/(rho*rho)) / (dedt * h);
+    double cs2 = (dpdr*dedt - dedr*dpdt + P*dpdt/(rho*rho)) / (dedt * h);
 
     return cs2;
 }
