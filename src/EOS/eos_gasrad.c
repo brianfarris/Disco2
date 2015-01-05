@@ -25,7 +25,7 @@ double eos_cs2_gasrad(double *prim, struct Sim *theSim)
 double eos_eps_gasrad(double *prim, struct Sim *theSim)
 {
     double x1 = sim_EOSPar1(theSim);
-    double x2 = sim_EOSPar1(theSim);
+    double x2 = sim_EOSPar2(theSim);
     double gam = sim_GAMMALAW(theSim);
     double rho = prim[RHO] * eos_rho_scale;
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs
@@ -39,7 +39,7 @@ double eos_eps_gasrad(double *prim, struct Sim *theSim)
 double eos_ppp_gasrad(double *prim, struct Sim *theSim)
 {
     double x1 = sim_EOSPar1(theSim);
-    double x2 = sim_EOSPar1(theSim);
+    double x2 = sim_EOSPar2(theSim);
     double rho = prim[RHO] * eos_rho_scale;
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs
 
@@ -52,7 +52,7 @@ double eos_ppp_gasrad(double *prim, struct Sim *theSim)
 double eos_dpppdrho_gasrad(double *prim, struct Sim *theSim)
 {
     double x1 = sim_EOSPar1(theSim);
-    double x2 = sim_EOSPar1(theSim);
+    double x2 = sim_EOSPar2(theSim);
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs
 
     double gas = T/eos_mp;
@@ -64,7 +64,7 @@ double eos_dpppdrho_gasrad(double *prim, struct Sim *theSim)
 double eos_dpppdttt_gasrad(double *prim, struct Sim *theSim)
 {
     double x1 = sim_EOSPar1(theSim);
-    double x2 = sim_EOSPar1(theSim);
+    double x2 = sim_EOSPar2(theSim);
     double rho = prim[RHO] * eos_rho_scale;
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs
 
@@ -77,7 +77,7 @@ double eos_dpppdttt_gasrad(double *prim, struct Sim *theSim)
 double eos_depsdrho_gasrad(double *prim, struct Sim *theSim)
 {
     double x1 = sim_EOSPar1(theSim);
-    double x2 = sim_EOSPar1(theSim);
+    double x2 = sim_EOSPar2(theSim);
     double rho = prim[RHO] * eos_rho_scale;
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs
 
@@ -90,7 +90,7 @@ double eos_depsdrho_gasrad(double *prim, struct Sim *theSim)
 double eos_depsdttt_gasrad(double *prim, struct Sim *theSim)
 {
     double x1 = sim_EOSPar1(theSim);
-    double x2 = sim_EOSPar1(theSim);
+    double x2 = sim_EOSPar2(theSim);
     double gam = sim_GAMMALAW(theSim);
     double rho = prim[RHO] * eos_rho_scale;
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs

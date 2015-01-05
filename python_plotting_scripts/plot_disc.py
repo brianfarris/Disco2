@@ -8,7 +8,7 @@ import readChkpt as rc
 
 GAM = 1.3333333333
 M = 1.0
-scale = 'linear'
+scale = 'log'
 
 def plot_r_profile_single(r, f, sca, ylabel, R=None, F=None):
 
@@ -48,7 +48,7 @@ def plot_r_profile(filename, sca='linear'):
     i = r.argmax()
     R = np.linspace(r.min(), r.max(), 100)
     #R = np.logspace(np.log10(r.min()), np.log10(r.max()), 100)
-    RHO = rho[i] * np.power(R/r[i], -0.5)
+    RHO = rho[i] * np.power(R/r[i], -1.5)
     TTT = T[i] * np.power(R/r[i], -1.0)
     URR = vr[i] * np.power(R/r[i], -0.5)
     UPP = vp[i] * np.power(R/r[i], -1.5)
@@ -56,10 +56,10 @@ def plot_r_profile(filename, sca='linear'):
     rhoh = rho*(1.0 + GAM/(GAM-1.0)*T)
     RHOH = RHO*(1.0 + GAM/(GAM-1.0)*TTT)
 
-    u0 = 1.0/np.sqrt(1.0-2*M/r-vr*vr/(1-2*M/r)-r*r*vp*vp)
-    U00 = 1.0/np.sqrt(1.0-2*M/R-URR*URR/(1-2*M/R)-R*R*UPP*UPP)
-    #u0 = 1.0/np.sqrt(1.0-2*M/r-4*M/r*vr-(1+2*M/r)*vr*vr-r*r*vp*vp)
-    #U00 = 1.0/np.sqrt(1.0-2*M/R-4*M/R*URR-(1+2*M/R)*URR*URR-R*R*UPP*UPP)
+    #u0 = 1.0/np.sqrt(1.0-2*M/r-vr*vr/(1-2*M/r)-r*r*vp*vp)
+    #U00 = 1.0/np.sqrt(1.0-2*M/R-URR*URR/(1-2*M/R)-R*R*UPP*UPP)
+    u0 = 1.0/np.sqrt(1.0-2*M/r-4*M/r*vr-(1+2*M/r)*vr*vr-r*r*vp*vp)
+    U00 = 1.0/np.sqrt(1.0-2*M/R-4*M/R*URR-(1+2*M/R)*URR*URR-R*R*UPP*UPP)
 
     #fac = 1.0/(1.0-2*M/(r-2*M)*vr)
     #vr = vr*fac
@@ -92,7 +92,12 @@ def plot_r_profile(filename, sca='linear'):
     plot_r_profile_single(r, T, sca, r"$T$", R, TTT)
     
     plt.subplot(334)
-    plot_r_profile_single(r, vr, sca, r"$v^r$", R, URR)
+    plot_r_profile_single(r, vr, "linear", r"$v^r$", R, URR)
+    plt.plot(R, (1-2*M/R)/(1+2*M/R), 'r--')
+    plt.plot(R, -1*np.ones(R.shape), 'r--')
+    plt.plot(R, (0.5-2*M/R)/(1+2*M/R), 'b--')
+    plt.plot(R, (-0.5-2*M/R)/(1+2*M/R), 'b--')
+    plt.gca().set_xscale("log")
     
     plt.subplot(335)
     plot_r_profile_single(r, vp, sca, r"$v^\phi$", R, UPP)

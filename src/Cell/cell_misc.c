@@ -92,7 +92,9 @@ void cell_update_dphi( struct Cell *** theCells,struct Sim * theSim ){
   }
 }
 
-void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim, double dt,void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int) ){
+void cell_bc_damp(struct Cell ***theCells, struct Sim *theSim, double dt, 
+        void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int))
+{
   int NUM_Q = sim_NUM_Q(theSim);
 
   double RMIN = sim_MIN(theSim,R_DIR);
@@ -142,3 +144,19 @@ void cell_print(struct Cell *** theCells,int i,int j,int k){
   */
   printf("theCells[%d][%d][%d].cons[BPP]: %e\n",k,i,j,theCells[k][i][j].cons[BPP]);
 }  
+
+void cell_print_all(struct Cell ***theCells, struct Sim *theSim)
+{
+    int i, j, k;
+    struct Cell *c;
+    printf("\n");
+    for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k )
+        for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i )
+            for( j=0 ; j<sim_N_p(theSim,i) ; ++j )
+            {
+                c = &(theCells[k][i][j]);
+                printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g, %.12g)\n",
+                    i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[UZZ],c->prim[PPP],
+                    c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[SZZ],c->cons[TAU]);
+            }
+}

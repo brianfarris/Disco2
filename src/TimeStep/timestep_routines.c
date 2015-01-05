@@ -37,15 +37,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   //TODO: Remove these dumb print statements
   if(PRINTTOOMUCH)
   {
-  printf("\n");
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
-      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-            struct Cell * c = &(theCells[k][i][j]);
-            printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g, %.12g)\n",i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[UZZ],c->prim[PPP],c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[SZZ],c->cons[TAU]);
-        }
-    }
-  }
+    cell_print_all(theCells, theSim);
   }
   
   // this is part of the runge-kutta method
@@ -53,18 +45,10 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   
   //TODO: Remove these dumb print statements
   
-  if(PRINTTOOMUCH){
-    printf("\n");
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
-      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-        
-            struct Cell * c = &(theCells[k][i][j]);
-            printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g, %.12g)\n",i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[UZZ],c->prim[PPP],c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[SZZ],c->cons[TAU]);
-        }
-    }
+  if(PRINTTOOMUCH)
+  {
+    cell_print_all(theCells, theSim);
   }
-    }
   
 
   //Piecewise-Linear Reconstructions.
@@ -168,16 +152,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   //TODO: Remove these dumb print statements
   if(PRINTTOOMUCH)
   {
-  printf("\n");
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
-      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-        
-            struct Cell * c = &(theCells[k][i][j]);
-            printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g, %.12g)\n",i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[UZZ],c->prim[PPP],c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[SZZ],c->cons[TAU]);
-        }
-    }
-  }
+    cell_print_all(theCells, theSim);
   }
   
   //Source Terms
@@ -187,16 +162,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   //TODO: Remove these dumb print statements
   if(PRINTTOOMUCH)
   {
-  printf("\n");
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
-      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-        
-            struct Cell * c = &(theCells[k][i][j]);
-            printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g, %.12g)\n",i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[UZZ],c->prim[PPP],c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[SZZ],c->cons[TAU]);
-        }
-    }
-  }
+    cell_print_all(theCells, theSim);
   }
   
 

@@ -21,7 +21,7 @@ void cell_prim2cons_grdisc(double *prim, double *cons, double *pos,
     double r;
     int i,j;
 
-    r = pos[0];
+    r = pos[R_DIR];
 
     //Get hydro primitives
     rho = prim[RHO];
@@ -30,7 +30,7 @@ void cell_prim2cons_grdisc(double *prim, double *cons, double *pos,
     v[2] = prim[UZZ];
 
     //Get ADM metric values
-    g = metric_create(time_global, pos[0], pos[1], pos[2], theSim);
+    g = metric_create(time_global, pos[R_DIR], pos[P_DIR], pos[Z_DIR], theSim);
     a = metric_lapse(g);
     for(i=0; i<3; i++)
         b[i] = metric_shift_u(g, i);
@@ -52,7 +52,7 @@ void cell_prim2cons_grdisc(double *prim, double *cons, double *pos,
 
     Pp = eos_ppp(prim, theSim);
     eps = eos_eps(prim, theSim);
-    rhoh = rho*(1.0+eps) + Pp;
+    rhoh = rho + rho*eps + Pp;
 
     H = sqrt(r*r*r*Pp / (rhoh*M)) / u0;
 
@@ -87,7 +87,7 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
     double tol = 1.0e-10;
     int maxIter = 50;
 
-    r = pos[0];
+    r = pos[R_DIR];
 
     D = cons[RHO] / dV;
     tau = cons[TAU] / dV;
@@ -95,7 +95,7 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
     S[1] = cons[LLL] / dV;
     S[2] = cons[SZZ] / dV;
 
-    g = metric_create(time_global, pos[0], pos[1], pos[2], theSim);
+    g = metric_create(time_global, pos[R_DIR], pos[P_DIR], pos[Z_DIR], theSim);
 
     //Get some metric quantities
     a = metric_lapse(g);
@@ -185,7 +185,20 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
 
     if(i == maxIter)
     {
-        printf("ERROR: NR failed to converge after %d iterations.\n", maxIter);
+        printf("ERROR: NR failed to converge after %d iterations.  Res = %.12lg\n",
+                maxIter, res);
+        printf("rho: %.12lg T: %.12lg\n", rho, T);
+        printf("D: %.12lg tau: %.12lg SR: %.12lg SP: %.12lg SZ: %.12lg\n",
+                D, tau, S[0], S[1], S[2]);
+        printf("S2: %.12lg SU: %.12lg\n", S2, SU);
+        printf("A: %.12lg B: %.12lg C: %.12lg\n", A, B, C);
+
+        double tc[5];
+        cell_prim2cons_grdisc(prim, tc, pos, dV, theSim);
+        printf("rho: %.12lg T: %.12lg vr: %.12lg vp: %.12lg vz: %.12lg\n", 
+                prim[RHO], prim[TTT], prim[URR], prim[UPP], prim[UZZ]);
+        printf("D: %.12lg tau: %.12lg Sr: %.12lg Sp: %.12lg Sz: %.12lg\n", 
+                tc[RHO], tc[TTT], tc[URR], tc[UPP], tc[UZZ]);
     }
 
     //Prim recovery

@@ -69,6 +69,8 @@ void cell_init_accdisc(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_accdisc(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_adaf(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_adaf(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_adaf2(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_adaf2(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data
@@ -134,4 +136,5 @@ void cell_adjust_RK_cons( struct Cell *** , struct Sim * , double );
 void cell_set_prim(struct Cell ***,int,int,int,int,double);//this will morph into a checkpoint restart routine
 void cell_set_tiph(struct Cell ***,int,int,int,double);//this will morph into a checkpoint restart routine
 void cell_print(struct Cell *** ,int ,int ,int );
+void cell_print_all(struct Cell *** , struct Sim *);
 #endif
