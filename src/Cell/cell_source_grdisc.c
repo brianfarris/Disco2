@@ -85,6 +85,7 @@ void cell_add_src_grdisc( struct Cell ***theCells, struct Sim *theSim,
                 H = sqrt(r*r*r*Pp / (rhoh*M)) / u[0];
                
                 //Viscous Terms
+                alpha = sim_AlphaVisc(theSim);
                 for(mu=0; mu<16; mu++)
                 {
                     visc[mu] = 0.0;
