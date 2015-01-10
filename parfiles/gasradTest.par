@@ -8,11 +8,11 @@ InitialDataType        20       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 16 Cartesian-Shear, 17 Disc Tests, 
                                 // 18 Accreting Disc, 19 ADAF, 20 ADAF2
 GravMassType            0       // 0 none, 1 single, 2 binary
-Background              2       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
+Background              3       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
 Metric                  2       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS
 Frame                   0       // 0 Euler, 1 Keplerian
-Restart                 1       // If this=1 restart using input.h5
+Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
 NumR			128			//Radial Zones
@@ -27,10 +27,10 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   0
-Time_Max                1.0e4
+Time_Max                1.0e-1
 Num_Checkpoints	        1000
-Num_Diag_Dump           20
-Num_Diag_Measure        20
+Num_Diag_Dump           100
+Num_Diag_Measure        100
 
 
 NoInnerBC               0
@@ -45,7 +45,7 @@ RiemannSolver           1           // 0 hllc, 1 hll
 Adiabatic_Index         1.6666667
 
 //Numerical Parameters
-CFL			0.1
+CFL			0.01
 PLM			1.0
 
 Grav_2D			1
@@ -67,9 +67,9 @@ CoolPar2            0.0
 //Initial Condition Parameters
 InitPar0        0           // 0 No Cooling
 InitPar1        1.0e4       // R0
-InitPar2        1.0e+0      // rho0
+InitPar2        1.0e-2      // rho0
 InitPar3        1.0e-6      // T0
-InitPar4        -0.1        // VR0
+InitPar4        -1.0e-1        // VR0
 
 PHI_ORDER               2
 

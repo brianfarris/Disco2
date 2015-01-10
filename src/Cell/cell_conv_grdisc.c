@@ -85,7 +85,7 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
     double f1, f2, df1dr, df1dt, df2dr, df2dt, detj;
     struct Metric *g;
     double tol = 1.0e-10;
-    int maxIter = 50;
+    int maxIter = 100;
 
     r = pos[R_DIR];
 

@@ -12,7 +12,7 @@ struct Diagnostics *diagnostics_create(struct Sim * theSim, struct TimeStep * th
   struct Diagnostics * theDiagnostics = (struct Diagnostics *) malloc(sizeof(struct Diagnostics));
   
     
-  theDiagnostics->NUM_DIAG = 11;
+  theDiagnostics->NUM_DIAG = 14;
 
 
   int * N_p_global_temp = malloc(sizeof(int)*sim_N_global(theSim,R_DIR));

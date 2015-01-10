@@ -97,7 +97,7 @@ def plot_r_profile(filename, sca='linear'):
     plt.plot(R, -1*np.ones(R.shape), 'r--')
     plt.plot(R, (0.5-2*M/R)/(1+2*M/R), 'b--')
     plt.plot(R, (-0.5-2*M/R)/(1+2*M/R), 'b--')
-    plt.gca().set_xscale("log")
+    plt.gca().set_xscale(sca)
     
     plt.subplot(335)
     plot_r_profile_single(r, vp, sca, r"$v^\phi$", R, UPP)

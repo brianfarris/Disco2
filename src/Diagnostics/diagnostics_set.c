@@ -4,6 +4,7 @@
 #include <math.h>
 #include "../Headers/Sim.h"
 #include "../Headers/Cell.h"
+#include "../Headers/EOS.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/Diagnostics.h"
 #include "../Headers/TimeStep.h"
@@ -70,7 +71,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double press = cell_prim(cell_single(theCells,i,j,k),PPP);
           double vr = cell_prim(cell_single(theCells,i,j,k),URR);
           double vp = cell_prim(cell_single(theCells,i,j,k),UPP)*r;
-          //double vz = cell_prim(cell_single(theCells,i,j,k),UZZ);
+          double vz = cell_prim(cell_single(theCells,i,j,k),UZZ);
 
           double passive_scalar = cell_prim(cell_single(theCells,i,j,k),5);
 
@@ -91,6 +92,12 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             ++position;
           }
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
+          double tmp_prim[5];
+          tmp_prim[RHO] = rho;
+          tmp_prim[PPP] = press;
+          tmp_prim[URR] = vr;
+          tmp_prim[UPP] = vp/r;
+          tmp_prim[UZZ] = vz;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+0] += (r/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1] += (rho/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+2] += (vr/sim_N_p(theSim,i)*dz) ;
@@ -103,6 +110,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (rho*vr*sin(phi)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (rho*vr*cos(2.*phi)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (rho*vr*sin(2.*phi)/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (eos_cs2(tmp_prim,theSim)/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (eos_eps(tmp_prim,theSim)/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (eos_ppp(tmp_prim,theSim)/sim_N_p(theSim,i)*dz) ;
           // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }

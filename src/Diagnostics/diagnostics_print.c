@@ -25,7 +25,7 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
       int i,n;
       for (i=0;i<sim_N_global(theSim,R_DIR);++i){
         for (n=0;n<theDiagnostics->NUM_DIAG+1;++n){
-          fprintf(DiagVectorFile,"%e ",theDiagnostics->VectorDiag[i][n]/dt_dump);       
+          fprintf(DiagVectorFile,"%.12le ",theDiagnostics->VectorDiag[i][n]/dt_dump);       
         }
         fprintf(DiagVectorFile,"\n");
       }

@@ -3,50 +3,83 @@
 #include <stdio.h>
 #include <math.h>
 #include "../Headers/Cell.h"
-#include "../Headers/Sim.h"
+#include "../Headers/EOS.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
+#include "../Headers/Sim.h"
 #include "../Headers/header.h"
 
 //Accreting Disc
 //
 //This is meant to be a generic initial condition for relativistic discs.  It initializes with a
-//constant density and pressure, keplerian orbital velocity, and constant accretion-rate radial
+//constant density and pressure (or temperature), keplerian orbital velocity, and constant accretion-rate radial
 //velocity.
 
 void cell_init_accdisc_flat(struct Cell *c, double r, double phi, double z, struct Sim *theSim)
 {
-    double Mdot = sim_InitPar1(theSim);
+    double r0 = sim_InitPar1(theSim);
     double rho = sim_InitPar2(theSim);
-    double Pp = sim_InitPar3(theSim);
-    double GAM = sim_GAMMALAW(theSim);
+    double T = sim_InitPar3(theSim);
+    double vr0 = sim_InitPar4(theSim);
     double M = sim_GravM(theSim);
+    double vMax = 0.5;
 
-    double vr;
-    double vp;
-        
-    double ur = -Mdot/(2*M_PI*rho*r);
-    //vp = exp(-1.0/(r/M-2)) * sqrt(M/(r*r*r));
-    vp = exp(-0.5/(r/M-3)) * sqrt(M/(r*r*r));
+    double vr, vp, u0;
+
+    vr = vr0 * r0/r;
+    vp = sqrt(M/(r*r*r));
 
     if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
     {
-        //Only valid outside r = 2*M
-        double u0 = sqrt((1+ur*ur/(1-2*M/r))/(1-2*M/r-r*r*vp*vp));
-        vr = ur/u0;
+        if(vr > vMax * (1-2*M/r))
+            vr = vMax * (1-2*M/r);
+        if(vr < -vMax * (1-2*M/r))
+            vr = -vMax * (1-2*M/r);
+        if(vp > vMax * sqrt(1-2*M/r)/r)
+            vp = vMax * sqrt(1-2*M/r)/r;
+        if(vp < -vMax * sqrt(1-2*M/r)/r)
+            vp = -vMax * sqrt(1-2*M/r)/r;
+        u0 = 1.0/sqrt(1-2*M/r-vr*vr/(1-2*M/r)-r*r*vp*vp);
     }
     else if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
-        if(r <= 3*M)
-            vp = 0.0;
-        if(r <=2*M && ur*ur +1.0 < 2*M/r)
-            ur = -1.01 * sqrt(2*M/r - 1.0);
-        double u0 = (2*M*ur/r + sqrt((1-(1+2*M/r)*r*r*vp*vp)*ur*ur + 1.0-2*M/r-r*r*vp*vp)) / (1-2*M/r-r*r*vp*vp);
-        vr = ur/u0;
+        double fac = 1.0/(1.0 + 2*M*vr/(r-2*M));
+        printf("%.12lg %.12lg %.12lg\n", r, vr, vp);
+        vr *= fac;
+        vp *= fac;
+
+
+        if(vr > (vMax-2*M/r)/(1+2*M/r))
+            vr = (vMax-2*M/r)/(1+2*M/r);
+        if(vr < (-vMax-2*M/r)/(1+2*M/r))
+            vr = (-vMax-2*M/r)/(1+2*M/r);
+        if(vp > vMax/(sqrt(1+2*M/r)*r))
+            vp = vMax/(sqrt(1+2*M/r)*r);
+        if(vp < -vMax/(sqrt(1+2*M/r)*r))
+            vp = -vMax/(sqrt(1+2*M/r)*r);
+        u0 = 1.0/sqrt(1-2*M/r-4*M/r*vr-(1+2*M/r)*vr*vr-r*r*vp*vp);
     }
-    
+
+    if( vp < 0)
+        printf("WHAT %.12lg %.12lg\n", vr, vp);
+
+    if(sim_Background(theSim) != GRDISC)
+    {
+        double tp[5];
+        tp[RHO] = rho;
+        tp[TTT] = T;
+        tp[URR] = vr;
+        tp[UPP] = vp;
+        tp[UZZ] = 0.0;
+        double eps = eos_eps(tp, theSim);
+        double P = eos_ppp(tp, theSim);
+        double H = sqrt(r*r*r*P/(M*(rho+rho*eps+P))) / u0;
+        rho = rho * H;
+        T = P * H;
+    }
+
     c->prim[RHO] = rho;
-    c->prim[PPP] = Pp;
+    c->prim[TTT] = T;
     c->prim[URR] = vr;
     c->prim[UPP] = vp;
     c->prim[UZZ] = 0.0;
@@ -54,7 +87,6 @@ void cell_init_accdisc_flat(struct Cell *c, double r, double phi, double z, stru
     if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) 
     {
         int i;
-        double x;
         for(i=sim_NUM_C(theSim); i<sim_NUM_Q(theSim); i++)
         {
             if(r*cos(phi) < 0)
@@ -90,8 +122,6 @@ void cell_single_init_accdisc(struct Cell *theCell, struct Sim *theSim,int i,int
 
 void cell_init_accdisc(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup)
 {
-    int test_num = sim_InitPar0(theSim);
-
     int i, j, k;
     for (k = 0; k < sim_N(theSim,Z_DIR); k++) 
     {
