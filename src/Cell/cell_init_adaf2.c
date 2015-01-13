@@ -20,15 +20,18 @@ void cell_init_adaf2_nocool(struct Cell *c, double r, double phi, double z,
 
     double rho, vr, vp, T;
     double rho0, T0, vr0, r0, u0;
+    double rho_power, T_power;
     double vMax = 0.5;
 
     r0 = sim_InitPar1(theSim);
     rho0 = sim_InitPar2(theSim);
     T0 = sim_InitPar3(theSim);
     vr0 = sim_InitPar4(theSim);
+    rho_power = sim_InitPar5(theSim);
+    T_power = sim_InitPar6(theSim);
 
-    rho = rho0 * pow(r/r0, -1.5);
-    T = T0 * pow(r/r0, -1.0);
+    rho = rho0 * pow(r/r0, rho_power);
+    T = T0 * pow(r/r0, T_power);
     rho = rho0;
     T = T0;
     vr = vr0 * alpha * pow(r/M, -0.5);

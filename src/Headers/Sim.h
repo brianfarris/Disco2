@@ -68,6 +68,8 @@ struct Sim {
   double InitPar2;
   double InitPar3;
   double InitPar4;
+  double InitPar5;
+  double InitPar6;
   double AlphaVisc;
   int EOSType;
   double EOSPar1;
@@ -136,6 +138,8 @@ double sim_InitPar1(struct Sim *);
 double sim_InitPar2(struct Sim *);
 double sim_InitPar3(struct Sim *);
 double sim_InitPar4(struct Sim *);
+double sim_InitPar5(struct Sim *);
+double sim_InitPar6(struct Sim *);
 double sim_AlphaVisc(struct Sim *);
 int sim_EOSType(struct Sim *);
 double sim_EOSPar1(struct Sim *);

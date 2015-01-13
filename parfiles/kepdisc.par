@@ -63,6 +63,8 @@ InitPar1        0.5       // B
 InitPar2        20        // mach# at r0
 InitPar3        5.0e6     // r0
 InitPar4        2.0e5      // dr
+InitPar5        -1
+InitPar6        -1
 
 PHI_ORDER               2
 

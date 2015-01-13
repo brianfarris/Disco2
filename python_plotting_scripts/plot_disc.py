@@ -8,7 +8,7 @@ import readChkpt as rc
 
 GAM = 1.3333333333
 M = 1.0
-scale = 'log'
+scale = 'linear'
 
 def plot_r_profile_single(r, f, sca, ylabel, R=None, F=None):
 
@@ -38,7 +38,8 @@ def plot_r_profile(filename, sca='linear'):
     vr = dat[6]
     vp = dat[7]
 
-    real = r>2*M
+    #real = r>2*M
+    real = r > -1
     r = r[real]
     rho = rho[real]
     T = T[real]

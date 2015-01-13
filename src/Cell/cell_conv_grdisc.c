@@ -127,10 +127,29 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
     rho = prim[RHO];
     T = prim[TTT];
 
+    double rho1,rho2,rho3,rho4,T1,T2,T3,T4;
+    rho1 = -1;
+    rho2 = -1;
+    rho3 = -1;
+    rho4 = -1;
+    T1 = -1;
+    T2 = -1;
+    T3 = -1;
+    T4 = -1;
+
     i = 0;
     //2D Newton-Raphson to find rho and T
     do
     {
+        rho4 = rho3;
+        rho3 = rho2;
+        rho2 = rho1;
+        rho1 = rho;
+        T4 = T3;
+        T3 = T2;
+        T2 = T1;
+        T1 = T;
+
         //Update from previous guess.
         tmp_prim[RHO] = rho;
         tmp_prim[TTT] = T;
@@ -158,6 +177,8 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
         //f-values
         f1 = (h*w*w - P/rho) / w - A;
         f2 = w*rho*H - B;
+        printf("    %.12lg (%.12lg %.12lg %.12lg) %.12lg (%.12lg %.12lg)\n", 
+                f1, h*w,-P/(rho*w),-A,f2,w*rho*H,-B);
 
         //jacobian
         df1dr = ((dhdr*w*w+2*h*w*dwdr-(dpdr*rho-P)/(rho*rho))*w
@@ -172,14 +193,41 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
         T   += -(-df2dr*f1 + df1dr*f2) / detj;
 
         if(rho <= 0.0)
+        {
+            T = 0.5*tmp_prim[RHO]/(tmp_prim[RHO]-rho) * (T-tmp_prim[TTT]) + tmp_prim[TTT];
             rho = 0.5*tmp_prim[RHO];
-        if(T <= 0.0)
+        }
+        else if(T <= 0.0)
+        {
+            rho = 0.5*tmp_prim[TTT]/(tmp_prim[TTT]-T) * (rho-tmp_prim[RHO]) + tmp_prim[RHO];
             T = 0.5*tmp_prim[TTT];
+        }
+        
+        if(rho==rho2 && T==T2)
+        {
+            printf("2-Cycle: taking average\n");
+            rho = 0.5*(rho1+rho2);
+            T = 0.5*(T1+T2);
+        }
+        else if(rho==rho3 && T==T3)
+        {
+            printf("3-Cycle: taking average\n");
+            rho = (rho1+rho2+rho3)/3.0;
+            T = (T1+T2+T3)/3.0;
+        }
+        else if(rho==rho4 && T==T4)
+        {
+            printf("4-Cycle: taking average\n");
+            rho = 0.25*(rho1+rho2+rho3+rho4);
+            T = 0.25*(T1+T2+T3+T4);
+        }
 
         // 2-norm of change in rho & T.
         res = sqrt((rho-tmp_prim[RHO])*(rho-tmp_prim[RHO])/(rho*rho)
                 + (T-tmp_prim[TTT])*(T-tmp_prim[TTT])/(T*T));
         i++;
+
+        printf("%d rho: %.20lg T: %.20lg res: %.20lg\n", i, rho, T, res);
     }
     while(res > tol && i < maxIter);
 
@@ -187,18 +235,34 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
     {
         printf("ERROR: NR failed to converge after %d iterations.  Res = %.12lg\n",
                 maxIter, res);
-        printf("rho: %.12lg T: %.12lg\n", rho, T);
+        printf("r: %.12lg rho: %.12lg T: %.12lg\n", r, rho, T);
         printf("D: %.12lg tau: %.12lg SR: %.12lg SP: %.12lg SZ: %.12lg\n",
                 D, tau, S[0], S[1], S[2]);
         printf("S2: %.12lg SU: %.12lg\n", S2, SU);
-        printf("A: %.12lg B: %.12lg C: %.12lg\n", A, B, C);
+        printf("A: %.20lg B: %.20lg C: %.20lg\n", A, B, C);
 
         double tc[5];
         cell_prim2cons_grdisc(prim, tc, pos, dV, theSim);
         printf("rho: %.12lg T: %.12lg vr: %.12lg vp: %.12lg vz: %.12lg\n", 
                 prim[RHO], prim[TTT], prim[URR], prim[UPP], prim[UZZ]);
         printf("D: %.12lg tau: %.12lg Sr: %.12lg Sp: %.12lg Sz: %.12lg\n", 
-                tc[RHO], tc[TTT], tc[URR], tc[UPP], tc[UZZ]);
+                tc[RHO]/dV, tc[TTT]/dV, tc[URR]/dV, tc[UPP]/dV, tc[UZZ]/dV);
+    }
+    else
+    {
+        printf("NR converged after %d iterations.  Res = %.12lg\n", i, res);
+        printf("r: %.12lg rho: %.12lg T: %.12lg\n", r, rho, T);
+        printf("D: %.12lg tau: %.12lg SR: %.12lg SP: %.12lg SZ: %.12lg\n",
+                D, tau, S[0], S[1], S[2]);
+        printf("S2: %.12lg SU: %.12lg\n", S2, SU);
+        printf("A: %.20lg B: %.20lg C: %.20lg\n", A, B, C);
+
+        double tc[5];
+        cell_prim2cons_grdisc(prim, tc, pos, dV, theSim);
+        printf("rho: %.12lg T: %.12lg vr: %.12lg vp: %.12lg vz: %.12lg\n", 
+                prim[RHO], prim[TTT], prim[URR], prim[UPP], prim[UZZ]);
+        printf("D: %.12lg tau: %.12lg Sr: %.12lg Sp: %.12lg Sz: %.12lg\n", 
+                tc[RHO]/dV, tc[TTT]/dV, tc[URR]/dV, tc[UPP]/dV, tc[UZZ]/dV);
     }
 
     //Prim recovery

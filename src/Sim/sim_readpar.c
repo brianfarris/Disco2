@@ -104,6 +104,8 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "InitPar2"           , VAR_DOUB , &(theSim->InitPar2)  );
       err += readvar( pfile , "InitPar3"           , VAR_DOUB , &(theSim->InitPar3)  );
       err += readvar( pfile , "InitPar4"           , VAR_DOUB , &(theSim->InitPar4)  );
+      err += readvar( pfile , "InitPar5"           , VAR_DOUB , &(theSim->InitPar5)  );
+      err += readvar( pfile , "InitPar6"           , VAR_DOUB , &(theSim->InitPar6)  );
       err += readvar( pfile , "AlphaVisc"           , VAR_DOUB , &(theSim->AlphaVisc)  );
       err += readvar( pfile , "EOSType"           , VAR_INT , &(theSim->EOSType)  );
       err += readvar( pfile , "EOSPar1"           , VAR_DOUB , &(theSim->EOSPar1)  );

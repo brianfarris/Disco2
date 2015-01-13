@@ -10,7 +10,7 @@
 
 
 void cell_clear_w(struct Cell ***theCells,struct Sim * theSim){
-  int i,j,k,q;
+  int i,j,k;
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){

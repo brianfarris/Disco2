@@ -32,7 +32,7 @@ MPI_Comm sim_comm;
 //#define NPCAP 256 
 double time_global;
 
-#define PRINTTOOMUCH 0
+#define PRINTTOOMUCH 1
 
 #define RHO_REF 1.0e10
 #define C_REF 2.99792458e10

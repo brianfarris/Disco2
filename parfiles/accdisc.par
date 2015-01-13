@@ -64,6 +64,8 @@ InitPar1        1.0e9       // Accretion Rate
 InitPar2        1.0e8       // Density
 InitPar3        1.0e4       // Pressure
 InitPar4        0.0
+InitPar5        -1
+InitPar6        -1
 
 PHI_ORDER               2
 

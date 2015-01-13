@@ -175,6 +175,12 @@ double sim_InitPar3(struct Sim *theSim){
 double sim_InitPar4(struct Sim *theSim){
   return(theSim->InitPar4);
 }
+double sim_InitPar5(struct Sim *theSim){
+  return(theSim->InitPar5);
+}
+double sim_InitPar6(struct Sim *theSim){
+  return(theSim->InitPar6);
+}
 double sim_AlphaVisc(struct Sim *theSim){
   return(theSim->AlphaVisc);
 }
