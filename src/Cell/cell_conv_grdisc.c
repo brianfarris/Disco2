@@ -177,7 +177,8 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
         //f-values
         f1 = (h*w*w - P/rho) / w - A;
         f2 = w*rho*H - B;
-        printf("    %.12lg (%.12lg %.12lg %.12lg) %.12lg (%.12lg %.12lg)\n", 
+        if(PRINTTOOMUCH)
+            printf("    %.12lg (%.12lg %.12lg %.12lg) %.12lg (%.12lg %.12lg)\n", 
                 f1, h*w,-P/(rho*w),-A,f2,w*rho*H,-B);
 
         //jacobian
@@ -205,19 +206,22 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
         
         if(rho==rho2 && T==T2)
         {
-            printf("2-Cycle: taking average\n");
+            if(PRINTTOOMUCH)
+                printf("2-Cycle: taking average\n");
             rho = 0.5*(rho1+rho2);
             T = 0.5*(T1+T2);
         }
         else if(rho==rho3 && T==T3)
         {
-            printf("3-Cycle: taking average\n");
+            if(PRINTTOOMUCH)
+                printf("3-Cycle: taking average\n");
             rho = (rho1+rho2+rho3)/3.0;
             T = (T1+T2+T3)/3.0;
         }
         else if(rho==rho4 && T==T4)
         {
-            printf("4-Cycle: taking average\n");
+            if(PRINTTOOMUCH)
+                printf("4-Cycle: taking average\n");
             rho = 0.25*(rho1+rho2+rho3+rho4);
             T = 0.25*(T1+T2+T3+T4);
         }
@@ -227,7 +231,8 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
                 + (T-tmp_prim[TTT])*(T-tmp_prim[TTT])/(T*T));
         i++;
 
-        printf("%d rho: %.20lg T: %.20lg res: %.20lg\n", i, rho, T, res);
+        if(PRINTTOOMUCH)
+            printf("%d rho: %.20lg T: %.20lg res: %.20lg\n", i, rho, T, res);
     }
     while(res > tol && i < maxIter);
 
@@ -248,7 +253,7 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
         printf("D: %.12lg tau: %.12lg Sr: %.12lg Sp: %.12lg Sz: %.12lg\n", 
                 tc[RHO]/dV, tc[TTT]/dV, tc[URR]/dV, tc[UPP]/dV, tc[UZZ]/dV);
     }
-    else
+    else if(PRINTTOOMUCH)
     {
         printf("NR converged after %d iterations.  Res = %.12lg\n", i, res);
         printf("r: %.12lg rho: %.12lg T: %.12lg\n", r, rho, T);

@@ -32,8 +32,6 @@ void cell_init_adaf2_nocool(struct Cell *c, double r, double phi, double z,
 
     rho = rho0 * pow(r/r0, rho_power);
     T = T0 * pow(r/r0, T_power);
-    rho = rho0;
-    T = T0;
     vr = vr0 * alpha * pow(r/M, -0.5);
     vp = pow(r/M, -1.5) / M;
 

@@ -15,11 +15,11 @@ Frame                   0       // 0 Euler, 1 Keplerian
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR			40			//Radial Zones
+NumR			128			//Radial Zones
 NumZ			1           //Vertical Zones
 ng              2
 R_Min		    1.0e0
-R_Max			1.0e1
+R_Max			1.0e3
 Z_Min			-1.0e4
 Z_Max			1.0e4
 NP_CONST        3
@@ -27,10 +27,10 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   0
-Time_Max                1.0e0
-Num_Checkpoints	        1000
-Num_Diag_Dump           100
-Num_Diag_Measure        100
+Time_Max                1.0e3
+Num_Checkpoints	        1001
+Num_Diag_Dump           1001
+Num_Diag_Measure        1001
 
 
 NoInnerBC               0
@@ -45,7 +45,7 @@ RiemannSolver           1           // 0 hllc, 1 hll
 Adiabatic_Index         1.6666666667
 
 //Numerical Parameters
-CFL			0.1
+CFL			0.3
 PLM			1.0
 
 Grav_2D			1
@@ -70,8 +70,8 @@ InitPar1        1.0e4       // R0
 InitPar2        1.0e-2      // rho0
 InitPar3        1.0e-6      // T0
 InitPar4        -1.0e-1        // VR0
-InitPar5        -1
-InitPar6        -1
+InitPar5        -1.5          // rho powerlaw
+InitPar6        -1          // T powerlaw
 
 PHI_ORDER               2
 
@@ -84,7 +84,7 @@ Vel_Cap			100.0
 runtype                 0
 
 //DAMPING
-DAMP_TIME               1.0e-8        // Set negative to turn off
+DAMP_TIME               1.0e-1        // Set negative to turn off
 RDAMP_INNER             1.5
 RDAMP_OUTER             1.0e100
 
