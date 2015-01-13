@@ -27,7 +27,7 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   0
-Time_Max                1.0e3
+Time_Max                1.0e2
 Num_Checkpoints	        1001
 Num_Diag_Dump           1001
 Num_Diag_Measure        1001
@@ -59,19 +59,19 @@ EOSPar1            1.0
 EOSPar2            0.0
 
 //Cooling
-CoolingType         0       //0 None, 1 Isothermal, 2 Blackbody-Thompson, 
+CoolingType         2       //0 None, 1 Isothermal, 2 Blackbody-Thompson, 
                             //3 Blackbody-freefree, 4 Neutrino
-CoolPar1            1.0
-CoolPar2            0.0
+CoolPar1            1.0e4
+CoolPar2            1.0
 
 //Initial Condition Parameters
 InitPar0        0           // 0 No Cooling
 InitPar1        1.0e4       // R0
-InitPar2        1.0e-2      // rho0
-InitPar3        1.0e-6      // T0
+InitPar2        1.0e2      // rho0
+InitPar3        1.0e-7      // T0
 InitPar4        -1.0e-1        // VR0
 InitPar5        -1.5          // rho powerlaw
-InitPar6        -1          // T powerlaw
+InitPar6        -1.5          // T powerlaw
 
 PHI_ORDER               2
 

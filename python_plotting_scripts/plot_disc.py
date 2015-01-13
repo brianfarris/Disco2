@@ -6,9 +6,25 @@ import sys
 import numpy as np
 import readChkpt as rc
 
-GAM = 1.3333333333
+GAM = 5.0/3.0
 M = 1.0
 scale = 'log'
+eos_x1 = 1.0
+eos_x2 = 0.0
+alpha = 0.1
+
+c = 2.99792458e10
+G = 6.6738e-8
+h = 6.62606957e-27
+kb = 1.3806488e-16
+sb = 1.56055371e59
+mp = 1.672621777e-24
+
+def P_gas(rho, T):
+    return rho * T
+
+def P_rad(rho, T):
+    return 4.0*sb/(3.0*c) * (T*mp*c*c)**4 / (c*c)
 
 def plot_r_profile_single(r, f, sca, ylabel, R=None, F=None):
 
@@ -72,10 +88,12 @@ def plot_r_profile(filename, sca='linear'):
     #mach = np.sqrt((vr*vr/(1-2*M/r)+r*r*vp*vp)/(GAM*P/rhoh))
     #MACH = np.sqrt((URR*URR/(1-2*M/R)+R*R*UPP*UPP)/(GAM*PPP/RHOH))
 
-    P = rho*T
-    PPP = RHO*TTT
+    Pg = eos_x1*P_gas(rho, T)
+    Pr = eos_x2*P_rad(rho, T)
+    Ptot = Pg+Pr
+    PPP = eos_x1*P_gas(RHO, TTT) + eos_x2*P_rad(RHO, TTT)
 
-    H = np.sqrt(P*r*r*r/(rhoh*M))/u0
+    H = np.sqrt(Ptot*r*r*r/(rhoh*M))/u0
     HHH = np.sqrt(PPP*R*R*R/(RHOH*M))/U00
 
     print("Plotting t = {0:g}".format(t))
@@ -87,10 +105,12 @@ def plot_r_profile(filename, sca='linear'):
     plot_r_profile_single(r, rho, sca, r"$\rho_0$", R, RHO)
 
     plt.subplot(332)
-    plot_r_profile_single(r, P, sca, r"$P = \rho_0 T$", R, PPP)
+    plot_r_profile_single(r, T, sca, r"$T$", R, TTT)
     
     plt.subplot(333)
-    plot_r_profile_single(r, T, sca, r"$T$", R, TTT)
+    plt.plot(r, Pg, 'g.')
+    plt.plot(r, Pr, 'b.')
+    plot_r_profile_single(r, Ptot, sca, r"$P$", R, PPP)
     
     plt.subplot(334)
     plot_r_profile_single(r, vr, "linear", r"$v^r$", R, URR)
