@@ -15,11 +15,11 @@ Frame                   0       // 0 Euler, 1 Keplerian
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR			128			//Radial Zones
+NumR			40			//Radial Zones
 NumZ			1           //Vertical Zones
 ng              2
 R_Min		    1.0e0
-R_Max			1.0e3
+R_Max			1.0e1
 Z_Min			-1.0e4
 Z_Max			1.0e4
 NP_CONST        3
@@ -27,7 +27,7 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   0
-Time_Max                1.0e2
+Time_Max                1.0e0
 Num_Checkpoints	        1001
 Num_Diag_Dump           1001
 Num_Diag_Measure        1001

@@ -98,6 +98,10 @@ void riemann_set_vel_grdisc(struct Riemann *theRiemann, struct Sim *theSim,
 
     theRiemann->Sl = Sl;
     theRiemann->Sr = Sr;
+    //TODO: This is only used for HLLC and is WRONG.
+    theRiemann->Ss = (Sl+Sr)/2;
+
+    metric_destroy(g);
 }
 
 void riemann_set_flux_grdisc(struct Riemann *theRiemann, struct Sim *theSim, double GAMMALAW, int SetState)

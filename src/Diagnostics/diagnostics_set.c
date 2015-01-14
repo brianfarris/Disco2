@@ -73,7 +73,13 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           double vp = cell_prim(cell_single(theCells,i,j,k),UPP)*r;
           double vz = cell_prim(cell_single(theCells,i,j,k),UZZ);
 
-          double passive_scalar = cell_prim(cell_single(theCells,i,j,k),5);
+          double passive_scalar;
+          int NUMQ = sim_NUM_Q(theSim);
+          int NUMC = sim_NUM_C(theSim);
+          if(NUMQ > NUMC)
+            passive_scalar = cell_prim(cell_single(theCells,i,j,k),NUMC);
+          else
+            passive_scalar = 0.0;
 
           if ((fabs(zp)<0.0000001)||(fabs(z)<0.0000001)){
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+0] = r;

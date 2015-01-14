@@ -10,7 +10,7 @@ GAM = 5.0/3.0
 M = 1.0
 scale = 'log'
 eos_x1 = 1.0
-eos_x2 = 0.0
+eos_x2 = 1.0
 alpha = 0.1
 
 c = 2.99792458e10
@@ -93,6 +93,8 @@ def plot_r_profile(filename, sca='linear'):
     Ptot = Pg+Pr
     PPP = eos_x1*P_gas(RHO, TTT) + eos_x2*P_rad(RHO, TTT)
 
+    W = 1.0/np.sqrt(1.0 - ((1.0+2.0*M/r)*vr+2*M/r)**2 - (1.0+2.0*M/r)*r*r*vp*vp)
+
     H = np.sqrt(Ptot*r*r*r/(rhoh*M))/u0
     HHH = np.sqrt(PPP*R*R*R/(RHOH*M))/U00
 
@@ -102,18 +104,22 @@ def plot_r_profile(filename, sca='linear'):
     fig = plt.figure(figsize=(12,9))
 
     plt.subplot(331)
-    plot_r_profile_single(r, rho, sca, r"$\rho_0$", R, RHO)
+    #plot_r_profile_single(r, rho, sca, r"$\rho_0$", R, RHO)
+    plot_r_profile_single(r, rho, sca, r"$\rho_0$")
 
     plt.subplot(332)
-    plot_r_profile_single(r, T, sca, r"$T$", R, TTT)
+    #plot_r_profile_single(r, T, sca, r"$T$", R, TTT)
+    plot_r_profile_single(r, T, sca, r"$T$")
     
     plt.subplot(333)
     plt.plot(r, Pg, 'g.')
     plt.plot(r, Pr, 'b.')
-    plot_r_profile_single(r, Ptot, sca, r"$P$", R, PPP)
+    #plot_r_profile_single(r, Ptot, sca, r"$P$", R, PPP)
+    plot_r_profile_single(r, Ptot, sca, r"$P$")
     
     plt.subplot(334)
-    plot_r_profile_single(r, vr, "linear", r"$v^r$", R, URR)
+    #plot_r_profile_single(r, vr, "linear", r"$v^r$", R, URR)
+    plot_r_profile_single(r, vr, "linear", r"$v^r$")
     plt.plot(R, (1-2*M/R)/(1+2*M/R), 'r--')
     plt.plot(R, -1*np.ones(R.shape), 'r--')
     plt.plot(R, (0.5-2*M/R)/(1+2*M/R), 'b--')
@@ -121,13 +127,16 @@ def plot_r_profile(filename, sca='linear'):
     plt.gca().set_xscale(sca)
     
     plt.subplot(335)
-    plot_r_profile_single(r, vp, sca, r"$v^\phi$", R, UPP)
+    #plot_r_profile_single(r, vp, sca, r"$v^\phi$", R, UPP)
+    plot_r_profile_single(r, vp, sca, r"$v^\phi$")
 
-    #plt.subplot(336)
+    plt.subplot(336)
     #plot_r_profile_single(r, mach, sca, r"$\mathcal{M}$", R, MACH)
+    plot_r_profile_single(r, W, sca, r"$\mathcal{W}$")
 
     plt.subplot(337)
-    plot_r_profile_single(r, H, sca, r"$\mathcal{H}$", R, HHH)
+    #plot_r_profile_single(r, H, sca, r"$\mathcal{H}$", R, HHH)
+    plot_r_profile_single(r, H, sca, r"$\mathcal{H}$")
 
     plt.tight_layout()
 
