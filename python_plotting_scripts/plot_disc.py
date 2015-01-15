@@ -28,15 +28,10 @@ def P_rad(rho, T):
 
 def plot_r_profile_single(r, f, sca, ylabel, R=None, F=None):
 
-    if sca == 'log' and (f < 0).any():
-        plt.plot(r, -f, 'k+')
-        if R != None and F != None:
-            plt.plot(R, -F, 'r')
-    else:
-        plt.plot(r, f, 'k+')
-        if R != None and F != None:
-            plt.plot(R, F, 'r')
-    
+    plt.plot(r, f, 'k+')
+    if R != None and F != None:
+        plt.plot(R, F, 'r')
+
     plt.gca().set_xscale(sca)
     if (f == 0.0).all():
         plt.gca().set_yscale('linear')
@@ -44,6 +39,9 @@ def plot_r_profile_single(r, f, sca, ylabel, R=None, F=None):
         plt.gca().set_yscale(sca)
     plt.xlabel(r"$r$")
     plt.ylabel(ylabel)
+
+    plt.xlim(r.min(), r.max())
+    plt.axvspan(plt.xlim()[0], 2*M, color='grey', alpha=0.5)
 
 def plot_r_profile(filename, sca='linear'):
     dat = rc.readChkpt(filename)
@@ -105,17 +103,17 @@ def plot_r_profile(filename, sca='linear'):
 
     plt.subplot(331)
     #plot_r_profile_single(r, rho, sca, r"$\rho_0$", R, RHO)
-    plot_r_profile_single(r, rho, sca, r"$\rho_0$")
+    plot_r_profile_single(r, rho, sca, r"$\rho_0$ ($g/cm^3$)")
 
     plt.subplot(332)
     #plot_r_profile_single(r, T, sca, r"$T$", R, TTT)
-    plot_r_profile_single(r, T, sca, r"$T$")
+    plot_r_profile_single(r, T, sca, r"$T$ ($m_p c^2$)")
     
     plt.subplot(333)
     plt.plot(r, Pg, 'g.')
     plt.plot(r, Pr, 'b.')
     #plot_r_profile_single(r, Ptot, sca, r"$P$", R, PPP)
-    plot_r_profile_single(r, Ptot, sca, r"$P$")
+    plot_r_profile_single(r, Ptot, sca, r"$P$ ($g\ c^2/cm^3$)")
     
     plt.subplot(334)
     #plot_r_profile_single(r, vr, "linear", r"$v^r$", R, URR)
@@ -129,10 +127,13 @@ def plot_r_profile(filename, sca='linear'):
     plt.subplot(335)
     #plot_r_profile_single(r, vp, sca, r"$v^\phi$", R, UPP)
     plot_r_profile_single(r, vp, sca, r"$v^\phi$")
+    plt.plot(R, 1.0/(np.sqrt(1+2.0*M/R)*R), 'r--')
+    plt.plot(R, 0.5/(np.sqrt(1+2.0*M/R)*R), 'b--')
 
     plt.subplot(336)
     #plot_r_profile_single(r, mach, sca, r"$\mathcal{M}$", R, MACH)
-    plot_r_profile_single(r, W, sca, r"$\mathcal{W}$")
+    plot_r_profile_single(r, W, sca, r"$W$")
+    plt.gca().set_yscale('linear')
 
     plt.subplot(337)
     #plot_r_profile_single(r, H, sca, r"$\mathcal{H}$", R, HHH)
