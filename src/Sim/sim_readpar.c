@@ -110,9 +110,13 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "EOSType"           , VAR_INT , &(theSim->EOSType)  );
       err += readvar( pfile , "EOSPar1"           , VAR_DOUB , &(theSim->EOSPar1)  );
       err += readvar( pfile , "EOSPar2"           , VAR_DOUB , &(theSim->EOSPar2)  );
+      err += readvar( pfile , "EOSPar3"           , VAR_DOUB , &(theSim->EOSPar3)  );
+      err += readvar( pfile , "EOSPar4"           , VAR_DOUB , &(theSim->EOSPar4)  );
       err += readvar( pfile , "CoolingType"           , VAR_INT , &(theSim->CoolingType)  );
       err += readvar( pfile , "CoolPar1"           , VAR_DOUB , &(theSim->CoolPar1)  );
       err += readvar( pfile , "CoolPar2"           , VAR_DOUB , &(theSim->CoolPar2)  );
+      err += readvar( pfile , "CoolPar3"           , VAR_DOUB , &(theSim->CoolPar3)  );
+      err += readvar( pfile , "CoolPar4"           , VAR_DOUB , &(theSim->CoolPar4)  );
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }

@@ -74,9 +74,13 @@ struct Sim {
   int EOSType;
   double EOSPar1;
   double EOSPar2;
+  double EOSPar3;
+  double EOSPar4;
   int CoolingType;
   double CoolPar1;
   double CoolPar2;
+  double CoolPar3;
+  double CoolPar4;
 };
 #endif
 
@@ -144,9 +148,13 @@ double sim_AlphaVisc(struct Sim *);
 int sim_EOSType(struct Sim *);
 double sim_EOSPar1(struct Sim *);
 double sim_EOSPar2(struct Sim *);
+double sim_EOSPar3(struct Sim *);
+double sim_EOSPar4(struct Sim *);
 int sim_CoolingType(struct Sim *);
 double sim_CoolPar1(struct Sim *);
 double sim_CoolPar2(struct Sim *);
+double sim_CoolPar3(struct Sim *);
+double sim_CoolPar4(struct Sim *);
 
 int sim_GravMassType(struct Sim * );
 //set Grid data

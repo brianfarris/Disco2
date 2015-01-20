@@ -57,6 +57,8 @@ AlphaVisc       0.01
 CoolingType         0       //0 None, 1 Isothermal, 2 Blackbody-Thompson
 CoolPar1            1.0e28
 CoolPar2            0.0
+CoolPar3            0.0
+CoolPar4            0.0
 
 //Initial Condition Parameters
 InitPar0        0           //0 Thompson Cooling

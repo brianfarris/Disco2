@@ -54,15 +54,19 @@ GravM           1.0
 AlphaVisc       0.1
 
 //EoS
-EOSType            1       //0 Gammalaw, 1 Gas+Rad
+EOSType            2       //0 Gammalaw, 1 Gas+Rad, 2 Gas+Rad+Deg
 EOSPar1            1.0
 EOSPar2            1.0
+EOSPar3            1.0
+EOSPar4            0.0
 
 //Cooling
 CoolingType         4       //0 None, 1 Isothermal, 2 Blackbody-Thompson, 
                             //3 Blackbody-freefree, 4 Neutrino
-CoolPar1            1.0e0
+CoolPar1            1.0
 CoolPar2            1.0
+CoolPar3            0.0
+CoolPar4            0.0
 
 //Initial Condition Parameters
 InitPar0        0           // 0 No Cooling

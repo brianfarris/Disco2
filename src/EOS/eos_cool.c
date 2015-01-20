@@ -29,12 +29,12 @@ double eos_cool_bb_es(double *prim, double H, struct Sim *theSim)
         double P;
         rho = (prim[RHO]/H)*eos_rho_scale;
         P = (prim[PPP]/H)*eos_rho_scale;
-        T = 0.5 * P / rho * eos_mp*eos_c*eos_c; //in ergs
+        T = P / rho * eos_mp*eos_c*eos_c; //in ergs
     }
     else
     {
         rho = prim[RHO]*eos_rho_scale;
-        T = 0.5 * prim[TTT] * eos_mp*eos_c*eos_c; //in ergs
+        T = prim[TTT] * eos_mp*eos_c*eos_c; //in ergs
     }
     double kappa = 0.2;
     double h = H*eos_r_scale;
@@ -54,12 +54,12 @@ double eos_cool_bb_ff(double *prim, double H, struct Sim *theSim)
         double P;
         rho = (prim[RHO]/H)*eos_rho_scale;
         P = (prim[PPP]/H)*eos_rho_scale;
-        T = 0.5 * P / rho * eos_mp*eos_c*eos_c; //in ergs
+        T = P / rho * eos_mp*eos_c*eos_c; //in ergs
     }
     else
     {
         rho = prim[RHO]*eos_rho_scale;
-        T = 0.5 * prim[TTT] * eos_mp*eos_c*eos_c; //in ergs
+        T = prim[TTT] * eos_mp*eos_c*eos_c; //in ergs
     }
     double kappa = 6.6e22 * rho * pow(T/eos_k, -3.5);
     double h = H*eos_r_scale;
@@ -80,12 +80,12 @@ double eos_cool_neutrino(double *prim, double H, struct Sim *theSim)
         double P;
         rho10 = (prim[RHO]/H)*eos_rho_scale / (1.0e10);
         P = (prim[PPP]/H)*eos_rho_scale;
-        t11 = 0.5 * P / prim[RHO] * eos_mp*eos_c*eos_c/(1.0e11*eos_k);
+        t11 = P / prim[RHO] * eos_mp*eos_c*eos_c/(1.0e11*eos_k);
     }
     else
     {
         rho10 = prim[RHO] * eos_rho_scale / (1.0e10);
-        t11 = 0.5 * prim[TTT] * eos_mp*eos_c*eos_c/(1.0e11*eos_k);
+        t11 = prim[TTT] * eos_mp*eos_c*eos_c/(1.0e11*eos_k);
     }
     double h = H * eos_r_scale;
     double q = (5.0e33*pow(t11,9) + 9.0e33*rho10*pow(t11,6)) * h;

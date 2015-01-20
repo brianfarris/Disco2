@@ -193,6 +193,12 @@ double sim_EOSPar1(struct Sim *theSim){
 double sim_EOSPar2(struct Sim *theSim){
   return(theSim->EOSPar2);
 }
+double sim_EOSPar3(struct Sim *theSim){
+  return(theSim->EOSPar3);
+}
+double sim_EOSPar4(struct Sim *theSim){
+  return(theSim->EOSPar4);
+}
 int sim_CoolingType(struct Sim *theSim){
   return(theSim->CoolingType);
 }
@@ -202,4 +208,9 @@ double sim_CoolPar1(struct Sim *theSim){
 double sim_CoolPar2(struct Sim *theSim){
   return(theSim->CoolPar2);
 }
-
+double sim_CoolPar3(struct Sim *theSim){
+  return(theSim->CoolPar3);
+}
+double sim_CoolPar4(struct Sim *theSim){
+  return(theSim->CoolPar4);
+}

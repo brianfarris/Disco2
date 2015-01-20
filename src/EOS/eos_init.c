@@ -31,6 +31,17 @@ void eos_init(struct Sim *theSim)
         eos_depsdrho = &eos_depsdrho_gasrad;
         eos_depsdttt = &eos_depsdttt_gasrad;
     }
+    else if(eosType == EOS_GASRADDEG)
+    {
+        eos_cs2  = &eos_cs2_gasraddeg;
+        eos_eps  = &eos_eps_gasraddeg;
+        eos_ppp  = &eos_ppp_gasraddeg;
+        eos_dpppdrho = &eos_dpppdrho_gasraddeg;
+        eos_dpppdttt = &eos_dpppdttt_gasraddeg;
+        eos_depsdrho = &eos_depsdrho_gasraddeg;
+        eos_depsdttt = &eos_depsdttt_gasraddeg;
+    }
+
     else
     {
         printf("ERROR: Unrecognized EOS.\n");

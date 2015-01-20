@@ -45,6 +45,14 @@ double eos_dpppdttt_gasrad(double *, struct Sim *);
 double eos_depsdrho_gasrad(double *, struct Sim *);
 double eos_depsdttt_gasrad(double *, struct Sim *);
 
+double eos_cs2_gasraddeg(double *, struct Sim *);
+double eos_eps_gasraddeg(double *, struct Sim *);
+double eos_ppp_gasraddeg(double *, struct Sim *);
+double eos_dpppdrho_gasraddeg(double *, struct Sim *);
+double eos_dpppdttt_gasraddeg(double *, struct Sim *);
+double eos_depsdrho_gasraddeg(double *, struct Sim *);
+double eos_depsdttt_gasraddeg(double *, struct Sim *);
+
 //Cooling
 double (*eos_cool)(double *, double, struct Sim *);
 double eos_cool_none(double *prim, double, struct Sim *theSim);
