@@ -11,7 +11,7 @@
 
 //ADAF2: Advection-Dominated Accretion Flow for GRDISC
 
-void cell_init_adaf2_nocool(struct Cell *c, double r, double phi, double z, 
+void cell_init_adaf2_nocool(struct Cell *c, double r, double phi, double z,
                             struct Sim *theSim)
 {
     int i;
@@ -49,9 +49,11 @@ void cell_init_adaf2_nocool(struct Cell *c, double r, double phi, double z,
     }
     else if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
+        /*
         double fac = 1.0/(1.0 + 2*M*vr/(r-2*M));
         vr *= fac;
         vp *= fac;
+        */
 
         if(vr > (vMax-2*M/r)/(1+2*M/r))
             vr = (vMax-2*M/r)/(1+2*M/r);
@@ -94,7 +96,7 @@ void cell_init_adaf2_nocool(struct Cell *c, double r, double phi, double z,
     }
 }
 
-void cell_init_adaf2_calc(struct Cell *c, double r, double phi, double z, 
+void cell_init_adaf2_calc(struct Cell *c, double r, double phi, double z,
                             struct Sim *theSim)
 {
     int disc_num = sim_InitPar0(theSim);
@@ -123,27 +125,30 @@ void cell_init_adaf2(struct Cell ***theCells,struct Sim *theSim,
                     struct MPIsetup *theMPIsetup)
 {
     int i, j, k;
-    for (k = 0; k < sim_N(theSim,Z_DIR); k++) 
+    for (k = 0; k < sim_N(theSim,Z_DIR); k++)
     {
         double zm = sim_FacePos(theSim,k-1,Z_DIR);
         double zp = sim_FacePos(theSim,k,Z_DIR);
         double z = 0.5*(zm+zp);
-        
-        for (i = 0; i < sim_N(theSim,R_DIR); i++) 
+
+        for (i = 0; i < sim_N(theSim,R_DIR); i++)
         {
             double rm = sim_FacePos(theSim,i-1,R_DIR);
             double rp = sim_FacePos(theSim,i,R_DIR);
             double r = 0.5*(rm+rp);
 
-            for (j = 0; j < sim_N_p(theSim,i); j++) 
+            for (j = 0; j < sim_N_p(theSim,i); j++)
             {
                 double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
-             
+
                 cell_init_adaf2_calc(&(theCells[k][i][j]), r, t, z, theSim);
-                
+
                 if(PRINTTOOMUCH)
                 {
-                    printf("(%d,%d,%d) = (%.12lg, %.12lg, %.12lg): (%.12lg, %.12lg, %.12lg, %.12lg, %.12lg)\n", i,j,k,r,t,z,theCells[k][i][j].prim[RHO],theCells[k][i][j].prim[URR],theCells[k][i][j].prim[UPP],theCells[k][i][j].prim[UZZ],theCells[k][i][j].prim[PPP]);
+                    printf("(%d,%d,%d) = (%.12lg, %.12lg, %.12lg): (%.12lg, %.12lg, %.12lg, %.12lg, %.12lg)\n",
+                          i,j,k,r,t,z,theCells[k][i][j].prim[RHO], theCells[k][i][j].prim[URR],
+                          theCells[k][i][j].prim[UPP], theCells[k][i][j].prim[UZZ],
+                          theCells[k][i][j].prim[PPP]);
                 }
             }
         }

@@ -8,7 +8,7 @@ import readChkpt as rc
 
 GAM = 5.0/3.0
 M = 1.0
-scale = 'log'
+scale = 'linear'
 eos_x1 = 1.0
 eos_x2 = 1.0
 eos_x3 = 1.0
@@ -87,9 +87,9 @@ def plot_r_profile_single(r, f, sca, ylabel, bounds=None, R=None, F=None):
             plt.ylim(lower, upper)
 
 def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
-    
+
     print("Reading {0:s}".format(filename))
-    
+
     dat = rc.readChkpt(filename)
     t = dat[0]
     r = dat[1]
@@ -105,7 +105,7 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
     T = T[real]
     vr = vr[real]
     vp = vp[real]
-    
+
     i = r.argmax()
     #R = np.linspace(r.min(), r.max(), 100)
     R = np.logspace(np.log10(r.min()), np.log10(r.max()), 100)
@@ -163,11 +163,11 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         bounds.append([H.min(), H.max()])
         bounds.append([Mdot[Mdot>0].min(), Mdot[Mdot>0].max()])
         bounds.append([min(cs.min(),np.abs(VR).min(),np.abs(VP).min(),V.min()),
-                    max(cs.max(),np.abs(VR).max(),np.abs(VP).max(),V.max())]) 
+                    max(cs.max(),np.abs(VR).max(),np.abs(VP).max(),V.max())])
         bounds = np.array(bounds)
 
     if plot:
-    
+
         print("Plotting t = {0:g}".format(t))
 
         #Plot.
@@ -180,14 +180,14 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         plt.subplot(332)
         #plot_r_profile_single(r, T, sca, r"$T$", R, TTT)
         plot_r_profile_single(r, T, sca, r"$T$ ($m_p c^2$)", bounds[1])
-        
+
         plt.subplot(333)
         plt.plot(r, Pg, 'g+')
         plt.plot(r, Pr, 'b+')
         plt.plot(r, Pd, 'r+')
         #plot_r_profile_single(r, Ptot, sca, r"$P$", R, PPP)
         plot_r_profile_single(r, Ptot, sca, r"$P$ ($g\ c^2/cm^3$)", bounds[2])
-        
+
         plt.subplot(334)
         #plot_r_profile_single(r, vr, "linear", r"$v^r$", R, URR)
         plt.plot(R, -(1-2*M/R)/(1+2*M/R), 'r--')
@@ -195,9 +195,9 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         plt.plot(R, -(0.5-2*M/R)/(1+2*M/R), 'b--')
         plt.plot(R, -(-0.5-2*M/R)/(1+2*M/R), 'b--')
         plt.plot(R, -(0.0-2*M/R)/(1+2*M/R), ls='--', color='grey')
-        plot_r_profile_single(r, -vr, "log", r"$v^r$", bounds[3])
-        plt.gca().set_xscale(sca)
-        
+        plot_r_profile_single(r, -vr, sca, r"$v^r$", bounds[3])
+        #plt.gca().set_xscale(sca)
+
         plt.subplot(335)
         #plot_r_profile_single(r, vp, sca, r"$v^\phi$", R, UPP)
         plt.plot(R, 1.0/(np.sqrt(1+2.0*M/R)*R), 'r--')
@@ -214,9 +214,9 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         plot_r_profile_single(r, H, sca, r"$H$", bounds[6])
 
         plt.subplot(338)
-        plot_r_profile_single(r, Mdot, sca, r"$\dot{M}$ ($M_\odot / s$)", 
+        plot_r_profile_single(r, Mdot, sca, r"$\dot{M}$ ($M_\odot / s$)",
                                 bounds[7])
-        
+
         plt.subplot(339)
         plt.plot(r, VR, 'r+')
         plt.plot(r, VP, 'g+')
@@ -260,7 +260,6 @@ if __name__ == "__main__":
             all_bounds[:,1] = np.maximum(all_bounds[:,1], bounds[:,1])
 
         for filename in sys.argv[1:]:
-            fig, bounds = plot_r_profile(filename, sca=scale, plot=True, 
+            fig, bounds = plot_r_profile(filename, sca=scale, plot=True,
                                         bounds=all_bounds)
             plt.close(fig)
-
