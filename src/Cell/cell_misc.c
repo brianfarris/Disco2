@@ -127,6 +127,8 @@ void cell_bc_damp( struct Cell *** theCells , struct Sim * theSim,struct GravMas
             }
         }
     }
+
+    cell_single_destroy(initialCell);
 }
 
 void cell_clear_w(struct Cell ***theCells,struct Sim * theSim){
