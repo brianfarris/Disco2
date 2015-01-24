@@ -8,16 +8,6 @@ SRCDIR   = src
 OBJDIR   = obj
 BINDIR   = bin
 
-#UNAME = $(shell uname)
-#ifeq ($(UNAME),Linux)
-#H55 = /home/install/app/hdf5-1.6_intel_mpi
-##H55 = /share/apps/hdf5/1.8.2/openmpi/intel
-#endif
-#ifeq ($(UNAME),Darwin)
-##H55 = /usr/local/hdf5
-#H55 = $(HOME)/Coding/Libraries/hdf5-1.8.9-par
-#endif
-
 SRCS    := $(shell find $(SRCDIR) -name '*.$(SRCEXT)')
 SRCDIRS := $(shell find . -name '*.$(SRCEXT)' -exec dirname {} \; | uniq)
 OBJS    := $(patsubst %.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))

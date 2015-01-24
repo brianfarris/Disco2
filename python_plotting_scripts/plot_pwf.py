@@ -8,10 +8,10 @@ import readChkpt as rc
 
 GAM = 5.0/3.0
 M = 1.0
-scale = 'linear'
-eos_x1 = 1.0
-eos_x2 = 1.0
-eos_x3 = 1.0
+scale = 'log'
+x1 = 1.0
+x2 = 1.0
+x3 = 1.0
 alpha = 0.1
 
 c = 2.99792458e10
@@ -75,7 +75,7 @@ def plot_r_profile_single(r, f, sca, ylabel, bounds=None, R=None, F=None):
     plt.ylabel(ylabel)
 
     plt.xlim(r.min(), r.max())
-    plt.axvspan(plt.xlim()[0], 2*M, color='grey', alpha=0.5)
+    plt.axvspan(plt.xlim()[0], 2*M*rg_solar, color='grey', alpha=0.5)
 
     if bounds is not None:
         if sca == "log":
@@ -106,18 +106,22 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
     vr = vr[real]
     vp = vp[real]
 
-    i = r.argmax()
+    #i = r.argmax()
     #R = np.linspace(r.min(), r.max(), 100)
-    R = np.logspace(np.log10(r.min()), np.log10(r.max()), 100)
-    RHO = rho[i] * np.power(R/r[i], -1.5)
-    TTT = T[i] * np.power(R/r[i], -1.0)
-    URR = vr[i] * np.power(R/r[i], -0.5)
-    UPP = vp[i] * np.power(R/r[i], -1.5)
+    #R = np.logspace(np.log10(r.min()), np.log10(r.max()), 100)
+    #RHO = rho[i] * np.power(R/r[i], -1.5)
+    #TTT = T[i] * np.power(R/r[i], -1.0)
+    #URR = vr[i] * np.power(R/r[i], -0.5)
+    #UPP = vp[i] * np.power(R/r[i], -1.5)
 
     #u0 = 1.0/np.sqrt(1.0-2*M/r-vr*vr/(1-2*M/r)-r*r*vp*vp)
     #U00 = 1.0/np.sqrt(1.0-2*M/R-URR*URR/(1-2*M/R)-R*R*UPP*UPP)
     u0 = 1.0/np.sqrt(1.0-2*M/r-4*M/r*vr-(1+2*M/r)*vr*vr-r*r*vp*vp)
-    U00 = 1.0/np.sqrt(1.0-2*M/R-4*M/R*URR-(1+2*M/R)*URR*URR-R*R*UPP*UPP)
+    #U00 = 1.0/np.sqrt(1.0-2*M/R-4*M/R*URR-(1+2*M/R)*URR*URR-R*R*UPP*UPP)
+
+    VR = vr*u0/np.sqrt(1.0 - 2.0*M/r + u0*u0*vr*vr) * c
+    VP = vp / (1.0 - 2*M*vr/(r-2*M)) * c/rg_solar
+    l = r*r*u0*vp * c*rg_solar
 
     #fac = 1.0/(1.0-2*M/(r-2*M)*vr)
     #vr = vr*fac
@@ -129,115 +133,123 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
     #mach = np.sqrt((vr*vr/(1-2*M/r)+r*r*vp*vp)/(GAM*P/rhoh))
     #MACH = np.sqrt((URR*URR/(1-2*M/R)+R*R*UPP*UPP)/(GAM*PPP/RHOH))
 
-    Pg = eos_x1*P_gas(rho, T)
-    Pr = eos_x2*P_rad(rho, T)
-    Pd = eos_x3*P_deg(rho, T)
+    Pg = x1*P_gas(rho, T)
+    Pr = x2*P_rad(rho, T)
+    Pd = x3*P_deg(rho, T)
     Ptot = Pg + Pr + Pd
-    epstot = eos_x1*e_gas(rho,T) + eos_x2*e_rad(rho,T) + eos_x3*e_deg(rho,T)
+    epstot = x1*e_gas(rho,T) + x2*e_rad(rho,T) + x3*e_deg(rho,T)
 
-    EPS = eos_x1*e_gas(RHO,TTT) + eos_x2*e_rad(RHO,TTT) + eos_x3*e_deg(RHO,TTT)
-    PPP = eos_x1*P_gas(RHO, TTT) + eos_x2*P_rad(RHO, TTT)
+    PPtot = Ptot * c*c
+
+    #EPS = x1*e_gas(RHO,TTT) + x2*e_rad(RHO,TTT) + x3*e_deg(RHO,TTT)
+    #PPP = x1*P_gas(RHO,TTT) + x2*P_rad(RHO,TTT) + eox_x3*P_deg(RHO,TTT)
 
     rhoh = rho + rho*epstot + Ptot
-    RHOH = RHO + RHO*EPS + PPP
+    #RHOH = RHO + RHO*EPS + PPP
+
+    Tk = T *mp*c*c / kb
 
     W = 1.0/np.sqrt(1.0 - ((1.0+2.0*M/r)*vr+2*M/r)**2 - (1.0+2.0*M/r)*r*r*vp*vp)
     H = np.sqrt(Ptot*r*r*r/(rhoh*M))/u0
-    HHH = np.sqrt(PPP*R*R*R/(RHOH*M))/U00
+    HH = np.sqrt(Ptot*r*r*r/(rhoh*M))/u0 * rg_solar
+    #HHH = np.sqrt(PPP*R*R*R/(RHOH*M))/U00
 
     Mdot = -2*math.pi*r*rho*u0*vr*H * c*rg_solar*rg_solar/M_solar
 
-    cs = np.sqrt(cs2(rho,T))
-    VR = np.abs((1.0 + 2.0*M/r)*vr + 2.0*M/r)
-    VP = np.sqrt(1.0+2.0*M/r)*r*vp
-    V = np.sqrt(VR*VR+VP*VP)
+    qee = 5.0e33 * np.power(Tk/1.0e11,9.0)
+    qeN = 9.0e33 * (rho/1.0e10) * np.power(Tk/1.0e11,6.0)
+    q = qee + qeN
+
+    Lee = qee * 2*math.pi*r*H * rg_solar*rg_solar
+    LeN = qeN * 2*math.pi*r*H * rg_solar*rg_solar
+    L   = q   * 2*math.pi*r*H * rg_solar*rg_solar
 
     if bounds is None:
         bounds = []
         bounds.append([rho.min(), rho.max()])
-        bounds.append([T.min(), T.max()])
-        bounds.append([Ptot.min(), Ptot.max()])
-        bounds.append([(-vr[vr<0]).min(), (-vr[vr<0]).max()])
-        bounds.append([vp[vp>0].min(), vp[vp>0].max()])
-        bounds.append([W.min(), W.max()])
-        bounds.append([H.min(), H.max()])
+        bounds.append([Tk.min(), Tk.max()])
+        bounds.append([(-VR[VR<0]).min(), (-VR[VR<0]).max()])
+        bounds.append([HH.min(), HH.max()])
+        bounds.append([VP[VP>0].min(), VP[VP>0].max()])
+        bounds.append([l[l>0].min(), l[l>0].max()])
+        bounds.append([q.min(), q.max()])
         bounds.append([Mdot[Mdot>0].min(), Mdot[Mdot>0].max()])
-        bounds.append([min(cs.min(),np.abs(VR).min(),np.abs(VP).min(),V.min()),
-                    max(cs.max(),np.abs(VR).max(),np.abs(VP).max(),V.max())])
+        bounds.append([L.min(), L.max()])
+        bounds.append([PPtot.min(), PPtot.max()])
         bounds = np.array(bounds)
 
     if plot:
 
         print("Plotting t = {0:g}".format(t))
 
-        #Plot.
-        fig = plt.figure(figsize=(12,9))
+        #Plot 1.
+        r *= rg_solar
 
-        plt.subplot(331)
-        #plot_r_profile_single(r, rho, sca, r"$\rho_0$", R, RHO)
-        plot_r_profile_single(r, rho, sca, r"$\rho_0$ ($g/cm^3$)", bounds[0])
+        fig1 = plt.figure(figsize=(9,9))
 
-        plt.subplot(332)
-        #plot_r_profile_single(r, T, sca, r"$T$", R, TTT)
-        plot_r_profile_single(r, T, sca, r"$T$ ($m_p c^2$)", bounds[1])
+        plt.subplot(321)
+        plot_r_profile_single(r, rho, sca, r"$\rho_0$ $(g/cm^3)$", bounds[0])
 
-        plt.subplot(333)
-        plt.plot(r, Pg, 'g+')
-        plt.plot(r, Pr, 'b+')
-        plt.plot(r, Pd, 'r+')
-        #plot_r_profile_single(r, Ptot, sca, r"$P$", R, PPP)
-        plot_r_profile_single(r, Ptot, sca, r"$P$ ($g\ c^2/cm^3$)", bounds[2])
+        plt.subplot(322)
+        plot_r_profile_single(r, Tk, sca, r"$T$ $(K)$", bounds[1])
 
-        plt.subplot(334)
-        #plot_r_profile_single(r, vr, "linear", r"$v^r$", R, URR)
-        plt.plot(R, -(1-2*M/R)/(1+2*M/R), 'r--')
-        plt.plot(R, -(-1*np.ones(R.shape)), 'r--')
-        plt.plot(R, -(0.5-2*M/R)/(1+2*M/R), 'b--')
-        plt.plot(R, -(-0.5-2*M/R)/(1+2*M/R), 'b--')
-        plt.plot(R, -(0.0-2*M/R)/(1+2*M/R), ls='--', color='grey')
-        plot_r_profile_single(r, -vr, sca, r"$v^r$", bounds[3])
-        #plt.gca().set_xscale(sca)
+        plt.subplot(323)
+        plot_r_profile_single(r, -VR, sca, r"$V$ $(cm/s)$", bounds[2])
 
-        plt.subplot(335)
-        #plot_r_profile_single(r, vp, sca, r"$v^\phi$", R, UPP)
-        plt.plot(R, 1.0/(np.sqrt(1+2.0*M/R)*R), 'r--')
-        plt.plot(R, 0.5/(np.sqrt(1+2.0*M/R)*R), 'b--')
-        plot_r_profile_single(r, vp, sca, r"$v^\phi$", bounds[4])
+        plt.subplot(324)
+        plot_r_profile_single(r, HH, sca, r"$H$ $(cm)$", bounds[3])
 
-        plt.subplot(336)
-        #plot_r_profile_single(r, mach, sca, r"$\mathcal{M}$", R, MACH)
-        plot_r_profile_single(r, W, sca, r"$W$", bounds[5])
-        plt.gca().set_yscale('linear')
+        plt.subplot(325)
+        #plot_r_profile_single(r, VP, sca, r"$\Omega$ ($1/s$)", bounds[4])
+        plot_r_profile_single(r, VP, sca, r"$\Omega$ $(1/s)$", None)
+        plt.plot(r, np.power(r/rg_solar,-1.5)*c/rg_solar, color='grey')
 
-        plt.subplot(337)
-        #plot_r_profile_single(r, H, sca, r"$\mathcal{H}$", R, HHH)
-        plot_r_profile_single(r, H, sca, r"$H$", bounds[6])
-
-        plt.subplot(338)
-        plot_r_profile_single(r, Mdot, sca, r"$\dot{M}$ ($M_\odot / s$)",
-                                bounds[7])
-
-        plt.subplot(339)
-        plt.plot(r, VR, 'r+')
-        plt.plot(r, VP, 'g+')
-        plt.plot(r, V,  'b+')
-        plot_r_profile_single(r, cs, sca, r"$c_s$ ($c$)", bounds[8])
+        plt.subplot(326)
+        plot_r_profile_single(r, l, sca, r"$\ell$ $(cm^2/s)$", bounds[5])
 
         plt.tight_layout()
 
+        #Plot 2.
+        fig2 = plt.figure(figsize=(9,9))
+
+        plt.subplot(321)
+        plt.plot(r, qee, 'g+')
+        plt.plot(r, qeN, 'b+')
+        plot_r_profile_single(r, q, sca, r"$\dot{q}$ $(erg/cm^3s)$", bounds[6])
+
+        plt.subplot(322)
+        plot_r_profile_single(r, Mdot, sca, r"$\dot{M}$ $(M_{\odot}/s)$", 
+                                bounds[7])
+
+        plt.subplot(323)
+        plt.plot(r, Lee, 'g+')
+        plt.plot(r, LeN, 'b+')
+        plot_r_profile_single(r, L, sca, r"$dL/dr$ $(erg/cm\ s)$", bounds[8])
+
+        plt.subplot(324)
+        plt.plot(r, Pg*c*c, 'r+')
+        plt.plot(r, Pr*c*c, 'g+')
+        plt.plot(r, Pd*c*c, 'b+')
+        plot_r_profile_single(r, PPtot, sca, r"$P$ $(erg/cm^3)$", bounds[9])
+
+        plt.tight_layout()
+
+
         outpath = filename.split("/")[:-1]
         chckname = filename.split("/")[-1]
-        outname = "plot_pwf_{0}.png".format("_".join(chckname.split(".")[0].split("_")[1:]))
+        outname1 = "plot_pwf1_{0}.png".format("_".join(chckname.split(".")[0].split("_")[1:]))
+        outname2 = "plot_pwf2_{0}.png".format("_".join(chckname.split(".")[0].split("_")[1:]))
 
-        #outname = "plot_r_{0}.png".format("_".join( filename.split(".")[0].split("_")[1:] ))
 
-        print("Saving {0:s}...".format(outname))
-        plt.savefig(outname)
+        print("Saving {0:s} and {1:s}...".format(outname1, outname2))
+        fig1.savefig(outname1)
+        fig2.savefig(outname2)
+        figs = (fig1,fig2)
 
     else:
-        fig = None
+        figs = None
 
-    return fig, bounds
+    return figs, bounds
 
 if __name__ == "__main__":
 
@@ -247,19 +259,20 @@ if __name__ == "__main__":
 
     elif len(sys.argv) == 2:
         filename = sys.argv[1]
-        fig = plot_r_profile(filename, sca=scale)
+        figs = plot_r_profile(filename, sca=scale)
         plt.show()
 
     else:
-        all_bounds = np.zeros((9,2))
+        all_bounds = np.zeros((10,2))
         all_bounds[:,0] = np.inf
         all_bounds[:,1] = -np.inf
         for filename in sys.argv[1:]:
-            fig, bounds = plot_r_profile(filename, sca=scale, plot=False)
+            figs, bounds = plot_r_profile(filename, sca=scale, plot=False)
             all_bounds[:,0] = np.minimum(all_bounds[:,0], bounds[:,0])
             all_bounds[:,1] = np.maximum(all_bounds[:,1], bounds[:,1])
 
         for filename in sys.argv[1:]:
-            fig, bounds = plot_r_profile(filename, sca=scale, plot=True,
+            figs, bounds = plot_r_profile(filename, sca=scale, plot=True,
                                         bounds=all_bounds)
-            plt.close(fig)
+            plt.close(figs[0])
+            plt.close(figs[1])
