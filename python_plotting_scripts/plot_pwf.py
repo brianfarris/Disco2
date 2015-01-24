@@ -77,7 +77,7 @@ def plot_r_profile_single(r, f, sca, ylabel, bounds=None, R=None, F=None):
     plt.xlim(r.min(), r.max())
     plt.axvspan(plt.xlim()[0], 2*M, color='grey', alpha=0.5)
 
-    if bounds != None:
+    if bounds is not None:
         if sca == "log":
             upper = 10.0 ** (math.ceil(math.log10(bounds[1]))+0.1)
             if bounds[0] > 0:
@@ -152,7 +152,7 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
     VP = np.sqrt(1.0+2.0*M/r)*r*vp
     V = np.sqrt(VR*VR+VP*VP)
 
-    if bounds == None:
+    if bounds is None:
         bounds = []
         bounds.append([rho.min(), rho.max()])
         bounds.append([T.min(), T.max()])

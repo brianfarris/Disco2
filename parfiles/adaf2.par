@@ -12,7 +12,7 @@ Background              2       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
 Metric                  2       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS
 Frame                   0       // 0 Euler, 1 Keplerian
-Restart                 1       // If this=1 restart using input.h5
+Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
 NumR			128			//Radial Zones
@@ -27,8 +27,8 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   0
-Time_Max                1.0e4
-Num_Checkpoints	        1000
+Time_Max                1.0e0
+Num_Checkpoints	        100
 Num_Diag_Dump           20
 Num_Diag_Measure        20
 
@@ -56,13 +56,17 @@ AlphaVisc       0.1
 //EoS
 EOSType            1       //0 Gammalaw, 1 Gas+Rad
 EOSPar1            1.0
-EOSPar2            0.0
+EOSPar2            1.0
+EOSPar3            1.0
+EOSPar4            1.0
 
 //Cooling
 CoolingType         0       //0 None, 1 Isothermal, 2 Blackbody-Thompson, 
                             //3 Blackbody-freefree, 4 Neutrino
 CoolPar1            1.0
 CoolPar2            0.0
+CoolPar3            0.0
+CoolPar4            0.0
 
 //Initial Condition Parameters
 InitPar0        0           // 0 No Cooling

@@ -14,3 +14,4 @@ bin*
 res/
 python_plotting_scripts/
 *.ignore
+Makefile.in
