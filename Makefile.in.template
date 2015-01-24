@@ -1,1 +1,11 @@
-H55 = /home/install/app/hdf5-1.6_intel_mpi
+#Makefile.in for Disco2
+
+#This file contains the user-specified build options and is machine-specific.
+
+#Location of (Parallel) HDF5 library.
+H55 = /usr/local
+
+#Compile flags
+USE_DEBUG = 1  # Compile with symbol table and all warnings
+USE_OPT   = 0  # Compile with optimization.
+
