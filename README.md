@@ -1,3 +1,6 @@
+Disco2
+======
+
 Build Instructions
 
 1) Copy Makefile.in.template into a new file Makefile.in.  Modify Makefile.in to accomodate your machine's layout, currently this only requires pointing it to your (parallel) HDF5 installation and setting the flags for performance or development.
