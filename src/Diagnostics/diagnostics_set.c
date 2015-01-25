@@ -4,6 +4,7 @@
 #include <math.h>
 #include "../Headers/Sim.h"
 #include "../Headers/Cell.h"
+#include "../Headers/EOS.h"
 #include "../Headers/GravMass.h"
 #include "../Headers/Diagnostics.h"
 #include "../Headers/TimeStep.h"
@@ -12,7 +13,6 @@
 
 void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCells,struct Sim * theSim,struct TimeStep * theTimeStep,struct MPIsetup * theMPIsetup,struct GravMass * theGravMasses){
   if (timestep_get_t(theTimeStep)>=diagnostics_tdiag_measure(theDiagnostics)){
-    int num_r_points = sim_N(theSim,R_DIR)-sim_Nghost_min(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR);
     int num_r_points_global = sim_N_global(theSim,R_DIR);
 
     int NUM_SCAL = theDiagnostics->NUM_DIAG;
@@ -67,16 +67,19 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
         double r = 0.5*(rm+rp);
         for (j=0;j<sim_N_p(theSim,i);++j){
           double phi = cell_tiph(cell_single(theCells,i,j,k));
-          double dphi = cell_dphi(cell_single(theCells,i,j,k));
           double rho = cell_prim(cell_single(theCells,i,j,k),RHO);
           double press = cell_prim(cell_single(theCells,i,j,k),PPP);
           double vr = cell_prim(cell_single(theCells,i,j,k),URR);
           double vp = cell_prim(cell_single(theCells,i,j,k),UPP)*r;
           double vz = cell_prim(cell_single(theCells,i,j,k),UZZ);
-          double v2   = vr*vr + vp*vp + vz*vz;
-          double rhoe = press/(sim_GAMMALAW(theSim)-1.);
 
-          double passive_scalar = cell_prim(cell_single(theCells,i,j,k),5);
+          double passive_scalar;
+          int NUMQ = sim_NUM_Q(theSim);
+          int NUMC = sim_NUM_C(theSim);
+          if(NUMQ > NUMC)
+            passive_scalar = cell_prim(cell_single(theCells,i,j,k),NUMC);
+          else
+            passive_scalar = 0.0;
 
           if ((fabs(zp)<0.0000001)||(fabs(z)<0.0000001)){
             EquatDiag_temp[(theDiagnostics->offset_eq+position)*NUM_EQ+0] = r;
@@ -95,6 +98,12 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             ++position;
           }
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
+          double tmp_prim[5];
+          tmp_prim[RHO] = rho;
+          tmp_prim[PPP] = press;
+          tmp_prim[URR] = vr;
+          tmp_prim[UPP] = vp/r;
+          tmp_prim[UZZ] = vz;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+0] += (r/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1] += (rho/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+2] += (vr/sim_N_p(theSim,i)*dz) ;
@@ -107,6 +116,9 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (rho*vr*sin(phi)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (rho*vr*cos(2.*phi)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (rho*vr*sin(2.*phi)/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (eos_cs2(tmp_prim,theSim)/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (eos_eps(tmp_prim,theSim)/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (eos_ppp(tmp_prim,theSim)/sim_N_p(theSim,i)*dz) ;
           // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }

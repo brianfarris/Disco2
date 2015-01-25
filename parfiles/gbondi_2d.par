@@ -4,38 +4,40 @@ InitialDataType         9       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 4 Shock1, 5 Shock2, 6 Shock3, 7 Shock4,
                                 // 8 Isentrope, 9 GR-Bondi
 GravMassType            0       // 0 none, 1 single, 2 binary
-Background              1       // 0 Newtonian, 1 GR
+Background              1       // 0 Newtonian, 1 GR, 2 GRvisc
 Metric                  2       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR			80			//Radial Zones
+NumR			256			//Radial Zones
 NumZ			1          //Vertical Zones
 ng              2
-R_Min		    1.5
-R_Max			20.0
-Z_Min			-0.5
-Z_Max			0.5
+R_Min		    1.0
+R_Max			16.0
+Z_Min			-1.0
+Z_Max			1.0
 NP_CONST        5
 aspect                  1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                1000
-Num_Checkpoints	        10	
+Time_Max                25
+Num_Checkpoints	        20	
 Num_Diag_Dump           20
 Num_Diag_Measure        20
 
 
 NoInnerBC            1
-BoundTypeR           0               // 0 fixed, 1 outflow, 2 periodic
-BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeRIn            0               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeROut           0               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZBot           2               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZTop           2               // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry         1
 
-Move_Cells              0
+Move_Cells              4
 RiemannSolver           1           // 0 hllc, 1 hll
-Adiabatic_Index         1.3333333333
+Adiabatic_Index         1.2
 
 //Numerical Parameters
 CFL			0.5
@@ -44,11 +46,17 @@ PLM			1.0
 Grav_2D			1
 G_EPS			0.0
 GravM           1.0
+AlphaVisc       0.0
+CoolFac         0.0
 
 //Initial Condition Parameters
 InitPar0        0 // 0 for 2D, 1 for  3D.
 InitPar1        8.0
 InitPar2        1.0
+InitPar3        0.00
+InitPar4        0.00
+InitPar5        -1
+InitPar6        -1
 
 PHI_ORDER               2
 

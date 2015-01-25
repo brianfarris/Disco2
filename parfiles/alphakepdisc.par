@@ -1,0 +1,95 @@
+//Disco Parameter File//
+
+InitialDataType        17       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform, 
+                                // 4 Shock1, 5 Shock2, 6 Shock3, 7 Shock4,
+                                // 8 Isentrope, 9 GR-Bondi, 10 GR-Bondi2,
+                                // 11 Equilibrium1, 12 Equilibrium2, 13 SSDisc
+                                // 14 NTDisc, 15 ConstantDisc,
+                                // 16 Cartesian-Shear, 17 Disc Tests
+GravMassType            0       // 0 none, 1 single, 2 binary
+Background              2       // 0 Newtonian, 1 GR, 2 GRvisc
+Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
+                                // 2 Schwarzschild-KS, 3 Flat-Cartesian
+Frame                   0       // 0 Euler, 1 Keplerian
+Restart                 0       // If this=1 restart using input.h5
+
+//Computational Grid
+NumR		    128			//Radial Zones
+NumZ			1          //Vertical Zones
+ng              2
+R_Min		    0.1
+R_Max			1.0
+Z_Min			-1.0e6
+Z_Max			1.0e6
+NP_CONST        3
+aspect          1.0
+
+NUM_C                   5
+NUM_N                   1
+Time_Max                1.0e3
+Num_Checkpoints	        1000
+Num_Diag_Dump           20
+Num_Diag_Measure        20
+
+
+NoInnerBC               0
+BoundTypeRIn            1               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeROut           0               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZBot           2               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZTop           2               // 0 fixed, 1 outflow, 2 periodic
+ZeroPsiBndry            1
+
+Move_Cells              0
+RiemannSolver           1           // 0 hllc, 1 hll
+Adiabatic_Index         1.333333
+
+//Numerical Parameters
+CFL			0.5
+PLM			1.0
+
+Grav_2D			1
+G_EPS			0.0
+GravM           1.0e-6
+AlphaVisc       0.1
+
+//EoS
+EOSType             1       //0 Ideal-Newtonian, 1 Ideal-GR
+EOSPar1            0.0
+EOSPar2            0.0
+
+//Cooling
+CoolingType         2       //0 None, 1 Isothermal, 2 Blackbody-Thompson, 
+                            //3 Blackbody-freefree, 4 Neutrino
+CoolPar1            1.0
+CoolPar2            0.0
+
+//Initial Condition Parameters
+InitPar0        2         // Keplerian Alpha-Disc
+InitPar1        1.0e-3    // rho0
+InitPar2        1.0e-9    // P0
+InitPar3        0.0       // 
+InitPar4        0.0       // 
+InitPar5        -1
+InitPar6        -1
+
+PHI_ORDER               2
+
+//Atmosphere Parameters
+Rho_Floor		0.000000001
+Cs_Floor		0.00000001		
+Cs_Cap			10000.0
+Vel_Cap			100.0
+
+runtype                 0
+
+//DAMPING
+DAMP_TIME               -1.0        // Set negative to turn off
+RDAMP_INNER             0.0
+RDAMP_OUTER             0.0
+
+RLogScale               0.1
+ZLogScale               1.0e6
+HiResSigma              1.0e6
+HiResR0                 1.0e6
+HiResFac                0.0
+

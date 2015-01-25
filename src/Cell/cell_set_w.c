@@ -49,13 +49,14 @@ void cell_set_w(struct Cell ***theCells,struct Sim *theSim){
     }
 
   } else if (sim_MOVE_CELLS(theSim) == C_KEPLER ) {
+    double M = sim_GravM(theSim);
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
       for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
         double rp = sim_FacePos(theSim,i,R_DIR);
         double rm = sim_FacePos(theSim,i-1,R_DIR);
         double r = 0.5*(rm+rp);
         for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-          theCells[k][i][j].wiph = pow(r,-0.5);
+            theCells[k][i][j].wiph = sqrt(M/r);
         }
       }
     }

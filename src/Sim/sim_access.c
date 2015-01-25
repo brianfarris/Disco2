@@ -37,11 +37,17 @@ double sim_FacePos(struct Sim *theSim,int index,int direction){
 int sim_N(struct Sim *theSim, int direction){
   return(theSim->N_noghost[direction]+theSim->Nghost_min[direction]+theSim->Nghost_max[direction]);
 }
-int sim_BoundTypeR(struct Sim *theSim){
-  return(theSim->BoundTypeR);
+int sim_BoundTypeRIn(struct Sim *theSim){
+  return(theSim->BoundTypeRIn);
 }
-int sim_BoundTypeZ(struct Sim *theSim){
-  return(theSim->BoundTypeZ);
+int sim_BoundTypeROut(struct Sim *theSim){
+  return(theSim->BoundTypeROut);
+}
+int sim_BoundTypeZBot(struct Sim *theSim){
+  return(theSim->BoundTypeZBot);
+}
+int sim_BoundTypeZTop(struct Sim *theSim){
+  return(theSim->BoundTypeZTop);
 }
 int sim_Ncells(struct Sim *theSim){
   return(theSim->Ncells);
@@ -57,6 +63,9 @@ int sim_Background(struct Sim *theSim){
 }
 int sim_Metric(struct Sim *theSim){
   return(theSim->Metric);
+}
+int sim_Frame(struct Sim *theSim){
+  return(theSim->Frame);
 }
 int sim_Ncells_global(struct Sim *theSim){
   return(theSim->Ncells_global);
@@ -160,4 +169,48 @@ double sim_InitPar1(struct Sim *theSim){
 double sim_InitPar2(struct Sim *theSim){
   return(theSim->InitPar2);
 }
-
+double sim_InitPar3(struct Sim *theSim){
+  return(theSim->InitPar3);
+}
+double sim_InitPar4(struct Sim *theSim){
+  return(theSim->InitPar4);
+}
+double sim_InitPar5(struct Sim *theSim){
+  return(theSim->InitPar5);
+}
+double sim_InitPar6(struct Sim *theSim){
+  return(theSim->InitPar6);
+}
+double sim_AlphaVisc(struct Sim *theSim){
+  return(theSim->AlphaVisc);
+}
+int sim_EOSType(struct Sim *theSim){
+  return(theSim->EOSType);
+}
+double sim_EOSPar1(struct Sim *theSim){
+  return(theSim->EOSPar1);
+}
+double sim_EOSPar2(struct Sim *theSim){
+  return(theSim->EOSPar2);
+}
+double sim_EOSPar3(struct Sim *theSim){
+  return(theSim->EOSPar3);
+}
+double sim_EOSPar4(struct Sim *theSim){
+  return(theSim->EOSPar4);
+}
+int sim_CoolingType(struct Sim *theSim){
+  return(theSim->CoolingType);
+}
+double sim_CoolPar1(struct Sim *theSim){
+  return(theSim->CoolPar1);
+}
+double sim_CoolPar2(struct Sim *theSim){
+  return(theSim->CoolPar2);
+}
+double sim_CoolPar3(struct Sim *theSim){
+  return(theSim->CoolPar3);
+}
+double sim_CoolPar4(struct Sim *theSim){
+  return(theSim->CoolPar4);
+}

@@ -13,6 +13,7 @@ void metric_init_background(struct Sim *theSim)
     {
         cell_prim2cons = &cell_prim2cons_newt;
         cell_cons2prim = &cell_cons2prim_newt;
+        cell_add_src = &cell_add_src_newt;
         cell_mindt = &cell_mindt_newt;
         riemann_set_flux = &riemann_set_flux_newt;
         riemann_set_vel = &riemann_set_vel_newt;
@@ -21,10 +22,43 @@ void metric_init_background(struct Sim *theSim)
     {
         cell_prim2cons = &cell_prim2cons_gr;
         cell_cons2prim = &cell_cons2prim_gr;
+        cell_add_src = &cell_add_src_gr;
         cell_mindt = &cell_mindt_gr;
         riemann_set_flux = &riemann_set_flux_gr;
         riemann_set_vel = &riemann_set_vel_gr;
     }
+    else if(sim_Background(theSim) == GRVISC1)
+    {
+        cell_prim2cons = &cell_prim2cons_gr;
+        cell_cons2prim = &cell_cons2prim_gr;
+        cell_add_src = &cell_add_src_gr;
+        cell_mindt = &cell_mindt_gr;
+        riemann_set_flux = &riemann_set_flux_gr;
+        riemann_set_vel = &riemann_set_vel_gr;
+    }
+    else if(sim_Background(theSim) == GRDISC)
+    {
+        cell_prim2cons = &cell_prim2cons_grdisc;
+        cell_cons2prim = &cell_cons2prim_grdisc;
+        cell_add_src = &cell_add_src_grdisc;
+        cell_mindt = &cell_mindt_grdisc;
+        riemann_set_flux = &riemann_set_flux_grdisc;
+        riemann_set_vel = &riemann_set_vel_grdisc;
+    }
+
+    if(sim_Frame(theSim) == FR_EULER)
+    {
+        printf("Euler!\n");
+        metric_frame_U_u = &metric_frame_U_u_euler;
+        metric_frame_dU_du = &metric_frame_dU_du_euler;
+    }
+    else if(sim_Frame(theSim) == FR_KEP)
+    {
+        printf("Kepler!\n");
+        metric_frame_U_u = &metric_frame_U_u_kep;
+        metric_frame_dU_du = &metric_frame_dU_du_kep;
+    }
+
 }
 
 void metric_init_metric(struct Sim *theSim)
@@ -52,6 +86,14 @@ void metric_init_metric(struct Sim *theSim)
         metric_dg_dd_exact = &metric_dg_dd_exact_schw_ks;
         metric_dg_uu_exact = &metric_dg_uu_exact_schw_ks;
         metric_killing_exact = &metric_killing_exact_schw_ks;
+    }
+    else if(sim_Metric(theSim) == SR_CART)
+    {
+        metric_g_dd_exact = &metric_g_dd_exact_sr_cart;
+        metric_g_uu_exact = &metric_g_uu_exact_sr_cart;
+        metric_dg_dd_exact = &metric_dg_dd_exact_sr_cart;
+        metric_dg_uu_exact = &metric_dg_uu_exact_sr_cart;
+        metric_killing_exact = &metric_killing_exact_sr_cart;
     }
     else
     {

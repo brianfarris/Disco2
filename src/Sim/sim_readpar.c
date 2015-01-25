@@ -55,11 +55,14 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "Restart"              , VAR_INT  , &(theSim->Restart)  );
       err += readvar( pfile , "InitialDataType"      , VAR_INT  , &(theSim->InitialDataType)  );
       err += readvar( pfile , "GravMassType"      , VAR_INT  , &(theSim->GravMassType)  );
-      err += readvar( pfile , "BoundTypeR"         , VAR_INT  , &(theSim->BoundTypeR)  );
-      err += readvar( pfile , "BoundTypeZ"         , VAR_INT  , &(theSim->BoundTypeZ)  );
+      err += readvar( pfile , "BoundTypeRIn"         , VAR_INT  , &(theSim->BoundTypeRIn)  );
+      err += readvar( pfile , "BoundTypeROut"         , VAR_INT  , &(theSim->BoundTypeROut)  );
+      err += readvar( pfile , "BoundTypeZBot"         , VAR_INT  , &(theSim->BoundTypeZBot)  );
+      err += readvar( pfile , "BoundTypeZTop"         , VAR_INT  , &(theSim->BoundTypeZTop)  );
       err += readvar( pfile , "NoInnerBC"         , VAR_INT  , &(theSim->NoInnerBC)  );
       err += readvar( pfile , "Background"         , VAR_INT  , &(theSim->Background)  );
       err += readvar( pfile , "Metric"         , VAR_INT  , &(theSim->Metric)  );
+      err += readvar( pfile , "Frame"         , VAR_INT  , &(theSim->Frame)  );
       err += readvar( pfile , "NumR"              , VAR_INT  , &(theSim->N_global[R_DIR]) );
       err += readvar( pfile , "NumZ"              , VAR_INT  , &(theSim->N_global[Z_DIR]) );
       err += readvar( pfile , "ng"              , VAR_INT  , &(theSim->ng));
@@ -99,6 +102,21 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "InitPar0"           , VAR_INT , &(theSim->InitPar0)  );
       err += readvar( pfile , "InitPar1"           , VAR_DOUB , &(theSim->InitPar1)  );
       err += readvar( pfile , "InitPar2"           , VAR_DOUB , &(theSim->InitPar2)  );
+      err += readvar( pfile , "InitPar3"           , VAR_DOUB , &(theSim->InitPar3)  );
+      err += readvar( pfile , "InitPar4"           , VAR_DOUB , &(theSim->InitPar4)  );
+      err += readvar( pfile , "InitPar5"           , VAR_DOUB , &(theSim->InitPar5)  );
+      err += readvar( pfile , "InitPar6"           , VAR_DOUB , &(theSim->InitPar6)  );
+      err += readvar( pfile , "AlphaVisc"           , VAR_DOUB , &(theSim->AlphaVisc)  );
+      err += readvar( pfile , "EOSType"           , VAR_INT , &(theSim->EOSType)  );
+      err += readvar( pfile , "EOSPar1"           , VAR_DOUB , &(theSim->EOSPar1)  );
+      err += readvar( pfile , "EOSPar2"           , VAR_DOUB , &(theSim->EOSPar2)  );
+      err += readvar( pfile , "EOSPar3"           , VAR_DOUB , &(theSim->EOSPar3)  );
+      err += readvar( pfile , "EOSPar4"           , VAR_DOUB , &(theSim->EOSPar4)  );
+      err += readvar( pfile , "CoolingType"           , VAR_INT , &(theSim->CoolingType)  );
+      err += readvar( pfile , "CoolPar1"           , VAR_DOUB , &(theSim->CoolPar1)  );
+      err += readvar( pfile , "CoolPar2"           , VAR_DOUB , &(theSim->CoolPar2)  );
+      err += readvar( pfile , "CoolPar3"           , VAR_DOUB , &(theSim->CoolPar3)  );
+      err += readvar( pfile , "CoolPar4"           , VAR_DOUB , &(theSim->CoolPar4)  );
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }

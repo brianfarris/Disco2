@@ -43,31 +43,31 @@ void LR_speed_newt(double *prim,double r,int * n,double GAMMALAW,double * p_vn,d
 void riemann_set_vel_newt(struct Riemann * theRiemann,struct Sim * theSim,double r,double GAMMALAW){
   double Sl, Sr, Ss;
 
-  double vnL,cf21,mnL,BnL,B2L;
-  double FL[3], FmL[3];
+  double vnL,cf21,mnL;
+  double FmL[3];
   LR_speed_newt(theRiemann->primL,r,theRiemann->n,GAMMALAW,&vnL,&cf21,FmL,&mnL);
 
   Sl = vnL - sqrt( cf21 );
   Sr = vnL + sqrt( cf21 );
 
-  double vnR,cf22,mnR,BnR,B2R;
-  double FR[3],FmR[3];
+  double vnR,cf22,mnR;
+  double FmR[3];
   LR_speed_newt(theRiemann->primR,r,theRiemann->n,GAMMALAW,&vnR,&cf22,FmR,&mnR);
  
   if( Sl > vnR - sqrt( cf22 ) ) Sl = vnR - sqrt( cf22 );
   if( Sr < vnR + sqrt( cf22 ) ) Sr = vnR + sqrt( cf22 );
  
-  double  mr = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[URR] + Sr*theRiemann->primR[RHO]*theRiemann->primR[URR] + FmL[0] - FmR[0] )/( Sr - Sl );
-  double  mp = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[UPP]*r + Sr*theRiemann->primR[RHO]*theRiemann->primR[UPP]*r + FmL[1] - FmR[1] )/( Sr - Sl );
-  double  mz = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[UZZ] + Sr*theRiemann->primR[RHO]*theRiemann->primR[UZZ] + FmL[2] - FmR[2] )/( Sr - Sl );
-  double rho = ( -Sl*theRiemann->primL[RHO] + Sr*theRiemann->primR[RHO] + mnL - mnR )/( Sr - Sl );
+  //double  mr = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[URR] + Sr*theRiemann->primR[RHO]*theRiemann->primR[URR] + FmL[0] - FmR[0] )/( Sr - Sl );
+  //double  mp = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[UPP]*r + Sr*theRiemann->primR[RHO]*theRiemann->primR[UPP]*r + FmL[1] - FmR[1] )/( Sr - Sl );
+  //double  mz = ( -Sl*theRiemann->primL[RHO]*theRiemann->primL[UZZ] + Sr*theRiemann->primR[RHO]*theRiemann->primR[UZZ] + FmL[2] - FmR[2] )/( Sr - Sl );
+  //double rho = ( -Sl*theRiemann->primL[RHO] + Sr*theRiemann->primR[RHO] + mnL - mnR )/( Sr - Sl );
 
   Ss = (theRiemann->primR[RHO]*vnR*(Sr-vnR)-theRiemann->primL[RHO]*vnL*(Sl-vnL)+theRiemann->primL[PPP]-theRiemann->primR[PPP])
     /(theRiemann->primR[RHO]*(Sr-vnR)-theRiemann->primL[RHO]*(Sl-vnL));
 
   //TODO: remove: Lax-Friedrichs
-    Sl = -1.0;
-    Sr = 1.0;
+  //Sl = -1.0;
+  //Sr = 1.0;
 
   theRiemann->Sl = Sl;
   theRiemann->Sr = Sr;

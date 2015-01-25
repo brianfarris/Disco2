@@ -12,6 +12,8 @@ struct Riemann {
   double pos[3];
   double r_cell_L;
   double r_cell_R;
+  double x_cell_L;
+  double x_cell_R;
   double dA;
   double cm;
   double *primL;
@@ -42,8 +44,14 @@ void riemann_AddFlux(struct Riemann *, struct Sim *,double);
 void (*riemann_set_flux)(struct Riemann *, struct Sim *, double, int);
 void riemann_set_flux_newt(struct Riemann *, struct Sim *, double, int);
 void riemann_set_flux_gr(struct Riemann *, struct Sim *, double, int);
+void riemann_set_flux_grdisc(struct Riemann *, struct Sim *, double, int);
 
 void (*riemann_set_vel)(struct Riemann *, struct Sim *, double, double);
 void riemann_set_vel_newt(struct Riemann *, struct Sim *, double, double);
 void riemann_set_vel_gr(struct Riemann *, struct Sim *, double, double);
+void riemann_set_vel_grdisc(struct Riemann *, struct Sim *, double, double);
+  
+void riemann_visc_flux_gr(struct Riemann *, struct Sim *);
+void riemann_visc_flux_grdisc(struct Riemann *, struct Sim *);
+void riemann_visc_flux_LR_gr(struct Riemann *, struct Sim *, int, double *);
 #endif

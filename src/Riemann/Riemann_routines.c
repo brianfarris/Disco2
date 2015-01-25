@@ -127,18 +127,28 @@ void riemann_setup_rz(struct Riemann * theRiemann,struct Face * theFaces,struct 
   theRiemann->dA = face_dA(theFaces,FaceNumber);
   theRiemann->cm = face_cm(theFaces,FaceNumber);
 
-  if (direction==0){
+  if (direction==RDIRECTION){
     theRiemann->r_cell_L = theRiemann->pos[R_DIR]-deltaL;
     theRiemann->r_cell_R = theRiemann->pos[R_DIR]+deltaR;
+    theRiemann->x_cell_L = theRiemann->pos[R_DIR]-deltaL;
+    theRiemann->x_cell_R = theRiemann->pos[R_DIR]+deltaR;
   } else{
     theRiemann->r_cell_L = theRiemann->pos[R_DIR];
     theRiemann->r_cell_R = theRiemann->pos[R_DIR];
+    theRiemann->x_cell_L = theRiemann->pos[Z_DIR]-deltaL;
+    theRiemann->x_cell_R = theRiemann->pos[Z_DIR]+deltaR;
   }
 
   int q;
   for (q=0;q<NUM_Q;++q){
-    theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_grad(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
-    theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_grad(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
+    if(direction == R_DIR){
+      theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_gradr(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
+      theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_gradr(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
+    }
+    else{
+      theRiemann->primL[q] = cell_prim(theRiemann->cL,q) + cell_gradz(theRiemann->cL,q)*deltaL + cell_gradp(theRiemann->cL,q)*dpL;
+      theRiemann->primR[q] = cell_prim(theRiemann->cR,q) - cell_gradz(theRiemann->cR,q)*deltaR - cell_gradp(theRiemann->cR,q)*dpR;
+    }
   }
 }
 
@@ -172,6 +182,8 @@ void riemann_setup_p(struct Riemann * theRiemann,struct Cell *** theCells,struct
 
   theRiemann->r_cell_L = r;
   theRiemann->r_cell_R = r;
+  theRiemann->x_cell_L = cell_tiph(theRiemann->cL) - 0.5*dpL;
+  theRiemann->x_cell_R = cell_tiph(theRiemann->cL) + 0.5*dpR;
 
   int q;
   for (q=0;q<NUM_Q;++q){
@@ -237,6 +249,12 @@ void riemann_AddFlux(struct Riemann * theRiemann, struct Sim *theSim,double dt )
       theRiemann->F[q] = theRiemann->Fstar[q] - w*theRiemann->Ustar[q];// w is only nonzero when we are in phi direction
     }
   }
+
+  //Add viscous flux
+  if(sim_Background(theSim) == GRVISC1)
+    riemann_visc_flux_gr(theRiemann, theSim);
+  else if(sim_Background(theSim) == GRDISC)
+    riemann_visc_flux_grdisc(theRiemann, theSim);
 
   int q;
   for( q=0 ; q<NUM_Q ; ++q ){

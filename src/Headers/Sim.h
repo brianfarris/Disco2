@@ -19,12 +19,15 @@ struct Sim {
   //fixed parameters
   int InitialDataType;
   int GravMassType;
-  int BoundTypeR;
-  int BoundTypeZ;
+  int BoundTypeRIn;
+  int BoundTypeROut;
+  int BoundTypeZBot;
+  int BoundTypeZTop;
   int NoInnerBC;
   int Restart;
   int Background;
   int Metric;
+  int Frame;
   int N_global[2];
   int NP_CONST;
   double aspect;
@@ -63,6 +66,21 @@ struct Sim {
   int InitPar0;
   double InitPar1;
   double InitPar2;
+  double InitPar3;
+  double InitPar4;
+  double InitPar5;
+  double InitPar6;
+  double AlphaVisc;
+  int EOSType;
+  double EOSPar1;
+  double EOSPar2;
+  double EOSPar3;
+  double EOSPar4;
+  int CoolingType;
+  double CoolPar1;
+  double CoolPar2;
+  double CoolPar3;
+  double CoolPar4;
 };
 #endif
 
@@ -81,8 +99,11 @@ int sim_NoInnerBC(struct Sim *);
 int sim_Restart(struct Sim *);
 int sim_Background(struct Sim *);
 int sim_Metric(struct Sim *);
-int sim_BoundTypeR(struct Sim *);
-int sim_BoundTypeZ(struct Sim *);
+int sim_Frame(struct Sim *);
+int sim_BoundTypeRIn(struct Sim *);
+int sim_BoundTypeROut(struct Sim *);
+int sim_BoundTypeZBot(struct Sim *);
+int sim_BoundTypeZTop(struct Sim *);
 int sim_N_global(struct Sim *,int);
 int sim_Ncells(struct Sim *);
 int sim_Ncells_global(struct Sim *);
@@ -119,6 +140,21 @@ double sim_RDAMP_OUTER(struct Sim *);
 int sim_InitPar0(struct Sim *);
 double sim_InitPar1(struct Sim *);
 double sim_InitPar2(struct Sim *);
+double sim_InitPar3(struct Sim *);
+double sim_InitPar4(struct Sim *);
+double sim_InitPar5(struct Sim *);
+double sim_InitPar6(struct Sim *);
+double sim_AlphaVisc(struct Sim *);
+int sim_EOSType(struct Sim *);
+double sim_EOSPar1(struct Sim *);
+double sim_EOSPar2(struct Sim *);
+double sim_EOSPar3(struct Sim *);
+double sim_EOSPar4(struct Sim *);
+int sim_CoolingType(struct Sim *);
+double sim_CoolPar1(struct Sim *);
+double sim_CoolPar2(struct Sim *);
+double sim_CoolPar3(struct Sim *);
+double sim_CoolPar4(struct Sim *);
 
 int sim_GravMassType(struct Sim * );
 //set Grid data

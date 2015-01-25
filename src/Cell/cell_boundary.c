@@ -11,19 +11,18 @@
 #include "../Headers/header.h"
 
 
-void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces ,struct Sim * theSim,struct MPIsetup * theMPIsetup, struct TimeStep * theTimeStep ){
-  int Nf = timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR);
+void cell_boundary_outflow_r_inner( struct Cell *** theCells , struct Face * theFaces ,struct Sim * theSim,struct MPIsetup * theMPIsetup, struct TimeStep * theTimeStep ){
   int NUM_Q = sim_NUM_Q(theSim);
-  int n1 = timestep_n(theTimeStep,sim_N(theSim,R_DIR)-2,R_DIR);
 
   int n,q;
   int i,j,k;
-  double r_face,r_face_m1,r_face_p1,r_cell;
+  double r_face,r_face_m1,r_cell;
 
   if( mpisetup_check_rin_bndry(theMPIsetup) ){
 
     if (sim_NoInnerBC(theSim)!=1){ // if the global inner radius is set negative, we don't apply an inner BC
-      for( i=0 ; i>=0 ; --i ){
+      for( i=0; i>=0 ; --i ){
+      //for( i=sim_Nghost_min(theSim,R_DIR)-1 ; i>=0 ; --i ){   //TODO: Good idea/bad idea?
         r_face=sim_FacePos(theSim,i,R_DIR);
         r_face_m1=sim_FacePos(theSim,i-1,R_DIR);
         r_cell = 0.5*(r_face+r_face_m1);
@@ -61,6 +60,16 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
       }
     }
   }
+}
+
+void cell_boundary_outflow_r_outer( struct Cell *** theCells , struct Face * theFaces ,struct Sim * theSim,struct MPIsetup * theMPIsetup, struct TimeStep * theTimeStep ){
+  int Nf = timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR);
+  int NUM_Q = sim_NUM_Q(theSim);
+  int n1 = timestep_n(theTimeStep,sim_N(theSim,R_DIR)-2,R_DIR);
+
+  int n,q;
+  int j,k;
+  double r_face,r_face_p1,r_cell;
 
   if( mpisetup_check_rout_bndry(theMPIsetup) ){
     for( n=n1 ; n<Nf ; ++n ){
@@ -95,18 +104,14 @@ void cell_boundary_outflow_r( struct Cell *** theCells , struct Face * theFaces 
         }
       }
     }
-
   }
-
 }
 
-void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces, struct Sim * theSim,struct MPIsetup * theMPIsetup,struct TimeStep * theTimeStep ){
+void cell_boundary_outflow_z_bot( struct Cell *** theCells , struct Face * theFaces, struct Sim * theSim,struct MPIsetup * theMPIsetup,struct TimeStep * theTimeStep ){
   int NUM_Q = sim_NUM_Q(theSim);
 
   int j,i;
-  int Nf = timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-1,Z_DIR);
   int n0 = timestep_n(theTimeStep,1,Z_DIR);
-  int n1 = timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-2,Z_DIR);
 
   int n,q;
 
@@ -136,6 +141,17 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       }
     }
   }
+}
+
+
+void cell_boundary_outflow_z_top( struct Cell *** theCells , struct Face * theFaces, struct Sim * theSim,struct MPIsetup * theMPIsetup,struct TimeStep * theTimeStep ){
+  int NUM_Q = sim_NUM_Q(theSim);
+
+  int j,i;
+  int Nf = timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-1,Z_DIR);
+  int n1 = timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-2,Z_DIR);
+
+  int n,q;
 
   if(mpisetup_check_ztop_bndry(theMPIsetup)){
     for( n=n1 ; n<Nf ; ++n ){
@@ -164,10 +180,9 @@ void cell_boundary_outflow_z( struct Cell *** theCells , struct Face * theFaces,
       }
     }
   }
-
 }
 
-void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup, 
+void cell_boundary_fixed_r_inner( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup, 
     void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int) ){
   int i,j,k;
   if (sim_NoInnerBC(theSim)!=1){ // if the global inner radius is set negative, we don't apply an inner BC
@@ -193,7 +208,11 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct 
                 for(j=0; j<sim_N_p(theSim,0); j++)
                     (*single_init_ptr)(&(theCells[k][0][j]),theSim,0,j,k);
           }
+}
 
+void cell_boundary_fixed_r_outer( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup, 
+    void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int) ){
+    int i,j,k;
   if( mpisetup_check_rout_bndry(theMPIsetup) ){
     for( i=sim_N(theSim,R_DIR)-1 ; i>sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)-1 ; --i ){
       for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
@@ -206,7 +225,7 @@ void cell_boundary_fixed_r( struct Cell *** theCells, struct Sim *theSim,struct 
 
 }
 
-void cell_boundary_fixed_z( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup,
+void cell_boundary_fixed_z_bot( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup,
     void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int)  ){
   int i,j,k;
   if(mpisetup_check_zbot_bndry(theMPIsetup)){
@@ -218,7 +237,11 @@ void cell_boundary_fixed_z( struct Cell *** theCells, struct Sim *theSim,struct 
       }
     }
   }
+}
 
+void cell_boundary_fixed_z_top( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup,
+    void (*single_init_ptr)(struct Cell *,struct Sim *,int,int,int)  ){
+  int i,j,k;
   if( mpisetup_check_ztop_bndry(theMPIsetup) ){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( k=sim_N(theSim,Z_DIR)-1 ; k>sim_N(theSim,Z_DIR)-sim_Nghost_max(theSim,Z_DIR)-1 ; --k ){
@@ -231,4 +254,145 @@ void cell_boundary_fixed_z( struct Cell *** theCells, struct Sim *theSim,struct 
 
 }
 
+void cell_boundary_ssprofile_r_inner( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup)
+{
+    int i,j,k,q;
+    if (sim_NoInnerBC(theSim)!=1) // if the global inner radius is set negative, we don't apply an inner BC
+    {
+        if(mpisetup_check_rin_bndry(theMPIsetup))
+        {
+            int iIn = sim_Nghost_min(theSim, R_DIR);
+            double rIn = 0.5*(sim_FacePos(theSim,iIn,R_DIR) + sim_FacePos(theSim,iIn-1,R_DIR));
+            double *primIn = theCells[0][iIn][0].prim;
+            for( i=0 ; i<iIn ; ++i )
+            {
+                double rp = sim_FacePos(theSim,i,R_DIR);
+                double rm = sim_FacePos(theSim,i-1,R_DIR);
+                double r = 0.5*(rp+rm);
+                for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k )
+                    for( j=0 ; j<sim_N_p(theSim,i) ; ++j )
+                    {
+                        if(sim_InitialDataType(theSim) == SSDISC)
+                        {
+                            if(sim_InitPar0(theSim)==0)
+                            {
+                                theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn, -0.6);
+                                theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn, -1.5);
+                                theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn, -0.4);
+                                theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn, -1.5);
+                                theCells[k][i][j].prim[UZZ] = 0.0;
+                                for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                    theCells[k][i][j].prim[q] = primIn[q] * pow(r/rIn, -0.6);
+                            }
+                            else if(sim_InitPar0(theSim)==1)
+                            {
+                                theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn, -1.5);
+                                theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn, -1.5);
+                                theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn, 0.5);
+                                theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn, -1.5);
+                                theCells[k][i][j].prim[UZZ] = 0.0;
+                                for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                    theCells[k][i][j].prim[q] = primIn[q] * pow(r/rIn, -1.5);
+                            }
+                        }
+                        else if(sim_InitialDataType(theSim) == NTDISC)
+                        {
+                            double M = sim_GravM(theSim);
+                            double rs = 6*M;
+                            double C = (1.0-3*M/r)/(1.0-3*M/rIn);
+                            double D = (1.0-2*M/r)/(1.0-2*M/rIn);
+                            double P = (1.0 - sqrt(rs/r) + sqrt(3*M/r)*(atanh(sqrt(3*M/r))-atanh(sqrt(3*M/rs)))) / (1.0 - sqrt(rs/rIn) + sqrt(3*M/rIn)*(atanh(sqrt(3*M/rIn))-atanh(sqrt(3*M/rs))));
+                            if(sim_InitPar0(theSim)==0)
+                            {
+                                theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn,-0.6) * pow(C,0.6) * pow(D,-1.6) * pow(P,0.6);
+                                theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn,-1.5) * sqrt(C) * P / (D*D);
+                                theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn,-0.4) * pow(C,-0.1) * pow(D,1.6) * pow(P,-0.6);
+                                theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn,-1.5);
+                                theCells[k][i][j].prim[UZZ] = 0.0;
+                                for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                    theCells[k][i][j].prim[q] = primIn[q] * pow(r/rIn,-0.6) * pow(C,0.6) * pow(D,-1.6) * pow(P,0.6);
+                            }
+                        }
+                        else if (sim_InitialDataType(theSim) == ADAF)
+                        {
+                            theCells[k][i][j].prim[RHO] = primIn[RHO] * pow(r/rIn,-0.5);
+                            theCells[k][i][j].prim[PPP] = primIn[PPP] * pow(r/rIn,-1.5);
+                            theCells[k][i][j].prim[URR] = primIn[URR] * pow(r/rIn,-0.5);
+                            theCells[k][i][j].prim[UPP] = primIn[UPP] * pow(r/rIn,-1.5);
+                        }
 
+                    }
+            }
+        }
+    }
+}
+
+void cell_boundary_ssprofile_r_outer( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup)
+{
+    int i,j,k,q;
+   if(mpisetup_check_rout_bndry(theMPIsetup))
+    {
+        int iOut = sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)-1;
+        double rOut = 0.5*(sim_FacePos(theSim,iOut,R_DIR) + sim_FacePos(theSim,iOut-1,R_DIR));
+        double *primOut = theCells[0][iOut][0].prim;
+        for(i=iOut+1; i<sim_N(theSim,R_DIR); i++)
+        {
+            double rp = sim_FacePos(theSim,i,R_DIR);
+            double rm = sim_FacePos(theSim,i-1,R_DIR);
+            double r = 0.5*(rp+rm);
+            for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k )
+                for( j=0 ; j<sim_N_p(theSim,i) ; ++j )
+                {
+                    if(sim_InitialDataType(theSim) == SSDISC)
+                    {
+                        if(sim_InitPar0(theSim)==0)
+                        {
+                            theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut, -0.6);
+                            theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut, -1.5);
+                            theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut, -0.4);
+                            theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut, -1.5);
+                            theCells[k][i][j].prim[UZZ] = 0.0;
+                            for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                theCells[k][i][j].prim[q] = primOut[q] * pow(r/rOut, -0.6);
+                        }
+                        else if(sim_InitPar0(theSim)==1)
+                        {
+                            theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut, -1.5);
+                            theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut, -1.5);
+                            theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut, 0.5);
+                            theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut, -1.5);
+                            theCells[k][i][j].prim[UZZ] = 0.0;
+                            for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                theCells[k][i][j].prim[q] = primOut[q] * pow(r/rOut, -1.5);
+                        }
+                    }
+                    
+                    else if(sim_InitialDataType(theSim) == NTDISC)
+                    {
+                        double M = sim_GravM(theSim);
+                        double rs = 6*M;
+                        double C = (1.0-3*M/r)/(1.0-3*M/rOut);
+                        double D = (1.0-2*M/r)/(1.0-2*M/rOut);
+                        double P = (1.0 - sqrt(rs/r) + sqrt(3*M/r)*(atanh(sqrt(3*M/r))-atanh(sqrt(3*M/rs)))) / (1.0 - sqrt(rs/rOut) + sqrt(3*M/rOut)*(atanh(sqrt(3*M/rOut))-atanh(sqrt(3*M/rs))));
+                        if(sim_InitPar0(theSim)==0)
+                        {
+                            theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut,-0.6) * pow(C,0.6) * pow(D,-1.6) * pow(P,0.6);
+                            theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut,-1.5) * sqrt(C) * P / (D*D);
+                            theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut,-0.4) * pow(C,-0.1) * pow(D,1.6) * pow(P,-0.6);
+                            theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut,-1.5);
+                            theCells[k][i][j].prim[UZZ] = 0.0;
+                            for(q=sim_NUM_C(theSim); q < sim_NUM_Q(theSim); q++)
+                                theCells[k][i][j].prim[q] = primOut[q] * pow(r/rOut,-0.6) * pow(C,0.6) * pow(D,-1.6) * pow(P,0.6);
+                        }
+                    }
+                    else if (sim_InitialDataType(theSim) == ADAF)
+                    {
+                        theCells[k][i][j].prim[RHO] = primOut[RHO] * pow(r/rOut,-0.5);
+                        theCells[k][i][j].prim[PPP] = primOut[PPP] * pow(r/rOut,-1.5);
+                        theCells[k][i][j].prim[URR] = primOut[URR] * pow(r/rOut,-0.5);
+                        theCells[k][i][j].prim[UPP] = primOut[UPP] * pow(r/rOut,-1.5);
+                    }
+                }
+        }
+    }
+}

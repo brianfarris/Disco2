@@ -52,6 +52,17 @@ double metric_dot3_u(struct Metric *g, double *a, double *b);
 double metric_dot3_d(struct Metric *g, double *a, double *b);
 double metric_dot4_u(struct Metric *g, double *a, double *b);
 double metric_dot4_d(struct Metric *g, double *a, double *b);
+double metric_conn(struct Metric *g, int tau, int mu, int nu);
+void metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, struct Sim *theSim);
+
+//Frames
+double (*metric_frame_U_u)(struct Metric *, int, struct Sim *);
+double (*metric_frame_dU_du)(struct Metric *, int, int, struct Sim *);
+
+double metric_frame_U_u_euler(struct Metric *g, int mu, struct Sim *theSim);
+double metric_frame_dU_du_euler(struct Metric *g, int mu, int nu, struct Sim *theSim);
+double metric_frame_U_u_kep(struct Metric *g, int mu, struct Sim *theSim);
+double metric_frame_dU_du_kep(struct Metric *g, int mu, int nu, struct Sim *theSim);
 
 //Exact Metrics
 double (*metric_g_dd_exact)(int i, int j, double t, double r, double p, double z, struct Sim *theSim);
@@ -80,4 +91,12 @@ double metric_g_uu_exact_schw_ks(int mu, int nu, double t, double r, double p, d
 double metric_dg_dd_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 double metric_dg_uu_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 void metric_killing_exact_schw_ks(int *k);
+
+//SR Cart
+double metric_g_dd_exact_sr_cart(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_g_uu_exact_sr_cart(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_dg_dd_exact_sr_cart(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_dg_uu_exact_sr_cart(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+void metric_killing_exact_sr_cart(int *k);
+
 #endif

@@ -25,7 +25,7 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
       int i,n;
       for (i=0;i<sim_N_global(theSim,R_DIR);++i){
         for (n=0;n<theDiagnostics->NUM_DIAG+1;++n){
-          fprintf(DiagVectorFile,"%e ",theDiagnostics->VectorDiag[i][n]/dt_dump);       
+          fprintf(DiagVectorFile,"%.12le ",theDiagnostics->VectorDiag[i][n]/dt_dump);       
         }
         fprintf(DiagVectorFile,"\n");
       }
@@ -41,12 +41,10 @@ void diagnostics_print(struct Diagnostics * theDiagnostics,struct TimeStep * the
       // HDF5 APIs definitions
       hid_t       file_id, dset_id;         /* file and dataset identifiers */
       hid_t       filespace, memspace;      /* file and memory dataspace identifiers */
-      hsize_t     dimsf1[1];                 /* 1d dataset dimensions */
+      //hsize_t     dimsf1[1];                 /* 1d dataset dimensions */
       hsize_t     dimsf2[2];                 /* 2d dataset dimensions */
-      hid_t	plist_id;                 /* property list identifier */
+      //hid_t	plist_id;                 /* property list identifier */
       herr_t	status;
-      // MPI variables
-      MPI_Info info  = MPI_INFO_NULL;
 
       // Create a new file collectively and release property list identifier.
       file_id = H5Fcreate(DiagEquatFilename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT /*plist_id*/);

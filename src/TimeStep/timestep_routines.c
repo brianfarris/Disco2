@@ -19,7 +19,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     struct Sim * theSim,struct GravMass * theGravMasses,
     struct MPIsetup * theMPIsetup,double timestep_fac){
 
-  int i,j,k,q;
+  int i,j,k;
   double dt = timestep_fac*theTimeStep->dt;
 
   // figure out what all the faces need to be and set them up
@@ -37,39 +37,51 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   //TODO: Remove these dumb print statements
   if(PRINTTOOMUCH)
   {
-  printf("\n");
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
-      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-            struct Cell * c = &(theCells[k][i][j]);
-            printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g)\n",i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[PPP],c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[TAU]);
-        }
-    }
-  }
+    cell_print_all(theCells, theSim);
   }
   
-  
-          // this is part of the runge-kutta method
+  // this is part of the runge-kutta method
   cell_adjust_RK_cons( theCells, theSim, theTimeStep->RK);
   
   //TODO: Remove these dumb print statements
   
-  if(PRINTTOOMUCH){
-    printf("\n");
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
-      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-        
-            struct Cell * c = &(theCells[k][i][j]);
-            printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g)\n",i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[PPP],c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[TAU]);
-        }
-    }
+  if(PRINTTOOMUCH)
+  {
+    cell_print_all(theCells, theSim);
   }
-    }
   
 
+  //Piecewise-Linear Reconstructions.
+  //  must be done before AddFlux to find gradients for viscosity
+  cell_plm_p(theCells,theSim);
+  cell_plm_rz(theCells,theSim,theFaces_r,theTimeStep,theMPIsetup,R_DIR);
+  if( sim_N_global(theSim,Z_DIR) != 1 )
+    cell_plm_rz(theCells,theSim,theFaces_z,theTimeStep,theMPIsetup,Z_DIR );
+
+  if(PRINTTOOMUCH && 0)
+  {
+    FILE *gradfile = fopen("grad.out", "w");
+    for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+      double zp = sim_FacePos(theSim,k,Z_DIR);
+      double zm = sim_FacePos(theSim,k-1,Z_DIR);
+      double z = 0.5*(zp+zm);
+      for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
+        double rp = sim_FacePos(theSim,i,R_DIR);
+        double rm = sim_FacePos(theSim,i-1,R_DIR);
+        double r = 0.5*(rp+rm);
+        for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){   
+          struct Cell * c = &(theCells[k][i][j]);
+          double p = cell_tiph(c) - 0.5*cell_dphi(c);
+          fprintf(gradfile, "%d, %d, %d, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g, %.12g\n",i,j,k,r,p,z,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[UZZ],c->prim[PPP],c->gradr[RHO],c->gradr[URR],c->gradr[UPP],c->gradr[UZZ],c->gradr[PPP],c->gradp[RHO],c->gradp[URR],c->gradp[UPP],c->gradp[UZZ],c->gradp[PPP],c->gradz[RHO],c->gradz[URR],c->gradz[UPP],c->gradz[UZZ],c->gradz[PPP]);
+          }
+      }
+    }  
+    fclose(gradfile);
+    gradfile = fopen("grad_face.out","w");
+    fclose(gradfile);
+  }
+
   //Phi Flux
-  cell_plm_p(theCells,theSim);//piecewise-linear reconstruction
   for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
     for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
       for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
@@ -84,20 +96,23 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
             double *FL = theRiemann->FL;
             double *FR = theRiemann->FR;
             double *us = theRiemann->Ustar;
-            double *fs = theRiemann->Fstar;
+            double *fs = theRiemann->F;
             printf("Face: r=%.12g, phi=%.12g\n",theRiemann->pos[R_DIR],0.5*(cell_tiph(theRiemann->cL)-cell_dphi(theRiemann->cL)+cell_tiph(theRiemann->cR)-cell_dphi(theRiemann->cR)));
-            printf("Flux Phi L (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", pL[RHO], pL[PPP], pL[URR], pL[UPP],FL[DDD],FL[SRR],FL[LLL],FL[TAU]);
-            printf("Flux Phi R (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", pR[RHO], pR[PPP], pR[URR], pR[UPP],FR[DDD],FR[SRR],FR[LLL],FR[TAU]);
-            printf("Flux Phi * (rhostar=%.12g, Sr=%.12g, Sp=%.12g, tau=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", us[DDD], us[SRR], us[LLL], us[TAU],fs[DDD],fs[SRR],fs[LLL],fs[TAU]);
+            printf("Flux Phi L (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g, vz=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, SZZ:%.12g, TAU:%.12g\n", pL[RHO], pL[PPP], pL[URR], pL[UPP], pL[UZZ],FL[DDD],FL[SRR],FL[LLL],FL[SZZ],FL[TAU]);
+            printf("Flux Phi R (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g, vz=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, SZZ:%.12g, TAU:%.12g\n", pR[RHO], pR[PPP], pR[URR], pR[UPP],pR[UZZ],FR[DDD],FR[SRR],FR[LLL],FR[SZZ],FR[TAU]);
+            printf("Flux Phi * (rhostar=%.12g, Sr=%.12g, Sp=%.12g, Sz=%.12g, tau=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, SZZ:%.12g, TAU:%.12g\n", us[DDD], us[SRR], us[LLL], us[SZZ], us[TAU],fs[DDD],fs[SRR],fs[LLL],fs[SZZ],fs[TAU]);
+        if(fs[SZZ] != 0.0)
+            printf("   SZZ flux!\n");
+        if(us[SZZ] != 0.0)
+            printf("   SZZ on face!\n");
         }
-        
         riemann_destroy(theRiemann); // clean up
 
       }
     }
   }
+
   //R Flux
-  cell_plm_rz(theCells,theSim,theFaces_r,theTimeStep,theMPIsetup,R_DIR); //piecewise-linear reconstruction
   int n;
   for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR) ; ++n ){
     struct Riemann * theRiemann = riemann_create(theSim); //struct to contain everything we need to solve Riemann problem
@@ -111,20 +126,21 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
         double *FL = theRiemann->FL;
         double *FR = theRiemann->FR;
         double *us = theRiemann->Ustar;
-        double *fs = theRiemann->Fstar;
+        double *fs = theRiemann->F;
         double Sl = theRiemann->Sl;
         double Sr = theRiemann->Sr;
         printf("Face: r=%.12g, phi=%.12g, dA=%.12g, cm=%.12g\n",theRiemann->pos[R_DIR],0.5*(cell_tiph(theRiemann->cL)-0.5*cell_dphi(theRiemann->cL)+cell_tiph(theRiemann->cR)-0.5*cell_dphi(theRiemann->cR)), face_dA(theFaces_r,n), face_cm(theFaces_r, n));
-        printf("Flux Rad L (Sl=%.12g) (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", Sl, pL[RHO], pL[PPP], pL[URR], pL[UPP],FL[DDD],FL[SRR],FL[LLL],FL[TAU]);
-        printf("Flux Rad R (Sr=%.12g) (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", Sr, pR[RHO], pR[PPP], pR[URR], pR[UPP],FR[DDD],FR[SRR],FR[LLL],FR[TAU]);
-        printf("Flux Rad * (rhostar=%.12g, Sr=%.12g, Sp=%.12g, tau=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, TAU:%.12g\n", us[DDD], us[SRR], us[LLL], us[TAU],fs[DDD],fs[SRR],fs[LLL],fs[TAU]);
+        printf("Flux Rad L (Sl=%.12g) (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g, vz=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, SZZ:%.12g, TAU:%.12g\n", Sl, pL[RHO], pL[PPP], pL[URR], pL[UPP],pL[UZZ],FL[DDD],FL[SRR],FL[LLL],FL[SZZ],FL[TAU]);
+        printf("Flux Rad R (Sr=%.12g) (rho=%.12g, Pp=%.12g, vr=%.12g, vp=%.12g, vz=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, SZZ:%.12g, TAU:%.12g\n", Sr, pR[RHO], pR[PPP], pR[URR], pR[UPP],pR[UZZ],FR[DDD],FR[SRR],FR[LLL],FR[SZZ],FR[TAU]);
+        printf("Flux Rad * (rhostar=%.12g, Sr=%.12g, Sp=%.12g, Sz=%.12g, tau=%.12g): DDD:%.12g, SRR:%.12g, LLL:%.12g, SZZ:%.12g, TAU:%.12g\n", us[DDD], us[SRR], us[LLL], us[SZZ], us[TAU],fs[DDD],fs[SRR],fs[LLL],fs[SZZ],fs[TAU]);
     }
     
     riemann_destroy(theRiemann); // clean up
   }
   //Z Flux
   if( sim_N_global(theSim,Z_DIR) != 1 ){
-    cell_plm_rz(theCells,theSim,theFaces_z,theTimeStep,theMPIsetup,Z_DIR );//piecewise-linear reconstruction
+      if(PRINTTOOMUCH)
+          printf("WHOA, Z FLUX HAPPENING!\n");
     for( n=0 ; n<timestep_n(theTimeStep,sim_N(theSim,Z_DIR)-1,Z_DIR); ++n ){
       struct Riemann * theRiemann = riemann_create(theSim); // struct to contain everything we need to solve Riemann problem
       riemann_setup_rz(theRiemann,theFaces_z,theSim,n,ZDIRECTION); // set various quantities in theRiemann
@@ -136,16 +152,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   //TODO: Remove these dumb print statements
   if(PRINTTOOMUCH)
   {
-  printf("\n");
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
-      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-        
-            struct Cell * c = &(theCells[k][i][j]);
-            printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g)\n",i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[PPP],c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[TAU]);
-        }
-    }
-  }
+    cell_print_all(theCells, theSim);
   }
   
   //Source Terms
@@ -155,16 +162,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   //TODO: Remove these dumb print statements
   if(PRINTTOOMUCH)
   {
-  printf("\n");
-  for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
-    for( i=0 ; i<sim_N(theSim,R_DIR) ; ++i ){
-      for( j=0 ; j<sim_N_p(theSim,i) ; ++j ){
-        
-            struct Cell * c = &(theCells[k][i][j]);
-            printf("(%d,%d,%d): (%.12g, %.12g, %.12g, %.12g) (%.12g, %.12g, %.12g, %.12g)\n",i,j,k,c->prim[RHO],c->prim[URR],c->prim[UPP],c->prim[PPP],c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[TAU]);
-        }
-    }
-  }
+    cell_print_all(theCells, theSim);
   }
   
 
@@ -179,17 +177,37 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_syncproc_z(theCells,theSim,theMPIsetup);
 
   //Boundary Data
-  if (sim_BoundTypeR(theSim)==BOUND_OUTFLOW){
-    cell_boundary_outflow_r( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
-  }else if (sim_BoundTypeR(theSim)==BOUND_FIXED){
-    cell_boundary_fixed_r(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+  //R - Inner
+  if (sim_BoundTypeRIn(theSim)==BOUND_OUTFLOW){
+    cell_boundary_outflow_r_inner( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
+  }else if (sim_BoundTypeRIn(theSim)==BOUND_FIXED){
+    cell_boundary_fixed_r_inner(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+  }else if (sim_BoundTypeRIn(theSim)==BOUND_SS){
+    cell_boundary_ssprofile_r_inner(theCells,theSim,theMPIsetup);    
+  }
+  //R - Outer
+  if (sim_BoundTypeROut(theSim)==BOUND_OUTFLOW){
+    cell_boundary_outflow_r_outer( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
+  }else if (sim_BoundTypeROut(theSim)==BOUND_FIXED){
+    cell_boundary_fixed_r_outer(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+  }else if (sim_BoundTypeROut(theSim)==BOUND_SS){
+    cell_boundary_ssprofile_r_outer(theCells,theSim,theMPIsetup);    
   }
   if (sim_N_global(theSim,Z_DIR)>1){
-    if (sim_BoundTypeZ(theSim)==BOUND_OUTFLOW){
-      cell_boundary_outflow_z( theCells , theFaces_z ,theSim,theMPIsetup, theTimeStep );
-    }else if (sim_BoundTypeZ(theSim)==BOUND_FIXED){
-      cell_boundary_fixed_z(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
-    } else if (sim_BoundTypeZ(theSim)==BOUND_PERIODIC){
+    //Z - Bottom
+    if (sim_BoundTypeZBot(theSim)==BOUND_OUTFLOW){
+      cell_boundary_outflow_z_bot( theCells , theFaces_z ,theSim,theMPIsetup, theTimeStep );
+    }else if (sim_BoundTypeZBot(theSim)==BOUND_FIXED){
+      cell_boundary_fixed_z_bot(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+    } else if (sim_BoundTypeZBot(theSim)==BOUND_PERIODIC){
+      //do nothing, this is already handled by the syncing routine
+    }
+    //Z - Top
+    if (sim_BoundTypeZTop(theSim)==BOUND_OUTFLOW){
+      cell_boundary_outflow_z_top( theCells , theFaces_z ,theSim,theMPIsetup, theTimeStep );
+    }else if (sim_BoundTypeZTop(theSim)==BOUND_FIXED){
+      cell_boundary_fixed_z_top(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
+    } else if (sim_BoundTypeZTop(theSim)==BOUND_PERIODIC){
       //do nothing, this is already handled by the syncing routine
     }
   } 

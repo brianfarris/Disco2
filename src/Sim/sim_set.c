@@ -134,7 +134,7 @@ void sim_set_rz(struct Sim * theSim,struct MPIsetup * theMPIsetup){
 }
 
 void sim_set_misc(struct Sim *theSim,struct MPIsetup * theMPIsetup) {
-  int i,j,k,q;
+  int i;
 
   // Stuff that involves counting cells  
   int Ncells=0;
@@ -166,7 +166,4 @@ void sim_set_misc(struct Sim *theSim,struct MPIsetup * theMPIsetup) {
   theSim->NUM_Q = theSim->NUM_C + theSim->NUM_N;
 
 }
-
-
-
 

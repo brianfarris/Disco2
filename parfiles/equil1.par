@@ -30,8 +30,10 @@ Num_Diag_Measure        20
 
 
 NoInnerBC            0
-BoundTypeR           0               // 0 fixed, 1 outflow, 2 periodic
-BoundTypeZ           2               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeRIn            0               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeROut           0               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZBot           2               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZTop           2               // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry         1
 
 Move_Cells              0
@@ -45,11 +47,17 @@ PLM			1.0
 Grav_2D			1
 G_EPS			0.0
 GravM      0.1
+AlphaVisc       0.000
+CoolFac         0.0
 
 //Initial Condition Parameters
 InitPar0        0
 InitPar1        1.0
 InitPar2        1.0
+InitPar3        0.00
+InitPar4        0.00
+InitPar5        -1
+InitPar6        -1
 
 PHI_ORDER               2
 

@@ -194,14 +194,14 @@ void cell_syncproc_z( struct Cell *** theCells , struct Sim *theSim,struct MPIse
     // fill your upper ghost zones with the buffer you recieved, unless
     // you're on the upper boundary and z BCs aren't periodic.
     if (!mpisetup_check_ztop_bndry(theMPIsetup) 
-            || sim_BoundTypeZ(theSim)==BOUND_PERIODIC)
+            || sim_BoundTypeZTop(theSim)==BOUND_PERIODIC)
     {
         set_cells(i0,iN,kNmg,kN,theSim,theCells,buffer_z_hi_recv);
     }
     // fill your lower ghost zones with the buffer you recieved, unless
     // you're on the lower boundary and z BCs aren't periodic.
     if (!mpisetup_check_zbot_bndry(theMPIsetup) 
-            || sim_BoundTypeZ(theSim)==BOUND_PERIODIC)
+            || sim_BoundTypeZBot(theSim)==BOUND_PERIODIC)
     {
         set_cells(i0,iN,k0,kg,theSim,theCells,buffer_z_low_recv);
     }

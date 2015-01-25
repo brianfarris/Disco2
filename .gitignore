@@ -6,3 +6,12 @@
 *.pdf
 html
 latex
+bin*
+*.png
+*.dat
+*.h5
+.DS_store
+res/
+python_plotting_scripts/
+*.ignore
+Makefile.in

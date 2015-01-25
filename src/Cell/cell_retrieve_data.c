@@ -11,11 +11,14 @@
 double cell_prim(struct Cell *theCell,int q){
   return(theCell->prim[q]);
 }
-double cell_grad(struct Cell *theCell,int q){
-  return(theCell->grad[q]);
+double cell_gradr(struct Cell *theCell,int q){
+  return(theCell->gradr[q]);
 }
 double cell_gradp(struct Cell *theCell,int q){
   return(theCell->gradp[q]);
+}
+double cell_gradz(struct Cell *theCell,int q){
+  return(theCell->gradz[q]);
 }
 struct Cell *cell_single(struct Cell ***theCells,int i,int j,int k){
   return &(theCells[k][i][j]);

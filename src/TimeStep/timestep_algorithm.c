@@ -38,6 +38,9 @@ void timestep_forward_euler(struct TimeStep * theTimeStep, struct Sim * theSim,
   cell_clear_w(theCells,theSim);
   cell_set_w( theCells ,theSim);
   timestep_set_dt(theTimeStep,theCells,theSim);
+  if (mpisetup_MyProc(theMPIsetup)==0){
+    printf("t: %e, dt: %e\n",theTimeStep->t,theTimeStep->dt);
+  }
   cell_copy(theCells,theSim);
   gravMass_copy(theGravMasses,theSim);
   timestep_set_RK(theTimeStep,0.0);
