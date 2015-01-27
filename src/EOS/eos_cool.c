@@ -74,6 +74,13 @@ double eos_cool_neutrino(double *prim, double H, struct Sim *theSim)
 {
     double rho10, t11;
     double x1 = sim_CoolPar1(theSim);
+    double xnuc = 1.0;
+
+    if(sim_EOSType(theSim) == EOS_PWF)
+    {
+        xnuc = eos_xnuc_pwf(prim[RHO]*eos_rho_scale, 
+                            prim[TTT]*eos_mp*eos_c*eos_c/eos_k);
+    }
 
     if(sim_Background(theSim) != GRDISC)
     {
@@ -88,7 +95,7 @@ double eos_cool_neutrino(double *prim, double H, struct Sim *theSim)
         t11 = prim[TTT] * eos_mp*eos_c*eos_c/(1.0e11*eos_k);
     }
     double h = H * eos_r_scale;
-    double q = (5.0e33*pow(t11,9) + 9.0e33*rho10*pow(t11,6)) * h;
+    double q = (5.0e33*pow(t11,9) + 9.0e33*xnuc*rho10*pow(t11,6)) * h;
     double Q = q / (eos_c*eos_c*eos_c * eos_rho_scale);
 
     return x1*Q;

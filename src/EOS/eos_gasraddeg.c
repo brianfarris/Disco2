@@ -49,7 +49,7 @@ double eos_ppp_gasraddeg(double *prim, struct Sim *theSim)
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs
 
     double gas = rho*T/eos_mp;
-    double rad = 4.0*eos_sb/(3.0*eos_c)*T*T*T*T; 
+    double rad = (1.0/3.0) * 4.0*eos_sb/eos_c * T*T*T*T; 
     double deg = 2*M_PI*eos_h*eos_c/3.0 * pow(3*rho/(8*M_PI*eos_mp),4.0/3.0);
 
     return (x1*gas + x2*rad + x3*deg) / (eos_rho_scale*eos_c*eos_c);
