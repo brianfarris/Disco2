@@ -41,6 +41,16 @@ void eos_init(struct Sim *theSim)
         eos_depsdrho = &eos_depsdrho_gasraddeg;
         eos_depsdttt = &eos_depsdttt_gasraddeg;
     }
+    else if(eosType == EOS_PWF)
+    {
+        eos_cs2  = &eos_cs2_pwf;
+        eos_eps  = &eos_eps_pwf;
+        eos_ppp  = &eos_ppp_pwf;
+        eos_dpppdrho = &eos_dpppdrho_pwf;
+        eos_dpppdttt = &eos_dpppdttt_pwf;
+        eos_depsdrho = &eos_depsdrho_pwf;
+        eos_depsdttt = &eos_depsdttt_pwf;
+    }
 
     else
     {
