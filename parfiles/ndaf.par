@@ -18,8 +18,8 @@ Restart                 0       // If this=1 restart using input.h5
 NumR			128			//Radial Zones
 NumZ			1       //Vertical Zones
 ng        2
-R_Min		  1.0e0
-R_Max			1.0e3
+R_Min		  3.0e0
+R_Max			1.0e4
 Z_Min			-1.0e4
 Z_Max			1.0e4
 NP_CONST       3
@@ -50,7 +50,7 @@ PLM			1.0
 
 Grav_2D			1
 G_EPS			0.0
-GravM           1.0
+GravM           3.0
 AlphaVisc       0.1
 
 //EoS
@@ -70,11 +70,11 @@ CoolPar4            0.0
 
 //Initial Condition Parameters
 InitPar0        0           // 0 No Cooling
-InitPar1        1.0e+3       // R0
+InitPar1        1.0e+4       // R0
 InitPar2        1.0e+6      // rho0
 InitPar3        1.0e-4      // T0
 InitPar4        -1.0        // VR0
-InitPar5        -1.5        // rho powerlaw
+InitPar5        -1.0        // rho powerlaw
 InitPar6        -0.5	         // T powerlaw
 
 PHI_ORDER               2

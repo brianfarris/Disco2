@@ -23,23 +23,32 @@ mp = 1.672621777e-24
 rg_solar = 1.4766250385e5
 M_solar = 1.9884e33
 
+def xnuc(rho, T):
+    rho10 = rho * 1.0e-10
+    T11 = T * mp*c*c/kb * 1.0e-11
+    xn = 30.97*np.power(rho10,-0.75)*np.power(T11,1.125)*np.exp(-6.096/T11)
+    xn[xn>1.0] = 1.0
+    return xn
+
 def P_gas(rho, T):
-    return rho * T
+    xn = xnuc(rho, T)
+    return (0.25+0.75*xn) * rho * T
 
 def P_rad(rho, T):
-    return 4.0*sb/(3.0*c) * (T*mp*c*c)**4 / (c*c)
+    return (11.0/12.0) * 4.0*sb/c * (T*mp*c*c)**4 / (c*c)
 
 def P_deg(rho, T):
-    return 2*np.pi*h*c/3.0 * np.power(3*rho/(8*np.pi*mp),4.0/3.0) / (c*c)
+    return 2*np.pi*h*c/3.0 * np.power(3*rho/(16*np.pi*mp),4.0/3.0) / (c*c)
 
 def e_gas(rho, T):
-    return T / (GAM-1.0)
+    xn = xnuc(rho, T)
+    return (0.25+0.75*xn)/(GAM-1) * T
 
 def e_rad(rho, T):
-    return 4.0*sb * (T*mp*c*c)**4 / (c*rho*c*c)
+    return (11.0/4.0) * 4.0*sb/c * (T*mp*c*c)**4 / (rho*c*c)
 
 def e_deg(rho, T):
-    return h*c/(4.0*mp) * np.power(3*rho/(8*np.pi*mp),1.0/3.0) / (c*c)
+    return h*c/(4.0*mp) * np.power(3*rho/(16*np.pi*mp),1.0/3.0) / (c*c)
 
 def dPdr(rho, T):
     return T + h*c/(3*mp)*np.power(3*rho/(8*np.pi*mp),1.0/3.0) / (c*c)
@@ -155,9 +164,10 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
     #HHH = np.sqrt(PPP*R*R*R/(RHOH*M))/U00
 
     Mdot = -2*math.pi*r*rho*u0*vr*H * c*rg_solar*rg_solar/M_solar
+    xn = xnuc(rho, T)
 
     qee = 5.0e33 * np.power(Tk/1.0e11,9.0)
-    qeN = 9.0e33 * (rho/1.0e10) * np.power(Tk/1.0e11,6.0)
+    qeN = 9.0e33 * xn * (rho/1.0e10) * np.power(Tk/1.0e11,6.0)
     q = qee + qeN
 
     Lee = qee * 2*math.pi*r*H * rg_solar*rg_solar
@@ -176,6 +186,7 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         bounds.append([Mdot[Mdot>0].min(), Mdot[Mdot>0].max()])
         bounds.append([L.min(), L.max()])
         bounds.append([PPtot.min(), PPtot.max()])
+        bounds.append([0.0,1.0])
         bounds = np.array(bounds)
 
     if plot:
@@ -202,7 +213,7 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         plt.subplot(325)
         #plot_r_profile_single(r, VP, sca, r"$\Omega$ ($1/s$)", bounds[4])
         plot_r_profile_single(r, VP, sca, r"$\Omega$ $(1/s)$", None)
-        plt.plot(r, np.power(r/rg_solar,-1.5)*c/rg_solar, color='grey')
+        plt.plot(r, np.power(r/(M*rg_solar),-1.5)*c/(M*rg_solar), color='grey')
 
         plt.subplot(326)
         plot_r_profile_single(r, l, sca, r"$\ell$ $(cm^2/s)$", bounds[5])
@@ -231,6 +242,10 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         plt.plot(r, Pr*c*c, 'g+')
         plt.plot(r, Pd*c*c, 'b+')
         plot_r_profile_single(r, PPtot, sca, r"$P$ $(erg/cm^3)$", bounds[9])
+        
+        plt.subplot(325)
+        plot_r_profile_single(r, xn, "linear", r"$X_{nuc}$", bounds[10])
+        plt.gca().set_xscale("log")
 
         plt.tight_layout()
 
@@ -263,7 +278,7 @@ if __name__ == "__main__":
         plt.show()
 
     else:
-        all_bounds = np.zeros((10,2))
+        all_bounds = np.zeros((11,2))
         all_bounds[:,0] = np.inf
         all_bounds[:,1] = -np.inf
         for filename in sys.argv[1:]:
