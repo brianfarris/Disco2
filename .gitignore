@@ -7,3 +7,7 @@
 html
 latex
 .DS_Store
+*.h5
+*.dat
+Makefile.in
+bin/
