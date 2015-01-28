@@ -1,0 +1,11 @@
+#Makefile.in for Disco2
+
+#This file contains the user-specified build options and is machine-specific.
+
+#Location of (Parallel) HDF5 library.
+H55 = /usr/local
+
+#Compile flags
+USE_DEBUG = 1  # Compile with symbol table and all warnings
+USE_OPT   = 0  # Compile with optimization -O3.
+
