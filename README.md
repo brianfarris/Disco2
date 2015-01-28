@@ -19,6 +19,8 @@ Output files will be written into the directory where you executed disco.
 
 ---
 
+Notes
+
 * The overall approach here is to mimic the sort of object-oriented design philosophy that you would typically get in C++, using only C. The way we do this is by organizing data and functions into categories that you can think of as "classes". Each folder in src/ is associated with a different class. Each class is composed of a structure and functions associated with that structure. We declare the structure as an incomplete type in its header file so that other classes cannot access its innards directly. See http://en.wikipedia.org/wiki/Opaque_pointer. The reason we do all this is that a new user who modifies the code is much less likely to introduce subtle bugs because they can only really modify data using pre-defined functions.
 
 * You will need to compile hdf5 with parallel support. Using macports won't give you this. I did it by simply compiling the hdf5 source using mpicc. make sure you edit the Disco Makefile according to the location of your installation.
