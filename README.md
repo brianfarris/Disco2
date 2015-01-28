@@ -3,18 +3,18 @@ Disco2
 
 Build Instructions
 
-1) Copy Makefile.in.template into a new file Makefile.in.  Modify Makefile.in to accomodate your machine's layout, currently this only requires pointing it to your (parallel) HDF5 installation and setting the flags for performance or development.
+1) Copy `Makefile.in.template` into a new file `Makefile.in`.  Modify `Makefile.in` to accomodate your machine's layout, currently this only requires pointing it to your (parallel) HDF5 installation and setting the flags for performance or development.
 
-2) Type 'make' to compile the binary.
+2) Type `make` to compile the binary.
 
 ---
 
 Run Instructions
 
-The disco binary lives in bin/.  It takes a single command-line option: a parameter file.  Example parameter files are found in parfiles/.  If you're in the top directory you can run the vortex example simply as:
-
-$ bin/disco parfiles/vortex.par
-
+The disco binary lives in `bin/`.  It takes a single command-line option: a parameter file.  Example parameter files are found in `parfiles/`.  If you're in the top directory you can run the vortex example simply as:
+```
+$ bin/disco parfiles/code_tests/vortex.par
+```
 Output files will be written into the directory where you executed disco.
 
 ---
