@@ -1,3 +1,6 @@
+MAKEFILE_IN = $(PWD)/Makefile.in
+include $(MAKEFILE_IN)
+
 APP      = disco
 
 SRCEXT   = c
@@ -5,32 +8,28 @@ SRCDIR   = src
 OBJDIR   = obj
 BINDIR   = bin
 
-UNAME = $(shell uname)
-ifeq ($(UNAME),Linux)
-H55 = /home/install/app/hdf5-1.6_intel_mpi
-#H55 = /share/apps/hdf5/1.8.2/openmpi/intel
-#GSL = /home/install/app/gsl_gcc_mpi
-#H55 = /share/apps/hdf5/1.8.2/openmpi/intel
-endif
-ifeq ($(UNAME),Darwin)
-H55 = /usr/local/
-#H55 = /opt/local/
-#GSL = /opt/local
-endif
-
 SRCS    := $(shell find $(SRCDIR) -name '*.$(SRCEXT)')
 SRCDIRS := $(shell find . -name '*.$(SRCEXT)' -exec dirname {} \; | uniq)
 OBJS    := $(patsubst %.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
 
-DEBUG    = -g
-#INCLUDES = -I$(H55)/include -I$(GSL)/include
-INCLUDES = -I$(H55)/include
-CFLAGS   = -O3 -c $(DEBUG) $(INCLUDES)
-#CFLAGS   = -c $(DEBUG) $(INCLUDES)
-#LDFLAGS  = -lm -lz -L$(H55)/lib -L$(GSL)/lib -lhdf5 -lgsl -lgslcblas
-LDFLAGS  = -lm -lz -L$(H55)/lib -lhdf5
+#Vital flags/incs/libs 
 
+DEBUG    = -g -Wall
+OPT      = -O3
+INCLUDES = -I$(H55)/include
+CFLAGS   = -c
+LDFLAGS  = -lm -lz -L$(H55)/lib -lhdf5
 CC       = mpicc
+
+#User-set flags
+ifeq ($(strip $(USE_DEBUG)), 1)
+	CFLAGS += $(DEBUG)
+endif
+ifeq ($(strip $(USE_OPT)), 1)
+	CFLAGS += $(OPT)
+endif
+
+CFLAGS += $(INCLUDES)
 
 .PHONY: all clean distclean
 
