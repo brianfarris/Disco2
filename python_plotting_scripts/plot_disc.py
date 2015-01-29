@@ -7,8 +7,8 @@ import numpy as np
 import readChkpt as rc
 
 GAM = 5.0/3.0
-M = 1.0
-scale = 'linear'
+M = 3.0
+scale = 'log'
 eos_x1 = 1.0
 eos_x2 = 1.0
 eos_x3 = 1.0

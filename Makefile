@@ -26,6 +26,7 @@ ifeq ($(strip $(USE_OPT)), 1)
 	CFLAGS += $(OPT)
 endif
 
+
 .PHONY: all clean distclean
 
 
