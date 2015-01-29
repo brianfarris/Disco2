@@ -121,6 +121,10 @@ int metric_killcoord(struct Metric *g, int k)
 double metric_conn(struct Metric *g, int tau, int mu, int nu)
 {
     //Returns value of the connection coefficient \Gamma^\tau_{\mu\nu}
+    //
+    //If you need to calculate LOTS of christoffel symbols, this is not the
+    //most efficient way.
+    
     double connection = 0.0;
     int sig;
     for(sig=0; sig<4; sig++)
@@ -144,6 +148,7 @@ void metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, str
         shear[mu] = 0.0;
     }
 
+    //Calculate 4-velocity u.
     a = metric_lapse(g);
     for(mu=0; mu<3; mu++)
         b[mu] = metric_shift_u(g, mu);
@@ -153,6 +158,7 @@ void metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, str
     u[2] = u[0]*v[1];
     u[3] = u[0]*v[2];
 
+    //Calculate coordinate derivatives of 4-velocity.
     for(mu=0; mu<4; mu++)
     {
         du0 = metric_dg_dd(g,mu,0,0);
@@ -169,6 +175,8 @@ void metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, str
         for(nu=1; nu<4; nu++)
             du[4*mu+nu] = v[nu-1]*du[4*mu] + u[0]*dv[3*mu+nu-1];
 
+    
+    //Calculate all Christoffel Symbols
     double christoffel_d[64];
     for(mu=0; mu<64; mu++)
         christoffel_d[mu] = 0.0;
@@ -177,19 +185,7 @@ void metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, str
     for(mu=0; mu<64; mu++)
         christoffel[mu] = 0.0;
 
-    /*
-    for(la=0; la<4; la++)
-        for(mu=0; mu<4; mu++)
-        {
-            for(nu=0; nu<mu; nu++)
-            {
-                christoffel[16*la+4*mu+nu] = metric_conn(g, la, mu, nu);
-                christoffel[16*la+4*nu+mu] = christoffel[16*la+4*mu+nu];
-            }
-            christoffel[16*la+4*mu+mu] = metric_conn(g, la, mu, mu);
-        }
-    */
-    
+    //First calculate fully lowered symbols.
     for(la=0; la<4; la++)
         for(mu=0; mu<4; mu++)
         {
@@ -214,7 +210,8 @@ void metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, str
                 christoffel_d[16*mu+4*mu+la] += dg;
             }
         }
-    
+   
+    //Now raise the first index to get the standard symbols.
     for(mu=0; mu<4; mu++)
     {
         for(nu=0; nu<mu; nu++)
@@ -246,6 +243,7 @@ void metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, str
     for(mu=0; mu<64; mu++)
         christoffel[mu] *= 0.5;
 
+    //Add transverse components to shear
     for(mu=0; mu<4; mu++)
     {
         for(nu=0; nu<4; nu++)
@@ -268,6 +266,7 @@ void metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, str
         }
     }
 
+    //Subtract trace to make traceless!
     if(sim_N_global(theSim, Z_DIR) != 1)
         divu *= 2.0/3.0;
 
