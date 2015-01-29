@@ -90,7 +90,7 @@ void riemann_set_vel_grdisc(struct Riemann *theRiemann, struct Sim *theSim,
     Sr = (SrL > SrR) ? SrL : SrR;
 
     //Fluxes are evaluated in orthonormal basis of coordinates.
-    if(dir == 1)
+    if(dir == PDIRECTION)
     {
         Sl *= r;
         Sr *= r;
@@ -220,9 +220,12 @@ void riemann_visc_flux_grdisc(struct Riemann *theRiemann, struct Sim *theSim)
     v[1] = prim[UPP];
     v[2] = prim[UZZ];
 
+    dir = -1;
     for(i=0; i<3; i++)
         if(theRiemann->n[i] == 1)
             dir = i;
+    if(dir == -1)
+        printf("ERROR: n[i] != 1 in riemann_visc_flux_grdisc\n");
 
     //v-derivatives normal to face are averages of L/R gradients.
     // dv/dt = 0 in viscous terms... for now.
@@ -252,7 +255,7 @@ void riemann_visc_flux_grdisc(struct Riemann *theRiemann, struct Sim *theSim)
                 + cell_gradz(theRiemann->cR, UZZ));
 
     //Derivatives across face are calculated directly using 2nd order stencil.
-    if(dir == 0)
+    if(dir == RDIRECTION)
     {
         double dphiR = theRiemann->pos[P_DIR] - (cell_tiph(theRiemann->cR)
                                             -0.5*cell_dphi(theRiemann->cR));
@@ -278,7 +281,7 @@ void riemann_visc_flux_grdisc(struct Riemann *theRiemann, struct Sim *theSim)
                     - cell_prim(theRiemann->cL,UZZ)
                         - cell_gradp(theRiemann->cL,UZZ)*dphiL);
     }
-    else if (dir == 1)
+    else if (dir == PDIRECTION)
     {
         double dphi = cell_tiph(theRiemann->cR)-0.5*cell_dphi(theRiemann->cR) 
                     - cell_tiph(theRiemann->cL)+0.5*cell_dphi(theRiemann->cL);
@@ -356,7 +359,7 @@ void riemann_visc_flux_grdisc(struct Riemann *theRiemann, struct Sim *theSim)
     else
         visc = -alpha * prim[RHO];
 
-    if(dir == 1)
+    if(dir == PDIRECTION)
         hn = r;
     else
         hn = 1.0;

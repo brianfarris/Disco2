@@ -2,6 +2,7 @@
 #include <math.h>
 #include "../Headers/Metric.h"
 #include "../Headers/header.h"
+#include "../Headers/Sim.h"
 
 double metric_lapse(struct Metric *g)
 {
