@@ -61,8 +61,8 @@ double eos_dpppdttt_pwf(double *, struct Sim *);
 double eos_depsdrho_pwf(double *, struct Sim *);
 double eos_depsdttt_pwf(double *, struct Sim *);
 double eos_xnuc_pwf(double, double);
-double eos_dxnudrho_pwf(double, double);
-double eos_dxnudttt_pwf(double, double);
+double eos_dxnudrho_pwf(double, double, double);
+double eos_dxnudttt_pwf(double, double, double);
 
 //Cooling
 double (*eos_cool)(double *, double, struct Sim *);
