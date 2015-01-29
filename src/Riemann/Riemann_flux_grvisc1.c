@@ -32,9 +32,12 @@ void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
     v[1] = prim[UPP];
     v[2] = prim[UZZ];
 
+    dir = -1;
     for(i=0; i<3; i++)
         if(theRiemann->n[i] == 1)
             dir = i;
+    if(dir == -1)
+        printf("ERROR: n[i] != 1 in riemann_visc_flux_LR_gr\n");
 
     dv[0] = 0.0;
     dv[1] = 0.0;
@@ -49,7 +52,7 @@ void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
     dv[10] = 0.5*(cell_gradz(theRiemann->cL, UPP) + cell_gradz(theRiemann->cR, UPP));
     dv[11] = 0.5*(cell_gradz(theRiemann->cL, UZZ) + cell_gradz(theRiemann->cR, UZZ));
 
-    if(dir == 0)
+    if(dir == RDIRECTION)
     {
         double dphiR = theRiemann->pos[P_DIR] - (cell_tiph(theRiemann->cR) - 0.5*cell_dphi(theRiemann->cR));
         double dphiL = theRiemann->pos[P_DIR] - (cell_tiph(theRiemann->cL) - 0.5*cell_dphi(theRiemann->cL));
@@ -63,7 +66,7 @@ void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
         dv[4] = idr * (cell_prim(theRiemann->cR,UPP)+cell_gradp(theRiemann->cR,UPP)*dphiR - cell_prim(theRiemann->cL,UPP)-cell_gradp(theRiemann->cL,UPP)*dphiL);
         dv[5] = idr * (cell_prim(theRiemann->cR,UZZ)+cell_gradp(theRiemann->cR,UZZ)*dphiR - cell_prim(theRiemann->cL,UZZ)-cell_gradp(theRiemann->cL,UZZ)*dphiL);
     }
-    else if (dir == 1)
+    else if (dir == PDIRECTION)
     {
         double dphi = cell_tiph(theRiemann->cR)-0.5*cell_dphi(theRiemann->cR) - cell_tiph(theRiemann->cL)+0.5*cell_dphi(theRiemann->cL);
         while (dphi < -M_PI) dphi += 2*M_PI;
@@ -128,7 +131,7 @@ void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
     else
         visc = -alpha * prim[RHO];
 
-    if(dir == 1)
+    if(dir == PDIRECTION)
         hn = theRiemann->pos[R_DIR];
     else
         hn = 1.0;
@@ -215,9 +218,12 @@ void riemann_visc_flux_LR_gr(struct Riemann *theRiemann, struct Sim *theSim, int
     v[1] = prim[UPP];
     v[2] = prim[UZZ];
 
+    dir = -1;
     for(i=0; i<3; i++)
         if(theRiemann->n[i] == 1)
             dir = i;
+    if(dir == -1)
+        printf("ERROR: n[i] != 1 in riemann_visc_flux_LR_gr\n");
 
     //TODO: FIX THIS.  Doesn't account for misaligned zones in r/z faces.
     struct Cell *mycell;
@@ -240,14 +246,14 @@ void riemann_visc_flux_LR_gr(struct Riemann *theRiemann, struct Sim *theSim, int
     dv[11] = cell_gradz(mycell, UZZ);
 
     /*
-    if(dir == 0)
+    if(dir == RDIRECTION)
     {
         double idr = 1.0/(theRiemann->x_cell_R - theRiemann->x_cell_L);
         dv[3] = idr * (theRiemann->cR->prim[URR] - theRiemann->cL->prim[URR]);
         dv[4] = idr * (theRiemann->cR->prim[UPP] - theRiemann->cL->prim[UPP]);
         dv[5] = idr * (theRiemann->cR->prim[UZZ] - theRiemann->cL->prim[UZZ]);
     }
-    else if (dir == 1)
+    else if (dir == PDIRECTION)
     {
         double idp = 1.0/(theRiemann->x_cell_R - theRiemann->x_cell_L);
         dv[6] = idp * (theRiemann->cR->prim[URR] - theRiemann->cL->prim[URR]);
@@ -297,7 +303,7 @@ void riemann_visc_flux_LR_gr(struct Riemann *theRiemann, struct Sim *theSim, int
     else
         visc = -alpha * prim[RHO];
 
-    if(dir == 1)
+    if(dir == PDIRECTION)
         hn = theRiemann->pos[R_DIR];
     else
         hn = 1.0;

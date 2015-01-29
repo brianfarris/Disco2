@@ -42,7 +42,7 @@ int sgn(double x) {
 
 //root finder
 double get_r(double r2,double RMIN,double RMAX,double r0,double sigma,double fac){
-  double r;
+  double r = 0;
   int n=1;
   int NMAX = 1000;
   double a=RMIN;

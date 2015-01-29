@@ -110,7 +110,7 @@ void riemann_set_vel_gr(struct Riemann *theRiemann, struct Sim *theSim, double r
         Sr = Sr1;
 
     //Fluxes in orthonormal basis
-    if(dir == 1)
+    if(dir == PDIRECTION)
     {
         Sl *= r;
         Sr *= r;

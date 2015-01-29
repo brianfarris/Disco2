@@ -35,7 +35,7 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
     deltaPerp = zp-zm;
     z = 0.5*(zm+zp);
   }
-  if (zDir){
+  else if (zDir){
     deltaL = .5*(sim_FacePos(theSim,k,Z_DIR)-sim_FacePos(theSim,k-1,Z_DIR));
     deltaR = .5*(sim_FacePos(theSim,k+1,Z_DIR)-sim_FacePos(theSim,k,Z_DIR));
     z = sim_FacePos(theSim,k,Z_DIR);
@@ -44,6 +44,11 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
     double rm = sim_FacePos(theSim,i-1,R_DIR);
     deltaPerp = rp-rm;
     r = .5*(rp+rm);
+  }
+  else
+  {
+      printf("ERROR FATAL: build_jloop called with neither rDir or zDir set.\n");
+      return;
   }
 
   int j,jp;
@@ -115,7 +120,7 @@ void build_jloop(int *pn,int i, int k,int rDir,int zDir,struct Cell *** theCells
 
 struct Face *face_create(struct Cell *** theCells ,struct Sim *theSim, struct TimeStep * theTimeStep,int direction){
 
-  struct Face * theFaces;
+  struct Face * theFaces = NULL;
 
   if (direction==0){ // r-direction
 
