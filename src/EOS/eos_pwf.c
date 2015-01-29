@@ -22,6 +22,9 @@
 // This setup is not meant to be an accurate depiction of the real world, but 
 // rather as a vastly simplified model which can be directly compared to PWF
 // for benchmarking.
+//
+// The organization of these functions was chosen to minimize calls to "x_nuc,"
+// which was taking a significant part of the runtime. 
 
 double eos_eps_pwf_loc(double rho, double T, double xnuc, double gam, 
                         double x1, double x2, double x3);
