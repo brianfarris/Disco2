@@ -27,10 +27,10 @@ aspect         1.0
 
 NUM_C                   5
 NUM_N                   0
-Time_Max                1.0e1
-Num_Checkpoints	        101
-Num_Diag_Dump           21
-Num_Diag_Measure        21
+Time_Max                1.0e2
+Num_Checkpoints	        2
+Num_Diag_Dump           2
+Num_Diag_Measure        2
 
 
 NoInnerBC               0
@@ -70,12 +70,12 @@ CoolPar4            0.0
 
 //Initial Condition Parameters
 InitPar0        0           // 0 No Cooling
-InitPar1        1.0e+4       // R0
-InitPar2        1.0e+6      // rho0
+InitPar1        1.0e+4      // R0
+InitPar2        2.5e+5      // rho0
 InitPar3        1.0e-4      // T0
 InitPar4        -1.0        // VR0
-InitPar5        -1.0        // rho powerlaw
-InitPar6        -0.5	         // T powerlaw
+InitPar5         0.0        // rho powerlaw
+InitPar6         0.0	         // T powerlaw
 
 PHI_ORDER               2
 
