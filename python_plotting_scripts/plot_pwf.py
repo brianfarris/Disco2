@@ -7,7 +7,7 @@ import numpy as np
 import readChkpt as rc
 
 GAM = 5.0/3.0
-M = 1.0
+M = 3.0
 scale = 'log'
 x1 = 1.0
 x2 = 1.0
@@ -86,6 +86,7 @@ def plot_r_profile_single(r, f, sca, ylabel, bounds=None, R=None, F=None):
     plt.xlim(r.min(), r.max())
     plt.axvspan(plt.xlim()[0], 2*M*rg_solar, color='grey', alpha=0.5)
 
+    """
     if bounds is not None:
         if sca == "log":
             upper = 10.0 ** (math.ceil(math.log10(bounds[1]))+0.1)
@@ -94,6 +95,7 @@ def plot_r_profile_single(r, f, sca, ylabel, bounds=None, R=None, F=None):
             else:
                 lower = 10.0 ** (math.floor(math.log10(f[f>0].min()))-0.1)
             plt.ylim(lower, upper)
+    """
 
 def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
 

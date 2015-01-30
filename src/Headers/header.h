@@ -19,7 +19,7 @@ enum{NEWTON,GR,GRVISC1,GRDISC};
 //Metric Types
 enum{SR,SCHWARZSCHILD_SC,SCHWARZSCHILD_KS,SR_CART};
 //Frames
-enum{FR_EULER,FR_KEP};
+enum{FR_EULER,FR_KEP,FR_ACC};
 //Equations of State
 enum{EOS_GAMMALAW, EOS_GASRAD, EOS_GASRADDEG, EOS_PWF};
 //Cooling Schemes

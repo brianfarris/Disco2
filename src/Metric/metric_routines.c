@@ -219,3 +219,57 @@ double metric_frame_dU_du_kep(struct Metric *g, int mu, int nu, struct Sim *theS
 
     return 0.0;
 }
+
+double metric_frame_U_u_acc(struct Metric *g, int mu, struct Sim *theSim)
+{
+    // This frame has purely Keplerian velocity in the Kerr-Schild frame.
+    // Since Kerr-Schild coordinates have a shift, this induces an (inwards)
+    // radial velocity in the coordinate basis as well.
+
+    double M = sim_GravM(theSim);
+    double r = g->x[1];
+
+    if(mu == 1)
+        return -2*M/sqrt((r+2*M)*(r-M));
+    else if(mu == 2)
+        return sqrt(M/(r*r*(r-M)));
+    else if (mu == 0)
+    {
+        if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
+            return sqrt((r+2*M)/(r-M));
+        else if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
+            return r*r / sqrt((r-2*M)*(r-2*M)*(r*r+M*r-2*M*M));
+    }
+    return 0.0;
+}
+
+double metric_frame_dU_du_acc(struct Metric *g, int mu, int nu, struct Sim *theSim)
+{
+    double M = sim_GravM(theSim);
+    double r = g->x[1];
+
+    if(mu != 1)
+        return 0.0;
+    if(nu == 1)
+    {
+        double ur = -2*M/sqrt((r+2*M)*(r-M));
+        return ur*ur*ur/(-8*M*M) * (2*r+M);
+    }
+    else if(nu == 2)
+    {
+        double up = sqrt(M/(r*r*(r-M)));
+        return -0.5*up*up*up/M * (3*r*r-2*M*r);
+    }
+    else if(nu == 0)
+    {
+        if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
+            return -1.5*M*sqrt((r-M)/(r+2*M)) / ((r-M)*(r-M));
+        else if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
+        {
+            double x = r/M;
+            double y = sqrt(x*x + x - 2);
+            return -0.5 * x * (-16 + 10*x + 3*x*x) / (M * (x-2)*(x-2) * y*y*y);
+        }
+    }
+    return 0.0;
+}

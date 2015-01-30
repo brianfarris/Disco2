@@ -152,8 +152,8 @@ double eos_xnuc_pwf(double rhocgs, double Tk)
 {
 // Returns the mass fraction of nucleons X_nuc, calculated from eq 3.10 in 
 // PWF.  Requires rho in g/cm^3 and T in Kelvin.
-    double xnuc = 30.97 * pow(rhocgs*1.0e-10,-0.75) * pow(Tk*1.0e-11,1.125)
-                    * exp(-6.096/(Tk*1.0e-11));
+    double xnuc = 30.97 * pow(rhocgs*1.0e-10,-0.75) * pow(Tk*1.0e-10,1.125)
+                    * exp(-6.096/(Tk*1.0e-10));
     if(xnuc > 1.0)
         return 1.0;
     return xnuc;
@@ -175,7 +175,7 @@ double eos_dxnudttt_pwf(double rhocgs, double Tk, double xnuc)
     if(xnuc > 1.0)
         return 0.0;
 
-    return (1.125/Tk + 6.096/(Tk*Tk*1.0e-11))*xnuc;
+    return (1.125/Tk + 6.096/(Tk*Tk*1.0e-10))*xnuc;
 }
 
 //

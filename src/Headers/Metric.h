@@ -63,6 +63,8 @@ double metric_frame_U_u_euler(struct Metric *g, int mu, struct Sim *theSim);
 double metric_frame_dU_du_euler(struct Metric *g, int mu, int nu, struct Sim *theSim);
 double metric_frame_U_u_kep(struct Metric *g, int mu, struct Sim *theSim);
 double metric_frame_dU_du_kep(struct Metric *g, int mu, int nu, struct Sim *theSim);
+double metric_frame_U_u_acc(struct Metric *g, int mu, struct Sim *theSim);
+double metric_frame_dU_du_acc(struct Metric *g, int mu, int nu, struct Sim *theSim);
 
 //Exact Metrics
 double (*metric_g_dd_exact)(int i, int j, double t, double r, double p, double z, struct Sim *theSim);

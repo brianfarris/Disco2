@@ -58,6 +58,12 @@ void metric_init_background(struct Sim *theSim)
         metric_frame_U_u = &metric_frame_U_u_kep;
         metric_frame_dU_du = &metric_frame_dU_du_kep;
     }
+    else if(sim_Frame(theSim) == FR_ACC)
+    {
+        printf("Accreting!\n");
+        metric_frame_U_u = &metric_frame_U_u_acc;
+        metric_frame_dU_du = &metric_frame_dU_du_acc;
+    }
 
 }
 
