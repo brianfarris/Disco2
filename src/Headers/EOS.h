@@ -15,6 +15,9 @@ const static double eos_sb = 1.56055371e59;     //Stefan-Boltzmann
 const static double eos_mp = 1.672621777e-24;   //Proton Mass
 const static double eos_rho_scale = 1.0;
 const static double eos_r_scale = 1.4766250385e5;
+
+const static double eos_n_nu = 3.0;             // # of Neutrino species
+const static double eos_sin2thw = 0.2319;       // Sin^2(theta_weinberg)
 #endif
 
 //Initialize
@@ -66,10 +69,11 @@ double eos_dxnudttt_pwf(double, double, double);
 
 //Cooling
 double (*eos_cool)(double *, double, struct Sim *);
-double eos_cool_none(double *prim, double, struct Sim *theSim);
-double eos_cool_isotherm(double *prim, double, struct Sim *theSim);
-double eos_cool_bb_es(double *prim, double, struct Sim *theSim);
-double eos_cool_bb_ff(double *prim, double, struct Sim *theSim);
-double eos_cool_neutrino(double *prim, double, struct Sim *theSim);
+double eos_cool_none(double *, double, struct Sim *);
+double eos_cool_isotherm(double *, double, struct Sim *);
+double eos_cool_bb_es(double *, double, struct Sim *);
+double eos_cool_bb_ff(double *, double, struct Sim *);
+double eos_cool_neutrino_aprx(double *, double, struct Sim *);
+double eos_cool_neutrino_itoh(double *, double, struct Sim *);
 
 #endif

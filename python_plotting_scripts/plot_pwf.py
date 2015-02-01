@@ -25,8 +25,8 @@ M_solar = 1.9884e33
 
 def xnuc(rho, T):
     rho10 = rho * 1.0e-10
-    T11 = T * mp*c*c/kb * 1.0e-11
-    xn = 30.97*np.power(rho10,-0.75)*np.power(T11,1.125)*np.exp(-6.096/T11)
+    T10 = T * mp*c*c/kb * 1.0e-10
+    xn = 30.97*np.power(rho10,-0.75)*np.power(T10,1.125)*np.exp(-6.096/T10)
     xn[xn>1.0] = 1.0
     return xn
 

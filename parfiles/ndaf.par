@@ -27,7 +27,7 @@ aspect         1.0
 
 NUM_C                   5
 NUM_N                   0
-Time_Max                1.0e1
+Time_Max                1.0e2
 Num_Checkpoints	        1001
 Num_Diag_Dump           2
 Num_Diag_Measure        2
@@ -62,9 +62,10 @@ EOSPar4            0.0
 
 //Cooling
 CoolingType         4       //0 None, 1 Isothermal, 2 Blackbody-Thompson,
-                            //3 Blackbody-freefree, 4 Neutrino
-CoolPar1            1.0
-CoolPar2            0.0
+                            //3 Blackbody-freefree, 4 Neutrino-Approx,
+                            //5 Neutrino-Itoh
+CoolPar1            1.0     // Coefficient for Pairs
+CoolPar2            1.0     // Coefficient for URCA
 CoolPar3            0.0
 CoolPar4            0.0
 
@@ -75,7 +76,7 @@ InitPar2        2.0e+7      // rho0
 InitPar3        6.0e-4      // T0
 InitPar4        -1.0        // VR0
 InitPar5         0.0        // rho powerlaw
-InitPar6         -0.5	         // T powerlaw
+InitPar6         -0.0	         // T powerlaw
 
 PHI_ORDER               2
 
