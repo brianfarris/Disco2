@@ -66,8 +66,10 @@ void eos_init(struct Sim *theSim)
         eos_cool = &eos_cool_bb_es;
     else if(coolType == COOL_BB_FF)
         eos_cool = &eos_cool_bb_ff;
-    else if(coolType == COOL_NU)
-        eos_cool = &eos_cool_neutrino;
+    else if(coolType == COOL_NU_APRX)
+        eos_cool = &eos_cool_neutrino_aprx;
+    else if(coolType == COOL_NU_ITOH)
+        eos_cool = &eos_cool_neutrino_itoh;
     else
     {
         printf("ERROR: Unrecognized Cooling.\n");

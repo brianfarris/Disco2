@@ -250,6 +250,7 @@ double metric_frame_dU_du_acc(struct Metric *g, int mu, int nu, struct Sim *theS
 
     if(mu != 1)
         return 0.0;
+    
     if(nu == 1)
     {
         double ur = -2*M/sqrt((r+2*M)*(r-M));
@@ -271,5 +272,6 @@ double metric_frame_dU_du_acc(struct Metric *g, int mu, int nu, struct Sim *theS
             return -0.5 * x * (-16 + 10*x + 3*x*x) / (M * (x-2)*(x-2) * y*y*y);
         }
     }
+
     return 0.0;
 }
