@@ -46,6 +46,8 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_adaf);
   } else if (sim_InitialDataType(theSim)==ADAF2){
     return(&cell_init_adaf2);
+  } else if (sim_InitialDataType(theSim)==GRORUS){
+    return(&cell_init_grorus);
    } else{
     printf("ERROR: Do not recognize initial data selection.\n");
     exit(0);
@@ -95,6 +97,8 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_adaf);
    } else if (sim_InitialDataType(theSim)==ADAF2){
     return(&cell_single_init_adaf2);
+   } else if (sim_InitialDataType(theSim)==GRORUS){
+    return(&cell_single_init_grorus);
   } else{
     printf("ERROR: Do not recognize initial data selection.\n");
     exit(0);
