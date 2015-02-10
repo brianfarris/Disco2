@@ -12,7 +12,7 @@ GravMassType            0       // 0 none, 1 single, 2 binary
 Background              3       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
 Metric                  2       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS
-Frame                   2       // 0 Euler, 1 Keplerian, 2 Accreting
+Frame                   0       // 0 Euler, 1 Keplerian, 2 Accreting
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
@@ -56,10 +56,10 @@ AlphaVisc       0.1
 
 //EoS
 EOSType            3       //0 Gammalaw, 1 Gas+Rad, 2 Gas+Rad+Deg, 3 PWF
-EOSPar1            1.0
-EOSPar2            1.0
-EOSPar3            1.0
-EOSPar4            0.0
+EOSPar1            1.0      // Gas
+EOSPar2            1.0      // Radiation
+EOSPar3            1.0      // Degeneracy
+EOSPar4            1.0      // Burning
 
 //Cooling
 CoolingType         5       //0 None, 1 Isothermal, 2 Blackbody-Thompson,
@@ -73,7 +73,7 @@ CoolPar4            0.0
 //Initial Condition Parameters
 InitPar0        0           // 0 No Cooling
 InitPar1        1.0e+3      // R0
-InitPar2        2.0e+8      // rho0
+InitPar2        2.0e+7      // rho0
 InitPar3        4.0e-4      // T0
 InitPar4        -1.0        // VR0
 InitPar5        -1.0        // rho powerlaw
@@ -90,8 +90,8 @@ Vel_Cap			100.0
 runtype                 0
 
 //DAMPING
-DAMP_TIME               1.0e-1        // Set negative to turn off
-RDAMP_INNER             1.0
+DAMP_TIME               1.0e-2        // Set negative to turn off
+RDAMP_INNER             1.5
 RDAMP_OUTER             1.0e100
 
 RLogScale               0.001

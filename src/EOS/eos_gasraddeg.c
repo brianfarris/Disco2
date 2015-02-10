@@ -22,6 +22,11 @@ double eos_cs2_gasraddeg(double *prim, struct Sim *theSim)
     return cs2;
 }
 
+double eos_rho_gasraddeg(double *prim, struct Sim *theSim)
+{
+    return prim[RHO];
+}
+
 double eos_eps_gasraddeg(double *prim, struct Sim *theSim)
 {
     double x1 = sim_EOSPar1(theSim);
