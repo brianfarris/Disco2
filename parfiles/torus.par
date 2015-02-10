@@ -13,14 +13,14 @@ R_Min			0.2
 R_Max			2.0
 Z_Min			-1.0
 Z_Max			1.0
-NP_CONST                -1 
+NP_CONST                3
 aspect                  1.0
 
 
 NUM_C                   5
 NUM_N                   0
 Time_Max                10.0
-Num_Checkpoints	        10	
+Num_Checkpoints	        100	
 Num_Diag_Dump           100
 Num_Diag_Measure        100
 

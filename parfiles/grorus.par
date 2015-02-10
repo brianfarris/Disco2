@@ -1,6 +1,6 @@
 //Disco Parameter File//
 
-InitialDataType        20       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
+InitialDataType        21       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 4 Shock1, 5 Shock2, 6 Shock3, 7 Shock4,
                                 // 8 Isentrope, 9 GR-Bondi, 10 GR-Bondi2,
                                 // 11 Equilibrium1, 12 Equilibrium2, 13 SSDisc
@@ -9,20 +9,20 @@ InitialDataType        20       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 18 Accreting Disc, 19 ADAF, 20 ADAF2, 
                                 // 21 GRorus
 GravMassType            0       // 0 none, 1 single, 2 binary
-Background              3       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
-Metric                  2       // 0 Flat, 1 Schwarzschild-SC,
+Background              1       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
+Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS
 Frame                   0       // 0 Euler, 1 Keplerian, 2 Accreting
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR			128			//Radial Zones
-NumZ			1       //Vertical Zones
+NumR			64			//Radial Zones
+NumZ			32       //Vertical Zones
 ng        2
-R_Min		  4.0e0
-R_Max			1.0e4
-Z_Min			-1.0e4
-Z_Max			1.0e4
+R_Min		  1.0
+R_Max			4.0
+Z_Min			-2.0
+Z_Max			2.0
 NP_CONST       3
 aspect         1.0
 
@@ -56,13 +56,13 @@ AlphaVisc       0.1
 
 //EoS
 EOSType            3       //0 Gammalaw, 1 Gas+Rad, 2 Gas+Rad+Deg, 3 PWF
-EOSPar1            1.0      // Gas
-EOSPar2            1.0      // Radiation
-EOSPar3            1.0      // Degeneracy
-EOSPar4            1.0      // Burning
+EOSPar1            1.0
+EOSPar2            1.0
+EOSPar3            1.0
+EOSPar4            0.0
 
 //Cooling
-CoolingType         5       //0 None, 1 Isothermal, 2 Blackbody-Thompson,
+CoolingType         4       //0 None, 1 Isothermal, 2 Blackbody-Thompson,
                             //3 Blackbody-freefree, 4 Neutrino-Approx,
                             //5 Neutrino-Itoh
 CoolPar1            1.0     // Coefficient for Pairs
@@ -74,10 +74,10 @@ CoolPar4            0.0
 InitPar0        0           // 0 No Cooling
 InitPar1        1.0e+3      // R0
 InitPar2        2.0e+7      // rho0
-InitPar3        4.0e-4      // T0
+InitPar3        6.0e-4      // T0
 InitPar4        -1.0        // VR0
-InitPar5        -1.0        // rho powerlaw
-InitPar6        -0.5      // T powerlaw
+InitPar5         0.0        // rho powerlaw
+InitPar6         -0.0	         // T powerlaw
 
 PHI_ORDER               2
 
@@ -90,8 +90,8 @@ Vel_Cap			100.0
 runtype                 0
 
 //DAMPING
-DAMP_TIME               1.0e-2        // Set negative to turn off
-RDAMP_INNER             1.5
+DAMP_TIME               1.0e-1        // Set negative to turn off
+RDAMP_INNER             1.0
 RDAMP_OUTER             1.0e100
 
 RLogScale               0.001

@@ -14,6 +14,7 @@ void eos_init(struct Sim *theSim)
     if(eosType == EOS_GAMMALAW)
     {
         eos_cs2  = &eos_cs2_gammalaw;
+        eos_rho  = &eos_rho_gammalaw;
         eos_eps  = &eos_eps_gammalaw;
         eos_ppp  = &eos_ppp_gammalaw;
         eos_dpppdrho = &eos_dpppdrho_gammalaw;
@@ -24,6 +25,7 @@ void eos_init(struct Sim *theSim)
     else if(eosType == EOS_GASRAD)
     {
         eos_cs2  = &eos_cs2_gasrad;
+        eos_rho  = &eos_rho_gasrad;
         eos_eps  = &eos_eps_gasrad;
         eos_ppp  = &eos_ppp_gasrad;
         eos_dpppdrho = &eos_dpppdrho_gasrad;
@@ -34,6 +36,7 @@ void eos_init(struct Sim *theSim)
     else if(eosType == EOS_GASRADDEG)
     {
         eos_cs2  = &eos_cs2_gasraddeg;
+        eos_rho  = &eos_rho_gasraddeg;
         eos_eps  = &eos_eps_gasraddeg;
         eos_ppp  = &eos_ppp_gasraddeg;
         eos_dpppdrho = &eos_dpppdrho_gasraddeg;
@@ -44,6 +47,7 @@ void eos_init(struct Sim *theSim)
     else if(eosType == EOS_PWF)
     {
         eos_cs2  = &eos_cs2_pwf;
+        eos_rho  = &eos_rho_pwf;
         eos_eps  = &eos_eps_pwf;
         eos_ppp  = &eos_ppp_pwf;
         eos_dpppdrho = &eos_dpppdrho_pwf;

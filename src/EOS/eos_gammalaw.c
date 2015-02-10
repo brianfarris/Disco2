@@ -12,6 +12,11 @@ double eos_cs2_gammalaw(double *prim, struct Sim *theSim)
     return GAM * prim[TTT] / (1.0 + GAM*prim[TTT]/(GAM-1.0));
 }
 
+double eos_rho_gammalaw(double *prim, struct Sim *theSim)
+{
+    return prim[RHO];
+}
+
 double eos_eps_gammalaw(double *prim, struct Sim *theSim)
 {
     double GAM = sim_EOSPar1(theSim);

@@ -71,6 +71,8 @@ void cell_init_adaf(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_adaf(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_adaf2(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_adaf2(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_grorus(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_grorus(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data

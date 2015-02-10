@@ -27,23 +27,24 @@
 // which was taking a significant part of the runtime. 
 
 double eos_eps_pwf_loc(double rho, double T, double xnuc, double gam, 
-                        double x1, double x2, double x3);
+                        double x1, double x2, double x3, double x4);
 double eos_ppp_pwf_loc(double rho, double T, double xnuc, double gam, 
-                        double x1, double x2, double x3);
+                        double x1, double x2, double x3, double x4);
 double eos_dpppdrho_pwf_loc(double rho, double T, double xnuc, double gam, 
-                        double x1, double x2, double x3);
+                        double x1, double x2, double x3, double x4);
 double eos_dpppdttt_pwf_loc(double rho, double T, double xnuc, double gam, 
-                        double x1, double x2, double x3);
+                        double x1, double x2, double x3, double x4);
 double eos_depsdrho_pwf_loc(double rho, double T, double xnuc, double gam, 
-                        double x1, double x2, double x3);
+                        double x1, double x2, double x3, double x4);
 double eos_depsdttt_pwf_loc(double rho, double T, double xnuc, double gam, 
-                        double x1, double x2, double x3);
+                        double x1, double x2, double x3, double x4);
 
 double eos_cs2_pwf(double *prim, struct Sim *theSim)
 {
     double x1 = sim_EOSPar1(theSim);
     double x2 = sim_EOSPar2(theSim);
     double x3 = sim_EOSPar3(theSim);
+    double x4 = sim_EOSPar4(theSim);
 
     double gam = sim_GAMMALAW(theSim);
     double rho = prim[RHO];
@@ -51,12 +52,12 @@ double eos_cs2_pwf(double *prim, struct Sim *theSim)
     double Tcgs = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs
     double xnuc = eos_xnuc_pwf(rhocgs, Tcgs/eos_k);
 
-    double P = eos_ppp_pwf_loc(rhocgs, Tcgs, xnuc, gam, x1, x2, x3);
-    double e = eos_eps_pwf_loc(rhocgs, Tcgs, xnuc, gam, x1, x2, x3);
-    double dedr = eos_depsdrho_pwf_loc(rhocgs, Tcgs, xnuc, gam, x1, x2, x3);
-    double dedt = eos_depsdttt_pwf_loc(rhocgs, Tcgs, xnuc, gam, x1, x2, x3);
-    double dpdr = eos_dpppdrho_pwf_loc(rhocgs, Tcgs, xnuc, gam, x1, x2, x3);
-    double dpdt = eos_dpppdttt_pwf_loc(rhocgs, Tcgs, xnuc, gam, x1, x2, x3);
+    double P = eos_ppp_pwf_loc(rhocgs, Tcgs, xnuc, gam, x1,x2,x3,x4);
+    double e = eos_eps_pwf_loc(rhocgs, Tcgs, xnuc, gam, x1,x2,x3,x4);
+    double dedr = eos_depsdrho_pwf_loc(rhocgs, Tcgs, xnuc, gam, x1,x2,x3,x4);
+    double dedt = eos_depsdttt_pwf_loc(rhocgs, Tcgs, xnuc, gam, x1,x2,x3,x4);
+    double dpdr = eos_dpppdrho_pwf_loc(rhocgs, Tcgs, xnuc, gam, x1,x2,x3,x4);
+    double dpdt = eos_dpppdttt_pwf_loc(rhocgs, Tcgs, xnuc, gam, x1,x2,x3,x4);
     double h = 1.0 + e + P/rho;
 
     double cs2 = (dpdr*dedt - dedr*dpdt + P*dpdt/(rho*rho)) / (dedt * h);
@@ -64,18 +65,24 @@ double eos_cs2_pwf(double *prim, struct Sim *theSim)
     return cs2;
 }
 
+double eos_rho_pwf(double *prim, struct Sim* theSim)
+{
+    return prim[RHO];
+}
+
 double eos_eps_pwf(double *prim, struct Sim *theSim)
 {
     double x1 = sim_EOSPar1(theSim);
     double x2 = sim_EOSPar2(theSim);
     double x3 = sim_EOSPar3(theSim);
+    double x4 = sim_EOSPar4(theSim);
 
     double gam = sim_GAMMALAW(theSim);
     double rho = prim[RHO] * eos_rho_scale;
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs
     double xnuc = eos_xnuc_pwf(rho, T/eos_k);
 
-    return eos_eps_pwf_loc(rho, T, xnuc, gam, x1, x2, x3);
+    return eos_eps_pwf_loc(rho, T, xnuc, gam, x1, x2, x3, x4);
 }
 
 double eos_ppp_pwf(double *prim, struct Sim *theSim)
@@ -83,13 +90,14 @@ double eos_ppp_pwf(double *prim, struct Sim *theSim)
     double x1 = sim_EOSPar1(theSim);
     double x2 = sim_EOSPar2(theSim);
     double x3 = sim_EOSPar3(theSim);
+    double x4 = sim_EOSPar4(theSim);
 
     double gam = sim_GAMMALAW(theSim);
     double rho = prim[RHO] * eos_rho_scale;
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs
     double xnuc = eos_xnuc_pwf(rho, T/eos_k);
 
-    return eos_ppp_pwf_loc(rho, T, xnuc, gam, x1, x2, x3);
+    return eos_ppp_pwf_loc(rho, T, xnuc, gam, x1, x2, x3, x4);
 }
 
 double eos_dpppdrho_pwf(double *prim, struct Sim *theSim)
@@ -97,13 +105,14 @@ double eos_dpppdrho_pwf(double *prim, struct Sim *theSim)
     double x1 = sim_EOSPar1(theSim);
     double x2 = sim_EOSPar2(theSim);
     double x3 = sim_EOSPar3(theSim);
+    double x4 = sim_EOSPar4(theSim);
 
     double gam = sim_GAMMALAW(theSim);
     double rho = prim[RHO] * eos_rho_scale;
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs
     double xnuc = eos_xnuc_pwf(rho, T/eos_k);
 
-    return eos_dpppdrho_pwf_loc(rho, T, xnuc, gam, x1, x2, x3);
+    return eos_dpppdrho_pwf_loc(rho, T, xnuc, gam, x1, x2, x3, x4);
 }
 
 double eos_dpppdttt_pwf(double *prim, struct Sim *theSim)
@@ -111,13 +120,14 @@ double eos_dpppdttt_pwf(double *prim, struct Sim *theSim)
     double x1 = sim_EOSPar1(theSim);
     double x2 = sim_EOSPar2(theSim);
     double x3 = sim_EOSPar3(theSim);
+    double x4 = sim_EOSPar4(theSim);
 
     double gam = sim_GAMMALAW(theSim);
     double rho = prim[RHO] * eos_rho_scale;
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  // (ergs)
     double xnuc = eos_xnuc_pwf(rho, T/eos_k);
 
-    return eos_dpppdttt_pwf_loc(rho, T, xnuc, gam, x1, x2, x3);
+    return eos_dpppdttt_pwf_loc(rho, T, xnuc, gam, x1, x2, x3, x4);
 }
 
 double eos_depsdrho_pwf(double *prim, struct Sim *theSim)
@@ -125,13 +135,14 @@ double eos_depsdrho_pwf(double *prim, struct Sim *theSim)
     double x1 = sim_EOSPar1(theSim);
     double x2 = sim_EOSPar2(theSim);
     double x3 = sim_EOSPar3(theSim);
+    double x4 = sim_EOSPar4(theSim);
     
     double gam = sim_GAMMALAW(theSim);
     double rho = prim[RHO] * eos_rho_scale;
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs
     double xnuc = eos_xnuc_pwf(rho, T/eos_k);
 
-    return eos_depsdrho_pwf_loc(rho, T, xnuc, gam, x1, x2, x3);
+    return eos_depsdrho_pwf_loc(rho, T, xnuc, gam, x1, x2, x3, x4);
 }
 
 double eos_depsdttt_pwf(double *prim, struct Sim *theSim)
@@ -139,13 +150,14 @@ double eos_depsdttt_pwf(double *prim, struct Sim *theSim)
     double x1 = sim_EOSPar1(theSim);
     double x2 = sim_EOSPar2(theSim);
     double x3 = sim_EOSPar3(theSim);
+    double x4 = sim_EOSPar4(theSim);
 
     double gam = sim_GAMMALAW(theSim);
     double rho = prim[RHO] * eos_rho_scale;
     double T = prim[TTT] * eos_mp*eos_c*eos_c;  //ergs
     double xnuc = eos_xnuc_pwf(rho, T/eos_k);
 
-    return eos_depsdttt_pwf_loc(rho, T, xnuc, gam, x1, x2, x3);
+    return eos_depsdttt_pwf_loc(rho, T, xnuc, gam, x1, x2, x3, x4);
 }
 
 double eos_xnuc_pwf(double rhocgs, double Tk)
@@ -154,6 +166,7 @@ double eos_xnuc_pwf(double rhocgs, double Tk)
 // PWF.  Requires rho in g/cm^3 and T in Kelvin.
     double xnuc = 30.97 * pow(rhocgs*1.0e-10,-0.75) * pow(Tk*1.0e-10,1.125)
                     * exp(-6.096/(Tk*1.0e-10));
+    
     if(xnuc > 1.0)
         return 1.0;
     return xnuc;
@@ -172,6 +185,7 @@ double eos_dxnudrho_pwf(double rhocgs, double Tk, double xnuc)
 double eos_dxnudttt_pwf(double rhocgs, double Tk, double xnuc)
 {
     //Returns d(X_nuc)/dT in CGS units.
+
     if(xnuc > 1.0)
         return 0.0;
 
@@ -183,27 +197,29 @@ double eos_dxnudttt_pwf(double rhocgs, double Tk, double xnuc)
 //
 
 double eos_eps_pwf_loc(double rho, double T, double xnuc, double gam, 
-                        double x1, double x2, double x3)
+                        double x1, double x2, double x3, double x4)
 {
     double gas = (0.25+0.75*xnuc)/((gam-1.0)*eos_mp) * T;
     double rad = (11.0/4.0) * 4.0*eos_sb/(eos_c*rho) * T*T*T*T;
     double deg = 3*eos_h*eos_c/(4*eos_mp)*pow(3*rho/(16*M_PI*eos_mp),1.0/3.0);
+    double nuc = xnuc * eos_alpha_bind / (4*eos_mp);
     
-    return (x1*gas + x2*rad + x3*deg) / (eos_c*eos_c);
+    return (x1*gas + x2*rad + x3*deg + x4*nuc) / (eos_c*eos_c);
 }
 
 double eos_ppp_pwf_loc(double rho, double T, double xnuc, double gam, 
-                        double x1, double x2, double x3)
+                        double x1, double x2, double x3, double x4)
 {
     double gas = (0.25+0.75*xnuc)*rho*T/eos_mp;
     double rad = (11.0/12.0) * 4.0*eos_sb/(eos_c) * T*T*T*T; 
     double deg = 2*M_PI*eos_h*eos_c/3.0 * pow(3*rho/(16*M_PI*eos_mp),4.0/3.0);
+    double nuc = 0.0;
 
-    return (x1*gas + x2*rad + x3*deg) / (eos_rho_scale*eos_c*eos_c);
+    return (x1*gas + x2*rad + x3*deg + x4*nuc) / (eos_rho_scale*eos_c*eos_c);
 }
 
 double eos_dpppdrho_pwf_loc(double rho, double T, double xnuc, double gam, 
-                        double x1, double x2, double x3)
+                        double x1, double x2, double x3, double x4)
 {
     double dxdr = eos_dxnudrho_pwf(rho, T/eos_k, xnuc);
 
@@ -211,24 +227,26 @@ double eos_dpppdrho_pwf_loc(double rho, double T, double xnuc, double gam,
     double rad = 0.0;
     double deg = eos_h*eos_c/(6.0*eos_mp)
                     * pow(3*rho/(16*M_PI*eos_mp),1.0/3.0);
+    double nuc = 0.0;
     
-    return (x1*gas + x2*rad + x3*deg) / (eos_c*eos_c);
+    return (x1*gas + x2*rad + x3*deg + x4*nuc) / (eos_c*eos_c);
 }
 
 double eos_dpppdttt_pwf_loc(double rho, double T, double xnuc, double gam, 
-                        double x1, double x2, double x3)
+                        double x1, double x2, double x3, double x4)
 {
     double dxdt = eos_dxnudttt_pwf(rho, T/eos_k, xnuc)/eos_k; // (#/ergs)
 
     double gas = 0.75*dxdt*rho*T/eos_mp + (0.25+0.75*xnuc)*rho/eos_mp;
     double rad = (11.0/3.0) * 4.0*eos_sb/eos_c * T*T*T;
     double deg = 0.0;
+    double nuc = 0.0;
     
-    return (x1*gas + x2*rad + x3*deg) * (eos_mp/eos_rho_scale);
+    return (x1*gas + x2*rad + x3*deg + x4*nuc) * (eos_mp/eos_rho_scale);
 }
 
 double eos_depsdrho_pwf_loc(double rho, double T, double xnuc, double gam, 
-                        double x1, double x2, double x3)
+                        double x1, double x2, double x3, double x4)
 {
     double dxdr = eos_dxnudrho_pwf(rho, T/eos_k, xnuc); // (cm^3/g)
 
@@ -236,18 +254,20 @@ double eos_depsdrho_pwf_loc(double rho, double T, double xnuc, double gam,
     double rad = (-1.0) * 4.0*eos_sb/(eos_c*rho*rho) * T*T*T*T;
     double deg = 3.0*eos_h*eos_c/(64*M_PI*eos_mp*eos_mp)
                     * pow(3*rho/(16*M_PI*eos_mp),-2.0/3.0);
+    double nuc = dxdr * eos_alpha_bind / (4*eos_mp);
     
-    return (x1*gas + x2*rad + x3*deg) * (eos_rho_scale / (eos_c*eos_c));
+    return (x1*gas + x2*rad + x3*deg + x4*nuc) * (eos_rho_scale/(eos_c*eos_c));
 }
 
 double eos_depsdttt_pwf_loc(double rho, double T, double xnuc, double gam, 
-                        double x1, double x2, double x3)
+                        double x1, double x2, double x3, double x4)
 {
     double dxdt = eos_dxnudttt_pwf(rho, T/eos_k, xnuc)/eos_k; // (#/erg)
 
     double gas = (0.75*dxdt*T + (0.25+0.75*xnuc))/((gam-1.0)*eos_mp);
     double rad = (11.0) * 4.0*eos_sb/(eos_c*rho)*T*T*T;
     double deg = 0.0;
+    double nuc = dxdt * eos_alpha_bind / (4*eos_mp);
     
-    return (x1*gas + x2*rad + x3*deg) * eos_mp;
+    return (x1*gas + x2*rad + x3*deg + x4*nuc) * eos_mp;
 }
