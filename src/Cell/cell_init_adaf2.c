@@ -65,6 +65,20 @@ void cell_init_adaf2_nocool(struct Cell *c, double r, double phi, double z,
             vp = -vMax/(sqrt(1+2*M/r)*r);
         u0 = 1.0/sqrt(1-2*M/r-4*M/r*vr-(1+2*M/r)*vr*vr-r*r*vp*vp);
     }
+    else if(sim_Metric(theSim) == KERR_KS)
+    {
+        if(vr > (vMax-2*M/r)/(1+2*M/r))
+            vr = (vMax-2*M/r)/(1+2*M/r);
+        if(vr < (-vMax-2*M/r)/(1+2*M/r))
+            vr = (-vMax-2*M/r)/(1+2*M/r);
+        if(vp > vMax/(sqrt(1+2*M/r)*r))
+            vp = vMax/(sqrt(1+2*M/r)*r);
+        if(vp < -vMax/(sqrt(1+2*M/r)*r))
+            vp = -vMax/(sqrt(1+2*M/r)*r);
+        u0 = 1.0/sqrt(1-2*M/r-4*M/r*vr-(1+2*M/r)*vr*vr-r*r*vp*vp);
+    }
+    else
+        u0 = 1.0;
 
     if(sim_Background(theSim) != GRDISC)
     {
