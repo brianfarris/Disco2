@@ -15,6 +15,8 @@
 #define DISIG2DZ (-2*z*(R*R*R*R+A*A*r*r) / ((R*R*R*R+A*A*z*z)*(R*R*R*R+A*A*z*z)))
 #define DDELDR (2.0*r - 2.0*M*r/R)
 #define DDELDZ (2.0*z - 2.0*M*z/R)
+#define DAAADR (2.0*r*((2.0*R*R+A*A)*R*R*R*R + A*A*z*z*(M*R-A*A))/(R*R*R*R))
+#define DAAADZ (2.0*z*(2.0*(R*R+A*A)*R*R*R*R - A*A*r*r*(M*R-A*A))/(R*R*R*R))
 
 double metric_g_dd_exact_kerr_ks(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim)
 {
@@ -31,7 +33,7 @@ double metric_g_dd_exact_kerr_ks(int mu, int nu, double t, double r, double p, d
         g = 1.0 + 2*M*r*r/(R*SIG2) + A*A*z*z*z*z/(R*R*R*R*R*R);
 
     else if(mu == 2 && nu == 2)
-        g = A*r*r / (R*R*SIG2);
+        g = AAA*r*r / (R*R*SIG2);
 
     else if(mu == 3 && nu == 3)
         g = 1.0 + 2*M*z*z/(R*SIG2) + A*A*r*r*z*z/(R*R*R*R*R*R);
@@ -119,7 +121,8 @@ double metric_dg_dd_exact_kerr_ks(int k, int mu, int nu, double t, double r, dou
                 - 6.0*A*A*pow(z,4)*r/pow(R,8);
 
         else if(mu == 2 && nu == 2)
-            dg = A * (2*r*R*R*SIG2 + r*r*(4*r*R*R)) / (pow(R,4)*SIG2*SIG2);
+            dg = (DAAADR*r*r+2*r*AAA) / (R*R*SIG2)
+                    - AAA*r*r*(4*r*R*R) / (R*R*R*R*SIG2*SIG2);
 
         else if(mu == 3 && nu == 3)
             dg = 2*M*z*z*(-r/(R*R*R*SIG2) + DISIG2DR/R)
@@ -159,7 +162,8 @@ double metric_dg_dd_exact_kerr_ks(int k, int mu, int nu, double t, double r, dou
                 + A*A*(4*z*z*z*R*R - 6*pow(z,5))/pow(R,8);
 
         else if(mu == 2 && nu == 2)
-            dg = -A*r*r*(4*R*R*z + 2*A*A*z) / (pow(R,4)*SIG2*SIG2);
+            dg = (DAAADZ*r*r) / (R*R*SIG2)
+                - AAA*r*r*(4*z*R*R+2*A*A*z) / (R*R*R*R*SIG2*SIG2);
 
         else if(mu == 3 && nu == 3)
             dg = 2*M*((z*(2*R*R-z*z))/(R*R*R*SIG2) + z*z*DISIG2DZ/R)
