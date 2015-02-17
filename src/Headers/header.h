@@ -17,7 +17,7 @@ enum{HLLC,HLL};
 //Background Types
 enum{NEWTON,GR,GRVISC1,GRDISC};
 //Metric Types
-enum{SR,SCHWARZSCHILD_SC,SCHWARZSCHILD_KS,SR_CART};
+enum{SR,SCHWARZSCHILD_SC,SCHWARZSCHILD_KS,SR_CART,KERR_KS};
 //Frames
 enum{FR_EULER,FR_KEP,FR_ACC};
 //Equations of State

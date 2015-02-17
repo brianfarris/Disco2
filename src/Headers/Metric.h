@@ -94,11 +94,18 @@ double metric_dg_dd_exact_schw_ks(int k, int mu, int nu, double t, double r, dou
 double metric_dg_uu_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 void metric_killing_exact_schw_ks(int *k);
 
-//SR Cart
+//SR Cartesian coords
 double metric_g_dd_exact_sr_cart(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 double metric_g_uu_exact_sr_cart(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 double metric_dg_dd_exact_sr_cart(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 double metric_dg_uu_exact_sr_cart(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 void metric_killing_exact_sr_cart(int *k);
+
+//Kerr - Kerr-Schild coords
+double metric_g_dd_exact_kerr_ks(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_g_uu_exact_kerr_ks(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_dg_dd_exact_kerr_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+double metric_dg_uu_exact_kerr_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
+void metric_killing_exact_kerr_ks(int *k);
 
 #endif

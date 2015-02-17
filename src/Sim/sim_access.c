@@ -118,6 +118,9 @@ double sim_G_EPS(struct Sim *theSim){
 double sim_GravM(struct Sim *theSim){
   return(theSim->GravM);
 }
+double sim_GravA(struct Sim *theSim){
+  return(theSim->GravA);
+}
 double sim_PHI_ORDER(struct Sim *theSim){
   return(theSim->PHI_ORDER);
 }
