@@ -28,7 +28,7 @@ aspect         1.0
 
 NUM_C                   5
 NUM_N                   0
-Time_Max                1.0e2
+Time_Max                1.0e4
 Num_Checkpoints	        1001
 Num_Diag_Dump           2
 Num_Diag_Measure        2
@@ -52,7 +52,7 @@ PLM			1.0
 Grav_2D			1
 G_EPS			0.0
 GravM           3.0
-GravA           0.5
+GravA           0.95
 AlphaVisc       0.1
 
 //EoS
@@ -84,7 +84,7 @@ PHI_ORDER               2
 
 //Atmosphere Parameters
 Rho_Floor		0.000001
-Cs_Floor		1.0e-7
+Cs_Floor		1.0e-10 // T floor in GRDISC
 Cs_Cap			1.0
 Vel_Cap			100.0
 
