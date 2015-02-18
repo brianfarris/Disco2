@@ -10,6 +10,10 @@
 #include "../Headers/Metric.h"
 #include "../Headers/header.h"
 
+//Local Functions
+int cons2prim_solve(double *cons, double *prim, double *pos, double dV, 
+                        struct Sim *theSim);
+
 void cell_prim2cons_grdisc(double *prim, double *cons, double *pos, 
                             double dV, struct Sim *theSim)
 {
@@ -75,6 +79,37 @@ void cell_prim2cons_grdisc(double *prim, double *cons, double *pos,
 void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
                             struct Sim *theSim)
 {
+    int err = cons2prim_solve(cons, prim, pos, dV, theSim);
+
+    if(err)
+    {
+        printf("cons:  %.12lg %.12lg %.12lg %.12lg %.12lg\n", 
+                cons[DDD], cons[TAU], cons[SRR], cons[LLL], cons[SZZ]);
+        printf("prim:  %.12lg %.12lg %.12lg %.12lg %.12lg\n", 
+                prim[RHO], prim[TTT], prim[URR], prim[UPP], prim[UZZ]);
+        if(prim[RHO] < sim_RHO_FLOOR(theSim))
+        {
+            prim[RHO] = sim_RHO_FLOOR(theSim);
+            printf("Floored RHO.\n.");
+        }
+        if(prim[TTT] < sim_CS_FLOOR(theSim))
+        {
+            prim[TTT] = sim_CS_FLOOR(theSim);
+            printf("Floored TTT.\n.");
+        }
+        printf("prim2: %.12lg %.12lg %.12lg %.12lg %.12lg\n", 
+                prim[RHO], prim[TTT], prim[URR], prim[UPP], prim[UZZ]);
+        
+        cell_prim2cons_grdisc(prim, cons, pos, dV, theSim);
+        
+        printf("cons2: %.12lg %.12lg %.12lg %.12lg %.12lg\n", 
+                cons[DDD], cons[TAU], cons[SRR], cons[LLL], cons[SZZ]);
+    }
+}
+
+int cons2prim_solve(double *cons, double *prim, double *pos, double dV, 
+                        struct Sim *theSim)
+{
     int mu, nu, i;
     double D, S[3], tau;
     double rho, T, h, P, eps, l, dpdr, dpdt, dedr, dedt, dhdr, dhdt;
@@ -84,6 +119,7 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
     double S2, SU, A, B, C;
     double f1, f2, df1dr, df1dt, df2dr, df2dt, detj;
     struct Metric *g;
+    int err = 0;
     double tol = 1.0e-10;
     int maxIter = 100;
 
@@ -193,16 +229,18 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
         rho += -( df2dt*f1 - df1dt*f2) / detj;
         T   += -(-df2dr*f1 + df1dr*f2) / detj;
 
+        
         if(rho <= 0.0)
         {
             T = 0.5*tmp_prim[RHO]/(tmp_prim[RHO]-rho) * (T-tmp_prim[TTT]) + tmp_prim[TTT];
             rho = 0.5*tmp_prim[RHO];
         }
-        else if(T <= 0.0)
+        if(T <= 0.0)
         {
             rho = 0.5*tmp_prim[TTT]/(tmp_prim[TTT]-T) * (rho-tmp_prim[RHO]) + tmp_prim[RHO];
             T = 0.5*tmp_prim[TTT];
         }
+        
         
         if(rho==rho2 && T==T2)
         {
@@ -238,6 +276,8 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
 
     if(i == maxIter)
     {
+        err = 1;
+
         printf("ERROR: NR failed to converge after %d iterations.  Res = %.12lg\n",
                 maxIter, res);
         printf("r: %.12lg rho: %.12lg T: %.12lg\n", r, rho, T);
@@ -270,12 +310,6 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
                 tc[RHO]/dV, tc[TTT]/dV, tc[URR]/dV, tc[UPP]/dV, tc[UZZ]/dV);
     }
 
-    //Prim recovery
-    if(rho < sim_RHO_FLOOR(theSim))
-        rho = sim_RHO_FLOOR(theSim);
-
-    //TODO: enforce CS FLOOR/CAP
-   
     prim[RHO] = rho;
     prim[TTT] = T;
 
@@ -307,5 +341,7 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
         prim[i] = cons[i]/cons[DDD];
 
     metric_destroy(g);
+
+    return err;
 }
 
