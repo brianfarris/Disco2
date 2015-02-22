@@ -289,3 +289,10 @@ void metric_killing_exact_kerr_ks(int *k)
     k[2] = 1;
     k[3] = 0;
 }
+
+double metric_horizon_exact_kerr_ks(struct Sim *theSim)
+{
+    double a = sim_GravA(theSim);
+    double M = sim_GravM(theSim);
+    return M * (1.0 + sqrt(1.0 - a*a));
+}

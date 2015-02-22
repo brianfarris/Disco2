@@ -41,3 +41,8 @@ void metric_killing_exact_sr_cart(int *k)
     k[2] = 1;
     k[3] = 1;
 }
+
+double metric_horizon_exact_sr_cart(struct Sim *theSim)
+{
+    return -1.0;
+}

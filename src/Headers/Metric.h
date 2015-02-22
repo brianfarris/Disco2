@@ -72,6 +72,7 @@ double (*metric_g_uu_exact)(int i, int j, double t, double r, double p, double z
 double (*metric_dg_dd_exact)(int k, int i, int j, double t, double r, double p, double z, struct Sim *theSim);
 double (*metric_dg_uu_exact)(int k, int i, int j, double t, double r, double p, double z, struct Sim *theSim);
 void (*metric_killing_exact)(int *k);
+double (*metric_horizon)(struct Sim *);
 
 //SR
 double metric_g_dd_exact_sr(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
@@ -79,6 +80,7 @@ double metric_g_uu_exact_sr(int mu, int nu, double t, double r, double p, double
 double metric_dg_dd_exact_sr(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 double metric_dg_uu_exact_sr(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 void metric_killing_exact_sr(int *k);
+double metric_horizon_exact_sr(struct Sim *);
 
 //Schwarzschild - Schwarzschild coords
 double metric_g_dd_exact_schw_sc(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
@@ -86,6 +88,7 @@ double metric_g_uu_exact_schw_sc(int mu, int nu, double t, double r, double p, d
 double metric_dg_dd_exact_schw_sc(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 double metric_dg_uu_exact_schw_sc(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 void metric_killing_exact_schw_sc(int *k);
+double metric_horizon_exact_schw_sc(struct Sim *);
 
 //Schwarzschild - Kerr-Schild coords
 double metric_g_dd_exact_schw_ks(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
@@ -93,6 +96,7 @@ double metric_g_uu_exact_schw_ks(int mu, int nu, double t, double r, double p, d
 double metric_dg_dd_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 double metric_dg_uu_exact_schw_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 void metric_killing_exact_schw_ks(int *k);
+double metric_horizon_exact_schw_ks(struct Sim *);
 
 //SR Cartesian coords
 double metric_g_dd_exact_sr_cart(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
@@ -100,6 +104,7 @@ double metric_g_uu_exact_sr_cart(int mu, int nu, double t, double r, double p, d
 double metric_dg_dd_exact_sr_cart(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 double metric_dg_uu_exact_sr_cart(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 void metric_killing_exact_sr_cart(int *k);
+double metric_horizon_exact_sr_cart(struct Sim *);
 
 //Kerr - Kerr-Schild coords
 double metric_g_dd_exact_kerr_ks(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
@@ -107,5 +112,6 @@ double metric_g_uu_exact_kerr_ks(int mu, int nu, double t, double r, double p, d
 double metric_dg_dd_exact_kerr_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 double metric_dg_uu_exact_kerr_ks(int k, int mu, int nu, double t, double r, double p, double z, struct Sim *theSim);
 void metric_killing_exact_kerr_ks(int *k);
+double metric_horizon_exact_kerr_ks(struct Sim *);
 
 #endif

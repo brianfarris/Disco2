@@ -227,18 +227,38 @@ double metric_frame_U_u_acc(struct Metric *g, int mu, struct Sim *theSim)
     // radial velocity in the coordinate basis as well.
 
     double M = sim_GravM(theSim);
+    double A = M*sim_GravA(theSim);
     double r = g->x[1];
 
-    if(mu == 1)
-        return -2*M/sqrt((r+2*M)*(r-M));
-    else if(mu == 2)
-        return sqrt(M/(r*r*(r-M)));
-    else if (mu == 0)
+    if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
-        if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
+        if(mu == 1)
+            return -2*M/sqrt((r+2*M)*(r-M));
+        else if(mu == 2)
+            return sqrt(M/(r*r*(r-M)));
+        else if (mu == 0)
             return sqrt((r+2*M)/(r-M));
-        else if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
+    }
+    else if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
+    {
+        if(mu == 1)
+            return -2*M/sqrt((r+2*M)*(r-M));
+        else if(mu == 2)
+            return sqrt(M/(r*r*(r-M)));
+        else if (mu == 0)
             return r*r / sqrt((r-2*M)*(r-2*M)*(r*r+M*r-2*M*M));
+    }
+    else if(sim_Metric(theSim) == KERR_KS)
+    {
+        double omk = sqrt(M/(r*r*r));
+        double Wp = 1.0 / sqrt((1.0+(A+r)*omk) * (1.0+(A-r)*omk));
+
+        if(mu == 1)
+            return (-2*M/r * (1+A*omk) / sqrt(1+2*M/r) + A*omk) * Wp;
+        else if(mu == 2)
+            return omk * Wp;
+        else if (mu == 0)
+            return (1.0+A*omk) * sqrt(1.0+2*M/r) * Wp;
     }
     return 0.0;
 }
@@ -246,31 +266,69 @@ double metric_frame_U_u_acc(struct Metric *g, int mu, struct Sim *theSim)
 double metric_frame_dU_du_acc(struct Metric *g, int mu, int nu, struct Sim *theSim)
 {
     double M = sim_GravM(theSim);
+    double A = M*sim_GravA(theSim);
     double r = g->x[1];
 
     if(mu != 1)
         return 0.0;
     
-    if(nu == 1)
+    if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
-        double ur = -2*M/sqrt((r+2*M)*(r-M));
-        return ur*ur*ur/(-8*M*M) * (2*r+M);
-    }
-    else if(nu == 2)
-    {
-        double up = sqrt(M/(r*r*(r-M)));
-        return -0.5*up*up*up/M * (3*r*r-2*M*r);
-    }
-    else if(nu == 0)
-    {
-        if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
+        if(nu == 1)
+        {
+            double ur = -2*M/sqrt((r+2*M)*(r-M));
+            return ur*ur*ur/(-8*M*M) * (2*r+M);
+        }
+        else if(nu == 2)
+        {
+            double up = sqrt(M/(r*r*(r-M)));
+            return -0.5*up*up*up/M * (3*r*r-2*M*r);
+        }
+        else if(nu == 0)
+        {
             return -1.5*M*sqrt((r-M)/(r+2*M)) / ((r-M)*(r-M));
-        else if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
+        }
+    }
+    else if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
+    {
+        if(nu == 1)
+        {
+            double ur = -2*M/sqrt((r+2*M)*(r-M));
+            return ur*ur*ur/(-8*M*M) * (2*r+M);
+        }
+        else if(nu == 2)
+        {
+            double up = sqrt(M/(r*r*(r-M)));
+            return -0.5*up*up*up/M * (3*r*r-2*M*r);
+        }
+        else if(nu == 0)
         {
             double x = r/M;
             double y = sqrt(x*x + x - 2);
             return -0.5 * x * (-16 + 10*x + 3*x*x) / (M * (x-2)*(x-2) * y*y*y);
         }
+    }
+    else if(sim_Metric(theSim) == KERR_KS)
+    {
+        double omk = sqrt(M/(r*r*r));
+        double domk = -1.5 * omk/r;
+        double Wp = 1.0 / sqrt((1.0+(A+r)*omk) * (1.0+(A-r)*omk));
+        double dWp = -0.5 * (2*(1.0+A*omk)*A*domk + M/(r*r)) * Wp*Wp*Wp;
+
+        if(nu == 1)
+        {
+            return (2*M/(r*r) * (1+A*omk) / sqrt(1+2*M/r)
+                    - 2*M/r * A*domk / sqrt(1+2*M/r)
+                    - 2*M/r * (1+A*omk) * M/(r*r*pow(1+2*M/r,1.5))
+                    + A*domk) * Wp
+                    + (-2*M/r * (1+A*omk) / sqrt(1+2*M/r) + A*omk) * dWp;
+        }
+        else if(nu == 2)
+            return domk * Wp + omk * dWp;
+        else if (nu == 0)
+            return A*domk * sqrt(1.0+2*M/r) * Wp
+                    + (1.0+A*omk) * (-M/(r*r*sqrt(1.0+2*M/r))) * Wp
+                    + (1.0+A*omk) * sqrt(1.0+2*M/r) * dWp;
     }
 
     return 0.0;

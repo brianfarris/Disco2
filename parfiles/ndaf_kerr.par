@@ -12,14 +12,14 @@ GravMassType            0       // 0 none, 1 single, 2 binary
 Background              3       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
 Metric                  4       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS, 4 Kerr-KS
-Frame                   0       // 0 Euler, 1 Keplerian, 2 Accreting
+Frame                   2       // 0 Euler, 1 Keplerian, 2 Accreting
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
 NumR			128			//Radial Zones
 NumZ			1       //Vertical Zones
 ng        2
-R_Min		  4.0e0
+R_Min		  2.5e0
 R_Max			1.0e4
 Z_Min			-1.0e4
 Z_Max			1.0e4
@@ -28,10 +28,10 @@ aspect         1.0
 
 NUM_C                   5
 NUM_N                   0
-Time_Max                1.0e4
+Time_Max                1.0e2
 Num_Checkpoints	        1001
-Num_Diag_Dump           2
-Num_Diag_Measure        2
+Num_Diag_Dump           1001
+Num_Diag_Measure        1001
 
 
 NoInnerBC               0
@@ -91,8 +91,8 @@ Vel_Cap			100.0
 runtype                 0
 
 //DAMPING
-DAMP_TIME               1.0e-2        // Set negative to turn off
-RDAMP_INNER             1.5
+DAMP_TIME               -1        // Set negative to turn off
+RDAMP_INNER             3.8
 RDAMP_OUTER             1.0e100
 
 RLogScale               0.001

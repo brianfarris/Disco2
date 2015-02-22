@@ -8,11 +8,13 @@ import readChkpt as rc
 
 GAM = 5.0/3.0
 M = 3.0
+a = 0.95
 scale = 'log'
 eos_x1 = 1.0
 eos_x2 = 1.0
 eos_x3 = 1.0
 alpha = 0.1
+A = a*M
 
 c = 2.99792458e10
 G = 6.6738e-8
@@ -74,8 +76,10 @@ def plot_r_profile_single(r, f, sca, ylabel, bounds=None, R=None, F=None):
     plt.xlabel(r"$r$")
     plt.ylabel(ylabel)
 
+    plt.axvspan(M*(1.0-math.sqrt(1.0-a*a)), M*(1.0+math.sqrt(1.0-a*a)), 
+                    color='grey', alpha=0.5)
+    plt.axvspan(plt.xlim()[0], 2*M, color='lightgrey', alpha=0.5)
     plt.xlim(r.min(), r.max())
-    plt.axvspan(plt.xlim()[0], 2*M, color='grey', alpha=0.5)
 
     if bounds is not None:
         if sca == "log":
@@ -106,6 +110,13 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
     vr = vr[real]
     vp = vp[real]
 
+    inds = np.argsort(r)
+    r = r[inds]
+    rho = rho[inds]
+    T = T[inds]
+    vr = vr[inds]
+    vp = vp[inds]
+
     i = r.argmax()
     #R = np.linspace(r.min(), r.max(), 100)
     R = np.logspace(np.log10(r.min()), np.log10(r.max()), 100)
@@ -116,8 +127,9 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
 
     #u0 = 1.0/np.sqrt(1.0-2*M/r-vr*vr/(1-2*M/r)-r*r*vp*vp)
     #U00 = 1.0/np.sqrt(1.0-2*M/R-URR*URR/(1-2*M/R)-R*R*UPP*UPP)
-    u0 = 1.0/np.sqrt(1.0-2*M/r-4*M/r*vr-(1+2*M/r)*vr*vr-r*r*vp*vp)
-    U00 = 1.0/np.sqrt(1.0-2*M/R-4*M/R*URR-(1+2*M/R)*URR*URR-R*R*UPP*UPP)
+    u0 = 1.0/np.sqrt(1.0-2*M/r - 4*M/r*vr + 4*M*A/r*vp - (1+2*M/r)*vr*vr
+                    + 2*A*(1+2*M/r)*vr*vp - (r*r+A*A*(1+2*M/r))*vp*vp)
+    #U00 = 1.0/np.sqrt(1.0-2*M/R-4*M/R*URR-(1+2*M/R)*URR*URR-R*R*UPP*UPP)
 
     #fac = 1.0/(1.0-2*M/(r-2*M)*vr)
     #vr = vr*fac
@@ -135,15 +147,16 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
     Ptot = Pg + Pr + Pd
     epstot = eos_x1*e_gas(rho,T) + eos_x2*e_rad(rho,T) + eos_x3*e_deg(rho,T)
 
-    EPS = eos_x1*e_gas(RHO,TTT) + eos_x2*e_rad(RHO,TTT) + eos_x3*e_deg(RHO,TTT)
-    PPP = eos_x1*P_gas(RHO, TTT) + eos_x2*P_rad(RHO, TTT)
+    #EPS = eos_x1*e_gas(RHO,TTT) + eos_x2*e_rad(RHO,TTT) + eos_x3*e_deg(RHO,TTT)
+    #PPP = eos_x1*P_gas(RHO, TTT) + eos_x2*P_rad(RHO, TTT)
 
     rhoh = rho + rho*epstot + Ptot
-    RHOH = RHO + RHO*EPS + PPP
+    #RHOH = RHO + RHO*EPS + PPP
 
-    W = 1.0/np.sqrt(1.0 - ((1.0+2.0*M/r)*vr+2*M/r)**2 - (1.0+2.0*M/r)*r*r*vp*vp)
+    W = u0 / np.sqrt(1+2*M/r)
+
     H = np.sqrt(Ptot*r*r*r/(rhoh*M))/u0
-    HHH = np.sqrt(PPP*R*R*R/(RHOH*M))/U00
+    #HHH = np.sqrt(PPP*R*R*R/(RHOH*M))/U00
 
     Mdot = -2*math.pi*r*rho*u0*vr*H * c*rg_solar*rg_solar/M_solar
 
@@ -190,11 +203,11 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
 
         plt.subplot(334)
         #plot_r_profile_single(r, vr, "linear", r"$v^r$", R, URR)
-        plt.plot(R, -(1-2*M/R)/(1+2*M/R), 'r--')
-        plt.plot(R, -(-1*np.ones(R.shape)), 'r--')
-        plt.plot(R, -(0.5-2*M/R)/(1+2*M/R), 'b--')
-        plt.plot(R, -(-0.5-2*M/R)/(1+2*M/R), 'b--')
-        plt.plot(R, -(0.0-2*M/R)/(1+2*M/R), ls='--', color='grey')
+        plt.plot(r, -((1-2*M/r)/(1+2*M/r) + A*vp), 'r--')
+        plt.plot(r, -(-1*np.ones(r.shape) + A*vp), 'r--')
+        plt.plot(r, -((0.5-2*M/r)/(1+2*M/r) + A*vp), 'b--')
+        plt.plot(r, -((-0.5-2*M/r)/(1+2*M/r) + A*vp), 'b--')
+        plt.plot(r, -((0.0-2*M/r)/(1+2*M/r) + A*vp), ls='--', color='grey')
         plot_r_profile_single(r, -vr, sca, r"$v^r$", bounds[3])
         #plt.gca().set_xscale(sca)
 
@@ -203,6 +216,10 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         plt.plot(R, 1.0/(np.sqrt(1+2.0*M/R)*R), 'r--')
         plt.plot(R, 0.5/(np.sqrt(1+2.0*M/R)*R), 'b--')
         plot_r_profile_single(r, vp, sca, r"$v^\phi$", bounds[4])
+        OMK = np.sqrt(M/(R*R*R))
+        plt.plot(R, OMK, 'g-')
+        plt.plot(R, OMK/(1+A*OMK), 'g--')
+        plt.plot(R, OMK/((1+A*OMK)*np.sqrt(1+2*M/R)), 'y-')
 
         plt.subplot(336)
         #plot_r_profile_single(r, mach, sca, r"$\mathcal{M}$", R, MACH)
