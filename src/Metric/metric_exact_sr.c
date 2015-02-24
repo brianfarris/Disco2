@@ -53,3 +53,8 @@ void metric_killing_exact_sr(int *k)
     k[2] = 1;
     k[3] = 1;
 }
+
+double metric_horizon_exact_sr(struct Sim *theSim)
+{
+    return -1.0;
+}

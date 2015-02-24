@@ -16,6 +16,7 @@ void cell_init_adaf2_nocool(struct Cell *c, double r, double phi, double z,
 {
     int i;
     double M = sim_GravM(theSim);
+    double A = M*sim_GravA(theSim);
     double alpha = sim_AlphaVisc(theSim);
 
     double rho, vr, vp, T;
@@ -49,33 +50,34 @@ void cell_init_adaf2_nocool(struct Cell *c, double r, double phi, double z,
     }
     else if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
-        /*
-        double fac = 1.0/(1.0 + 2*M*vr/(r-2*M));
-        vr *= fac;
-        vp *= fac;
-        */
+        double vpMax =  vMax/(sqrt(1+2*M/r)*r);
+        double vpMin = -vMax/(sqrt(1+2*M/r)*r);
+        double vrMax = (vMax-2*M/r)/(1+2*M/r);
+        double vrMin = (-vMax-2*M/r)/(1+2*M/r);
 
-        if(vr > (vMax-2*M/r)/(1+2*M/r))
-            vr = (vMax-2*M/r)/(1+2*M/r);
-        if(vr < (-vMax-2*M/r)/(1+2*M/r))
-            vr = (-vMax-2*M/r)/(1+2*M/r);
-        if(vp > vMax/(sqrt(1+2*M/r)*r))
-            vp = vMax/(sqrt(1+2*M/r)*r);
-        if(vp < -vMax/(sqrt(1+2*M/r)*r))
-            vp = -vMax/(sqrt(1+2*M/r)*r);
+        vp = vp > vpMax ? vpMax : vp;
+        vp = vp < vpMin ? vpMin : vp;
+        vr = vr > vrMax ? vrMax : vr;
+        vr = vr < vrMin ? vrMin : vr;
+
         u0 = 1.0/sqrt(1-2*M/r-4*M/r*vr-(1+2*M/r)*vr*vr-r*r*vp*vp);
     }
     else if(sim_Metric(theSim) == KERR_KS)
     {
-        if(vr > (vMax-2*M/r)/(1+2*M/r))
-            vr = (vMax-2*M/r)/(1+2*M/r);
-        if(vr < (-vMax-2*M/r)/(1+2*M/r))
-            vr = (-vMax-2*M/r)/(1+2*M/r);
-        if(vp > vMax/(sqrt(1+2*M/r)*r))
-            vp = vMax/(sqrt(1+2*M/r)*r);
-        if(vp < -vMax/(sqrt(1+2*M/r)*r))
-            vp = -vMax/(sqrt(1+2*M/r)*r);
-        u0 = 1.0/sqrt(1-2*M/r-4*M/r*vr-(1+2*M/r)*vr*vr-r*r*vp*vp);
+        double vpMax =  vMax/(sqrt(1+2*M/r)*r);
+        double vpMin = -vMax/(sqrt(1+2*M/r)*r);
+
+        vp = vp > vpMax ? vpMax : vp;
+        vp = vp < vpMin ? vpMin : vp;
+
+        double vrMax = (vMax-2*M/r)/(1+2*M/r) + A*vp;
+        double vrMin = (-vMax-2*M/r)/(1+2*M/r) + A*vp;
+
+        vr = vr > vrMax ? vrMax : vr;
+        vr = vr < vrMin ? vrMin : vr;
+
+        u0 = 1.0/sqrt(1-2*M/r - 4*M/r*vr + 4*M*A/r*vp - (1+2*M/r)*vr*vr
+                        + 2*A*(1+2*M/r)*vr*vp - (r*r+A*A*(1+2*M/r))*vp*vp);
     }
     else
         u0 = 1.0;

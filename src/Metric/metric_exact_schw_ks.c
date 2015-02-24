@@ -279,3 +279,8 @@ void metric_killing_exact_schw_ks(int *k)
     k[2] = 1;
     k[3] = 0;
 }
+
+double metric_horizon_exact_schw_ks(struct Sim *theSim)
+{
+    return 2.0*sim_GravM(theSim);
+}

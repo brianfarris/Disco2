@@ -76,6 +76,7 @@ void metric_init_metric(struct Sim *theSim)
         metric_dg_dd_exact = &metric_dg_dd_exact_sr;
         metric_dg_uu_exact = &metric_dg_uu_exact_sr;
         metric_killing_exact = &metric_killing_exact_sr;
+        metric_horizon = &metric_horizon_exact_sr;
     }
     else if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
     {
@@ -84,6 +85,7 @@ void metric_init_metric(struct Sim *theSim)
         metric_dg_dd_exact = &metric_dg_dd_exact_schw_sc;
         metric_dg_uu_exact = &metric_dg_uu_exact_schw_sc;
         metric_killing_exact = &metric_killing_exact_schw_sc;
+        metric_horizon = &metric_horizon_exact_schw_sc;
     }
     else if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
@@ -92,6 +94,7 @@ void metric_init_metric(struct Sim *theSim)
         metric_dg_dd_exact = &metric_dg_dd_exact_schw_ks;
         metric_dg_uu_exact = &metric_dg_uu_exact_schw_ks;
         metric_killing_exact = &metric_killing_exact_schw_ks;
+        metric_horizon = &metric_horizon_exact_schw_ks;
     }
     else if(sim_Metric(theSim) == SR_CART)
     {
@@ -100,6 +103,7 @@ void metric_init_metric(struct Sim *theSim)
         metric_dg_dd_exact = &metric_dg_dd_exact_sr_cart;
         metric_dg_uu_exact = &metric_dg_uu_exact_sr_cart;
         metric_killing_exact = &metric_killing_exact_sr_cart;
+        metric_horizon = &metric_horizon_exact_sr_cart;
     }
     else if(sim_Metric(theSim) == KERR_KS)
     {
@@ -108,6 +112,7 @@ void metric_init_metric(struct Sim *theSim)
         metric_dg_dd_exact = &metric_dg_dd_exact_kerr_ks;
         metric_dg_uu_exact = &metric_dg_uu_exact_kerr_ks;
         metric_killing_exact = &metric_killing_exact_kerr_ks;
+        metric_horizon = &metric_horizon_exact_kerr_ks;
     }
     else
     {
