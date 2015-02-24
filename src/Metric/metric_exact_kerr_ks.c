@@ -15,7 +15,7 @@
 #define DISIG2DZ (-2*z*(R*R*R*R+A*A*r*r) / ((R*R*R*R+A*A*z*z)*(R*R*R*R+A*A*z*z)))
 #define DDELDR (2.0*r - 2.0*M*r/R)
 #define DDELDZ (2.0*z - 2.0*M*z/R)
-#define DAAADR (2.0*r*((2.0*R*R+A*A)*R*R*R*R + A*A*z*z*(M*R-A*A))/(R*R*R*R))
+#define DAAADR (2.0*r*((2.0*R*R+A*A)*R*R*R*R + A*A*(M*R*(R*R+z*z)-A*A*z*z))/(R*R*R*R))
 #define DAAADZ (2.0*z*(2.0*(R*R+A*A)*R*R*R*R - A*A*r*r*(M*R-A*A))/(R*R*R*R))
 
 double metric_g_dd_exact_kerr_ks(int mu, int nu, double t, double r, double p, double z, struct Sim *theSim)
@@ -158,7 +158,7 @@ double metric_dg_dd_exact_kerr_ks(int k, int mu, int nu, double t, double r, dou
             dg =  2*M*(z/(R*SIG2) + R*DISIG2DZ);
 
         else if(mu == 1 && nu == 1)
-            dg = 2*M*r*r*(-r/(R*R*R*SIG2) + DISIG2DZ/R)
+            dg = 2*M*r*r*(-z/(R*R*R*SIG2) + DISIG2DZ/R)
                 + A*A*(4*z*z*z*R*R - 6*pow(z,5))/pow(R,8);
 
         else if(mu == 2 && nu == 2)
@@ -173,7 +173,7 @@ double metric_dg_dd_exact_kerr_ks(int k, int mu, int nu, double t, double r, dou
             dg = 2*M*r*DISIG2DZ;
 
         else if((mu == 0 && nu == 2) || (mu == 2 && nu == 0))
-            dg = -2*M*A*r*(-z/(R*R*R*SIG2) + DISIG2DZ/R);
+            dg = -2*M*A*r*r*(-z/(R*R*R*SIG2) + DISIG2DZ/R);
 
         else if((mu == 0 && nu == 3) || (mu == 3 && nu == 0))
             dg = 2*M*(1.0/SIG2 + z*DISIG2DZ);
@@ -236,7 +236,7 @@ double metric_dg_uu_exact_kerr_ks(int k, int mu, int nu, double t, double r, dou
                      - (r*A*A-2*M*R*r)*(4*R*R*r)) / (R*R*R*R*SIG2*SIG2);
 
         else if((mu == 2 && nu == 3) || (mu == 3 && nu == 2))
-            dg = A*z * (-r/(R*R*SIG2) + DISIG2DR/R);
+            dg = A*z * (-r/(R*R*R*SIG2) + DISIG2DR/R);
 
         else
             dg = 0.0;
@@ -264,7 +264,7 @@ double metric_dg_uu_exact_kerr_ks(int k, int mu, int nu, double t, double r, dou
             dg = 2*M*(1.0/SIG2 + z*DISIG2DZ);
 
         else if((mu == 1 && nu == 2) || (mu == 2 && nu == 1))
-            dg = A*r * (-z/(R*R*SIG2) + DISIG2DZ/R);
+            dg = A*r * (-z/(R*R*R*SIG2) + DISIG2DZ/R);
 
         else if((mu == 1 && nu == 3) || (mu == 3 && nu == 1))
             dg = r*((A*A-2*M*(R+z*z/R))*R*R*SIG2
