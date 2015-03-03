@@ -20,7 +20,7 @@ NumR			128			//Radial Zones
 NumZ			1       //Vertical Zones
 ng              2
 R_Min		    3.5e0
-R_Max			3.0e2
+R_Max			1.5e2
 Z_Min			-1.0e4
 Z_Max			1.0e4
 NP_CONST       -1
@@ -77,8 +77,8 @@ InitPar1        1.0         // rho0
 InitPar2        1.0e-4      // T0
 InitPar3        1.0e6       // rho1
 InitPar4        1.0e-4       // T1
-InitPar5        300.0       // r1
-InitPar6        150.0        // b
+InitPar5        100.0       // r1
+InitPar6        50.0        // b
 
 PHI_ORDER               2
 
