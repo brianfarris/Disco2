@@ -58,10 +58,14 @@ void cell_prim2cons_grdisc(double *prim, double *cons, double *pos,
     eps = eos_eps(prim, theSim);
     rhoh = rho + rho*eps + Pp;
 
-    H = sqrt(r*r*r*Pp / (rhoh*M)) / u0;
+    if(sim_Metric(theSim) == KERR_KS)
+    {
+        double A = M*sim_GravA(theSim);
 
-    u0 = 1.0 / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v)
-                    - metric_square3_u(g,v));
+        H = r*r * sqrt(Pp / (rhoh*(u_d[2]*u_d[2]-A*A*(u_d[0]*u_d[0]-1.0))));
+    }
+    else
+        H = sqrt(r*r*r*Pp / (rhoh*M)) / u0;
 
     cons[DDD] = a*sqrtg*u0 * rho * H * dV;
     cons[SRR] = a*sqrtg*rhoh*u0 * u_d[1] * H * dV;
@@ -112,7 +116,7 @@ int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
 {
     int mu, nu, i;
     double D, S[3], tau;
-    double rho, T, h, P, eps, l, dpdr, dpdt, dedr, dedt, dhdr, dhdt;
+    double rho, T, h, P, eps, dpdr, dpdt, dedr, dedt, dhdr, dhdt;
     double w, dwdr, dwdt, H, dHdr, dHdt;
     double tmp_prim[5], res;
     double r, a, b[3], sqrtg, U[4], Ud[4], ud[4], M;
@@ -201,14 +205,35 @@ int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
         dhdr = dedr + (dpdr*rho-P)/(rho*rho);
         dhdt = dedt + dpdt/rho;
 
-        l = S[2] / (D*h);
         w = sqrt(1.0+C/(h*h));
         dwdr = -C / (h*h*h * w) * dhdr;
         dwdt = -C / (h*h*h * w) * dhdt;
 
-        H = sqrt(r*r*r*P / (rho*h*M)) * (a/w);
-        dHdr = (-dwdr/w + 0.5*dpdr/P - 0.5/rho - 0.5*dhdr/h) * H; 
-        dHdt = (-dwdt/w + 0.5*dpdt/P - 0.5*dhdt/h) * H; 
+        if(sim_Metric(theSim) == KERR_KS)
+        {
+            double AA, l2, dl2dr, dl2dt, e2, de2dr, de2dt, guu;
+            AA = M*sim_GravA(theSim);
+            l2 = S[1]*S[1] / (D*D*h*h);
+            dl2dr = -2*l2/h*dhdr;
+            dl2dt = -2*l2/h*dhdt;
+            guu = (metric_g_uu(g,1,1)*S[0]*S[0] + metric_g_uu(g,2,2)*S[1]*S[1]
+                    + metric_g_uu(g,3,3)*S[2]*S[2]) / (D*D*h*h);
+            e2 = (-1.0 - guu) / metric_g_uu(g,0,0);
+            de2dr = 2*guu / ( h * metric_g_uu(g,0,0)) * dhdr;
+            de2dt = 2*guu / ( h * metric_g_uu(g,0,0)) * dhdt;
+
+            H = r*r*sqrt(P/(rho*h*(l2 - AA*AA*(e2-1.0))));
+            dHdr = (-0.5*(dl2dr-AA*AA*de2dr)/(l2-AA*AA*(e2-1.0))
+                    + 0.5*dpdr/P - 0.5/rho - 0.5*dhdr/h ) * H;
+            dHdt = (-0.5*(dl2dt-AA*AA*de2dt)/(l2-AA*AA*(e2-1.0))
+                    + 0.5*dpdt/P - 0.5*dhdt/h ) * H;
+        }
+        else
+        {
+            H = sqrt(r*r*r*P / (rho*h*M)) * (a/w);
+            dHdr = (-dwdr/w + 0.5*dpdr/P - 0.5/rho - 0.5*dhdr/h) * H; 
+            dHdt = (-dwdt/w + 0.5*dpdt/P - 0.5*dhdt/h) * H; 
+        }
         
         //f-values
         f1 = (h*w*w - P/rho) / w - A;

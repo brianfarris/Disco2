@@ -56,15 +56,16 @@ plt.xlabel("y")
 plt.subplot(223)
 plt.plot(z, data, 'k.')
 plt.xlabel("z")
+plt.savefig("prim_plot.png")
 
 if(equat):
-    plt.subplot(224)
+    plt.figure()
     plt.xlim(x.min(),x.max())
     plt.ylim(y.min(),y.max())
     plt.gca().set_aspect('equal')
     plt.tricontourf(triang, data[inds],v,cmap=plt.cm.afmhot_r)
     plt.colorbar()
+    plt.savefig("prim_plot_equat.png")
 
-plt.savefig("prim_plot.png")
 plt.show()
 

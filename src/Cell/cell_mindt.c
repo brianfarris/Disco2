@@ -403,6 +403,9 @@ double cell_mindt_grdisc(struct Cell ***theCells, struct Sim *theSim)
                     b[mu] = metric_shift_d(g,mu);
                 u[0] = 1.0 / sqrt(-metric_g_dd(g,0,0) - metric_square3_u(g,v)
                                 - 2*(v[0]*b[0]+v[1]*b[1]+v[2]*b[2]));
+                u[1] = u[0]*v[0];
+                u[2] = u[0]*v[1];
+                u[3] = u[0]*v[2];
 
                 rho = theCells[k][i][j].prim[RHO];
                 Pp = eos_ppp(theCells[k][i][j].prim, theSim);
@@ -410,7 +413,26 @@ double cell_mindt_grdisc(struct Cell ***theCells, struct Sim *theSim)
                 cs2 = eos_cs2(theCells[k][i][j].prim, theSim);
 
                 rhoh = rho + rho*eps + Pp;
-                H = sqrt(r*r*r*Pp / (M*rhoh)) / u[0];
+                if(sim_Metric(theSim) == KERR_KS)
+                {
+                    double A = M*sim_GravA(theSim);
+                    double l2 = 0.0;
+                    double e2 = 0.0;
+                    int mu;
+
+                    for(mu = 0; mu < 4; mu++)
+                    {
+                        e2 += metric_g_dd(g,0,mu)*u[mu];
+                        l2 += metric_g_dd(g,2,mu)*u[mu];
+                    }
+                    e2 = e2*e2;
+                    l2 = l2*l2;
+
+                    H = r*r * sqrt(Pp / (rhoh * (l2-A*A*(e2-1.0))));
+
+                }
+                else
+                    H = sqrt(r*r*r*Pp / (M*rhoh)) / u[0];
 
                 if(alpha < 0.0)
                     nu_visc = -alpha;
@@ -432,7 +454,6 @@ double cell_mindt_grdisc(struct Cell ***theCells, struct Sim *theSim)
                     sqrtg = metric_sqrtgamma(g)/r;
                     for(mu = 0; mu < 4; mu++)
                         U[mu] = metric_frame_U_u(g, mu, theSim);
-                    u[1] = u[0]*v[0]; u[2] = u[0]*v[1]; u[3] = u[0]*v[2];
                     
                     for(mu=0; mu<4; mu++)
                         u_d[mu] = 0.0;

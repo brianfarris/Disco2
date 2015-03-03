@@ -8,7 +8,7 @@ import readChkpt as rc
 
 GAM = 5.0/3.0
 M = 3.0
-a = 0.95
+a = 0.0
 scale = 'log'
 eos_x1 = 1.0
 eos_x2 = 1.0
@@ -81,14 +81,14 @@ def plot_r_profile_single(r, f, sca, ylabel, bounds=None, R=None, F=None):
     plt.axvspan(plt.xlim()[0], 2*M, color='lightgrey', alpha=0.5)
     plt.xlim(r.min(), r.max())
 
-    if bounds is not None:
-        if sca == "log":
-            upper = 10.0 ** (math.ceil(math.log10(bounds[1]))+0.1)
-            if bounds[0] > 0:
-                lower = 10.0 ** (math.floor(math.log10(bounds[0]))-0.1)
-            else:
-                lower = 10.0 ** (math.floor(math.log10(f[f>0].min()))-0.1)
-            plt.ylim(lower, upper)
+    #if bounds is not None:
+    #    if sca == "log":
+    #        upper = 10.0 ** (math.ceil(math.log10(bounds[1]))+0.1)
+    #        if bounds[0] > 0:
+    #            lower = 10.0 ** (math.floor(math.log10(bounds[0]))-0.1)
+    #        else:
+    #            lower = 10.0 ** (math.floor(math.log10(f[f>0].min()))-0.1)
+    #        plt.ylim(lower, upper)
 
 def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
 
@@ -167,8 +167,8 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
 
     if bounds is None:
         bounds = []
-        bounds.append([rho.min(), rho.max()])
-        bounds.append([T.min(), T.max()])
+        bounds.append([rho[rho==rho].min(), rho[rho==rho].max()])
+        bounds.append([T[T==T].min(), T[T==T].max()])
         bounds.append([Ptot.min(), Ptot.max()])
         bounds.append([(-vr[vr<0]).min(), (-vr[vr<0]).max()])
         bounds.append([vp[vp>0].min(), vp[vp>0].max()])
@@ -267,12 +267,13 @@ if __name__ == "__main__":
 
     else:
         all_bounds = np.zeros((9,2))
-        all_bounds[:,0] = np.inf
-        all_bounds[:,1] = -np.inf
-        for filename in sys.argv[1:]:
-            fig, bounds = plot_r_profile(filename, sca=scale, plot=False)
-            all_bounds[:,0] = np.minimum(all_bounds[:,0], bounds[:,0])
-            all_bounds[:,1] = np.maximum(all_bounds[:,1], bounds[:,1])
+        #all_bounds[:,0] = np.inf
+        #all_bounds[:,1] = -np.inf
+        #for filename in sys.argv[1:]:
+            #fig, bounds = plot_r_profile(filename, sca=scale, plot=False)
+            #fig, bounds = plot_r_profile(filename, sca=scale, plot=False)
+            #all_bounds[:,0] = np.minimum(all_bounds[:,0], bounds[:,0])
+            #all_bounds[:,1] = np.maximum(all_bounds[:,1], bounds[:,1])
 
         for filename in sys.argv[1:]:
             fig, bounds = plot_r_profile(filename, sca=scale, plot=True,

@@ -12,11 +12,11 @@ GravMassType            0       // 0 none, 1 single, 2 binary
 Background              3       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
 Metric                  4       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS, 4 Kerr-KS
-Frame                   2       // 0 Euler, 1 Keplerian, 2 Accreting
+Frame                   0       // 0 Euler, 1 Keplerian, 2 Accreting
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR			128			//Radial Zones
+NumR			256			//Radial Zones
 NumZ			1       //Vertical Zones
 ng        2
 R_Min		  2.5e0
@@ -78,7 +78,7 @@ InitPar2        2.0e+7      // rho0
 InitPar3        4.0e-4      // T0
 InitPar4        -1.0        // VR0
 InitPar5        -0.5        // rho powerlaw
-InitPar6        -0.5      // T powerlaw
+InitPar6        -1.0      // T powerlaw
 
 PHI_ORDER               2
 
