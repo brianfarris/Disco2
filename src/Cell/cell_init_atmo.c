@@ -49,7 +49,7 @@ void cell_init_atmo_normal(struct Cell *c, double r, double phi, double z,
     double sina = impactpar/r1;
     double yp = fabs(y + sina/sqrt(1-sina*sina)*(x - r1)) / sqrt(1.0+sina*sina/(1-sina*sina));
 
-    if(yp < 20*M && r > r1)
+    if(yp < 20*M && r > r1 && x > 0)
     {
         double v = sqrt(2*M/r1); //Newtonian parabolic orbit.
         double scale = exp(-yp*yp/(2*(5*M)*(5*M))) * 0.5*(atan((r-r1-20*M)/(20*M))+1.0);
