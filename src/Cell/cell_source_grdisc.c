@@ -82,7 +82,16 @@ void cell_add_src_grdisc( struct Cell ***theCells, struct Sim *theSim,
                 cs2 = eos_cs2(c->prim, theSim);
                 rhoh = rho + rho*eps + Pp;
                 M = sim_GravM(theSim);
-                H = sqrt(r*r*r*Pp / (rhoh*M)) / u[0];
+
+                if(sim_Metric(theSim) == KERR_KS)
+                {
+                    double A = M*sim_GravA(theSim);
+
+                    H = r*r * sqrt(Pp / (rhoh * (u_d[2]*u_d[2]
+                                    -A*A * (u_d[0]*u_d[0]-1.0) ) ) );
+                }
+                else
+                    H = sqrt(r*r*r*Pp / (rhoh*M)) / u[0];
                
                 //Viscous Terms
                 alpha = sim_AlphaVisc(theSim);

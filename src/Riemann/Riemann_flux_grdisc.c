@@ -179,7 +179,15 @@ void riemann_set_flux_grdisc(struct Riemann *theRiemann, struct Sim *theSim, dou
     eps = eos_eps(prim, theSim);
     rhoh = rho*(1.0 + eps) + Pp;
     M = sim_GravM(theSim);
-    H = sqrt(r*r*r*Pp / (rhoh*M)) / u0;
+
+    if(sim_Metric(theSim) == KERR_KS)
+    {
+        double A = M*sim_GravA(theSim);
+
+        H = r*r * sqrt(Pp / (rhoh*(u_d[2]*u_d[2] - A*A*(u_d[0]*u_d[0]-1.0))));
+    }
+    else
+        H = sqrt(r*r*r*Pp / (rhoh*M)) / u0;
 
     //The Fluxes.
     F[DDD] = hn*sqrtg*a*u0 * rho*vn * H;
@@ -353,7 +361,26 @@ void riemann_visc_flux_grdisc(struct Riemann *theRiemann, struct Sim *theSim)
     eps = eos_eps(prim, theSim);
     rhoh = prim[RHO]*(1.0 + eps) + Pp;
     cs2 = eos_cs2(prim, theSim);
-    H = sqrt(r*r*r*Pp / (rhoh*M)) / u0;
+    
+    if(sim_Metric(theSim) == KERR_KS)
+    {
+        double A = M*sim_GravA(theSim);
+        double l2 = metric_g_dd(g,0,2);
+        double e2 = metric_g_dd(g,0,0);
+
+        for(i=0; i<3; i++)
+        {
+            l2 += metric_g_dd(g,2,i+1)*v[i];
+            e2 += metric_g_dd(g,0,i+1)*v[i];
+        }
+        l2 = u0*u0*l2*l2;
+        e2 = u0*u0*e2*e2;
+
+        H = r*r * sqrt(Pp / (rhoh * (l2 - A*A*(e2-1.0))));
+    }
+    else
+        H = sqrt(r*r*r*Pp / (rhoh*M)) / u0;
+
     if(alpha > 0)
         visc = alpha * sqrt(cs2) * H * prim[RHO];
     else
