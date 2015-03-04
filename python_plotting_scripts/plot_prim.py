@@ -4,6 +4,7 @@ import matplotlib.tri as tri
 import sys
 import h5py
 import numpy as np
+import readChkpt as rc
 
 equat = False
 if(len(sys.argv) < 3):
@@ -17,20 +18,26 @@ if(len(sys.argv) > 3):
     if(sys.argv[3] == 'e'):
         equat = True
 
+dat = rc.readChkpt(filename)
+t = dat[0]
+r = dat[1]
+phi = dat[2]
+z = dat[3]
+
 #open hdf5 file
-f = h5py.File(filename,'r')
-Data = f['Data']
+#f = h5py.File(filename,'r')
+#Data = f['Data']
 
 #read in coords
-phi = array(Data[:,0])
-r = np.array(Data[:,1])
-z = np.array(Data[:,2])
+#phi = array(Data[:,0])
+#r = np.array(Data[:,1])
+#z = np.array(Data[:,2])
 
 #Get Data
-data = array(Data[:,diagnum])
+data = array(dat[diagnum+1])
 
 #close file
-f.close()
+#f.close()
 
 #convert to cartesian
 x = r * np.cos(phi)

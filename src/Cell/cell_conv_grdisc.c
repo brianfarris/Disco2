@@ -11,8 +11,10 @@
 #include "../Headers/header.h"
 
 //Local Functions
+int cons2prim_prep(double *cons, double *prim, double *pos, double dV, 
+                        struct Metric *g, struct Sim *theSim);
 int cons2prim_solve(double *cons, double *prim, double *pos, double dV, 
-                        struct Sim *theSim);
+                        struct Metric *g, struct Sim *theSim);
 
 void cell_prim2cons_grdisc(double *prim, double *cons, double *pos, 
                             double dV, struct Sim *theSim)
@@ -67,12 +69,12 @@ void cell_prim2cons_grdisc(double *prim, double *cons, double *pos,
     else
         H = sqrt(r*r*r*Pp / (rhoh*M)) / u0;
 
-    cons[DDD] = a*sqrtg*u0 * rho * H * dV;
-    cons[SRR] = a*sqrtg*rhoh*u0 * u_d[1] * H * dV;
-    cons[LLL] = a*sqrtg*rhoh*u0 * u_d[2] * H * dV;
-    cons[SZZ] = a*sqrtg*rhoh*u0 * u_d[3] * H * dV;
-    cons[TAU] = a*sqrtg*(-rhoh*u0*(U[0]*u_d[0]+U[1]*u_d[1]+U[2]*u_d[2]
-                        +U[3]*u_d[3]) - rho*u0 - U[0]*Pp) * H * dV;
+    cons[DDD] = a*sqrtg * u0 * rho * H * dV;
+    cons[SRR] = a*sqrtg * rhoh*u0 * u_d[1] * H * dV;
+    cons[LLL] = a*sqrtg * rhoh*u0 * u_d[2] * H * dV;
+    cons[SZZ] = a*sqrtg * rhoh*u0 * u_d[3] * H * dV;
+    cons[TAU] = a*sqrtg * (-rhoh*u0*(U[0]*u_d[0]+U[1]*u_d[1]+U[2]*u_d[2]
+                            +U[3]*u_d[3]) - rho*u0 - U[0]*Pp) * H * dV;
 
     for(i=sim_NUM_C(theSim); i<sim_NUM_Q(theSim); i++)
         cons[i] = prim[i] * cons[DDD];
@@ -83,7 +85,12 @@ void cell_prim2cons_grdisc(double *prim, double *cons, double *pos,
 void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
                             struct Sim *theSim)
 {
-    int err = cons2prim_solve(cons, prim, pos, dV, theSim);
+    int err;
+    struct Metric *g;
+    g = metric_create(time_global, pos[R_DIR], pos[P_DIR], pos[Z_DIR], theSim);
+
+    err = cons2prim_prep(cons, prim, pos, dV, g, theSim);
+    err = cons2prim_solve(cons, prim, pos, dV, g, theSim);
 
     if(err)
     {
@@ -109,10 +116,47 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
         printf("cons2: %.12lg %.12lg %.12lg %.12lg %.12lg\n", 
                 cons[DDD], cons[TAU], cons[SRR], cons[LLL], cons[SZZ]);
     }
+
+    metric_destroy(g);
+}
+
+int cons2prim_prep(double *cons, double *prim, double *pos, double dV, 
+                        struct Metric *g, struct Sim *theSim)
+{
+    int err = 0;
+
+    if(sim_Frame(theSim) == FR_EULER)
+    {
+        double D, tau, S[3], S2;
+
+        D = cons[DDD]/dV;
+        tau = cons[TAU]/dV;
+        S[0] = cons[SRR]/dV;
+        S[1] = cons[LLL]/dV;
+        S[2] = cons[SZZ]/dV;
+
+        S2 = metric_square3_d(g, S);
+
+        if(S2 >= tau*(tau+2*D))
+        {
+            printf("2 fast 2 cold.\n");
+            double fac = sqrt(0.98*tau*(tau+2*D)/S2);
+            cons[SRR] *= fac;
+            cons[LLL] *= fac;
+            cons[SZZ] *= fac;
+            err = 1;
+        }
+    }
+    else
+    {
+        //TODO: Figure out what to put here.
+    }
+
+    return err;
 }
 
 int cons2prim_solve(double *cons, double *prim, double *pos, double dV, 
-                        struct Sim *theSim)
+                        struct Metric *g, struct Sim *theSim)
 {
     int mu, nu, i;
     double D, S[3], tau;
@@ -122,7 +166,6 @@ int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
     double r, a, b[3], sqrtg, U[4], Ud[4], ud[4], M;
     double S2, SU, A, B, C;
     double f1, f2, df1dr, df1dt, df2dr, df2dt, detj;
-    struct Metric *g;
     int err = 0;
     double tol = 1.0e-10;
     int maxIter = 100;
@@ -134,8 +177,6 @@ int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
     S[0] = cons[SRR] / dV;
     S[1] = cons[LLL] / dV;
     S[2] = cons[SZZ] / dV;
-
-    g = metric_create(time_global, pos[R_DIR], pos[P_DIR], pos[Z_DIR], theSim);
 
     //Get some metric quantities
     a = metric_lapse(g);
@@ -364,8 +405,6 @@ int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
 
     for(i = sim_NUM_C(theSim); i < sim_NUM_Q(theSim); i++)
         prim[i] = cons[i]/cons[DDD];
-
-    metric_destroy(g);
 
     return err;
 }
