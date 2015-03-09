@@ -13,7 +13,7 @@ double fgrav( double M , double r , double eps, double n ){
 }
 
 double fgrav_neg_centrifugal( double M , double r , double eps, double n ){
-  double Om = 0.0;
+  double Om = 200.0;
   return( M*r*Om*Om );
 }
 

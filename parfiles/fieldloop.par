@@ -5,7 +5,7 @@ runtype = 0
 //Disco Parameter File//
 
 InitialDataType         4               // 0 Flock, 1 Shear, 2 vortex, 3 stone, 4 fieldloop
-GravMassType            0               // 0 none, 1 single, 2 binary
+GravMassType            1               // 0 none, 1 single, 2 binary
 MassRatio               1.0
 Restart			0		//If this=1 restart using input.h5
 
