@@ -1,6 +1,6 @@
 SET_T = 0
 HoR = 1.
-runtype = 0
+runtype = 1
 
 //Disco Parameter File//
 
