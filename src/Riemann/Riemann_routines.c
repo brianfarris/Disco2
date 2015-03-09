@@ -228,11 +228,18 @@ void riemann_set_star_hllc(struct Riemann * theRiemann,struct Sim * theSim,doubl
       + theRiemann->primR[BZZ]*theRiemann->n[2];
 
     double wp_a = sim_rOm_a(theSim,r,1.);
-    printf("Need to fix wp_a stuff when MHD is turned on\n");
-    exit(1);
+   // printf("Need to fix wp_a stuff when MHD is turned on\n");
+   // exit(1);
 
     theRiemann->Ustar[BRR] = Bsr;
+/*
     theRiemann->Ustar[BPP] = (Bsp + wp_a*(BnL-BnR)/(theRiemann->Sr-theRiemann->Sl))/r;
+	if (fabs(BnL-BnR)>1.e-8){
+printf("BnL-BnR: %e\n",BnL-BnR);
+}
+*/
+    theRiemann->Ustar[BPP] = Bsp/r;
+   
     theRiemann->Ustar[BZZ] = Bsz;
     theRiemann->Ustar[PSI] = psi;
   }
@@ -298,8 +305,8 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     double B2 = Br*Br + Bp*Bp + Bz*Bz;
 
     double wp_a = sim_rOm_a(theSim,r,1.);
-    printf("Need to fix wp_a stuff when MHD is turned on\n");
-    exit(1);
+   // printf("Need to fix wp_a stuff when MHD is turned on\n");
+   // exit(1);
 
     F[SRR] +=     .5*B2*theRiemann->n[0] - Br*Bn;
     F[LLL] += r*( .5*B2*theRiemann->n[1] - Bp*Bn );
@@ -307,7 +314,7 @@ void riemann_set_flux(struct Riemann * theRiemann, struct Sim * theSim,double GA
     F[TAU] += B2*vn - vB*Bn;
     double psi = prim[PSI];
     F[BRR] =(Br*vn - vr*Bn + psi*theRiemann->n[0]);
-    F[BPP] =(Bp*vn - vp*Bn /*+ wp_a*Bn*/ + psi*theRiemann->n[1])/r;
+    F[BPP] =(Bp*vn - vp*Bn + /*wp_a*Bn +*/ psi*theRiemann->n[1])/r;
     F[BZZ] = Bz*vn - vz*Bn + psi*theRiemann->n[2];
     F[PSI] = pow(DIVB_CH,2.)*Bn + wp_a*psi*theRiemann->n[1];
   }

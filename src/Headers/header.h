@@ -15,7 +15,7 @@ enum{HLLC,HLL};
 #include "mpi.h"
 MPI_Comm sim_comm;
 #define farris_mpi_factorization 0
-#define NO_W_IN_CFL 0
+#define NO_W_IN_CFL 1
 #define KEP_BNDRY 0
 #define BzZ 0
 #define BNORM_AVG 0
@@ -28,4 +28,5 @@ MPI_Comm sim_comm;
 #define EXTRAP_BC 0
 #define SS_BCS 0
 #define w_a_milos_index 8
+#define Fieldloop_Omega 100.
 double time_global;
