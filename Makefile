@@ -12,8 +12,8 @@ GSL = /home/install/app/gsl_gcc_mpi
 #H55 = /share/apps/hdf5/1.8.2/openmpi/intel
 endif
 ifeq ($(UNAME),Darwin)
-H55 = /usr/local/hdf5
-GSL = /opt/local
+H55 = /usr/local/
+GSL = /usr/local
 #H55 = /opt/local/
 endif
 
