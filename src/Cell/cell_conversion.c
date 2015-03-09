@@ -20,7 +20,7 @@ void cell_prim2cons( double * prim , double * cons , double r , double phi, doub
     double v2  = vr*vr + vp*vp + vz*vz;
 
     double xi_g = 0.1;
-    double xi_r_times_xi_g_pow_8 = 1.e-2;
+    double xi_r_times_xi_g_pow_8 = 1.e-1;
     double xi_r =  xi_r_times_xi_g_pow_8*pow(xi_g,-8);
 
     int NumGravMass = sim_NumGravMass(theSim);
@@ -94,7 +94,7 @@ void cell_cons2prim( double * cons , double * prim , double r , double phi, doub
     double rhoe = E - KE;
 
     double xi_g = 0.1;
-    double xi_r_times_xi_g_pow_8 = 1.e-2;
+    double xi_r_times_xi_g_pow_8 = 1.e-1;
     double xi_r =  xi_r_times_xi_g_pow_8*pow(xi_g,-8);
 
     double Tguess;

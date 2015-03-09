@@ -11,7 +11,7 @@
 
 void cell_single_init_beta(struct Cell *theCell, struct Sim *theSim,struct GravMass * theGravMasses,int i,int j,int k){
 
-    double r0 = 0.3;
+    double r0 = 0.4;
     int d=2;
     double rm = sim_FacePos(theSim,i-1,R_DIR);
     double rp = sim_FacePos(theSim,i,R_DIR);
@@ -19,7 +19,7 @@ void cell_single_init_beta(struct Cell *theCell, struct Sim *theSim,struct GravM
 
     double Gamma = sim_GAMMALAW(theSim);
     double xi_g = 0.1;
-    double xi_r_times_xi_g_pow_8 = 1.e-2;
+    double xi_r_times_xi_g_pow_8 = 1.e-1;
     double xi_r =  xi_r_times_xi_g_pow_8*pow(xi_g,-8);
 
     double Sigma =  pow(r,-3./5.)*exp(-pow(r/r0,-d));
@@ -40,11 +40,11 @@ void cell_single_init_beta(struct Cell *theCell, struct Sim *theSim,struct GravM
 
 void cell_init_beta(struct Cell ***theCells,struct Sim *theSim,struct GravMass * theGravMasses,struct MPIsetup * theMPIsetup) {
 
-    double r0 = 0.3;
+    double r0 = 0.4;
     int d=2;
     double Gamma = sim_GAMMALAW(theSim);
     double xi_g = 0.1;
-    double xi_r_times_xi_g_pow_8 = 1.e-2;
+    double xi_r_times_xi_g_pow_8 = 1.e-1;
     double xi_r =  xi_r_times_xi_g_pow_8*pow(xi_g,-8);
 
     int i, j,k;
