@@ -1,3 +1,4 @@
+#TODO: Check if Makefile.in exists
 MAKEFILE_IN = $(PWD)/Makefile.in
 include $(MAKEFILE_IN)
 
