@@ -139,7 +139,7 @@ int cons2prim_prep(double *cons, double *prim, double *pos, double dV,
 
         if(S2 >= tau*(tau+2*D))
         {
-            printf("2 fast 2 cold.\n");
+            printf("2 fast 2 cold. r = %.12lg\n", pos[R_DIR]);
             double fac = sqrt(0.98*tau*(tau+2*D)/S2);
             cons[SRR] *= fac;
             cons[LLL] *= fac;
