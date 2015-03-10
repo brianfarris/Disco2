@@ -21,7 +21,13 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim){
     double vr  = prim[URR];
     double vz  = prim[UZZ];
     double cs  = sqrt(sim_GAMMALAW(theSim)*Pp/rho);
-    double cf2 = cs*cs;
+
+    double Br  = prim[BRR];
+    double Bp  = prim[BPP];
+    double Bz  = prim[BZZ];
+    double b2  = (Br*Br+Bp*Bp+Bz*Bz)/rho;
+
+    double cf2 = cs*cs + b2;
 
     double maxv = sqrt(cf2) + sqrt( vr*vr + vp*vp + vz*vz );
 

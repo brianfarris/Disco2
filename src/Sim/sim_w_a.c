@@ -13,8 +13,8 @@ double sim_rOm_a(struct Sim * theSim,double r,double a){
     //keplerian rotation
     return(pow(r,-0.5));
   }else if (sim_W_ANALYTIC_TYPE(theSim)==A_OMEGA20){
-    //rigid rotation with Omega = 20
-    return(r*20); 
+    //rigid rotation with Omega = Fieldloop_Omega
+    return(r*Fieldloop_Omega); 
   }else if (sim_W_ANALYTIC_TYPE(theSim)==A_MILOS){
     //Useful for Milos/MacFadyen disks
     //return((1.-exp(-pow((r/0.5),w_a_milos_index)))/sqrt(r)); 

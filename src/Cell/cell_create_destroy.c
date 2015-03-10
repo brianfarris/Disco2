@@ -79,11 +79,22 @@ struct Cell ***cell_create(struct Sim *theSim,struct MPIsetup * theMPIsetup){
                 theCells[k][i][j].cons[SRR] = 0.0;
                 theCells[k][i][j].cons[LLL] = 0.0;
                 theCells[k][i][j].cons[SZZ] = 0.0;
+          	theCells[k][i][j].prim[BRR] = 0.0;
+          	theCells[k][i][j].prim[BPP] = 0.0;
+          	theCells[k][i][j].prim[BZZ] = 0.0;
+          	theCells[k][i][j].cons[BRR] = 0.0;
+          	theCells[k][i][j].cons[BPP] = 0.0;
+          	theCells[k][i][j].cons[BZZ] = 0.0;
+     
                 theCells[k][i][j].RKcons[DDD] = 0.0;
                 theCells[k][i][j].RKcons[TAU] = 0.0;
                 theCells[k][i][j].RKcons[SRR] = 0.0;
                 theCells[k][i][j].RKcons[LLL] = 0.0;
                 theCells[k][i][j].RKcons[SZZ] = 0.0;
+    		theCells[k][i][j].RKcons[BRR] = 0.0;
+          	theCells[k][i][j].RKcons[BPP] = 0.0;
+          	theCells[k][i][j].RKcons[BZZ] = 0.0;
+
                 theCells[k][i][j].wiph = 0.0;
                 theCells[k][i][j].tiph = tiph;
                 theCells[k][i][j].RKtiph = tiph;

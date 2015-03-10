@@ -19,11 +19,20 @@ void cell_prim2cons( double * prim , double * cons , double r , double dV ,struc
   double v2  = vr*vr + vp*vp + vz*vz;
   double rhoe = Pp/(GAMMALAW - 1.);
 
+  double Br  = prim[BRR];
+  double Bp  = prim[BPP];
+  double Bz  = prim[BZZ];
+  double B2 = Br*Br + Bp*Bp + Bz*Bz;
+
+
   cons[DDD] = rho*dV;
   cons[SRR] = rho*vr*dV;
   cons[LLL] = r*rho*vp*dV; // note that the conserved variable is angular momentum, not linear momentum
   cons[SZZ] = rho*vz*dV;
-  cons[TAU] = ( .5*rho*v2 + rhoe )*dV;
+  cons[TAU] = ( .5*rho*v2 + rhoe + .5*B2 )*dV;
+  cons[BRR] = Br*dV;
+  cons[BPP] = Bp*dV/r; // note that the conserved variable is Bp/r. This helps us reduce geometric source terms
+  cons[BZZ] = Bz*dV;
 
   int q;
   for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q ){
@@ -75,7 +84,15 @@ void cell_cons2prim( double * cons , double * prim , double r , double dV ,struc
   double KE = .5*( Sr*vr + Sp*vp + Sz*vz );
   double v_magnitude = sqrt(2.*KE/rho);
 
-  double rhoe = E - KE;
+  double Br  = cons[BRR]/dV;
+  double Bp  = cons[BPP]/dV*r;
+  double Bz  = cons[BZZ]/dV;
+  double B2 = Br*Br+Bp*Bp+Bz*Bz;
+  prim[BRR] = Br;
+  prim[BPP] = Bp;
+  prim[BZZ] = Bz;
+
+  double rhoe = E - KE - .5*B2;
   double Pp = (GAMMALAW-1.)*rhoe;
 
   if( Pp < CS_FLOOR*CS_FLOOR*rho/GAMMALAW ) {
