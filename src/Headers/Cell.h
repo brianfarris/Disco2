@@ -73,6 +73,8 @@ void cell_init_adaf2(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_adaf2(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_atmo(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_atmo(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_orbit(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_orbit(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data

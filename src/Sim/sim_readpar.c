@@ -118,6 +118,10 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "CoolPar2"           , VAR_DOUB , &(theSim->CoolPar2)  );
       err += readvar( pfile , "CoolPar3"           , VAR_DOUB , &(theSim->CoolPar3)  );
       err += readvar( pfile , "CoolPar4"           , VAR_DOUB , &(theSim->CoolPar4)  );
+      err += readvar( pfile , "BoostType"       , VAR_INT , &(theSim->BoostType)  );
+      err += readvar( pfile , "BinA"           , VAR_DOUB , &(theSim->BinA)  );
+      err += readvar( pfile , "BinW"           , VAR_DOUB , &(theSim->BinW)  );
+      err += readvar( pfile , "BinM"           , VAR_DOUB , &(theSim->BinM)  );
     }
     MPI_Barrier(MPI_COMM_WORLD);
   }

@@ -76,7 +76,7 @@ InitPar0        0           // 0 Normal
 InitPar1        1.0         // rho0
 InitPar2        1.0e-4      // T0
 InitPar3        1.0e6       // rho1
-InitPar4        1.0e-4       // T1
+InitPar4        1.0e-10       // T1
 InitPar5        120.0       // r1
 InitPar6        100.0        // b
 
@@ -84,7 +84,7 @@ PHI_ORDER               2
 
 //Atmosphere Parameters
 Rho_Floor		0.000001
-Cs_Floor		1.0e-10 // T floor in GRDISC
+Cs_Floor		1.0e-14 // T floor in GRDISC
 Cs_Cap			1.0
 Vel_Cap			100.0
 

@@ -217,3 +217,15 @@ double sim_CoolPar3(struct Sim *theSim){
 double sim_CoolPar4(struct Sim *theSim){
   return(theSim->CoolPar4);
 }
+int sim_BoostType(struct Sim *theSim){
+  return(theSim->BoostType);
+}
+double sim_BinA(struct Sim *theSim){
+  return(theSim->BinA);
+}
+double sim_BinW(struct Sim *theSim){
+  return(theSim->BinW);
+}
+double sim_BinM(struct Sim *theSim){
+  return(theSim->BinM);
+}

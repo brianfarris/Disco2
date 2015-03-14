@@ -82,6 +82,10 @@ struct Sim {
   double CoolPar2;
   double CoolPar3;
   double CoolPar4;
+  int BoostType;
+  double BinA;
+  double BinW;
+  double BinM;
 };
 #endif
 
@@ -157,6 +161,10 @@ double sim_CoolPar1(struct Sim *);
 double sim_CoolPar2(struct Sim *);
 double sim_CoolPar3(struct Sim *);
 double sim_CoolPar4(struct Sim *);
+int sim_BoostType(struct Sim *);
+double sim_BinA(struct Sim *);
+double sim_BinW(struct Sim *);
+double sim_BinM(struct Sim *);
 
 int sim_GravMassType(struct Sim * );
 //set Grid data

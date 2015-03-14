@@ -49,6 +49,7 @@ void cell_add_src_grdisc( struct Cell ***theCells, struct Sim *theSim,
                 struct Metric *g;
                 double dv[12];
                 double qdot, visc[16], viscm[16], alpha;
+                double T[16], Tm[16];
                 
                 g = metric_create(time_global, r, phi, z, theSim);
                 a = metric_lapse(g);
@@ -123,13 +124,11 @@ void cell_add_src_grdisc( struct Cell ***theCells, struct Sim *theSim,
 
                 //If 2-D, no z-shear
                 if(sim_N(theSim,Z_DIR)==1)
-                {
                     for(mu=0; mu<4; mu++)
                     {
                         visc[4*mu+3] = 0.0;
                         visc[4*3+mu] = 0.0;
                     }
-                }
             
                 for(mu=0; mu<16; mu++)
                     visc[mu] *= -alpha;
@@ -139,6 +138,22 @@ void cell_add_src_grdisc( struct Cell ***theCells, struct Sim *theSim,
                     for(nu=0; nu<4; nu++)
                         for(la=0; la<4; la++)
                             viscm[4*mu+nu] += metric_g_dd(g,nu,la)*visc[4*mu+la];
+
+                // Stress-Energy Tensor T.
+                // (2,0) T[4*mu+nu] = T^{mu nu}
+                // (1,1) Tm[4*mu+nu] = T^mu_nu
+                for(mu=0; mu<4; mu++)
+                {
+                    for(nu=0; nu<4; nu++)
+                    {
+                        T[4*mu+nu] = rhoh*u[mu]*u[nu]
+                                    + Pp*metric_g_uu(g,mu,nu)
+                                    + visc[4*mu+nu];
+                        Tm[4*mu+nu] = rhoh*u[mu]*u_d[nu]
+                                    + viscm[4*mu+nu];
+                    }
+                    Tm[4*mu+mu] += Pp;
+                }
 
                 //Momentum sources and contribution to energy source
                 s = 0;
@@ -151,14 +166,9 @@ void cell_add_src_grdisc( struct Cell ***theCells, struct Sim *theSim,
                     {
                         sk = 0;
                         for(mu=0; mu<max_dim; mu++)
-                        {
-                            sk += 0.5*(rhoh*u[mu]*u[mu]+Pp*metric_g_uu(g,mu,mu)
-                                    +visc[4*mu+mu]) * metric_dg_dd(g,la,mu,mu);
-                            for(nu=mu+1; nu<max_dim; nu++)
-                                sk += (rhoh*u[mu]*u[nu]+Pp*metric_g_uu(g,mu,nu)
-                                        +visc[4*mu+nu])
-                                    * metric_dg_dd(g,la,mu,nu);
-                        }
+                            for(nu=0; nu<max_dim; nu++)
+                                sk += 0.5*T[4*mu+nu]*metric_dg_dd(g,la,mu,nu);
+
                         if(la == 1)
                         {
                             c->cons[SRR] += dt*dV*sqrtg*a * sk * H;
@@ -186,17 +196,9 @@ void cell_add_src_grdisc( struct Cell ***theCells, struct Sim *theSim,
                     }
 
                 //Remaining energy sources
-                
                 for(mu=0; mu<max_dim; mu++)
                     for(nu=0; nu<max_dim; nu++)
-                    {
-                        if(mu == nu)
-                            s -= (rhoh*u[mu]*u_d[nu] + Pp + viscm[4*mu+nu])
-                                    * metric_frame_dU_du(g,mu,nu,theSim);
-                        else
-                            s -= (rhoh*u[mu]*u_d[nu] + viscm[4*mu+nu])
-                                    * metric_frame_dU_du(g,mu,nu,theSim);
-                    }
+                        s -= Tm[4*mu+nu] * metric_frame_dU_du(g,mu,nu,theSim);
                 
                 if(PRINTTOOMUCH)
                 {
