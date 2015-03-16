@@ -43,6 +43,8 @@ void cell_init_SStest(struct Cell ***,struct Sim *,struct GravMass *, struct MPI
 void cell_single_init_SStest(struct Cell *, struct Sim *,struct GravMass *,int ,int ,int );
 void cell_init_fieldloop(struct Cell ***,struct Sim *,struct GravMass *, struct MPIsetup *);
 void cell_single_init_fieldloop(struct Cell *, struct Sim *,struct GravMass *,int ,int ,int );
+void cell_init_flock(struct Cell ***,struct Sim *,struct GravMass *, struct MPIsetup *);
+void cell_single_init_flock(struct Cell *, struct Sim *,struct GravMass *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct GravMass *,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,struct GravMass *,int,int,int );
 ///retrieve data
