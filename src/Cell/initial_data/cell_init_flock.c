@@ -9,7 +9,7 @@
 #include "../../Headers/MPIsetup.h"
 #include "../../Headers/header.h"
 
-void cell_single_init_flock(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
+void cell_single_init_flock(struct Cell *theCell, struct Sim *theSim, struct GravMass * theGravMasses,int i,int j,int k){
   double DISK_MACH = 10.;
   double GAMMALAW = sim_GAMMALAW(theSim);
   double rm =  sim_FacePos(theSim,i-1,R_DIR);
@@ -32,7 +32,7 @@ void cell_single_init_flock(struct Cell *theCell, struct Sim *theSim,int i,int j
   theCell->wiph = omega*r;
 }
 
-void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup) {
+void cell_init_flock(struct Cell ***theCells,struct Sim *theSim,struct GravMass * theGravMasses, struct MPIsetup * theMPIsetup) {
 
   double DISK_MACH = 10.;
   double GAMMALAW = sim_GAMMALAW(theSim);
