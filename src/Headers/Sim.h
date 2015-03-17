@@ -23,6 +23,11 @@ struct Sim {
   int BoundTypeROut;
   int BoundTypeZBot;
   int BoundTypeZTop;
+  int BoundTypeSource;
+  double BoundPar1;
+  double BoundPar2;
+  double BoundPar3;
+  double BoundPar4;
   int NoInnerBC;
   int Restart;
   int Background;
@@ -82,6 +87,10 @@ struct Sim {
   double CoolPar2;
   double CoolPar3;
   double CoolPar4;
+  int BoostType;
+  double BinA;
+  double BinW;
+  double BinM;
 };
 #endif
 
@@ -105,6 +114,11 @@ int sim_BoundTypeRIn(struct Sim *);
 int sim_BoundTypeROut(struct Sim *);
 int sim_BoundTypeZBot(struct Sim *);
 int sim_BoundTypeZTop(struct Sim *);
+int sim_BoundTypeSource(struct Sim *);
+double sim_BoundPar1(struct Sim *);
+double sim_BoundPar2(struct Sim *);
+double sim_BoundPar3(struct Sim *);
+double sim_BoundPar4(struct Sim *);
 int sim_N_global(struct Sim *,int);
 int sim_Ncells(struct Sim *);
 int sim_Ncells_global(struct Sim *);
@@ -157,6 +171,10 @@ double sim_CoolPar1(struct Sim *);
 double sim_CoolPar2(struct Sim *);
 double sim_CoolPar3(struct Sim *);
 double sim_CoolPar4(struct Sim *);
+int sim_BoostType(struct Sim *);
+double sim_BinA(struct Sim *);
+double sim_BinW(struct Sim *);
+double sim_BinM(struct Sim *);
 
 int sim_GravMassType(struct Sim * );
 //set Grid data

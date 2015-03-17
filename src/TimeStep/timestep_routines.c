@@ -210,7 +210,12 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
     } else if (sim_BoundTypeZTop(theSim)==BOUND_PERIODIC){
       //do nothing, this is already handled by the syncing routine
     }
-  } 
+  }
+
+  // Add External Sources
+  if(sim_BoundTypeSource(theSim) == BOUND_NOZZLE)
+      cell_boundary_nozzle(theCells, theSim, theMPIsetup, theTimeStep);
+
   //clean up
   face_destroy(theFaces_r);
   if (sim_N_global(theSim,Z_DIR)>1){

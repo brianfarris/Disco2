@@ -49,6 +49,21 @@ int sim_BoundTypeZBot(struct Sim *theSim){
 int sim_BoundTypeZTop(struct Sim *theSim){
   return(theSim->BoundTypeZTop);
 }
+int sim_BoundTypeSource(struct Sim *theSim){
+  return(theSim->BoundTypeSource);
+}
+double sim_BoundPar1(struct Sim *theSim){
+  return(theSim->BoundPar1);
+}
+double sim_BoundPar2(struct Sim *theSim){
+  return(theSim->BoundPar2);
+}
+double sim_BoundPar3(struct Sim *theSim){
+  return(theSim->BoundPar3);
+}
+double sim_BoundPar4(struct Sim *theSim){
+  return(theSim->BoundPar4);
+}
 int sim_Ncells(struct Sim *theSim){
   return(theSim->Ncells);
 }
@@ -216,4 +231,16 @@ double sim_CoolPar3(struct Sim *theSim){
 }
 double sim_CoolPar4(struct Sim *theSim){
   return(theSim->CoolPar4);
+}
+int sim_BoostType(struct Sim *theSim){
+  return(theSim->BoostType);
+}
+double sim_BinA(struct Sim *theSim){
+  return(theSim->BinA);
+}
+double sim_BinW(struct Sim *theSim){
+  return(theSim->BinW);
+}
+double sim_BinM(struct Sim *theSim){
+  return(theSim->BinM);
 }

@@ -11,16 +11,16 @@ import numpy as np
 import readChkpt as rc
 
 GAM = 5.0/3.0
-M = 3.0
+M = 1.0
 a = 0.0
 gridscale = 'linear'
-datscale = 'log'
+datscale = 'linear'
 A = a*M
 cmap = plt.cm.jet
 
 def plot_equat_single(fig, ax, mesh, dat, gridscale="linear", gridbounds=None,
                     datscale="linear", datbounds=None, label=None, **kwargs):
-    N = 100
+    N = 400
 
     #Set data bounds & scale.
     if datbounds is None:
@@ -43,13 +43,14 @@ def plot_equat_single(fig, ax, mesh, dat, gridscale="linear", gridbounds=None,
     colorbar = fig.colorbar(C, format=formatter, ticks=locator)
 
     #Patches to highlight horizona and ergosphere
-    ergo = pat.Circle((0,0), 2*M)
-    horizon = pat.Wedge((0,0), M*(1.0+math.sqrt(1.0-a*a)), 0, 360, 
-                        2*M*math.sqrt(1.0-a*a))
-    patches = coll.PatchCollection([ergo,horizon], cmap=plt.cm.Greys,alpha=0.4)
-    colors = np.array([0.1,0.3])
-    patches.set_array(colors)
-    ax.add_collection(patches)
+    if M > 0.0:
+        ergo = pat.Circle((0,0), 2*M)
+        horizon = pat.Wedge((0,0), M*(1.0+math.sqrt(1.0-a*a)), 0, 360, 
+                            2*M*math.sqrt(1.0-a*a))
+        patches = coll.PatchCollection([ergo,horizon], cmap=plt.cm.Greys,alpha=0.4)
+        colors = np.array([0.1,0.3])
+        patches.set_array(colors)
+        ax.add_collection(patches)
 
     #Formatting
     ax.set_aspect('equal')
@@ -94,6 +95,8 @@ def plot_all(filename, gridscale='linear', plot=True, bounds=None):
     T = dat[5]
     vr = dat[6]
     vp = dat[7]
+    dV = dat[9]
+    q = dat[10]
 
     inds = z==z[len(z)/2]
     r = r[inds]
@@ -103,6 +106,8 @@ def plot_all(filename, gridscale='linear', plot=True, bounds=None):
     T = T[inds]
     vr = vr[inds]
     vp = vp[inds]
+    dV = dV[inds]
+    q = q[inds]
 
     if bounds is None:
         bounds = []
@@ -110,6 +115,7 @@ def plot_all(filename, gridscale='linear', plot=True, bounds=None):
         bounds.append([T[T==T].min(), T[T==T].max()])
         bounds.append([vr[vr==vr].min(), vr[vr==vr].max()])
         bounds.append([vp[vp==vp].min(), vp[vp==vp].max()])
+        bounds.append([q[q==q].min(), q[q==q].max()])
         bounds = np.array(bounds)
 
     if plot:
@@ -133,6 +139,8 @@ def plot_all(filename, gridscale='linear', plot=True, bounds=None):
                     "_".join(chckname.split(".")[0].split("_")[1:]), "vr")
         vpname = "plot_disc_equat_{0}_{1}.png".format(
                     "_".join(chckname.split(".")[0].split("_")[1:]), "vp")
+        qname = "plot_disc_equat_{0}_{1}.png".format(
+                    "_".join(chckname.split(".")[0].split("_")[1:]), "q")
         #Plot.
 
         #Rho
@@ -155,6 +163,12 @@ def plot_all(filename, gridscale='linear', plot=True, bounds=None):
                 datscale="linear", datbounds=bounds[3],
                 label=r'$v^\phi$', title=title, filename=vpname, cmap=cmap)
 
+        #q
+        make_plot(mesh, q, gridscale="linear", gridbounds=None,
+                datscale="linear", datbounds=bounds[4],
+                label=r'$q$', title=title, filename=qname, cmap=cmap)
+        print (q*dV).sum()
+
     return bounds
 
 
@@ -170,14 +184,16 @@ if __name__ == "__main__":
         plt.show()
 
     else:
-        bounds = np.zeros((4,2))
+        bounds = np.zeros((5,2))
         bounds[:,0] = np.inf
         bounds[:,1] = -np.inf
         for filename in sys.argv[1:]:
             b = plot_all(filename, gridscale=gridscale, plot=False)
             lower = b[:,0]<bounds[:,0]
             upper = b[:,1]>bounds[:,1]
-            bounds[lower] = b[lower]
-            bounds[upper] = b[upper]
+            bounds[lower,0] = b[lower,0]
+            bounds[upper,1] = b[upper,1]
+
         for filename in sys.argv[1:]:
             plot_all(filename, gridscale=gridscale, plot=True, bounds=bounds)
+

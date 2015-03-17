@@ -9,6 +9,12 @@
 #include "../Headers/Metric.h"
 #include "../Headers/header.h"
 
+//Local Functions
+static int cons2prim_prep(double *cons, double *prim, double *pos, double dV, 
+                        struct Metric *g, struct Sim *theSim);
+static int cons2prim_solve(double *cons, double *prim, double *pos, double dV, 
+                        struct Metric *g, struct Sim *theSim);
+
 void cell_prim2cons_gr( double * prim , double * cons , double *pos , double dV ,struct Sim * theSim)
 {
     int i,j;
@@ -77,10 +83,59 @@ void cell_prim2cons_gr( double * prim , double * cons , double *pos , double dV 
     metric_destroy(g);
 }
 
-void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struct Sim *theSim)
+void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, 
+                        struct Sim *theSim)
+{
+    int err;
+    struct Metric *g;
+    g = metric_create(time_global, pos[R_DIR],pos[P_DIR],pos[Z_DIR], theSim);
+
+    err = cons2prim_prep(cons, prim, pos, dV, g, theSim);
+    err = cons2prim_solve(cons, prim, pos, dV, g, theSim);
+
+    metric_destroy(g);
+}
+
+static int cons2prim_prep(double *cons, double *prim, double *pos, double dV, 
+                        struct Metric *g, struct Sim *theSim)
+{
+    int err = 0;
+
+    if(sim_Frame(theSim) == FR_EULER)
+    {
+        double D, tau, S[3], S2;
+
+        D = cons[DDD]/dV;
+        tau = cons[TAU]/dV;
+        S[0] = cons[SRR]/dV;
+        S[1] = cons[LLL]/dV;
+        S[2] = cons[SZZ]/dV;
+
+        S2 = metric_square3_d(g, S);
+
+        if(S2 >= tau*(tau+2*D))
+        {
+            if(pos[R_DIR] >= metric_horizon(theSim))
+                printf("2 fast 2 cold. r = %.12lg\n", pos[R_DIR]);
+            double fac = sqrt(0.98*tau*(tau+2*D)/S2);
+            cons[SRR] *= fac;
+            cons[LLL] *= fac;
+            cons[SZZ] *= fac;
+            err = 1;
+        }
+    }
+    else
+    {
+        //TODO: Figure out what to put here.
+    }
+
+    return err;
+}
+
+static int cons2prim_solve(double *cons, double *prim, double *pos, double dV, 
+                        struct Metric *g, struct Sim *theSim)
 {
     int i,j;
-    struct Metric *g;
     double a, b[3], sqrtg, U[4];
     double GAMMALAW, u0, hmo;
     double rho, v[3], Pp;
@@ -91,12 +146,12 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     double eps = 1.0e-14;
     double CS_FLOOR, CS_CAP, RHO_FLOOR;
     double r, phi, z;
+    int err = 0;
 
     r = pos[R_DIR];
     phi = pos[P_DIR];
     z = pos[Z_DIR];
 
-    g = metric_create(time_global, r, phi, z, theSim);
 
     //Metric quantities needed later
     a = metric_lapse(g);
@@ -137,6 +192,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
         printf("r = %lg, dV = %lg\n", r, dV);
         printf("rho = %lg, P = %lg, vr = %lg, vp = %lg, vz = %lg\n",prim[RHO],prim[PPP],prim[URR],prim[UPP],prim[UZZ]);
         printf("rhostar = %lg, tau = %lg, Sr = %lg, Sp = %lg, Sz = %lg\n",cons[DDD],cons[TAU],cons[SRR],cons[LLL],cons[SZZ]);
+        err = 1;
         //exit(0);
     }
 
@@ -160,6 +216,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     {
         printf("NR failed to converge: wmo0 = %lg, wmo = %lg, wmo1 = %lg\n", wmo0,wmo,wmo1);
         printf("Poly coeffs: c[0]=%lg, c[1]=%lg, c[2]=%lg, c[3]=%lg, c[4]=%lg\n",c[0],c[1],c[2],c[3],c[4]);
+        err = 1;
     }
     wmo = wmo1;
 
@@ -167,6 +224,7 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     {
         printf("ERROR: w-1 < 0 in cons2prim_gr. (r = %lg, wmo = %lg)\n", r, wmo);
         wmo = 0.0;
+        err = 1;
     }
     
     //Prim recovery
@@ -174,11 +232,15 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     u0 = w/a;
     hmo = w*(E-w)/(w*w-gam);
     if(hmo < -1.0)
+    {
         printf("ERROR: h < 0 in cons2prim_gr (r = %lg, h-1 = %lg)\n", r, hmo);
+        err = 1;
+    }
     else if(hmo < 0.0)
     {
         printf("ERROR: h < 1 in cons2prim_gr (r = %.12g, h-1 = %.12g)\n", r, hmo);
         printf("       e^2 = %.12g, s^2 = %.12g, w =%.12g\n", e*e, s2, w);
+        err = 1;
     }
 
     RHO_FLOOR = sim_RHO_FLOOR(theSim);
@@ -190,17 +252,20 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     {
         rho = RHO_FLOOR;
         printf("Whoa, not enough density pal! (r=%.12g)\n", r);
+        err = 1;
     }
     Pp = gam * rho * hmo;
     if(Pp < CS_FLOOR*CS_FLOOR*rho*(hmo+1)/GAMMALAW)
     {
         Pp = CS_FLOOR*CS_FLOOR*rho*(hmo+1)/GAMMALAW;
         printf("Whoa, that's a pretty low pressure bub! (r=%.12g)\n", r);
+        err = 1;
     }
     if(Pp > CS_CAP*CS_CAP*rho*(hmo+1)/GAMMALAW)
     {
         Pp = CS_CAP*CS_CAP*rho*(hmo+1)/GAMMALAW;
         printf("Whoa, that's a really high pressure chum! (r=%.12g)\n", r);
+        err = 1;
     }
 
     for(i=0; i<3; i++)
@@ -221,17 +286,6 @@ void cell_cons2prim_gr(double *cons, double *prim, double *pos, double dV, struc
     for(i = sim_NUM_C(theSim); i < sim_NUM_Q(theSim); i++)
         prim[i] = cons[i]/cons[DDD];
 
-    metric_destroy(g);
-/*
-    if(PRINTTOOMUCH)
-    {
-        double cons2[sim_NUM_Q(theSim)];
-        cell_prim2cons(prim,cons2,pos,dV,theSim);
-        printf("cons2prim: r=%.12g, dV = %.12g\n", r, dV);
-        printf("cons: rhostar=%.12g, Sr=%.12g, Sp=%.12g, Sz=%.12g, tau=%.12g\n", cons[DDD],cons[SRR],cons[LLL],cons[SZZ],cons[TAU]);
-        printf("prim: rho=%.12g, vr=%.12g, vp=%.12g, vz=%.12g, P=%.12g\n", prim[RHO],prim[URR],prim[UPP],prim[UZZ],prim[PPP]);
-        printf("cons2: rhostar=%.12g, Sr=%.12g, Sp=%.12g, Sz=%.12g, tau=%.12g\n", cons2[DDD],cons2[SRR],cons2[LLL],cons2[SZZ],cons2[TAU]);
-    }
-*/
+    return err;
 }
 

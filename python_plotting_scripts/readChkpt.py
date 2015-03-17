@@ -23,6 +23,7 @@ def readChkpt(filename):
     vr = np.array(Data[:,5])
     vp = np.array(Data[:,6])
     vz = np.array(Data[:,7])
+    q = np.array(Data[:,8])
 
     #calculate cell volumes
     z_vals = np.unique(z)
@@ -59,5 +60,5 @@ def readChkpt(filename):
         phi[inds] = piph[inds] - 0.5*dp
         dV[inds] *= r[inds] * dphi[inds]
 
-    return t, r, phi, z, rho, P, vr, vp, vz, dV
+    return t, r, phi, z, rho, P, vr, vp, vz, dV, q
 
