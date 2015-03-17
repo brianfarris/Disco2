@@ -11,9 +11,9 @@
 #include "../Headers/header.h"
 
 //Local Functions
-int cons2prim_prep(double *cons, double *prim, double *pos, double dV, 
+static int cons2prim_prep(double *cons, double *prim, double *pos, double dV, 
                         struct Metric *g, struct Sim *theSim);
-int cons2prim_solve(double *cons, double *prim, double *pos, double dV, 
+static int cons2prim_solve(double *cons, double *prim, double *pos, double dV, 
                         struct Metric *g, struct Sim *theSim);
 
 void cell_prim2cons_grdisc(double *prim, double *cons, double *pos, 
@@ -120,7 +120,7 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
     metric_destroy(g);
 }
 
-int cons2prim_prep(double *cons, double *prim, double *pos, double dV, 
+static int cons2prim_prep(double *cons, double *prim, double *pos, double dV, 
                         struct Metric *g, struct Sim *theSim)
 {
     int err = 0;
@@ -155,7 +155,7 @@ int cons2prim_prep(double *cons, double *prim, double *pos, double dV,
     return err;
 }
 
-int cons2prim_solve(double *cons, double *prim, double *pos, double dV, 
+static int cons2prim_solve(double *cons, double *prim, double *pos, double dV, 
                         struct Metric *g, struct Sim *theSim)
 {
     int mu, nu, i;

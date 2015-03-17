@@ -330,7 +330,7 @@ void cell_boundary_ssprofile_r_inner( struct Cell *** theCells, struct Sim *theS
 void cell_boundary_ssprofile_r_outer( struct Cell *** theCells, struct Sim *theSim,struct MPIsetup * theMPIsetup)
 {
     int i,j,k,q;
-   if(mpisetup_check_rout_bndry(theMPIsetup))
+    if(mpisetup_check_rout_bndry(theMPIsetup))
     {
         int iOut = sim_N(theSim,R_DIR)-sim_Nghost_max(theSim,R_DIR)-1;
         double rOut = 0.5*(sim_FacePos(theSim,iOut,R_DIR) + sim_FacePos(theSim,iOut-1,R_DIR));
@@ -395,4 +395,54 @@ void cell_boundary_ssprofile_r_outer( struct Cell *** theCells, struct Sim *theS
                 }
         }
     }
+}
+
+void cell_boundary_nozzle(struct Cell ***theCells, struct Sim *theSim, 
+                struct MPIsetup *theMPIsetup, struct TimeStep *theTimeStep)
+{
+    // A nozzle entering injecting gas from the boundary.
+    
+    int i,j,k,q;
+    if(mpisetup_check_rout_bndry(theMPIsetup))
+    {
+        double V = sim_BoundPar1(theSim);
+        double b = sim_BoundPar2(theSim);
+        double rho0 = sim_BoundPar3(theSim);
+        double T0 = sim_BoundPar4(theSim);
+
+        for(i = sim_N(theSim,R_DIR) - sim_Nghost_max(theSim,R_DIR); 
+                i < sim_N(theSim,R_DIR); i++)
+        {
+            double rp = sim_FacePos(theSim,i,R_DIR);
+            double rm = sim_FacePos(theSim,i-1,R_DIR);
+            double r = 0.5*(rp+rm);
+            double width = r/10.0;
+            for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k )
+            {
+                double zp = sim_FacePos(theSim,k,Z_DIR);
+                double zm = sim_FacePos(theSim,k-1,Z_DIR);
+                double z = 0.5*(zp+zm);
+
+                for( j=0 ; j<sim_N_p(theSim,i) ; ++j )
+                {
+                    double phi = theCells[k][i][j].tiph
+                                - 0.5*theCells[k][i][j].dphi;
+                    double x = r * cos(phi);
+                    double y = r * sin(phi);
+                    if(x > 0.0 && sin(phi) < 0.5)
+                    {
+                        double fac = exp(-(y*y+z*z)/(2*width*width));
+                        double sina = b/r;
+                        double vr = -V * sqrt(1.0-sina*sina);
+                        double vp = V * sina/r;
+                        theCells[k][i][j].prim[RHO] += fac*rho0;
+                        theCells[k][i][j].prim[TTT] += fac*T0;
+                        theCells[k][i][j].prim[URR] += fac*vr;
+                        theCells[k][i][j].prim[UPP] += fac*vp;
+                    }
+                }
+            }
+        }
+    }
+
 }

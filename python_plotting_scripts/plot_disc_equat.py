@@ -11,7 +11,7 @@ import numpy as np
 import readChkpt as rc
 
 GAM = 5.0/3.0
-M = 0.0
+M = 1.0
 a = 0.0
 gridscale = 'linear'
 datscale = 'linear'
@@ -20,7 +20,7 @@ cmap = plt.cm.jet
 
 def plot_equat_single(fig, ax, mesh, dat, gridscale="linear", gridbounds=None,
                     datscale="linear", datbounds=None, label=None, **kwargs):
-    N = 100
+    N = 400
 
     #Set data bounds & scale.
     if datbounds is None:

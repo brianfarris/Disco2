@@ -59,6 +59,11 @@ int sim_read_par_file(struct Sim * theSim, struct MPIsetup * theMPIsetup, char *
       err += readvar( pfile , "BoundTypeROut"         , VAR_INT  , &(theSim->BoundTypeROut)  );
       err += readvar( pfile , "BoundTypeZBot"         , VAR_INT  , &(theSim->BoundTypeZBot)  );
       err += readvar( pfile , "BoundTypeZTop"         , VAR_INT  , &(theSim->BoundTypeZTop)  );
+      err += readvar( pfile , "BoundTypeSource"         , VAR_INT  , &(theSim->BoundTypeSource)  );
+      err += readvar( pfile , "BoundPar1"         , VAR_DOUB  , &(theSim->BoundPar1)  );
+      err += readvar( pfile , "BoundPar2"         , VAR_DOUB  , &(theSim->BoundPar2)  );
+      err += readvar( pfile , "BoundPar3"         , VAR_DOUB  , &(theSim->BoundPar3)  );
+      err += readvar( pfile , "BoundPar4"         , VAR_DOUB  , &(theSim->BoundPar4)  );
       err += readvar( pfile , "NoInnerBC"         , VAR_INT  , &(theSim->NoInnerBC)  );
       err += readvar( pfile , "Background"         , VAR_INT  , &(theSim->Background)  );
       err += readvar( pfile , "Metric"         , VAR_INT  , &(theSim->Metric)  );
