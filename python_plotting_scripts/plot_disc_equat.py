@@ -14,7 +14,7 @@ GAM = 5.0/3.0
 M = 1.0
 a = 0.0
 gridscale = 'linear'
-datscale = 'linear'
+datscale = 'log'
 A = a*M
 cmap = plt.cm.jet
 

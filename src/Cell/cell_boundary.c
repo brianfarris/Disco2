@@ -397,6 +397,141 @@ void cell_boundary_ssprofile_r_outer( struct Cell *** theCells, struct Sim *theS
     }
 }
 
+void cell_boundary_linear_r_inner(struct Cell ***theCells, 
+                struct Face *theFaces, struct Sim *theSim, 
+                struct MPIsetup *theMPIsetup, struct TimeStep * theTimeStep )
+{
+    int NUM_Q = sim_NUM_Q(theSim);
+
+    int n,q;
+    int i,j,k;
+
+    // if the global inner radius is set negative, we don't apply an inner BC
+    if(mpisetup_check_rin_bndry(theMPIsetup) && sim_NoInnerBC(theSim)!=1)
+    {
+        double r2, r1, r0, r0m, dr;
+        r2 = sim_FacePos(theSim, 2, R_DIR); 
+        r1 = sim_FacePos(theSim, 1, R_DIR); 
+        r0 = sim_FacePos(theSim, 0, R_DIR); 
+        r0m = sim_FacePos(theSim, -1, R_DIR); 
+
+        //Clear radial gradients in Annulus 1.
+        for(k = 0; k < sim_N(theSim, Z_DIR); k++)
+            for(j = 0; j < sim_N_p(theSim,1); j++)
+                for(q = 0; q < NUM_Q; q++)
+                    theCells[k][1][j].gradr[q] = 0.0;
+
+        //Radial gradients in Annulus 1 updated with area weighted derivatives
+        //between Annulus 1 & 2;
+        dr = 0.5*(r2-r0);
+        for(n = timestep_n(theTimeStep,1,R_DIR); 
+                n < timestep_n(theTimeStep,2,R_DIR); n++)
+        {
+            double dA = face_dA(theFaces,n);
+            struct Cell *cL = face_L_pointer(theFaces,n);
+            struct Cell *cR = face_R_pointer(theFaces,n);
+
+            for(q = 0; q < NUM_Q; q++)
+                cL->gradr[q] += dA*(cR->prim[q]-cL->prim[q])/dr;
+        }
+        for(k = 0; k < sim_N(theSim, Z_DIR); k++)
+        {
+            double dz = sim_FacePos(theSim, k, Z_DIR)
+                        - sim_FacePos(theSim, k-1, Z_DIR);
+            for(j = 0; j < sim_N_p(theSim,1); j++)
+            {
+                double dA = r1 * theCells[k][1][j].dphi * dz;
+                for(q = 0; q < NUM_Q; q++)
+                    theCells[k][1][j].gradr[q] /= dA;
+            }
+        }
+
+        //Clear prims in Annulus 0
+        for(k = 0; k < sim_N(theSim, Z_DIR); k++)
+            for(j = 0; j < sim_N_p(theSim,0); j++)
+                for(q = 0; q < NUM_Q; q++)
+                    theCells[k][0][j].prim[q] = 0.0;
+
+        //Annulus 0 updated to area-weighted extrapolation of Annulus 1.
+        dr = r1 - r0m;
+        for(n = timestep_n(theTimeStep,0,R_DIR); 
+                n < timestep_n(theTimeStep,1,R_DIR); n++)
+        {
+            double dA = face_dA(theFaces,n);
+            struct Cell *cL = face_L_pointer(theFaces,n);
+            struct Cell *cR = face_R_pointer(theFaces,n);
+
+            for(q = 0; q < NUM_Q; q++)
+            {
+                double qextrap;
+                if(q == URR || q == UPP || q == UZZ)
+                    qextrap = cR->prim[q] - cR->gradr[q] * dr;
+                else
+                    qextrap = cR->prim[q] - 0.0*cR->gradr[q] * dr;
+                if((q == RHO || q == PPP) && qextrap < 0.0)
+                    qextrap = 0.5*cR->prim[q];
+                cL->prim[q] += dA*qextrap;
+            }
+        }
+        for(k = 0; k < sim_N(theSim, Z_DIR); k++)
+        {
+            double dz = sim_FacePos(theSim, k, Z_DIR)
+                        - sim_FacePos(theSim, k-1, Z_DIR);
+            for(j = 0; j < sim_N_p(theSim,0); j++)
+            {
+                double dA = r0*theCells[k][0][j].dphi * dz;
+                for(q = 0; q < NUM_Q; q++)
+                    theCells[k][0][j].prim[q] /= dA;
+            }
+        }
+    }
+}
+
+void cell_boundary_linear_r_outer( struct Cell *** theCells , struct Face * theFaces ,struct Sim * theSim,struct MPIsetup * theMPIsetup, struct TimeStep * theTimeStep ){
+  int Nf = timestep_n(theTimeStep,sim_N(theSim,R_DIR)-1,R_DIR);
+  int NUM_Q = sim_NUM_Q(theSim);
+  int n1 = timestep_n(theTimeStep,sim_N(theSim,R_DIR)-2,R_DIR);
+
+  int n,q;
+  int j,k;
+  double r_face,r_face_p1,r_cell;
+
+  if( mpisetup_check_rout_bndry(theMPIsetup) ){
+    for( n=n1 ; n<Nf ; ++n ){
+      for( q=0 ; q<NUM_Q ; ++q ){
+        face_R_pointer(theFaces,n)->prim[q] = 0.0;
+      }
+    }
+    for( n=n1 ; n<Nf ; ++n ){
+      struct Cell * cL = face_L_pointer(theFaces,n);
+      struct Cell * cR = face_R_pointer(theFaces,n);
+      for( q=0 ; q<NUM_Q ; ++q ){
+        cR->prim[q] += cL->prim[q]*face_dA(theFaces,n);
+      }
+    }
+    r_face = sim_FacePos(theSim,sim_N(theSim,R_DIR)-2,R_DIR);
+    r_face_p1 = sim_FacePos(theSim,sim_N(theSim,R_DIR)-1,R_DIR);
+    r_cell = 0.5*(r_face+r_face_p1);
+    //printf("r_cell outer: %e\n",r_cell);
+    for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k ){
+      double zp = sim_FacePos(theSim,k,Z_DIR);
+      double zm = sim_FacePos(theSim,k-1,Z_DIR);
+      double dz = zp-zm;
+      for( j=0 ; j<sim_N_p(theSim,sim_N(theSim,R_DIR)-1) ; ++j ){
+        double dA = dz*r_face*theCells[k][sim_N(theSim,R_DIR)-1][j].dphi;
+        for( q=0 ; q<NUM_Q ; ++q ){
+          theCells[k][sim_N(theSim,R_DIR)-1][j].prim[q] /= dA;
+        }
+        //theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] *= -1.;
+        if( theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] < 0.0 ) theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] = 0.0;
+        if (KEP_BNDRY==1){
+          theCells[k][sim_N(theSim,R_DIR)-1][j].prim[UPP] = pow(r_cell,-1.5);
+        }
+      }
+    }
+  }
+}
+
 void cell_boundary_nozzle(struct Cell ***theCells, struct Sim *theSim, 
                 struct MPIsetup *theMPIsetup, struct TimeStep *theTimeStep)
 {

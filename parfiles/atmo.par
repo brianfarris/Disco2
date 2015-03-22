@@ -35,12 +35,12 @@ Num_Diag_Measure        1001
 
 
 NoInnerBC               0
-BoundTypeRIn            1       // 0 fixed, 1 outflow, 3 SS profile
-BoundTypeROut           1       // 0 fixed, 1 outflow, 3 SS profile
+BoundTypeRIn            1       // 0 fixed, 1 outflow, 3 SS profile, 4 Linear
+BoundTypeROut           1       // 0 fixed, 1 outflow, 3 SS profile, 4 Linear
 BoundTypeZTop           2       // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2       // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry            1
-BoundTypeSource         0       // 0 None, 4 Nozzle
+BoundTypeSource         0       // 0 None, 5 Nozzle
 BoundPar1               0.0
 BoundPar2               0.0
 BoundPar3               0.0
