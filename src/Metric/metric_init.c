@@ -7,6 +7,9 @@
 #include "../Headers/Sim.h"
 #include "../Headers/Metric.h"
 
+void metric_init_exactmetric(struct Sim *);
+void metric_init_admmetric(struct Sim *);
+
 void metric_init_background(struct Sim *theSim)
 {
     if(sim_Background(theSim) == NEWTON)
@@ -71,6 +74,7 @@ void metric_init_metric(struct Sim *theSim)
 {
     if(sim_Metric(theSim) == SR)
     {
+        metric_init_exactmetric(theSim);
         metric_g_dd_exact = &metric_g_dd_exact_sr;
         metric_g_uu_exact = &metric_g_uu_exact_sr;
         metric_dg_dd_exact = &metric_dg_dd_exact_sr;
@@ -80,6 +84,7 @@ void metric_init_metric(struct Sim *theSim)
     }
     else if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
     {
+        metric_init_exactmetric(theSim);
         metric_g_dd_exact = &metric_g_dd_exact_schw_sc;
         metric_g_uu_exact = &metric_g_uu_exact_schw_sc;
         metric_dg_dd_exact = &metric_dg_dd_exact_schw_sc;
@@ -89,6 +94,7 @@ void metric_init_metric(struct Sim *theSim)
     }
     else if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
+        metric_init_exactmetric(theSim);
         metric_g_dd_exact = &metric_g_dd_exact_schw_ks;
         metric_g_uu_exact = &metric_g_uu_exact_schw_ks;
         metric_dg_dd_exact = &metric_dg_dd_exact_schw_ks;
@@ -98,6 +104,7 @@ void metric_init_metric(struct Sim *theSim)
     }
     else if(sim_Metric(theSim) == SR_CART)
     {
+        metric_init_exactmetric(theSim);
         metric_g_dd_exact = &metric_g_dd_exact_sr_cart;
         metric_g_uu_exact = &metric_g_uu_exact_sr_cart;
         metric_dg_dd_exact = &metric_dg_dd_exact_sr_cart;
@@ -107,6 +114,7 @@ void metric_init_metric(struct Sim *theSim)
     }
     else if(sim_Metric(theSim) == KERR_KS)
     {
+        metric_init_exactmetric(theSim);
         metric_g_dd_exact = &metric_g_dd_exact_kerr_ks;
         metric_g_uu_exact = &metric_g_uu_exact_kerr_ks;
         metric_dg_dd_exact = &metric_dg_dd_exact_kerr_ks;
@@ -114,9 +122,71 @@ void metric_init_metric(struct Sim *theSim)
         metric_killing_exact = &metric_killing_exact_kerr_ks;
         metric_horizon = &metric_horizon_exact_kerr_ks;
     }
+    else if(sim_Metric(theSim) == SR_ADM)
+    {
+        metric_init_admmetric(theSim);
+        metric_lapse_adm = &metric_lapse_adm_sr;
+        metric_shift_adm_exact = &metric_shift_adm_sr;
+        metric_spatial_adm = &metric_spatial_adm_sr;
+        metric_ispatial_adm = &metric_ispatial_adm_sr;
+        metric_dlapse_adm = &metric_dlapse_adm_sr;
+        metric_dshift_adm_exact = &metric_dshift_adm_sr;
+        metric_dspatial_adm = &metric_dspatial_adm_sr;
+        metric_killing_exact = &metric_killing_adm_sr;
+        metric_horizon = &metric_horizon_adm_sr;
+    }
+    else if(sim_Metric(theSim) == SCHWARZSCHILD_KS_ADM)
+    {
+        metric_init_admmetric(theSim);
+        metric_lapse_adm = &metric_lapse_adm_schw_ks;
+        metric_shift_adm_exact = &metric_shift_adm_schw_ks;
+        metric_spatial_adm = &metric_spatial_adm_schw_ks;
+        metric_ispatial_adm = &metric_ispatial_adm_schw_ks;
+        metric_dlapse_adm = &metric_dlapse_adm_schw_ks;
+        metric_dshift_adm_exact = &metric_dshift_adm_schw_ks;
+        metric_dspatial_adm = &metric_dspatial_adm_schw_ks;
+        metric_killing_exact = &metric_killing_adm_schw_ks;
+        metric_horizon = &metric_horizon_adm_schw_ks;
+    }
     else
     {
         printf("ERROR: Trying to initialize with an unknown metric: %d\n", sim_Metric(theSim));
+        exit(0);
+    }
+}
+
+void metric_init_exactmetric(struct Sim *theSim)
+{
+    metric_create = &metric_create_exact;
+    metric_create_der = &metric_create_der_exact;
+}
+
+void metric_init_admmetric(struct Sim *theSim)
+{
+    metric_create = &metric_create_adm;
+    metric_create_der = &metric_create_der_adm;
+
+    if(sim_BoostType(theSim) == BOOST_NONE)
+    {
+        metric_shift_adm_boost = &metric_boost_none;
+        metric_dshift_adm_boost = &metric_dboost_none;
+        metric_killing_boost = &metric_killing_boost_none;
+    }
+    else if(sim_BoostType(theSim) == BOOST_RIGID)
+    {
+        metric_shift_adm_boost = &metric_boost_rigid;
+        metric_dshift_adm_boost = &metric_dboost_rigid;
+        metric_killing_boost = &metric_killing_boost_rigid;
+    }
+    else if(sim_BoostType(theSim) == BOOST_BIN)
+    {
+        metric_shift_adm_boost = &metric_boost_bin;
+        metric_dshift_adm_boost = &metric_dboost_bin;
+        metric_killing_boost = &metric_killing_boost_bin;
+    }
+    else
+    {
+        printf("ERROR: Trying to initialize with an unknown boost: %d\n", sim_BoostType(theSim));
         exit(0);
     }
 }

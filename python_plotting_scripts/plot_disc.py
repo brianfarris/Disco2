@@ -7,13 +7,13 @@ import numpy as np
 import readChkpt as rc
 
 GAM = 5.0/3.0
-M = 3.0
+M = 1.0
 a = 0.0
 scale = 'log'
 eos_x1 = 1.0
-eos_x2 = 1.0
-eos_x3 = 1.0
-alpha = 0.1
+eos_x2 = 0.0
+eos_x3 = 0.0
+alpha = 0.0
 A = a*M
 
 c = 2.99792458e10

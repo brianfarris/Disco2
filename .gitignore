@@ -10,6 +10,7 @@ bin*
 *.png
 *.dat
 *.h5
+*.mp4
 .DS_store
 res/
 python_plotting_scripts/

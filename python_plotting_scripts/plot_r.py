@@ -7,10 +7,11 @@ import numpy as np
 import readChkpt as rc
 
 GAM = 1.3333333333
+M = 1.0
 
-def plot_r_profile_single(r, f, sca, ylabel, R=None, F=None):
+def plot_r_profile_single(r, f, xsca, ysca, ylabel, R=None, F=None):
 
-    if sca == 'log' and (f < 0).all():
+    if ysca == 'log' and (f < 0).all():
         plt.plot(r, -f, 'k+')
         if R != None and F != None:
             plt.plot(R, -F, 'r')
@@ -18,11 +19,15 @@ def plot_r_profile_single(r, f, sca, ylabel, R=None, F=None):
         plt.plot(r, f, 'k+')
         if R != None and F != None:
             plt.plot(R, F, 'r')
-    
-    plt.gca().set_xscale(sca)
-    plt.gca().set_yscale(sca)
+
+    plt.gca().set_xscale(xsca)
+    plt.gca().set_yscale(ysca)
     plt.xlabel(r"$r$")
     plt.ylabel(ylabel)
+    
+    if 2*M > r.min():
+        plt.axvspan(plt.xlim()[0], 2*M, color='lightgrey', alpha=0.5)
+    
 
 def plot_r_profile(filename, sca='linear'):
     dat = rc.readChkpt(filename)
@@ -32,35 +37,22 @@ def plot_r_profile(filename, sca='linear'):
     P = dat[5]
     vr = dat[6]
     vp = dat[7]
-    
-    i = r.argmax()
-    R = np.linspace(r.min(), r.max(), 1000)
-    RHO = rho[i] * np.power(R/r[i], -0.5)
-    PPP = P[i] * np.power(R/r[i], -1.5)
-    URR = vr[i] * np.power(R/r[i], -0.5)
-    UPP = vp[i] * np.power(R/r[i], -1.5)
 
-    mach = np.sqrt((vr*vr+r*r*vp*vp)/(GAM*P/rho))
-    MACH = np.sqrt((URR*URR+R*R*UPP*UPP)/(GAM*PPP/RHO))
+    R = np.linspace(r.min(), r.max(), 200)
 
     print("Plotting t = {0:g}".format(t))
 
     #Plot.
     fig = plt.figure(figsize=(12,9))
-    plt.subplot(231)
-    plot_r_profile_single(r, rho, sca, r"$\rho_0$", R, RHO)
-    plt.subplot(232)
-    plot_r_profile_single(r, P, sca, r"$P$", R, PPP)
-    plt.subplot(234)
-    plot_r_profile_single(r, vr, sca, r"$v^r$", R, URR)
-    plt.plot(R, -np.ones(R.shape), 'b')
-    plt.plot(R, -(2.0-R)/(2.0+R), 'b')
-    plt.subplot(235)
-    plot_r_profile_single(r, vp, sca, r"$v^\phi$", R, UPP)
-    plt.subplot(236)
-    plot_r_profile_single(r, mach, sca, r"$\mathcal{M}$", R, MACH)
-    plt.subplot(233)
-    plot_r_profile_single(r, P/rho, sca, r"$T = P/\rho_0$", R, PPP/RHO)
+    plt.subplot(221)
+    plot_r_profile_single(r, rho, sca, sca, r"$\rho_0$")
+    plt.subplot(222)
+    plot_r_profile_single(r, P, sca, sca, r"$P$")
+    plt.subplot(223)
+    plot_r_profile_single(r, vr, sca, "linear", r"$v^r$")
+    plt.subplot(224)
+    plot_r_profile_single(r, vp, sca, "linear", r"$v^\phi$")
+    plt.plot(R, np.sqrt(M/(R*R*R)), 'r')
 
     plt.tight_layout()
 

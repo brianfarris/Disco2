@@ -91,6 +91,14 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                     }
                     Tm[4*mu+mu] += Pp;
                 }
+                if(PRINTTOOMUCH)
+                {
+                    printf("a = %.6e, sqrtg = %.6e\n", a,sqrtg);
+                    printf("T = (%.6e, %.6e, %.6e, %.6e)\n", T[0],T[1],T[2],T[3]);
+                    printf("    (%.6e, %.6e, %.6e, %.6e)\n", T[4],T[5],T[6],T[7]);
+                    printf("    (%.6e, %.6e, %.6e, %.6e)\n", T[8],T[9],T[10],T[11]);
+                    printf("    (%.6e, %.6e, %.6e, %.6e)\n", T[12],T[13],T[14],T[15]);
+                }
                
                 //Viscous Terms
                 double cool;
@@ -172,15 +180,14 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                         sk = 0;
                         for(mu=0; mu<max_dim; mu++)
                         {
-                            /*
                             for(nu=0; nu<max_dim; nu++)
                                 sk += 0.5*T[4*mu+nu]*metric_dg_dd(g,la,mu,nu);
-                                */
 
-                            
+                            /*
                             sk += 0.5*(rhoh*u[mu]*u[mu]+Pp*metric_g_uu(g,mu,mu)+visc[4*mu+mu]) * metric_dg_dd(g,la,mu,mu);
                             for(nu=mu+1; nu<max_dim; nu++)
                                 sk += (rhoh*u[mu]*u[nu]+Pp*metric_g_uu(g,mu,nu)+visc[4*mu+nu]) * metric_dg_dd(g,la,mu,nu);
+                            */
                             
                         }
                         if(la == 1)
@@ -214,13 +221,14 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                 for(mu=0; mu<max_dim; mu++)
                     for(nu=0; nu<max_dim; nu++)
                     {
-                        /*
                         s -= Tm[4*mu+nu] * metric_frame_dU_du(g,mu,nu,theSim);
-                        */
+                        
+                        /*
                         if(mu == nu)
                             s -= (rhoh*u[mu]*u_d[nu] + Pp + viscm[4*mu+nu]) * metric_frame_dU_du(g,mu,nu,theSim);
                         else
                             s -= (rhoh*u[mu]*u_d[nu] + viscm[4*mu+nu]) * metric_frame_dU_du(g,mu,nu,theSim);
+                        */
                         
                     }
                 
@@ -260,13 +268,17 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                     printf("LLL cooling: (%d,%d,%d): r=%.12g, dV=%.12g, q = %.12g, Q = %.12g\n",i,j,k,r,dV,-a*sqrtg* cool*u_d[2],-dt*dV*sqrtg*a *cool*u_d[2]);
                     printf("TAU cooling: (%d,%d,%d): r=%.12g, dV=%.12g, q = %.12g, Q = %.12g\n",i,j,k,r,dV,a*sqrtg* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]),dt*dV*sqrtg*a *cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]));
                 }
-
-                if(sim_BoostType(theSim) == BOOST_BIN
-                        && r > metric_horizon(theSim))
+               
+                
+                if(sim_BoostType(theSim) == BOOST_BIN)
+                        //&& r > metric_horizon(theSim))
                 {
                     cell_src_boost(time_global, r, phi, z, c->cons, g, rhoh, 
                                     u, U, dV, dt, theSim);
                 }
+                
+                
+                
 
                 metric_destroy(g);
             }
@@ -289,20 +301,17 @@ void cell_src_boost(double t, double r, double phi, double z, double *cons,
     double sqrtg = metric_sqrtgamma(g) / r;
 
     double Fr, Fp, Ft;
+    Fr = 0.0;
+    Fp = 0.0;
 
     //Centrifugal and Coriolis terms: 1/2 T^{\mu\nu} \partial_i g_{\mu\nu}
     /*
-    Fr = rhoh*u[0]*u[0]*(w*w*(r+a*cos(phi)))
-        + rhoh*u[0]*u[2]*w*(2*r+a*cos(phi));
-    Fp = -rhoh*u[0]*u[0]*w*w*r*a*sin(phi)
-        + rhoh*u[0]*u[1]*a*w*cos(phi)
-        - rhoh*u[0]*u[2]*r*w*a*sin(phi);
-    */
-    Fr = rhoh*u[0]*u[0]*w*w*r
+    Fr += rhoh*u[0]*u[0]*w*w*r
         + rhoh*u[0]*u[0]*w*w*a*cos(phi)
         + rhoh*u[0]*u[2]*2*w*r;
-    Fp = -rhoh*u[0]*u[0]*w*w*a*sin(phi)*r
+    Fp += -rhoh*u[0]*u[0]*w*w*a*sin(phi)*r
         - rhoh*u[0]*u[1]*2*w*r;
+    */
 
     double X = 2*a + r*cos(phi);
     double Y = r*sin(phi);

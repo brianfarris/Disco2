@@ -178,21 +178,31 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
 
   //Boundary Data
   //R - Inner
-  if (sim_BoundTypeRIn(theSim)==BOUND_OUTFLOW){
-    cell_boundary_outflow_r_inner( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
-  }else if (sim_BoundTypeRIn(theSim)==BOUND_FIXED){
-    cell_boundary_fixed_r_inner(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
-  }else if (sim_BoundTypeRIn(theSim)==BOUND_SS){
-    cell_boundary_ssprofile_r_inner(theCells,theSim,theMPIsetup);    
-  }
+  if (sim_BoundTypeRIn(theSim)==BOUND_OUTFLOW)
+    cell_boundary_outflow_r_inner( theCells, theFaces_r, theSim, theMPIsetup, 
+                                    theTimeStep);
+  else if (sim_BoundTypeRIn(theSim)==BOUND_FIXED)
+    cell_boundary_fixed_r_inner(theCells, theSim, theMPIsetup, 
+                                    (*cell_single_init_ptr(theSim)));
+  else if (sim_BoundTypeRIn(theSim)==BOUND_SS)
+    cell_boundary_ssprofile_r_inner(theCells, theSim, theMPIsetup);    
+  else if (sim_BoundTypeRIn(theSim)==BOUND_LINEAR)
+    cell_boundary_linear_r_inner( theCells, theFaces_r, theSim, theMPIsetup, 
+                                    theTimeStep);
+  
   //R - Outer
-  if (sim_BoundTypeROut(theSim)==BOUND_OUTFLOW){
-    cell_boundary_outflow_r_outer( theCells , theFaces_r ,theSim,theMPIsetup, theTimeStep );
-  }else if (sim_BoundTypeROut(theSim)==BOUND_FIXED){
-    cell_boundary_fixed_r_outer(theCells,theSim,theMPIsetup,(*cell_single_init_ptr(theSim)));    
-  }else if (sim_BoundTypeROut(theSim)==BOUND_SS){
-    cell_boundary_ssprofile_r_outer(theCells,theSim,theMPIsetup);    
-  }
+  if (sim_BoundTypeROut(theSim)==BOUND_OUTFLOW)
+    cell_boundary_outflow_r_outer( theCells, theFaces_r, theSim, theMPIsetup, 
+                                    theTimeStep );
+  else if (sim_BoundTypeROut(theSim)==BOUND_FIXED)
+    cell_boundary_fixed_r_outer( theCells, theSim, theMPIsetup,
+                                (*cell_single_init_ptr(theSim)));
+  else if (sim_BoundTypeROut(theSim)==BOUND_SS)
+    cell_boundary_ssprofile_r_outer(theCells, theSim, theMPIsetup);
+  else if (sim_BoundTypeROut(theSim)==BOUND_LINEAR)
+    cell_boundary_linear_r_outer( theCells, theFaces_r, theSim, theMPIsetup, 
+                                    theTimeStep);
+  
   if (sim_N_global(theSim,Z_DIR)>1){
     //Z - Bottom
     if (sim_BoundTypeZBot(theSim)==BOUND_OUTFLOW){
