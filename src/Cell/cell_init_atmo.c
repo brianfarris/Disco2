@@ -139,6 +139,70 @@ void cell_init_atmo_nozzle(struct Cell *c, double r, double phi, double z,
         c->prim[i] = q;
 }
 
+void cell_init_atmo_disc(struct Cell *c, double r, double phi, double z,
+                            struct Sim *theSim)
+{
+    int i;
+    double M = sim_GravM(theSim);
+    double A = M*sim_GravA(theSim);
+    double alpha = sim_AlphaVisc(theSim);
+
+    double rho0, T0, rho1, T1, rho, T, vr, vp;
+    double R0, q;
+
+    rho0 = sim_InitPar1(theSim);
+    T0 = sim_InitPar2(theSim);
+    R0 = sim_InitPar3(theSim);
+    rho1 = sim_InitPar4(theSim);
+    T1 = sim_InitPar5(theSim);
+
+    struct Metric *g = metric_create(time_global, r, phi, z, theSim);
+    double a, b[3];
+    a = metric_lapse(g);
+    b[0] = metric_shift_u(g,0);
+    b[1] = metric_shift_u(g,1);
+    b[2] = metric_shift_u(g,2);
+    metric_destroy(g);
+
+    rho = rho0;
+    T = T0;
+    vr = -b[0];
+    vp = -b[1];
+    q = 0.0;
+
+    if(r < R0 && r > 6*M)
+    {
+        rho = rho1;
+        T = T1;
+        vr = (-2*M/r) / (1+2*M/r);
+        vp = sqrt(M/(r*r*(r+2*M)));
+        q = 1.0;
+    }
+/*
+    if(sim_Background(theSim) != GRDISC)
+    {
+        double tp[5];
+        tp[RHO] = rho0;
+        tp[TTT] = T0;
+        tp[URR] = vr;
+        tp[UPP] = vp;
+        tp[UZZ] = -b[2];
+        double eps = eos_eps(tp, theSim);
+        double P = eos_ppp(tp, theSim);
+        double H = sqrt(r*r*r*P/(M*(rho+rho*eps+P))) * a;
+        rho = rho0 * H;
+        T = P * H;
+    }
+*/
+    c->prim[RHO] = rho;
+    c->prim[TTT] = T;
+    c->prim[URR] = vr;
+    c->prim[UPP] = vp;
+    c->prim[UZZ] = -b[2];
+
+    for(i=sim_NUM_C(theSim); i<sim_NUM_Q(theSim); i++)
+        c->prim[i] = q;
+}
 void cell_init_atmo_calc(struct Cell *c, double r, double phi, double z,
                             struct Sim *theSim)
 {
@@ -148,6 +212,8 @@ void cell_init_atmo_calc(struct Cell *c, double r, double phi, double z,
         cell_init_atmo_normal(c, r, phi, z, theSim);
     else if(opt == 1)
         cell_init_atmo_nozzle(c, r, phi, z, theSim);
+    else if(opt == 2)
+        cell_init_atmo_disc(c, r, phi, z, theSim);
     else
         printf("ERROR: cell_init_atmo given bad option.\n");
 }
