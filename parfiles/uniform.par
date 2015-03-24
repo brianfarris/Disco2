@@ -9,7 +9,7 @@ InitialDataType         3       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 16 Cartesian-Shear, 17 Disc Tests
 GravMassType            0       // 0 none, 1 single, 2 binary
 Background              1       // 0 Newtonian, 1 GR
-Metric                  6       // 0 Flat, 1 Schwarzschild-SC,
+Metric                  5       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS, 3 Flat-Cartesian
 Frame                   0       // 0 Euler, 1 Keplerian
 Restart                 0       // If this=1 restart using input.h5
@@ -18,7 +18,7 @@ Restart                 0       // If this=1 restart using input.h5
 NumR			32			//Radial Zones
 NumZ			1			//Vertical Zones
 ng              2
-R_Min		    1.0	
+R_Min		    0.1	
 R_Max			2.0
 Z_Min			-0.5
 Z_Max			0.5
@@ -27,13 +27,13 @@ aspect                  1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                1.0
-Num_Checkpoints	        100	
-Num_Diag_Dump           20
-Num_Diag_Measure        20
+Time_Max                10.0
+Num_Checkpoints	        301	
+Num_Diag_Dump           301
+Num_Diag_Measure        301
 
 
-NoInnerBC            0
+NoInnerBC            1
 BoundTypeRIn            0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeROut           0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2               // 0 fixed, 1 outflow, 2 periodic
@@ -55,13 +55,13 @@ PLM			1.0
 
 Grav_2D			1
 G_EPS			0.0
-GravM           1.0
+GravM           0.0
 GravA           0.0
 AlphaVisc       0.0
 
-BoostType   0       // 0 None, 1 Rigid, 2 Binary
-BinA        0.0
-BinW        0.1
+BoostType   2       // 0 None, 1 Rigid, 2 Binary
+BinA        1.0
+BinW        0.2
 BinM        0.0
 
 //EoS
@@ -81,9 +81,9 @@ CoolPar3            0.0
 CoolPar4            0.0
 
 //Initial Condition Parameters
-InitPar0        0
-InitPar1        1.0
-InitPar2        1.0
+InitPar0        0   // Provide Counter-boost?
+InitPar1        1.0 // rho
+InitPar2        1.0 // P
 InitPar3        0.00
 InitPar4        0.00
 InitPar5        -1

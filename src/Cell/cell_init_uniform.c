@@ -8,7 +8,9 @@
 #include "../Headers/GravMass.h"
 #include "../Headers/header.h"
 
-void cell_single_init_uniform(struct Cell *theCell, struct Sim *theSim,int i,int j,int k){
+void cell_single_init_uniform(struct Cell *theCell, struct Sim *theSim,int i,int j,int k)
+{
+    int counterBoost = sim_InitPar0(theSim);
     double rho  = sim_InitPar1(theSim);
     double Pp  = sim_InitPar2(theSim);
     double vr = 0.0;
@@ -22,6 +24,17 @@ void cell_single_init_uniform(struct Cell *theCell, struct Sim *theSim,int i,int
     double zp = sim_FacePos(theSim,k,Z_DIR);
     double z = 0.5*(zm+zp);
     double t = theCell->tiph-.5*theCell->dphi;
+
+    if(counterBoost && sim_BoostType(theSim) == BOOST_RIGID)
+        vp = -sim_BinW(theSim);
+
+    if(counterBoost && sim_BoostType(theSim) == BOOST_BIN)
+    {
+        double w = sim_BinW(theSim);
+        double a = sim_BinA(theSim);
+        vr = -a*w*sin(t);
+        vp = -w - a*w*cos(t)/r;
+    }
 
     theCell->prim[RHO] = rho;
     theCell->prim[PPP] = Pp;
@@ -39,11 +52,15 @@ void cell_single_init_uniform(struct Cell *theCell, struct Sim *theSim,int i,int
 void cell_init_uniform(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup)
 {
 
+    int counterBoost = sim_InitPar0(theSim);
     double rho  = sim_InitPar1(theSim);
     double Pp  = sim_InitPar2(theSim);
     double vr = 0.0;
     double vp = 0.0;
     double vz = 0.0;
+    
+    if(counterBoost && sim_BoostType(theSim) == BOOST_RIGID)
+        vp = -sim_BinW(theSim);
 
     int i, j, k;
     for (k = 0; k < sim_N(theSim,Z_DIR); k++) 
@@ -59,6 +76,14 @@ void cell_init_uniform(struct Cell ***theCells,struct Sim *theSim,struct MPIsetu
             for (j = 0; j < sim_N_p(theSim,i); j++) 
             {
                 double t = theCells[k][i][j].tiph-.5*theCells[k][i][j].dphi;
+
+                if(counterBoost && sim_BoostType(theSim) == BOOST_BIN)
+                {
+                    double w = sim_BinW(theSim);
+                    double a = sim_BinA(theSim);
+                    vr = -a*w*sin(t);
+                    vp = -w - a*w*cos(t)/r;
+                }
              
                 theCells[k][i][j].prim[RHO] = rho;
                 theCells[k][i][j].prim[PPP] = Pp;

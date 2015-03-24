@@ -11,12 +11,12 @@ import numpy as np
 import readChkpt as rc
 
 GAM = 5.0/3.0
-M = 1.0
+M = 0.0
 a = 0.0
 gridscale = 'linear'
-datscale = 'log'
+datscale = 'linear'
 A = a*M
-cmap = plt.cm.jet
+cmap = plt.cm.afmhot
 
 def plot_equat_single(fig, ax, mesh, dat, gridscale="linear", gridbounds=None,
                     datscale="linear", datbounds=None, label=None, **kwargs):

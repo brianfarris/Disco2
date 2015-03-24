@@ -24,9 +24,9 @@ double metric_shift_adm_schw_ks(int i, double t, double r, double p, double z,
     double R = sqrt(r*r + z*z);
     double b;
 
-    if(b == 1)
+    if(i == 1)
         b = 2.0*M*r / (R*R + 2*M*R);
-    else if (b == 3)
+    else if (i == 3)
         b = 2.0*M*z / (R*R + 2*M*R);
     else
         b = 0.0;
@@ -104,8 +104,8 @@ double metric_dshift_adm_schw_ks(int mu, int i, double t, double r, double p,
 
     if(mu == 1 && i == 1)
         db =  2*M * (R*R+2*M*R-2*r*r*(1.0+M/R)) / ((R*R+2*M*R)*(R*R+2*M*R));
-    if((mu == 3 && i == 1) || (mu == 1 && i == 3))
-        db =  4*M*(R+M)*r*z / (R*(R*R+2*M*R)*(R*R+2*M*R));
+    else if((mu == 3 && i == 1) || (mu == 1 && i == 3))
+        db =  -4*M*(R+M)*r*z / (R*(R*R+2*M*R)*(R*R+2*M*R));
     else if(mu == 3 && i == 3)
         db =  2*M * (R*R+2*M*R-2*z*z*(1.0+M/R)) / ((R*R+2*M*R)*(R*R+2*M*R));
     else

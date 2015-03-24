@@ -184,6 +184,9 @@ void metric_create_der_adm(struct Metric *g)
         b[0] = g->g_uu[1] * a*a;
         b[1] = g->g_uu[2] * a*a;
         b[2] = g->g_uu[3] * a*a;
+        bd[0] = g->g_dd[1];
+        bd[1] = g->g_dd[2];
+        bd[2] = g->g_dd[3];
         gam[0] = g->g_dd[4];
         gam[1] = g->g_dd[5];
         gam[2] = g->g_dd[6];
@@ -221,7 +224,9 @@ void metric_create_der_adm(struct Metric *g)
                 {
                     dbd[i] = 0.0;
                     for(j=0; j<3; j++)
+                    {
                         dbd[i] += gam[3*i+j]*db[j] + dgam[3*i+j]*b[j];
+                    }
                 }
                 dg00 = -2*a*da;
                 for(i=0; i<3; i++)
