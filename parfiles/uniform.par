@@ -9,7 +9,7 @@ InitialDataType         3       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 16 Cartesian-Shear, 17 Disc Tests
 GravMassType            0       // 0 none, 1 single, 2 binary
 Background              1       // 0 Newtonian, 1 GR
-Metric                  5       // 0 Flat, 1 Schwarzschild-SC,
+Metric                  1       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS, 3 Flat-Cartesian
 Frame                   0       // 0 Euler, 1 Keplerian
 Restart                 0       // If this=1 restart using input.h5
@@ -28,9 +28,9 @@ aspect                  1.0
 NUM_C                   5
 NUM_N                   1
 Time_Max                10.0
-Num_Checkpoints	        301	
-Num_Diag_Dump           301
-Num_Diag_Measure        301
+Num_Checkpoints	        101	
+Num_Diag_Dump           11
+Num_Diag_Measure        11
 
 
 NoInnerBC            1
@@ -60,7 +60,7 @@ GravA           0.0
 AlphaVisc       0.0
 
 BoostType   2       // 0 None, 1 Rigid, 2 Binary
-BinA        1.0
+BinA        2.0
 BinW        0.2
 BinM        0.0
 
@@ -81,9 +81,9 @@ CoolPar3            0.0
 CoolPar4            0.0
 
 //Initial Condition Parameters
-InitPar0        0   // Provide Counter-boost?
-InitPar1        1.0 // rho
-InitPar2        1.0 // P
+InitPar0        1       // Provide Counter-boost?
+InitPar1        1.0     // rho
+InitPar2        1.0e-4  // P
 InitPar3        0.00
 InitPar4        0.00
 InitPar5        -1
@@ -93,7 +93,7 @@ PHI_ORDER               2
 
 //Atmosphere Parameters
 Rho_Floor		0.00001
-Cs_Floor		0.0001		
+Cs_Floor		1.0e-10		
 Cs_Cap			100.0
 Vel_Cap			100.0
 

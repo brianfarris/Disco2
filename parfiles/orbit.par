@@ -1,6 +1,6 @@
 //Disco Parameter File//
 
-InitialDataType        21       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
+InitialDataType        22       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 4 Shock1, 5 Shock2, 6 Shock3, 7 Shock4,
                                 // 8 Isentrope, 9 GR-Bondi, 10 GR-Bondi2,
                                 // 11 Equilibrium1, 12 Equilibrium2, 13 SSDisc
@@ -10,8 +10,9 @@ InitialDataType        21       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 21 Atmosphere, 22 Orbit
 GravMassType            0       // 0 none, 1 single, 2 binary
 Background              1       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
-Metric                  2       // 0 Flat, 1 Schwarzschild-SC,
-                                // 2 Schwarzschild-KS, 4 Kerr-KS
+Metric                  5       // 0 Flat, 1 Schwarzschild-SC,
+                                // 2 Schwarzschild-KS, 4 Kerr-KS, 5 FlatADM,
+                                // 6 Schwarzschild-KS-ADM, 
 Frame                   0       // 0 Euler, 1 Keplerian, 2 Accreting
 Restart                 0       // If this=1 restart using input.h5
 
@@ -19,8 +20,8 @@ Restart                 0       // If this=1 restart using input.h5
 NumR			32			//Radial Zones
 NumZ			1       //Vertical Zones
 ng              2
-R_Min		    1.7
-R_Max			100.0
+R_Min		    1.0
+R_Max			30.0
 Z_Min			-100.0
 Z_Max			100.0
 NP_CONST       -1
@@ -28,14 +29,14 @@ aspect         1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                100.0
+Time_Max                1.0e3
 Num_Checkpoints	        101
 Num_Diag_Dump           101
 Num_Diag_Measure        101
 
 
 NoInnerBC               0
-BoundTypeRIn            1       // 0 fixed, 1 outflow, 3 SS profile
+BoundTypeRIn            0       // 0 fixed, 1 outflow, 3 SS profile
 BoundTypeROut           1       // 0 fixed, 1 outflow, 3 SS profile
 BoundTypeZTop           2       // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2       // 0 fixed, 1 outflow, 2 periodic
@@ -60,7 +61,7 @@ GravM           1.0
 GravA           0.0
 AlphaVisc       0.0
 
-BoostType   1
+BoostType   2       // 0 None, 1 Rigid, 2 Binary
 BinA        100.0
 BinW        5e-4
 BinM        1.0
@@ -84,8 +85,8 @@ CoolPar4            0.0
 //Initial Condition Parameters
 InitPar0        0           // 0 Normal, 1 Nozzle
 InitPar1        1.0         // rho0
-InitPar2        1.0e-3      // T0
-InitPar3        0.0         // 
+InitPar2        1.0e-4      // T0
+InitPar3        10.0         // 
 InitPar4        0.0         //
 InitPar5        0.0         // 
 InitPar6        0.0         // 
@@ -105,7 +106,7 @@ DAMP_TIME               -1        // Set negative to turn off
 RDAMP_INNER             0.0
 RDAMP_OUTER             0.0
 
-RLogScale               0.01
+RLogScale               1.0e3 // 0.01
 ZLogScale               1000.0
 HiResSigma              1000.0
 HiResR0                 1000.0

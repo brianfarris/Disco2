@@ -11,7 +11,7 @@ import numpy as np
 import readChkpt as rc
 
 GAM = 5.0/3.0
-M = 0.0
+M = 1.0
 a = 0.0
 gridscale = 'linear'
 datscale = 'linear'
@@ -145,14 +145,15 @@ def plot_all(filename, gridscale='linear', plot=True, bounds=None):
 
         #Rho
         make_plot(mesh, rho, gridscale="linear", gridbounds=None,
-                datscale=datscale, datbounds=bounds[0],
+                datscale="linear", datbounds=bounds[0],
                 label=r'$\rho_0$', title=title, filename=rhoname, cmap=cmap)
 
         #T
         make_plot(mesh, T, gridscale="linear", gridbounds=None,
-                datscale=datscale, datbounds=bounds[1],
+                datscale="log", datbounds=bounds[1],
                 label=r'$T$', title=title, filename=Tname, cmap=cmap)
 
+        """
         #Vr
         make_plot(mesh, vr, gridscale="linear", gridbounds=None,
                 datscale="linear", datbounds=bounds[2],
@@ -162,12 +163,11 @@ def plot_all(filename, gridscale='linear', plot=True, bounds=None):
         make_plot(mesh, vp, gridscale="linear", gridbounds=None,
                 datscale="linear", datbounds=bounds[3],
                 label=r'$v^\phi$', title=title, filename=vpname, cmap=cmap)
-
+        """
         #q
         make_plot(mesh, q, gridscale="linear", gridbounds=None,
                 datscale="linear", datbounds=bounds[4],
                 label=r'$q$', title=title, filename=qname, cmap=cmap)
-        print (q*dV).sum()
 
     return bounds
 

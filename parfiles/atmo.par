@@ -7,11 +7,12 @@ InitialDataType        21       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 14 NTDisc, 15 ConstantDisc,
                                 // 16 Cartesian-Shear, 17 Disc Tests,
                                 // 18 Accreting Disc, 19 ADAF, 20 ADAF2, 
-                                // 21 Atmosphere
+                                // 21 Atmosphere, 22 Orbit
 GravMassType            0       // 0 none, 1 single, 2 binary
 Background              1       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
 Metric                  2       // 0 Flat, 1 Schwarzschild-SC,
-                                // 2 Schwarzschild-KS, 4 Kerr-KS
+                                // 2 Schwarzschild-KS, 4 Kerr-KS, 5 FlatADM,
+                                // 6 Schwarzschild-KS-ADM, 
 Frame                   0       // 0 Euler, 1 Keplerian, 2 Accreting
 Restart                 0       // If this=1 restart using input.h5
 
@@ -60,7 +61,7 @@ GravM           1.0
 GravA           0.0
 AlphaVisc       0.1
 
-BoostType   1       // 0 None, 1 Binary
+BoostType   2       // 0 None, 1 Rigid, 2 Binary
 BinA        100.0
 BinW        5e-4
 BinM        1.0

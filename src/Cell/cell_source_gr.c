@@ -268,14 +268,17 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                     printf("LLL cooling: (%d,%d,%d): r=%.12g, dV=%.12g, q = %.12g, Q = %.12g\n",i,j,k,r,dV,-a*sqrtg* cool*u_d[2],-dt*dV*sqrtg*a *cool*u_d[2]);
                     printf("TAU cooling: (%d,%d,%d): r=%.12g, dV=%.12g, q = %.12g, Q = %.12g\n",i,j,k,r,dV,a*sqrtg* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]),dt*dV*sqrtg*a *cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]));
                 }
-                /*
+               
+                
                 if(sim_BoostType(theSim) == BOOST_BIN)
                         //&& r > metric_horizon(theSim))
                 {
                     cell_src_boost(time_global, r, phi, z, c->cons, g, rhoh, 
                                     u, U, dV, dt, theSim);
                 }
-                */
+                
+                
+                
 
                 metric_destroy(g);
             }
@@ -298,20 +301,17 @@ void cell_src_boost(double t, double r, double phi, double z, double *cons,
     double sqrtg = metric_sqrtgamma(g) / r;
 
     double Fr, Fp, Ft;
+    Fr = 0.0;
+    Fp = 0.0;
 
     //Centrifugal and Coriolis terms: 1/2 T^{\mu\nu} \partial_i g_{\mu\nu}
     /*
-    Fr = rhoh*u[0]*u[0]*(w*w*(r+a*cos(phi)))
-        + rhoh*u[0]*u[2]*w*(2*r+a*cos(phi));
-    Fp = -rhoh*u[0]*u[0]*w*w*r*a*sin(phi)
-        + rhoh*u[0]*u[1]*a*w*cos(phi)
-        - rhoh*u[0]*u[2]*r*w*a*sin(phi);
-    */
-    Fr = rhoh*u[0]*u[0]*w*w*r
+    Fr += rhoh*u[0]*u[0]*w*w*r
         + rhoh*u[0]*u[0]*w*w*a*cos(phi)
         + rhoh*u[0]*u[2]*2*w*r;
-    Fp = -rhoh*u[0]*u[0]*w*w*a*sin(phi)*r
+    Fp += -rhoh*u[0]*u[0]*w*w*a*sin(phi)*r
         - rhoh*u[0]*u[1]*2*w*r;
+    */
 
     double X = 2*a + r*cos(phi);
     double Y = r*sin(phi);
