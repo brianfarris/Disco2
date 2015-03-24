@@ -152,12 +152,80 @@ int main(int argc, char **argv) {
     io_deallocbuf(theIO);
   }
 
+  int mu,nu,la;
+  struct Metric *g = metric_create(0,4,0,0,theSim);
+  double gmn[16], dgmn[64], igmn[16], a, da[4], b[3], db[12];
+  a = metric_lapse(g);
+  for(mu=0; mu<3; mu++)
+      b[mu] = metric_shift_u(g,mu);
+  for(mu=0; mu<4; mu++)
+      for(nu=0; nu<4; nu++)
+      {
+          gmn[4*mu+nu] = metric_g_dd(g,mu,nu);
+          igmn[4*mu+nu] = metric_g_uu(g,mu,nu);
+      }
+  for(la=0; la<4; la++)
+  {
+      da[la] = metric_dlapse(g,la);
+      for(mu=0; mu<3; mu++)
+        db[3*la+mu] = metric_dshift_u(g,la,mu);
+      for(mu=0; mu<4; mu++)
+          for(nu=0; nu<4; nu++)
+              dgmn[16*la+4*mu+nu] = metric_dg_dd(g,la,mu,nu);
+  }
+  int k[4];
+  for(mu = 0; mu < 4; mu++)
+      k[mu] = metric_killcoord(g, mu);
+  metric_destroy(g);
+  printf("***** Metric Test *****\n");
+  printf("a = %.3g\n", a);
+  printf("da = (%.3g, %.3g, %.3g, %.3g)\n", da[0], da[1], da[2], da[3]);
+  printf("\n");
+  printf("b = (%.3g, %.3g, %.3g)\n", b[0], b[1], b[2]);
+  printf("dbdt = (%.3g, %.3g, %.3g)\n", db[0], db[1], db[2]);
+  printf("dbdr = (%.3g, %.3g, %.3g)\n", db[3], db[4], db[5]);
+  printf("dbdp = (%.3g, %.3g, %.3g)\n", db[6], db[7], db[8]);
+  printf("dbdz = (%.3g, %.3g, %.3g)\n", db[9], db[10], db[11]);
+  printf("\n");
+  printf("     (%.3g, %.3g, %.3g, %.3g)\n", gmn[0],gmn[1],gmn[2],gmn[3]);
+  printf(" g = (%.3g, %.3g, %.3g, %.3g)\n", gmn[4],gmn[5],gmn[6],gmn[7]);
+  printf("     (%.3g, %.3g, %.3g, %.3g)\n", gmn[8],gmn[9],gmn[10],gmn[11]);
+  printf("     (%.3g, %.3g, %.3g, %.3g)\n", gmn[12],gmn[13],gmn[14],gmn[15]);
+  printf("\n");
+  printf("     (%.3g, %.3g, %.3g, %.3g)\n", igmn[0],igmn[1],igmn[2],igmn[3]);
+  printf("ig = (%.3g, %.3g, %.3g, %.3g)\n", igmn[4],igmn[5],igmn[6],igmn[7]);
+  printf("     (%.3g, %.3g, %.3g, %.3g)\n", igmn[8],igmn[9],igmn[10],igmn[11]);
+  printf("     (%.3g, %.3g, %.3g, %.3g)\n", igmn[12],igmn[13],igmn[14],igmn[15]);
+  printf("\n");
+  printf("       (%.3g, %.3g, %.3g, %.3g)\n", dgmn[0],dgmn[1],dgmn[2],dgmn[3]);
+  printf("dgdt = (%.3g, %.3g, %.3g, %.3g)\n", dgmn[4],dgmn[5],dgmn[6],dgmn[7]);
+  printf("       (%.3g, %.3g, %.3g, %.3g)\n", dgmn[8],dgmn[9],dgmn[10],dgmn[11]);
+  printf("       (%.3g, %.3g, %.3g, %.3g)\n", dgmn[12],dgmn[13],dgmn[14],dgmn[15]);
+  printf("\n");
+  printf("       (%.3g, %.3g, %.3g, %.3g)\n", dgmn[16],dgmn[17],dgmn[18],dgmn[19]);
+  printf("dgdr = (%.3g, %.3g, %.3g, %.3g)\n", dgmn[20],dgmn[21],dgmn[22],dgmn[23]);
+  printf("       (%.3g, %.3g, %.3g, %.3g)\n", dgmn[24],dgmn[25],dgmn[26],dgmn[27]);
+  printf("       (%.3g, %.3g, %.3g, %.3g)\n", dgmn[28],dgmn[29],dgmn[30],dgmn[31]);
+  printf("\n");
+  printf("       (%.3g, %.3g, %.3g, %.3g)\n", dgmn[32],dgmn[33],dgmn[34],dgmn[35]);
+  printf("dgdp = (%.3g, %.3g, %.3g, %.3g)\n", dgmn[36],dgmn[37],dgmn[38],dgmn[39]);
+  printf("       (%.3g, %.3g, %.3g, %.3g)\n", dgmn[40],dgmn[41],dgmn[42],dgmn[43]);
+  printf("       (%.3g, %.3g, %.3g, %.3g)\n", dgmn[44],dgmn[45],dgmn[46],dgmn[47]);
+  printf("\n");
+  printf("       (%.3g, %.3g, %.3g, %.3g)\n", dgmn[48],dgmn[49],dgmn[50],dgmn[51]);
+  printf("dgdz = (%.3g, %.3g, %.3g, %.3g)\n", dgmn[52],dgmn[53],dgmn[54],dgmn[55]);
+  printf("       (%.3g, %.3g, %.3g, %.3g)\n", dgmn[56],dgmn[57],dgmn[58],dgmn[59]);
+  printf("       (%.3g, %.3g, %.3g, %.3g)\n", dgmn[60],dgmn[61],dgmn[62],dgmn[63]);
+  printf("\n");
+  printf(" k = (%d, %d, %d, %d)\n", k[0], k[1], k[2], k[3]);
+  printf("***** Metric Test End *****\n");
+
   //Begin the run
   printf("Let's go!\nStarting Loop.\n");
   while( timestep_get_t(theTimeStep) < sim_get_T_MAX(theSim) ){
     // here the actual timestep is taken
-    //timestep_forward_euler(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
-    timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
+    timestep_forward_euler(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
+    //timestep_rk2(theTimeStep,theSim,theCells,theGravMasses,theMPIsetup);
 
     // calculate diagnostics
     diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep,theMPIsetup,theGravMasses);

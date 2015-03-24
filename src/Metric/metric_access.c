@@ -86,7 +86,7 @@ double metric_dg_dd(struct Metric *g, int k, int i, int j)
     return g->dg_dd[10*a + i+4*j-j*(j+1)/2];
 }
 
-double metric_dg_uu(struct Metric *g, int k, int i, int j)
+double metric_dg_uu_(struct Metric *g, int k, int i, int j)
 {
     if(g->killing[k])
         return 0.0;
@@ -104,14 +104,20 @@ double metric_dg_uu(struct Metric *g, int k, int i, int j)
 
 double metric_dlapse(struct Metric *g, int k)
 {
-    return 0.5 * metric_dg_uu(g,k,0,0) / sqrt(-g->g_uu[0]*g->g_uu[0]*g->g_uu[0]);
+    if(g->length_dg == 0)
+        metric_create_der(g);
+    //return 0.5 * metric_dg_uu(g,k,0,0) / sqrt(-g->g_uu[0]*g->g_uu[0]*g->g_uu[0]);
+    return g->da[k];
 }
 
 double metric_dshift_u(struct Metric *g, int k, int i)
 {
-    if(i < 0 || i > 2)
+    if(i < 0 || i > 2 || k < 0 || k > 3)
         return 0.0;
-    return g->g_uu[i+1]*metric_dg_uu(g,k,0,0)/(g->g_uu[0]*g->g_uu[0]) - metric_dg_uu(g,k,0,i+1)/(g->g_uu[0]);
+    if(g->length_dg == 0)
+        metric_create_der(g);
+    //return g->g_uu[i+1]*metric_dg_uu(g,k,0,0)/(g->g_uu[0]*g->g_uu[0]) - metric_dg_uu(g,k,0,i+1)/(g->g_uu[0]);
+    return g->db[3*k+i];
 }
 
 int metric_killcoord(struct Metric *g, int k)

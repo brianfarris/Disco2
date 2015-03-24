@@ -91,6 +91,14 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                     }
                     Tm[4*mu+mu] += Pp;
                 }
+                if(PRINTTOOMUCH)
+                {
+                    printf("a = %.6e, sqrtg = %.6e\n", a,sqrtg);
+                    printf("T = (%.6e, %.6e, %.6e, %.6e)\n", T[0],T[1],T[2],T[3]);
+                    printf("    (%.6e, %.6e, %.6e, %.6e)\n", T[4],T[5],T[6],T[7]);
+                    printf("    (%.6e, %.6e, %.6e, %.6e)\n", T[8],T[9],T[10],T[11]);
+                    printf("    (%.6e, %.6e, %.6e, %.6e)\n", T[12],T[13],T[14],T[15]);
+                }
                
                 //Viscous Terms
                 double cool;
@@ -172,15 +180,14 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                         sk = 0;
                         for(mu=0; mu<max_dim; mu++)
                         {
-                            /*
                             for(nu=0; nu<max_dim; nu++)
                                 sk += 0.5*T[4*mu+nu]*metric_dg_dd(g,la,mu,nu);
-                                */
 
-                            
+                            /*
                             sk += 0.5*(rhoh*u[mu]*u[mu]+Pp*metric_g_uu(g,mu,mu)+visc[4*mu+mu]) * metric_dg_dd(g,la,mu,mu);
                             for(nu=mu+1; nu<max_dim; nu++)
                                 sk += (rhoh*u[mu]*u[nu]+Pp*metric_g_uu(g,mu,nu)+visc[4*mu+nu]) * metric_dg_dd(g,la,mu,nu);
+                            */
                             
                         }
                         if(la == 1)
@@ -214,13 +221,14 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                 for(mu=0; mu<max_dim; mu++)
                     for(nu=0; nu<max_dim; nu++)
                     {
-                        /*
                         s -= Tm[4*mu+nu] * metric_frame_dU_du(g,mu,nu,theSim);
-                        */
+                        
+                        /*
                         if(mu == nu)
                             s -= (rhoh*u[mu]*u_d[nu] + Pp + viscm[4*mu+nu]) * metric_frame_dU_du(g,mu,nu,theSim);
                         else
                             s -= (rhoh*u[mu]*u_d[nu] + viscm[4*mu+nu]) * metric_frame_dU_du(g,mu,nu,theSim);
+                        */
                         
                     }
                 

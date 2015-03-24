@@ -9,7 +9,7 @@ InitialDataType         3       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 16 Cartesian-Shear, 17 Disc Tests
 GravMassType            0       // 0 none, 1 single, 2 binary
 Background              1       // 0 Newtonian, 1 GR
-Metric                  0       // 0 Flat, 1 Schwarzschild-SC,
+Metric                  6       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS, 3 Flat-Cartesian
 Frame                   0       // 0 Euler, 1 Keplerian
 Restart                 0       // If this=1 restart using input.h5
@@ -28,7 +28,7 @@ aspect                  1.0
 NUM_C                   5
 NUM_N                   1
 Time_Max                1.0
-Num_Checkpoints	        5	
+Num_Checkpoints	        100	
 Num_Diag_Dump           20
 Num_Diag_Measure        20
 
@@ -39,6 +39,11 @@ BoundTypeROut           0               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZTop           2               // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry          1
+BoundTypeSource         0       // 0 None, 5 Nozzle
+BoundPar1               0.0
+BoundPar2               0.0
+BoundPar3               0.0
+BoundPar4               0.0
 
 Move_Cells       `       0
 RiemannSolver           1           // 0 hllc, 1 hll
@@ -50,9 +55,30 @@ PLM			1.0
 
 Grav_2D			1
 G_EPS			0.0
-GravM           0.1
+GravM           1.0
+GravA           0.0
 AlphaVisc       0.0
-CoolFac         0.0
+
+BoostType   0       // 0 None, 1 Rigid, 2 Binary
+BinA        0.0
+BinW        0.1
+BinM        0.0
+
+//EoS
+EOSType            0       //0 Gammalaw, 1 Gas+Rad, 2 Gas+Rad+Deg, 3 PWF
+EOSPar1            1.0      // Gas
+EOSPar2            0.0      // Radiation
+EOSPar3            0.0      // Degeneracy
+EOSPar4            0.0      // Burning
+
+//Cooling
+CoolingType         0       //0 None, 1 Isothermal, 2 Blackbody-Thompson,
+                            //3 Blackbody-freefree, 4 Neutrino-Approx,
+                            //5 Neutrino-Itoh
+CoolPar1            0.0     // Coefficient for Pairs
+CoolPar2            0.0     // Coefficient for URCA
+CoolPar3            0.0
+CoolPar4            0.0
 
 //Initial Condition Parameters
 InitPar0        0
