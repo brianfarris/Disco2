@@ -56,7 +56,8 @@ def plot_r_profile(filename, sca='linear'):
 
     plt.tight_layout()
 
-    outname = "plot_r_{0}.png".format("_".join( filename.split(".")[0].split("_")[1:] ))
+    pathless_
+    outname = "plot_r_{0}.png".format("_".join( filename.split("/")[-1].split(".")[0].split("_")[1:] ))
 
     print("Saving {0:s}...".format(outname))
     plt.savefig(outname)

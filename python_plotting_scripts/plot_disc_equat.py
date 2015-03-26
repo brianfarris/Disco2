@@ -10,16 +10,23 @@ import sys
 import numpy as np
 import readChkpt as rc
 
-GAM = 5.0/3.0
 M = 1.0
 a = 0.0
 gridscale = 'linear'
 datscale = 'linear'
 A = a*M
-cmap = plt.cm.afmhot
+poscmap = plt.cm.afmhot
+divcmap = plt.cm.RdBu
+
+BINSEP = 200.0
+ROCHE = True
+XROCHE = None
+YROCHE = None
+ZROCHE = None
 
 def plot_equat_single(fig, ax, mesh, dat, gridscale="linear", gridbounds=None,
-                    datscale="linear", datbounds=None, label=None, **kwargs):
+                    datscale="linear", datbounds=None, label=None, 
+                    normal=False, **kwargs):
     N = 400
 
     #Set data bounds & scale.
@@ -33,7 +40,11 @@ def plot_equat_single(fig, ax, mesh, dat, gridscale="linear", gridbounds=None,
         locator = tkr.LogLocator()
         formatter = tkr.LogFormatter()
     else:
-        v = np.linspace(datbounds[0], datbounds[1], N)
+        if normal:
+            datm = max(abs(datbounds[0]), abs(datbounds[1]))
+            v = np.linspace(-datm, datm, N)
+        else:
+            v = np.linspace(datbounds[0], datbounds[1], N)
         norm = clrs.Normalize()
         locator = tkr.AutoLocator()
         formatter = tkr.ScalarFormatter()
@@ -41,6 +52,10 @@ def plot_equat_single(fig, ax, mesh, dat, gridscale="linear", gridbounds=None,
     #Plot Disc Image
     C = ax.tricontourf(mesh, dat, v, norm=norm, **kwargs)
     colorbar = fig.colorbar(C, format=formatter, ticks=locator)
+
+    #Plot Roche Equipotential
+    if ROCHE:
+        plot_roche(ax, mesh, gridbounds)
 
     #Patches to highlight horizona and ergosphere
     if M > 0.0:
@@ -67,14 +82,44 @@ def plot_equat_single(fig, ax, mesh, dat, gridscale="linear", gridbounds=None,
     ax.set_xlabel(r'$x$')
     ax.set_ylabel(r'$y$')
 
+def plot_roche(ax, mesh, gridbounds):
+
+    N = 128
+
+    global XROCHE
+    global YROCHE
+    global ZROCHE
+
+    if XROCHE == None or YROCHE is None or ZROCHE is None:
+        print("Building Roche Lobe")
+        if gridbounds is None:
+            xlim = ax.get_xlim()
+            ylim = ax.get_ylim()
+        else:
+            xlim = gridbounds[0]
+            ylim = gridbounds[1]
+        x = np.linspace(xlim[0], xlim[1], N)
+        y = np.linspace(ylim[0], ylim[1], N)
+
+        XROCHE,YROCHE = np.meshgrid(x, y)
+        ZROCHE = -M/np.sqrt((XROCHE)*(XROCHE)+YROCHE*YROCHE) \
+                -M/np.sqrt((XROCHE+BINSEP)*(XROCHE+BINSEP)+YROCHE*YROCHE) \
+                -M*((XROCHE+0.5*BINSEP)*(XROCHE+0.5*BINSEP)+YROCHE*YROCHE) \
+                    / (BINSEP*BINSEP*BINSEP)
+
+    lvl = -4*M/BINSEP
+    ax.contour(XROCHE, YROCHE, ZROCHE, levels=[lvl], colors='m')
+    #ax.contour(XROCHE, YROCHE, ZROCHE)
+
+
 def make_plot(mesh, dat, gridscale="linear", gridbounds=None, 
                 datscale="linear", datbounds=None, label=None, 
-                title=None, filename=None, **kwargs):
+                title=None, filename=None, normal=False, **kwargs):
 
     fig = plt.figure(figsize=(12,9))
     ax = fig.add_subplot(1,1,1)
     plot_equat_single(fig, ax, mesh, dat, gridscale, gridbounds,
-                    datscale, datbounds, label, **kwargs)
+                    datscale, datbounds, label, normal, **kwargs)
     if title is not None:
         ax.set_title(title)
     if filename is not None:
@@ -126,6 +171,8 @@ def plot_all(filename, gridscale='linear', plot=True, bounds=None):
         y = r*sin(phi)
         mesh = tri.Triangulation(x, y)
 
+        gridbounds = np.array([[-r.max(),r.max()],[-r.max(),r.max()]])
+
         outpath = filename.split("/")[:-1]
         chckname = filename.split("/")[-1]
 
@@ -144,30 +191,32 @@ def plot_all(filename, gridscale='linear', plot=True, bounds=None):
         #Plot.
 
         #Rho
-        make_plot(mesh, rho, gridscale="linear", gridbounds=None,
+        make_plot(mesh, rho, gridscale="linear", gridbounds=gridbounds,
                 datscale="linear", datbounds=bounds[0],
-                label=r'$\rho_0$', title=title, filename=rhoname, cmap=cmap)
+                label=r'$\rho_0$', title=title, filename=rhoname, cmap=poscmap)
 
         #T
-        make_plot(mesh, T, gridscale="linear", gridbounds=None,
+        make_plot(mesh, T, gridscale="linear", gridbounds=gridbounds,
                 datscale="log", datbounds=bounds[1],
-                label=r'$T$', title=title, filename=Tname, cmap=cmap)
+                label=r'$T$', title=title, filename=Tname, cmap=poscmap)
 
-        """
+        
         #Vr
-        make_plot(mesh, vr, gridscale="linear", gridbounds=None,
+        make_plot(mesh, vr, gridscale="linear", gridbounds=gridbounds,
                 datscale="linear", datbounds=bounds[2],
-                label=r'$v^r$', title=title, filename=vrname, cmap=cmap)
+                label=r'$v^r$', title=title, filename=vrname, normal=True,
+                cmap=divcmap)
 
         #Vp
-        make_plot(mesh, vp, gridscale="linear", gridbounds=None,
+        make_plot(mesh, vp, gridscale="linear", gridbounds=gridbounds,
                 datscale="linear", datbounds=bounds[3],
-                label=r'$v^\phi$', title=title, filename=vpname, cmap=cmap)
-        """
+                label=r'$v^\phi$', title=title, filename=vpname, normal=True,
+                cmap=divcmap)
+        
         #q
-        make_plot(mesh, q, gridscale="linear", gridbounds=None,
+        make_plot(mesh, q, gridscale="linear", gridbounds=gridbounds,
                 datscale="linear", datbounds=bounds[4],
-                label=r'$q$', title=title, filename=qname, cmap=cmap)
+                label=r'$q$', title=title, filename=qname, cmap=poscmap)
 
     return bounds
 
