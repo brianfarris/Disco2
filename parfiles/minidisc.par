@@ -29,10 +29,10 @@ aspect         1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                1.0e4
-Num_Checkpoints	        1001
-Num_Diag_Dump           1001
-Num_Diag_Measure        1001
+Time_Max                4.0e4
+Num_Checkpoints	        4001
+Num_Diag_Dump           41
+Num_Diag_Measure        41
 
 
 NoInnerBC               0
@@ -77,7 +77,7 @@ EOSPar4            0.0      // Burning
 CoolingType         2       //0 None, 1 Isothermal, 2 Blackbody-Thompson,
                             //3 Blackbody-freefree, 4 Neutrino-Approx,
                             //5 Neutrino-Itoh
-CoolPar1            1.0     // Coefficient for Cooling
+CoolPar1            1.0e-6     // Coefficient for Cooling
 CoolPar2            0.0     
 CoolPar3            0.0
 CoolPar4            0.0

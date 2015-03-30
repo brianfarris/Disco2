@@ -8,6 +8,7 @@ import readChkpt as rc
 
 GAM = 1.3333333333
 M = 1.0
+ysca = "linear"
 
 def plot_r_profile_single(r, f, xsca, ysca, ylabel, R=None, F=None):
 
@@ -71,11 +72,11 @@ if __name__ == "__main__":
 
     elif len(sys.argv) == 2:
         filename = sys.argv[1]
-        fig = plot_r_profile(filename, sca='log')
+        fig = plot_r_profile(filename, sca=ysca)
         plt.show()
 
     else:
         for filename in sys.argv[1:]:
-            fig = plot_r_profile(filename, sca='log')
+            fig = plot_r_profile(filename, sca=ysca)
             plt.close(fig)
 
