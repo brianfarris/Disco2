@@ -44,6 +44,9 @@ double eos_cool_bb_es(double *prim, double H, struct Sim *theSim)
     double q = q0 * 8.0*eos_sb * T*T*T*T/(3.0*kappa*rho*h);
     double Q = q / (eos_c*eos_c*eos_c * eos_rho_scale);
 
+    if(sim_NUM_Q(theSim) > sim_NUM_C(theSim))
+        Q *= prim[sim_NUM_C(theSim)];
+
     return Q;
 }
 

@@ -186,8 +186,8 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
             double dr = rp-rm;
             double r = .5*(rp+rm);
             
-            //if(r < metric_horizon(theSim))
-            //    continue;
+            if(r < metric_horizon(theSim))
+                continue;
 
             for(j = 0; j < sim_N_p(theSim,i); ++j)
             {
@@ -252,7 +252,7 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                         dtv = 1.0e100; //HUGE
                     
                     //Luminosity Time
-                    double maxdisp = 0.1; //Should be a fraction like 0.1
+                    double maxdisp = 0.04; //Should be a fraction like 0.1
                     double dtl;
 
                     if(sim_CoolingType(theSim) != COOL_NONE)

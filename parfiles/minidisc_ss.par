@@ -13,15 +13,15 @@ Background              2       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
 Metric                  6       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS, 4 Kerr-KS, 5 FlatADM,
                                 // 6 Schwarzschild-KS-ADM, 
-Frame                   0       // 0 Euler, 1 Keplerian, 2 Accreting
+Frame                   2       // 0 Euler, 1 Keplerian, 2 Accreting
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR			128			//Radial Zones
+NumR			256			//Radial Zones
 NumZ			1       //Vertical Zones
 ng              2
-R_Min		    100
-R_Max			500
+R_Min		    1.5
+R_Max			100
 Z_Min			-1.0e4
 Z_Max			1.0e4
 NP_CONST       3
@@ -29,14 +29,14 @@ aspect         1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                4.0e4
-Num_Checkpoints	        4001
-Num_Diag_Dump           41
-Num_Diag_Measure        41
+Time_Max                1.0e3
+Num_Checkpoints	        1001
+Num_Diag_Dump           11
+Num_Diag_Measure        11
 
 
 NoInnerBC               0
-BoundTypeRIn            1       // 0 fixed, 1 outflow, 3 SS profile, 4 Linear
+BoundTypeRIn            4       // 0 fixed, 1 outflow, 3 SS profile, 4 Linear
 BoundTypeROut           1       // 0 fixed, 1 outflow, 3 SS profile, 4 Linear
 BoundTypeZTop           2       // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2       // 0 fixed, 1 outflow, 2 periodic
@@ -77,25 +77,25 @@ EOSPar4            0.0      // Burning
 CoolingType         2       //0 None, 1 Isothermal, 2 Blackbody-Thompson,
                             //3 Blackbody-freefree, 4 Neutrino-Approx,
                             //5 Neutrino-Itoh
-CoolPar1            1.0e-6     // Coefficient for Cooling
+CoolPar1            1.0     // Coefficient for Cooling
 CoolPar2            0.0     
 CoolPar3            0.0
 CoolPar4            0.0
 
 //Initial Condition Parameters
-InitPar0        0           // 0 Spread, 1 Shakura-Sunyaev
-InitPar1        250.0       // R0 - location of disc denter
-InitPar2        25.0        // dr - extent of disc
-InitPar3        1.0e0       // rho1 - peak density
-InitPar4        1.0e-4      // rho0 - density of atmosphere
-InitPar5        1.0e-6      // P0 - pressure of atmosphere
+InitPar0        1           // 0 Spread, 1 Shakura-Sunyaev
+InitPar1        0.0       // R0 - Inner edge of Disc
+InitPar2        60.0        // R1 - Outer Edge of Disc
+InitPar3        1.0e-13    // mdot - in M_solar / s
+InitPar4        1.0e-3      // rho0 - density of atmosphere
+InitPar5        1.0e-8      // P0 - pressure of atmosphere
 InitPar6        0.0         // 
 
 PHI_ORDER               2
 
 //Atmosphere Parameters
 Rho_Floor		1.0e-10
-Cs_Floor		1.0e-14 // T floor in GRDISC
+Cs_Floor		1.0e-20 // T floor in GRDISC
 Cs_Cap			1.0
 Vel_Cap			100.0
 

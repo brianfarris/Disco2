@@ -85,10 +85,10 @@ void cell_init_minidisc_shakura(struct Cell *c, double r, double phi, double z,
     double alpha = sim_AlphaVisc(theSim);
 
     double rho, T, vr, vp, q;
-    double R0, dr, mdot, rho0, T0;
+    double R0, R1, mdot, rho0, T0;
 
-    R0 = sim_InitPar1(theSim);   //Location of disc
-    dr = sim_InitPar2(theSim);  //Extent of disc from R0
+    R0 = sim_InitPar1(theSim);   //Inner Edge of Disc
+    R1 = sim_InitPar2(theSim);  //Outer Edge of Disc
     mdot = sim_InitPar3(theSim); //Accretion rate in solar masses per second
     rho0 = sim_InitPar4(theSim); //Density of atmosphere
     T0 = sim_InitPar5(theSim);   //Temperature of atmosphere
@@ -107,8 +107,8 @@ void cell_init_minidisc_shakura(struct Cell *c, double r, double phi, double z,
     vp = -b[1];
     q = 0.0;
 
-    if( fabs(r-R0) < 3*dr)
-    {
+    //if(r > 10*M)
+    //{
         //First get everything in CGS.
         double omk = sqrt(M/(r*r*r)) * eos_c/eos_r_scale;
         double kappa = 0.2;  //Thompson opacity in cgs
@@ -119,14 +119,24 @@ void cell_init_minidisc_shakura(struct Cell *c, double r, double phi, double z,
         double rhoH = pow(0.75 * eos_sb*eos_mp*eos_mp*eos_mp*eos_mp/kappa
                              * PH*PH*PH*PH / qdot, 0.2);
         double vrcgs = -mdot / (2*M_PI*r*rhoH);
+
+        //cavity scale
+        double scale = exp(-pow(r/R0,-5) - pow(r/R1,10));
+        //double scale = exp(-10*(R0/r + R1/r));
         
         //Now assign values in code units
-        rho += rhoH / (eos_rho_scale*eos_r_scale);
-        T += PH / (eos_rho_scale*eos_c*eos_c*eos_r_scale);
+        rho = scale * rhoH / (eos_rho_scale*eos_r_scale) + (1-scale)*rho0;
+        T = scale * PH / (eos_rho_scale*eos_c*eos_c*eos_r_scale) + (1-scale)*T0;
         vr = vrcgs / eos_c;
         vp = omk / (eos_c/eos_r_scale);
-        q = 1;
-    }
+        q += scale * 1.0;
+    //}
+
+    double rel_weight = exp(-pow(r/(6*M),-5));
+    vr = rel_weight * vr + (1-rel_weight) * (-b[0]);
+    if(vr < (-2*M/r) / (1+2*M/r))
+        vr = (-2*M/r) / (1+2*M/r);
+    vp = rel_weight * vp + (1-rel_weight) * 1.0*sqrt(M/(r*r*(r+2*M)));
 /*
     if(sim_Background(theSim) != GRDISC)
     {

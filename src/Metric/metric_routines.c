@@ -260,6 +260,15 @@ double metric_frame_U_u_acc(struct Metric *g, int mu, struct Sim *theSim)
         else if (mu == 0)
             return (1.0+A*omk) * sqrt(1.0+2*M/r) * Wp;
     }
+    else if(sim_Metric(theSim) == SCHWARZSCHILD_KS_ADM)
+    {
+        if(mu == 1)
+            return -2*M/sqrt((r+2*M)*(r-M));
+        else if(mu == 2)
+            return sqrt(M/(r*r*(r-M)));
+        else if (mu == 0)
+            return sqrt((r+2*M)/(r-M));
+    }
     return 0.0;
 }
 
@@ -329,6 +338,23 @@ double metric_frame_dU_du_acc(struct Metric *g, int mu, int nu, struct Sim *theS
             return A*domk * sqrt(1.0+2*M/r) * Wp
                     + (1.0+A*omk) * (-M/(r*r*sqrt(1.0+2*M/r))) * Wp
                     + (1.0+A*omk) * sqrt(1.0+2*M/r) * dWp;
+    }
+    if(sim_Metric(theSim) == SCHWARZSCHILD_KS_ADM)
+    {
+        if(nu == 1)
+        {
+            double ur = -2*M/sqrt((r+2*M)*(r-M));
+            return ur*ur*ur/(-8*M*M) * (2*r+M);
+        }
+        else if(nu == 2)
+        {
+            double up = sqrt(M/(r*r*(r-M)));
+            return -0.5*up*up*up/M * (3*r*r-2*M*r);
+        }
+        else if(nu == 0)
+        {
+            return -1.5*M*sqrt((r-M)/(r+2*M)) / ((r-M)*(r-M));
+        }
     }
 
     return 0.0;
