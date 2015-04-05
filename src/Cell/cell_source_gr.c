@@ -244,11 +244,17 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                 //if it will, instead reduce the momenta by 0.9.  These lines
                 //should be irrelevant because of the luminosity-limited timestep.
                 if(fabs(c->cons[SRR]) < fabs(dt*dV*sqrtg*a* cool*u_d[1]))
+                {
+                    printf("That SRR is pretty cool! (r = %.12g\n", r);
                     c->cons[SRR] /= 1.1;
+                }
                 else
                     c->cons[SRR] -= dt*dV*sqrtg*a* cool*u_d[1];
                 if(fabs(c->cons[LLL]) <  fabs(dt*dV*sqrtg*a* cool*u_d[2]))
+                {
+                    printf("That LLL is pretty cool! (r = %.12g\n", r);
                     c->cons[LLL] /= 1.1;
+                }
                 else
                     c->cons[LLL] -= dt*dV*sqrtg*a* cool*u_d[2];
                 if( fabs(c->cons[SZZ]) < fabs(dt*dV*sqrtg*a* cool*u_d[3]))
@@ -258,7 +264,7 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                 if(fabs(c->cons[TAU]) < fabs(dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3])))
                 {
                     c->cons[TAU] /= 1.1;
-                    printf("That's pretty cool!\n");
+                    printf("That TAU is pretty cool! (r = %.12g)\n", r);
                 }
                 else
                     c->cons[TAU] += dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]); 

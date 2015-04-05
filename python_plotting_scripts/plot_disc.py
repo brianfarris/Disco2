@@ -26,34 +26,38 @@ rg_solar = 1.4766250385e5
 M_solar = 1.9884e33
 
 def P_gas(rho, T):
-    return rho * T
+    return eos_x1 * rho * T
 
 def P_rad(rho, T):
-    return 4.0*sb/(3.0*c) * (T*mp*c*c)**4 / (c*c)
+    return eos_x2 * 4.0*sb/(3.0*c) * (T*mp*c*c)**4 / (c*c)
 
 def P_deg(rho, T):
-    return 2*np.pi*h*c/3.0 * np.power(3*rho/(8*np.pi*mp),4.0/3.0) / (c*c)
+    return eos_x3 * 2*np.pi*h*c/3.0 * np.power(3*rho/(8*np.pi*mp),4.0/3.0) \
+            / (c*c)
 
 def e_gas(rho, T):
-    return T / (GAM-1.0)
+    return eos_x1 * T / (GAM-1.0)
 
 def e_rad(rho, T):
-    return 4.0*sb * (T*mp*c*c)**4 / (c*rho*c*c)
+    return eos_x2 * 4.0*sb * (T*mp*c*c)**4 / (c*rho*c*c)
 
 def e_deg(rho, T):
-    return h*c/(4.0*mp) * np.power(3*rho/(8*np.pi*mp),1.0/3.0) / (c*c)
+    return eos_x3 * h*c/(4.0*mp) * np.power(3*rho/(8*np.pi*mp),1.0/3.0) / (c*c)
 
 def dPdr(rho, T):
-    return T + h*c/(3*mp)*np.power(3*rho/(8*np.pi*mp),1.0/3.0) / (c*c)
+    return eos_x1*T \
+            + eos_x3*h*c/(3*mp)*np.power(3*rho/(8*np.pi*mp),1.0/3.0)/(c*c)
 
 def dPdT(rho, T):
-    return rho + 16.0*sb/(3.0*c) * (T*mp*c*c)**3 * mp
+    return eos_x1 * rho + eos_x2 * 16.0*sb/(3.0*c) * (T*mp*c*c)**3 * mp
 
 def dedr(rho, T):
-    return -4.0*sb * (T*mp*c*c)**4 / (c*rho*rho*c*c) + 3*h*c/(32*np.pi*mp*mp) * np.power(3*rho/(8*np.pi*mp),-2.0/3.0) / (c*c)
+    return eos_x2 * -4.0*sb * (T*mp*c*c)**4 / (c*rho*rho*c*c) \
+            + eos_x3 * 3*h*c/(32*np.pi*mp*mp) \
+                * np.power(3*rho/(8*np.pi*mp),-2.0/3.0) / (c*c)
 
 def dedT(rho, T):
-    return c*c/(GAM-1.0) + 16.0*sb*(T*mp*c*c)**3 * mp / (c*rho)
+    return eos_x1 * c*c/(GAM-1.0) + eos_x2*16.0*sb*(T*mp*c*c)**3 * mp/(c*rho)
 
 def cs2(rho, T):
     P = P_gas(rho,T)+P_rad(rho,T)+P_deg(rho,T)
@@ -118,7 +122,6 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
     vp = vp[inds]
 
     i = r.argmax()
-    #R = np.linspace(r.min(), r.max(), 100)
     R = np.logspace(np.log10(r.min()), np.log10(r.max()), 100)
     RHO = rho[i] * np.power(R/r[i], -1.5)
     TTT = T[i] * np.power(R/r[i], -1.0)
@@ -126,37 +129,20 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
     UPP = vp[i] * np.power(R/r[i], -1.5)
 
     #u0 = 1.0/np.sqrt(1.0-2*M/r-vr*vr/(1-2*M/r)-r*r*vp*vp)
-    #U00 = 1.0/np.sqrt(1.0-2*M/R-URR*URR/(1-2*M/R)-R*R*UPP*UPP)
     u0 = 1.0/np.sqrt(1.0-2*M/r - 4*M/r*vr + 4*M*A/r*vp - (1+2*M/r)*vr*vr
                     + 2*A*(1+2*M/r)*vr*vp - (r*r+A*A*(1+2*M/r))*vp*vp)
-    #U00 = 1.0/np.sqrt(1.0-2*M/R-4*M/R*URR-(1+2*M/R)*URR*URR-R*R*UPP*UPP)
 
-    #fac = 1.0/(1.0-2*M/(r-2*M)*vr)
-    #vr = vr*fac
-    #vp = vp*fac
-
-    #V = u0*vr / np.sqrt(1-2*M/r+u0*u0*vr*vr)
-    #VVV = U00*URR / np.sqrt(1-2*M/R+U00*U00*URR*URR)
-
-    #mach = np.sqrt((vr*vr/(1-2*M/r)+r*r*vp*vp)/(GAM*P/rhoh))
-    #MACH = np.sqrt((URR*URR/(1-2*M/R)+R*R*UPP*UPP)/(GAM*PPP/RHOH))
-
-    Pg = eos_x1*P_gas(rho, T)
-    Pr = eos_x2*P_rad(rho, T)
-    Pd = eos_x3*P_deg(rho, T)
+    Pg = P_gas(rho, T)
+    Pr = P_rad(rho, T)
+    Pd = P_deg(rho, T)
     Ptot = Pg + Pr + Pd
-    epstot = eos_x1*e_gas(rho,T) + eos_x2*e_rad(rho,T) + eos_x3*e_deg(rho,T)
-
-    #EPS = eos_x1*e_gas(RHO,TTT) + eos_x2*e_rad(RHO,TTT) + eos_x3*e_deg(RHO,TTT)
-    #PPP = eos_x1*P_gas(RHO, TTT) + eos_x2*P_rad(RHO, TTT)
+    epstot = e_gas(rho,T) + e_rad(rho,T) + e_deg(rho,T)
 
     rhoh = rho + rho*epstot + Ptot
-    #RHOH = RHO + RHO*EPS + PPP
 
     W = u0 / np.sqrt(1+2*M/r)
 
     H = np.sqrt(Ptot*r*r*r/(rhoh*M))/u0
-    #HHH = np.sqrt(PPP*R*R*R/(RHOH*M))/U00
 
     Mdot = -2*math.pi*r*rho*u0*vr*H * c*rg_solar*rg_solar/M_solar
 

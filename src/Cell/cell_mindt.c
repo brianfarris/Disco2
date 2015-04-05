@@ -186,8 +186,8 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
             double dr = rp-rm;
             double r = .5*(rp+rm);
             
-            //if(r < metric_horizon(theSim))
-            //    continue;
+            if(r < metric_horizon(theSim))
+                continue;
 
             for(j = 0; j < sim_N_p(theSim,i); ++j)
             {
@@ -252,7 +252,7 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                         dtv = 1.0e100; //HUGE
                     
                     //Luminosity Time
-                    double maxdisp = 0.1; //Should be a fraction like 0.1
+                    double maxdisp = 0.04; //Should be a fraction like 0.1
                     double dtl;
 
                     if(sim_CoolingType(theSim) != COOL_NONE)
@@ -295,18 +295,21 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                             printf("WHAT.");
                         dtl_min = dtl;
                         dtl = maxdisp * fabs(theCells[k][i][j].cons[SRR] / (dV*al*sqrtg*u_d[1]*cool));
-                        if(dtl < dtl_min)
+                        if(dtl < dtl_min && dtl > 0.0)
                             dtl_min = dtl;
                         dtl = maxdisp * fabs(theCells[k][i][j].cons[LLL] / (dV*al*sqrtg*u_d[2]*cool));
-                        if(dtl < dtl_min)
+                        if(dtl < dtl_min && dtl > 0.0)
                             dtl_min = dtl;
                         if(sim_N(theSim, Z_DIR) > 1)
                         {
                             dtl = maxdisp * fabs(theCells[k][i][j].cons[SZZ] / (dV*al*sqrtg*u_d[3]*cool));
-                            if(dtl < dtl_min)
+                            if(dtl < dtl_min && dtl > 0.0)
                                 dtl_min = dtl;
                         }
                         dtl = dtl_min;
+
+                        if(dtl == 0.0)
+                            printf("r=%.12g (%.12g %.12g %.12g)\n",r, dt, dtv, dtl);
 
                         dt = dt/(1.0 + dt/dtv + dt/dtl);
                     }

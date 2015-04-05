@@ -47,12 +47,13 @@ def calc_mdot(r, phi, z, rho, H, vr, vp):
     U0 = calc_u0(r, phi, vr, vp)
     UR = U0*VR
 
-    Rs, nphi = np.unique(RRR, return_counts=True)
+    Rs = np.unique(RRR)
     Mdot = np.zeros(Rs.shape)
 
     for i,R in enumerate(Rs):
         inds = (RRR==R)
-        dphi = 2*math.pi / nphi[i]
+        nphi = len(RRR[inds])
+        dphi = 2*math.pi / nphi
 
         Mdot[i] = -R * (SIG[inds] * UR[inds] * dphi).sum()
 
