@@ -121,7 +121,7 @@ void cell_init_minidisc_shakura(struct Cell *c, double r, double phi, double z,
         double vrcgs = -mdot / (2*M_PI*r*rhoH);
 
         //cavity scale
-        double scale = exp(-pow(r/R0,-5) - pow(r/R1,10));
+        double scale = exp(-pow(r/R0,-1) - pow(r/R1,10));
         //double scale = exp(-10*(R0/r + R1/r));
         
         //Now assign values in code units
