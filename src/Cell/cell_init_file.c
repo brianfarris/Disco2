@@ -23,7 +23,7 @@ void cell_init_file_radtxt(struct Cell *c, double r, double phi, double z,
     // the number of variables (must be at least 4).  It is assumed values of 
     // r are unique and increasing.
 
-    int i;
+    int i, atleast2;
     double r1, *dat1, r2, *dat2, w1, w2;
     int nr, nq;
     double rho, P, vr, vp, vz, *q;
@@ -36,7 +36,8 @@ void cell_init_file_radtxt(struct Cell *c, double r, double phi, double z,
     q = nq>5 ? (double*)malloc((nq-5)*sizeof(double)) : NULL;
 
     r2 = -1;
-    while(r2 < r)
+    atleast2 = 0;
+    while(r2 < r || atleast2 < 2)
     {
         r1 = r2;
         for(i=0; i<nq; i++)
@@ -44,6 +45,7 @@ void cell_init_file_radtxt(struct Cell *c, double r, double phi, double z,
         fscanf(f, "%lg ", &r2);
         for(i=0; i<nq; i++)
             fscanf(f, "%lg ", &dat2[i]);
+        atleast2++;
     }
     fclose(f);
 
