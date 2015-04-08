@@ -84,8 +84,8 @@ CoolPar4            0.0
 
 //Initial Condition Parameters
 InitPar0        1           // 0 Spread, 1 Shakura-Sunyaev
-InitPar1        100.0       // R0 - Inner edge of Disc
-InitPar2        400.0        // R1 - Outer Edge of Disc
+InitPar1        1.0e20       // R0 - Inner edge of Disc
+InitPar2        4.0e20        // R1 - Outer Edge of Disc
 InitPar3        1.0e-12    // mdot - in M_solar / s
 InitPar4        1.0e-3      // rho0 - density of atmosphere
 InitPar5        1.0e-8      // P0 - pressure of atmosphere
@@ -95,7 +95,7 @@ PHI_ORDER               2
 
 //Atmosphere Parameters
 Rho_Floor		1.0e-10
-Cs_Floor		1.0e-10 // T floor in GRDISC
+Cs_Floor		1.0e-6 // T floor in GRDISC
 Cs_Cap			1.0
 Vel_Cap			100.0
 

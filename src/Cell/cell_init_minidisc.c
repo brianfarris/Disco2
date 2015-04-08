@@ -120,23 +120,28 @@ void cell_init_minidisc_shakura(struct Cell *c, double r, double phi, double z,
                              * PH*PH*PH*PH / qdot, 0.2);
         double vrcgs = -mdot / (2*M_PI*r*rhoH);
 
-        //cavity scale
+        //cavity scaling
         double scale = exp(-pow(r/R0,-1) - pow(r/R1,10));
         //double scale = exp(-10*(R0/r + R1/r));
         
         //Now assign values in code units
         rho = scale * rhoH / (eos_rho_scale*eos_r_scale) + (1-scale)*rho0;
         T = scale * PH / (eos_rho_scale*eos_c*eos_c*eos_r_scale) + (1-scale)*T0;
-        vr = vrcgs / eos_c;
-        vp = omk / (eos_c/eos_r_scale);
+        vr = scale * vrcgs / eos_c + (1-scale)*vr;
+        vp = scale * omk / (eos_c/eos_r_scale) + (1-scale)*vp;
         q += scale * 1.0;
     //}
-
+/*
     double rel_weight = exp(-pow(r/(6*M),-5));
     vr = rel_weight * vr + (1-rel_weight) * (-b[0]);
-    if(vr < (-2*M/r) / (1+2*M/r))
-        vr = (-2*M/r) / (1+2*M/r);
     vp = rel_weight * vp + (1-rel_weight) * 1.0*sqrt(M/(r*r*(r+2*M)));
+*/
+    double vmax = 0.5;
+    double vrmax = (vmax-2*M/r)/(1+2*M/r);
+    double vrmin = (-vmax-2*M/r)/(1+2*M/r);
+    vr = vr > vrmax ? vrmax : vr;
+    vr = vr < vrmin ? vrmin : vr;
+
 /*
     if(sim_Background(theSim) != GRDISC)
     {
