@@ -21,7 +21,7 @@ NumR			256			//Radial Zones
 NumZ			1       //Vertical Zones
 ng              2
 R_Min		    1.5
-R_Max			5.0e2
+R_Max			2.0e2
 Z_Min			-1.0e4
 Z_Max			1.0e4
 NP_CONST       3
@@ -29,7 +29,7 @@ aspect         1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                1.0e3
+Time_Max                1.0e2
 Num_Checkpoints	        1001
 Num_Diag_Dump           11
 Num_Diag_Measure        11
@@ -84,8 +84,8 @@ CoolPar4            0.0
 
 //Initial Condition Parameters
 InitPar0        1           // 0 Spread, 1 Shakura-Sunyaev
-InitPar1        1.0e20       // R0 - Inner edge of Disc
-InitPar2        4.0e20        // R1 - Outer Edge of Disc
+InitPar1        1.0e2       // R0 - Inner edge of Disc
+InitPar2        3.0e2        // R1 - Outer Edge of Disc
 InitPar3        1.0e-12    // mdot - in M_solar / s
 InitPar4        1.0e-3      // rho0 - density of atmosphere
 InitPar5        1.0e-8      // P0 - pressure of atmosphere
