@@ -23,7 +23,10 @@ def readChkpt(filename):
     vr = np.array(Data[:,5])
     vp = np.array(Data[:,6])
     vz = np.array(Data[:,7])
-    q = np.array(Data[:,8])
+    try:
+        q = np.array(Data[:,8])
+    except:
+        q = np.zeros(r.shape)
 
     #calculate cell volumes
     z_vals = np.unique(z)
