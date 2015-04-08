@@ -101,7 +101,7 @@ def plot_r_profile(filename, sca='linear'):
     plt.gca().set_xscale(sca)
     
     plt.subplot(335)
-    plot_r_profile_single(r, vp, sca, r"$v^\phi$")
+    plot_r_profile_single(r, vp, linear, r"$v^\phi$")
     plt.plot(R, 1.0/(R*(1+2*M/R)), 'r--')
     plt.plot(R, 0.5/(R*(1+2*M/R)), 'b--')
 

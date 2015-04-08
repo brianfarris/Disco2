@@ -128,6 +128,7 @@ void cell_init_minidisc_shakura(struct Cell *c, double r, double phi, double z,
         rho = scale * rhoH / (eos_rho_scale*eos_r_scale) + (1-scale)*rho0;
         T = scale * PH / (eos_rho_scale*eos_c*eos_c*eos_r_scale) + (1-scale)*T0;
         //vr = scale * vrcgs / eos_c + (1-scale)*vr;
+        vr = -0.1 * alpha * pow(r/M, -0.5);
         vp = scale * omk / (eos_c/eos_r_scale) + (1-scale)*vp;
         q += scale * 1.0;
     //}
