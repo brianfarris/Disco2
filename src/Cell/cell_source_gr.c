@@ -243,19 +243,24 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                 //Cooling should never (?) change the sign of the momenta,
                 //if it will, instead reduce the momenta by 0.9.  These lines
                 //should be irrelevant because of the luminosity-limited timestep.
+                
+                /*
                 if(fabs(c->cons[SRR]) < fabs(dt*dV*sqrtg*a* cool*u_d[1]))
                 {
-                    printf("That SRR is pretty cool! (r = %.12g\n", r);
+                    printf("That SRR is pretty cool! (r = %.12g, ur = %.12lg, SRR = %.12lg qR = %.12lg\n", r, u_d[1], c->cons[SRR], dt*dV*sqrtg*a* cool*u_d[1]);
                     c->cons[SRR] /= 1.1;
                 }
                 else
+                */
                     c->cons[SRR] -= dt*dV*sqrtg*a* cool*u_d[1];
+                /*
                 if(fabs(c->cons[LLL]) <  fabs(dt*dV*sqrtg*a* cool*u_d[2]))
                 {
-                    printf("That LLL is pretty cool! (r = %.12g\n", r);
+                    printf("That LLL is pretty cool! (r = %.12g, up = %.12lg, LLL = %.12lg qL = %.12lg\n", r, u_d[2], c->cons[LLL], dt*dV*sqrtg*a* cool*u_d[2]);
                     c->cons[LLL] /= 1.1;
                 }
                 else
+                */
                     c->cons[LLL] -= dt*dV*sqrtg*a* cool*u_d[2];
                 if( fabs(c->cons[SZZ]) < fabs(dt*dV*sqrtg*a* cool*u_d[3]))
                     c->cons[SZZ] /= 1.1;

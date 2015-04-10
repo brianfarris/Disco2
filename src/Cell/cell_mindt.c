@@ -8,6 +8,10 @@
 #include "../Headers/Sim.h"
 #include "../Headers/header.h"
 
+//Local functions
+double cell_mindt_binary_step(double r, double phi, double d4V, double tau,
+                                double rhoh, double *u, struct Sim *theSim);
+
 double maxvel(double * prim , double w , double r ,struct Sim * theSim){
 
     double maxv;
@@ -320,6 +324,32 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
 
                 }
 
+                if(sim_BoostType(theSim) == BOOST_BIN)
+                {
+                    struct Metric *g;
+                    g = metric_create(time_global, r, phi, z, theSim);
+                    double al, b[3], sqrtg, v[3], u[4];
+                    al = metric_lapse(g);
+                    b[0] = metric_shift_u(g,0);
+                    b[1] = metric_shift_u(g,1);
+                    b[2] = metric_shift_u(g,2);
+                    sqrtg = metric_sqrtgamma(g)/r;
+                    v[0] = theCells[k][i][j].prim[URR];
+                    v[1] = theCells[k][i][j].prim[UPP];
+                    v[2] = theCells[k][i][j].prim[UZZ];
+                    u[0] = 1.0/sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
+                    u[1] = u[0]*v[0]; u[2] = u[0]*v[1]; u[3] = u[0]*v[2];
+                    double rho = theCells[k][i][j].prim[RHO];
+                    double Pp = theCells[k][i][j].prim[PPP];
+                    double GAM = sim_GAMMALAW(theSim);
+                    double rhoh = rho + GAM/(GAM-1)*Pp;
+                    double dV = 0.5*(rp+rm)*dr*dphi*dz;
+                    double dtb = cell_mindt_binary_step(r, phi, al*sqrtg*dV, 
+                                    theCells[k][i][j].cons[TAU], rhoh, u, 
+                                    theSim);
+                    dt = dt/(1.0 + dt/dtb);
+                }
+
                 if(dt_m > dt)
                     dt_m = dt;
             }     
@@ -513,4 +543,24 @@ double cell_mindt_grdisc(struct Cell ***theCells, struct Sim *theSim)
     //printf("\nNewtonian dt: %lg, GR dt: %lg\n", dt_newt, dt2);
 
     return dt2;
+}
+
+double cell_mindt_binary_step(double r, double phi, double d4V, double tau,
+                                double rhoh, double *u, struct Sim *theSim)
+{
+    //Calculates the time-scale for energy loss due to the binary.
+    
+    double a = sim_BinA(theSim);
+    double M2 = sim_BinM(theSim);
+
+    double Fr, Fp, Ft;
+    double X = 2*a + r*cos(phi);
+    double Y = r*sin(phi);
+    double R = sqrt(X*X+Y*Y);
+
+    Fr += -M2/(R*R)*( X*cos(phi)/R + Y*sin(phi)/R)*rhoh*u[0]*u[0];
+    Fp += -M2/(R*R)*(-X*sin(phi)/R + Y*cos(phi)/R)*rhoh*u[0]*u[0]*r;
+    Ft = (u[1]*Fr + u[2]*Fp/r)/u[0];
+
+    return 1.0e4 * fabs(tau/(d4V * Ft));
 }

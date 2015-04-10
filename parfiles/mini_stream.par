@@ -20,7 +20,7 @@ Restart                 0       // If this=1 restart using input.h5
 NumR			32			//Radial Zones
 NumZ			1       //Vertical Zones
 ng              2
-R_Min		    3.0e1
+R_Min		    30
 R_Max			1.2e2
 Z_Min			-1.0e2
 Z_Max			1.0e2
@@ -41,7 +41,7 @@ BoundTypeROut           1       // 0 fixed, 1 outflow, 3 SS profile, 4 Linear
 BoundTypeZTop           2       // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2       // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry            1
-BoundTypeSource         5           // 0 None, 5 Nozzle
+BoundTypeSource         0           // 0 None, 5 Nozzle
 BoundPar1               0.1         // V - speed
 BoundPar2               100.0        // b - impact parameter
 BoundPar3               1.0         // rho0 - density
@@ -77,15 +77,15 @@ EOSPar4            0.0      // Burning
 CoolingType         2       //0 None, 1 Isothermal, 2 Blackbody-Thompson,
                             //3 Blackbody-freefree, 4 Neutrino-Approx,
                             //5 Neutrino-Itoh
-CoolPar1            0.0     // Coefficient for Pairs
+CoolPar1            1.0     // Coefficient for Pairs
 CoolPar2            0.0     // Coefficient for URCA
 CoolPar3            0.0
 CoolPar4            0.0
 
 //Initial Condition Parameters
 InitPar0        0           // 0 Normal, 1 Nozzle, 2 Disc
-InitPar1        1.0e-6      // rho0
-InitPar2        1.0e-3      // T0
+InitPar1        1.0e-3      // rho0
+InitPar2        1.0e-8      // T0
 InitPar3        100.0       // R0
 InitPar4        0.0         //  
 InitPar5        0.0         // 
