@@ -117,6 +117,9 @@ int main(int argc, char **argv) {
   }else{
     (*gravMass_init_ptr(theSim))(theGravMasses); // set up gravitating masses. 
     (*cell_init_ptr(theSim))(theCells,theSim,theMPIsetup); // setup initial data using routine specified in .par file
+    // Add External Sources
+    if(sim_BoundTypeSource(theSim) == BOUND_NOZZLE)
+      cell_boundary_nozzle(theCells, theSim, theMPIsetup);
   }
   gravMass_clean_pi(theGravMasses,theSim); // make sure GravMasses have phi between 0 and 2 pi.
 

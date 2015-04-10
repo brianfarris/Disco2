@@ -305,34 +305,23 @@ void cell_src_boost(double t, double r, double phi, double z, double *cons,
                     double dV, double dt, struct Sim *theSim)
 {
     double a = sim_BinA(theSim);
-    double w = sim_BinW(theSim);
     double M2 = sim_BinM(theSim);
 
     double al = metric_lapse(g);
     double sqrtg = metric_sqrtgamma(g) / r;
 
     double Fr, Fp, Ft;
-    Fr = 0.0;
-    Fp = 0.0;
-
-    //Centrifugal and Coriolis terms: 1/2 T^{\mu\nu} \partial_i g_{\mu\nu}
-    /*
-    Fr += rhoh*u[0]*u[0]*w*w*r
-        + rhoh*u[0]*u[0]*w*w*a*cos(phi)
-        + rhoh*u[0]*u[2]*2*w*r;
-    Fp += -rhoh*u[0]*u[0]*w*w*a*sin(phi)*r
-        - rhoh*u[0]*u[1]*2*w*r;
-    */
 
     double X = 2*a + r*cos(phi);
     double Y = r*sin(phi);
     double R = sqrt(X*X+Y*Y);
-    Fr += -M2/(R*R)*( X*cos(phi)/R + Y*sin(phi)/R)*rhoh*u[0]*u[0];
-    Fp += -M2/(R*R)*(-X*sin(phi)/R + Y*cos(phi)/R)*rhoh*u[0]*u[0]*r;
+    Fr = -M2/(R*R)*( X*cos(phi)/R + Y*sin(phi)/R)*rhoh*u[0]*u[0];
+    Fp = -M2/(R*R)*(-X*sin(phi)/R + Y*cos(phi)/R)*rhoh*u[0]*u[0]*r;
 
-    Ft = (u[1]*Fr + u[2]*Fp/r)/u[0];
+    //Energy source ensures no heating/cooling in fluid rest frame.
+    Ft = -(u[1]*Fr + u[2]*Fp/r)/u[0];
 
     cons[SRR] += al*sqrtg*dV*dt * Fr;
     cons[LLL] += al*sqrtg*dV*dt * Fp;
-    cons[TAU] += al*sqrtg*dV*dt * Ft;
+    cons[TAU] += al*sqrtg*dV*dt * (-U[0]*Ft - U[1]*Fr - U[2]*Fp);
 }

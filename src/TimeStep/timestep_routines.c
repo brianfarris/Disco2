@@ -224,7 +224,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
 
   // Add External Sources
   if(sim_BoundTypeSource(theSim) == BOUND_NOZZLE)
-      cell_boundary_nozzle(theCells, theSim, theMPIsetup, theTimeStep);
+      cell_boundary_nozzle(theCells, theSim, theMPIsetup);
 
   //clean up
   face_destroy(theFaces_r);

@@ -29,7 +29,7 @@ aspect         1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                1.0e3
+Time_Max                1.0e1
 Num_Checkpoints	        1001
 Num_Diag_Dump           1001
 Num_Diag_Measure        1001
@@ -41,11 +41,11 @@ BoundTypeROut           1       // 0 fixed, 1 outflow, 3 SS profile, 4 Linear
 BoundTypeZTop           2       // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2       // 0 fixed, 1 outflow, 2 periodic
 ZeroPsiBndry            1
-BoundTypeSource         0           // 0 None, 5 Nozzle
+BoundTypeSource         5           // 0 None, 5 Nozzle
 BoundPar1               0.1         // V - speed
 BoundPar2               100.0        // b - impact parameter
 BoundPar3               1.0         // rho0 - density
-BoundPar4               1.0e-3      // P - pressure
+BoundPar4               1.0e-5      // P - pressure
 
 Move_Cells              0       // 0 None, 4 Keplerian
 RiemannSolver           1           // 0 hllc, 1 hll
@@ -85,8 +85,8 @@ CoolPar4            0.0
 //Initial Condition Parameters
 InitPar0        0           // 0 Normal, 1 Nozzle, 2 Disc
 InitPar1        1.0e-3      // rho0
-InitPar2        1.0e-8      // T0
-InitPar3        100.0       // R0
+InitPar2        1.0e-5     // P0
+InitPar3        0.0       // R0
 InitPar4        0.0         //  
 InitPar5        0.0         // 
 InitPar6        0.0         // 

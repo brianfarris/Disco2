@@ -121,7 +121,7 @@ void cell_boundary_ssprofile_r_inner( struct Cell ***, struct Sim *,struct MPIse
 void cell_boundary_ssprofile_r_outer( struct Cell ***, struct Sim *,struct MPIsetup *);
 void cell_boundary_linear_r_inner( struct Cell *** , struct Face * ,struct Sim * ,struct MPIsetup *, struct TimeStep * );
 void cell_boundary_linear_r_outer( struct Cell *** , struct Face * ,struct Sim * ,struct MPIsetup *, struct TimeStep * );
-void cell_boundary_nozzle( struct Cell ***, struct Sim *,struct MPIsetup *, struct TimeStep *);
+void cell_boundary_nozzle( struct Cell ***, struct Sim *,struct MPIsetup *);
 void cell_bc_damp( struct Cell *** , struct Sim * , double ,void (*)(struct Cell *,struct Sim *,int,int,int));
 //primitive-conservative conversion routines
 void cell_calc_prim( struct Cell ***,struct Sim *);
