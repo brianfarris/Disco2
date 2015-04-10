@@ -533,7 +533,7 @@ void cell_boundary_linear_r_outer( struct Cell *** theCells , struct Face * theF
 }
 
 void cell_boundary_nozzle(struct Cell ***theCells, struct Sim *theSim, 
-                struct MPIsetup *theMPIsetup, struct TimeStep *theTimeStep)
+                struct MPIsetup *theMPIsetup)
 {
     // A nozzle entering injecting gas from the boundary.
     
@@ -564,7 +564,7 @@ void cell_boundary_nozzle(struct Cell ***theCells, struct Sim *theSim,
                                 - 0.5*theCells[k][i][j].dphi;
                     double x = r * cos(phi);
                     double y = r * sin(phi);
-                    if(x > 0.0 && fabs(sin(phi)) < 3*width/r)
+                    if(x > 0.0 && fabs(sin(phi)) < 2*width/r)
                     {
                         double fac = exp(-(y*y+z*z)/(2*width*width));
                         double sina = b/r;
@@ -575,6 +575,8 @@ void cell_boundary_nozzle(struct Cell ***theCells, struct Sim *theSim,
                         theCells[k][i][j].prim[TTT] = fac*T0;
                         theCells[k][i][j].prim[URR] = fac*vr;
                         theCells[k][i][j].prim[UPP] = fac*vp;
+                        if(sim_NUM_Q(theSim) > sim_NUM_C(theSim))
+                            theCells[k][i][j].prim[sim_NUM_C(theSim)] = fac;
                     }
                 }
             }

@@ -10,7 +10,8 @@
 
 //Local functions
 double cell_mindt_binary_step(double r, double phi, double d4V, double tau,
-                                double rhoh, double *u, struct Sim *theSim);
+                                double rhoh, double *u, double *U,
+                                struct Sim *theSim);
 
 double maxvel(double * prim , double w , double r ,struct Sim * theSim){
 
@@ -256,7 +257,7 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                         dtv = 1.0e100; //HUGE
                     
                     //Luminosity Time
-                    double maxdisp = 0.04; //Should be a fraction like 0.1
+                    double maxdisp = 0.1; //Should be a fraction like 0.1
                     double dtl;
 
                     if(sim_CoolingType(theSim) != COOL_NONE)
@@ -328,7 +329,7 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                 {
                     struct Metric *g;
                     g = metric_create(time_global, r, phi, z, theSim);
-                    double al, b[3], sqrtg, v[3], u[4];
+                    double al, b[3], sqrtg, v[3], u[4], U[4];
                     al = metric_lapse(g);
                     b[0] = metric_shift_u(g,0);
                     b[1] = metric_shift_u(g,1);
@@ -339,13 +340,18 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                     v[2] = theCells[k][i][j].prim[UZZ];
                     u[0] = 1.0/sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
                     u[1] = u[0]*v[0]; u[2] = u[0]*v[1]; u[3] = u[0]*v[2];
+                    U[0] = metric_frame_U_u(g, 0, theSim);
+                    U[1] = metric_frame_U_u(g, 1, theSim);
+                    U[2] = metric_frame_U_u(g, 2, theSim);
+                    U[3] = metric_frame_U_u(g, 3, theSim);
+                    metric_destroy(g);
                     double rho = theCells[k][i][j].prim[RHO];
                     double Pp = theCells[k][i][j].prim[PPP];
                     double GAM = sim_GAMMALAW(theSim);
                     double rhoh = rho + GAM/(GAM-1)*Pp;
                     double dV = 0.5*(rp+rm)*dr*dphi*dz;
                     double dtb = cell_mindt_binary_step(r, phi, al*sqrtg*dV, 
-                                    theCells[k][i][j].cons[TAU], rhoh, u, 
+                                    theCells[k][i][j].cons[TAU], rhoh, u, U,
                                     theSim);
                     dt = dt/(1.0 + dt/dtb);
                 }
@@ -546,7 +552,8 @@ double cell_mindt_grdisc(struct Cell ***theCells, struct Sim *theSim)
 }
 
 double cell_mindt_binary_step(double r, double phi, double d4V, double tau,
-                                double rhoh, double *u, struct Sim *theSim)
+                                double rhoh, double *u, double *U, 
+                                struct Sim *theSim)
 {
     //Calculates the time-scale for energy loss due to the binary.
     
@@ -558,9 +565,9 @@ double cell_mindt_binary_step(double r, double phi, double d4V, double tau,
     double Y = r*sin(phi);
     double R = sqrt(X*X+Y*Y);
 
-    Fr += -M2/(R*R)*( X*cos(phi)/R + Y*sin(phi)/R)*rhoh*u[0]*u[0];
-    Fp += -M2/(R*R)*(-X*sin(phi)/R + Y*cos(phi)/R)*rhoh*u[0]*u[0]*r;
-    Ft = (u[1]*Fr + u[2]*Fp/r)/u[0];
+    Fr = -M2/(R*R)*( X*cos(phi)/R + Y*sin(phi)/R)*rhoh*u[0]*u[0];
+    Fp = -M2/(R*R)*(-X*sin(phi)/R + Y*cos(phi)/R)*rhoh*u[0]*u[0]*r;
+    Ft = -(u[1]*Fr + u[2]*Fp/r)/u[0];
 
-    return 1.0e4 * fabs(tau/(d4V * Ft));
+    return 0.5 * fabs(tau / (d4V * (-U[0]*Ft-U[1]*Fr-U[2]*Fp)));
 }
