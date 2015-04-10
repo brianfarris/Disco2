@@ -319,7 +319,7 @@ void cell_src_boost(double t, double r, double phi, double z, double *cons,
     Fp = -M2/(R*R)*(-X*sin(phi)/R + Y*cos(phi)/R)*rhoh*u[0]*u[0]*r;
 
     //Energy source ensures no heating/cooling in fluid rest frame.
-    Ft = -(u[1]*Fr + u[2]*Fp/r)/u[0];
+    Ft = -(u[1]*Fr + u[2]*Fp)/u[0];
 
     cons[SRR] += al*sqrtg*dV*dt * Fr;
     cons[LLL] += al*sqrtg*dV*dt * Fp;

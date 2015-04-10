@@ -9,7 +9,7 @@ InitialDataType        21       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 18 Accreting Disc, 19 ADAF, 20 ADAF2, 
                                 // 21 Atmosphere, 22 Orbit
 GravMassType            0       // 0 none, 1 single, 2 binary
-Background              2       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
+Background              1       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
 Metric                  6       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS, 4 Kerr-KS, 5 FlatADM,
                                 // 6 Schwarzschild-KS-ADM, 
@@ -29,7 +29,7 @@ aspect         1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                1.0e1
+Time_Max                1.0e4
 Num_Checkpoints	        1001
 Num_Diag_Dump           1001
 Num_Diag_Measure        1001
@@ -84,7 +84,7 @@ CoolPar4            0.0
 
 //Initial Condition Parameters
 InitPar0        0           // 0 Normal, 1 Nozzle, 2 Disc
-InitPar1        1.0e-3      // rho0
+InitPar1        1.0      // rho0
 InitPar2        1.0e-5     // P0
 InitPar3        0.0       // R0
 InitPar4        0.0         //  
