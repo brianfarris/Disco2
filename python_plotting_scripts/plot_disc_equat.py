@@ -13,7 +13,7 @@ import readChkpt as rc
 M = 1.0
 a = 0.0
 gridscale = 'linear'
-datscale = 'linear'
+datscale = 'log'
 A = a*M
 poscmap = plt.cm.afmhot
 divcmap = plt.cm.RdBu
@@ -192,7 +192,7 @@ def plot_all(filename, gridscale='linear', plot=True, bounds=None):
 
         #Rho
         make_plot(mesh, rho, gridscale="linear", gridbounds=gridbounds,
-                datscale="linear", datbounds=bounds[0],
+                datscale=datscale, datbounds=bounds[0],
                 label=r'$\rho_0$', title=title, filename=rhoname, cmap=poscmap)
 
         #T

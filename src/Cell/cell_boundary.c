@@ -564,16 +564,17 @@ void cell_boundary_nozzle(struct Cell ***theCells, struct Sim *theSim,
                                 - 0.5*theCells[k][i][j].dphi;
                     double x = r * cos(phi);
                     double y = r * sin(phi);
-                    if(x > 0.0 && sin(phi) < 0.5)
+                    if(x > 0.0 && fabs(sin(phi)) < 3*width/r)
                     {
                         double fac = exp(-(y*y+z*z)/(2*width*width));
                         double sina = b/r;
                         double vr = -V * sqrt(1.0-sina*sina);
                         double vp = V * sina/r;
-                        theCells[k][i][j].prim[RHO] += fac*rho0;
-                        theCells[k][i][j].prim[TTT] += fac*T0;
-                        theCells[k][i][j].prim[URR] += fac*vr;
-                        theCells[k][i][j].prim[UPP] += fac*vp;
+
+                        theCells[k][i][j].prim[RHO] = fac*rho0;
+                        theCells[k][i][j].prim[TTT] = fac*T0;
+                        theCells[k][i][j].prim[URR] = fac*vr;
+                        theCells[k][i][j].prim[UPP] = fac*vp;
                     }
                 }
             }
