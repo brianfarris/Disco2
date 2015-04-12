@@ -62,6 +62,8 @@ void cell_metric_horizon_jazz(struct Cell ***theCells, struct Sim *theSim)
                         {
                             nans++;
                             printf("Got a NaN here! (q=%d, r=%.12lg)\n", q, r);
+                            (*cell_single_init_ptr(theSim))(&(theCells[k][i][j]), theSim, i,j,k);
+                            /*
                             int jL = j>0 ? j-1 : sim_N_p(theSim,i)-1;
                             int jR = j<sim_N_p(theSim,i)-1 ? j+1 : 0;
                             double qL = theCells[k][i][jL].prim[q];
@@ -84,6 +86,7 @@ void cell_metric_horizon_jazz(struct Cell ***theCells, struct Sim *theSim)
                             }
                             else
                                 printf("   No Fix, hopefully next time.\n");
+                            */
                         }
                     }
                 }
