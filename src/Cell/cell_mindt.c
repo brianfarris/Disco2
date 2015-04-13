@@ -253,7 +253,7 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                         nu = alpha * sqrt(GAM*Pp/rhoh) * H;
                     }
                     double dtv = 0.25*dx*dx/nu;
-                    if(alpha == 0.0)
+                    if(alpha == 0.0 || rp < metric_horizon(theSim))
                         dtv = 1.0e100; //HUGE
                     
                     //Luminosity Time
@@ -264,9 +264,11 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                     {
                         double dV = 0.5*(rp+rm)*dr*dphi*dz;
                         double U[4];
-                        double cool;
+                        double cool = 0.0;
 
-                        cool = eos_cool(theCells[k][i][j].prim, H, theSim);
+                        if(rp > metric_horizon(theSim))
+                            cool = eos_cool(theCells[k][i][j].prim, H, theSim);
+
                         struct Metric *g;
                         int mu;
                         g = metric_create(time_global, r, phi, z, theSim);
