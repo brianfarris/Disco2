@@ -111,8 +111,7 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                     visc[mu] = 0.0;
                     viscm[mu] = 0.0;
                 }
-                if(sim_Background(theSim) == GRVISC1
-                        && rp < metric_horizon(theSim))
+                if(sim_Background(theSim) == GRVISC1)
                 { 
                     double dv[12];
                     double cs2;
