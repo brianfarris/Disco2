@@ -83,7 +83,7 @@ CoolPar3            0.0
 CoolPar4            0.0
 
 //Initial Condition Parameters
-InitPar0        2           // 0 Normal, 1 Nozzle, 2 Disc
+InitPar0        0           // 0 Normal, 1 Nozzle, 2 Disc
 InitPar1        1.0         // rho0
 InitPar2        1.0e-3      // T0
 InitPar3        20.0        // R0
