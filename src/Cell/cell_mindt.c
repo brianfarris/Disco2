@@ -191,8 +191,8 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
             double dr = rp-rm;
             double r = .5*(rp+rm);
             
-            if(r < metric_horizon(theSim))
-                continue;
+            //if(r < metric_horizon(theSim))
+            //    continue;
 
             for(j = 0; j < sim_N_p(theSim,i); ++j)
             {

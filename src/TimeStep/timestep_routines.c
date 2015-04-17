@@ -177,8 +177,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   cell_syncproc_z(theCells,theSim,theMPIsetup);
 
   //Do weird horizon jazz if there's a metric
-  if(sim_Background(theSim) != NEWTON)
-      cell_metric_horizon_jazz(theCells, theSim);
+  //if(sim_Background(theSim) != NEWTON)
+  //    cell_metric_horizon_jazz(theCells, theSim);
 
   //Boundary Data
   //R - Inner

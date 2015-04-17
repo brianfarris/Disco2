@@ -467,7 +467,7 @@ void cell_boundary_linear_r_inner(struct Cell ***theCells,
                 if(q == URR || q == UPP || q == UZZ)
                     qextrap = cR->prim[q] - cR->gradr[q] * dr;
                 else
-                    qextrap = cR->prim[q] - 0.5*cR->gradr[q] * dr;
+                    qextrap = cR->prim[q] - 0.0*cR->gradr[q] * dr;
                 if((q == RHO || q == PPP) && qextrap < 0.0)
                     qextrap = 0.5*cR->prim[q];
                 cL->prim[q] += dA*qextrap;

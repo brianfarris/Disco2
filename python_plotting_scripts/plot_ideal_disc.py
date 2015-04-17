@@ -26,9 +26,10 @@ def plot_r_profile_single(r, f, sca, ylabel, R=None, F=None):
         plt.gca().set_yscale('linear')
     else:
         plt.gca().set_yscale(sca)
-    
-    plt.axvspan(r.min(), 2*M, color='lightgrey', alpha=0.5)
-    plt.xlim(r.min(), r.max())
+   
+    xmin = math.pow(10, math.floor(math.log10(r.min())))
+    plt.axvspan(xmin, 2*M, color='lightgrey', alpha=0.5)
+    plt.xlim(xmin, r.max())
     
     plt.xlabel(r"$r$")
     plt.ylabel(ylabel)

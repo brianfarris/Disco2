@@ -266,12 +266,12 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                     c->cons[SZZ] /= 1.1;
                 else
                     c->cons[SZZ] -= dt*dV*sqrtg*a* cool*u_d[3];
-                if(fabs(c->cons[TAU]) < fabs(dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3])))
-                {
-                    c->cons[TAU] /= 1.1;
-                    printf("That TAU is pretty cool! (r = %.12g)\n", r);
-                }
-                else
+     //           if(fabs(c->cons[TAU]) < fabs(dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3])))
+     //           {
+     //               c->cons[TAU] /= 1.1;
+     //               printf("That TAU is pretty cool! (r = %.12g)\n", r);
+     //           }
+     //           else
                     c->cons[TAU] += dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]); 
                 if(PRINTTOOMUCH)
                 {
