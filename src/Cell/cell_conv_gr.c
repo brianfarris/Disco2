@@ -122,7 +122,8 @@ static int cons2prim_prep(double *cons, double *prim, double *pos, double dV,
             //cons[LLL] *= fac;
             //cons[SZZ] *= fac;
             err = 1;
-            cons[TAU] *= 1.01*(sqrt(D*D+S2)-D)/tau;
+            //cons[TAU] *= 1.01*(sqrt(D*D+S2)-D)/tau;
+            cons[TAU] = 1.001 * D * (sqrt(1.0+S2/(D*D))-1.0) * dV;
         }
     }
     else
