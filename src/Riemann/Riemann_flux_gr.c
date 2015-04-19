@@ -187,7 +187,7 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
             V[i] = (v[i]+b[i])/a;
         V2 = metric_square3_u(g, V);
         //Correction factor.
-        corr = sqrt((MAXW*MAXW+1.0)/(MAXW*MAXW*V2));
+        corr = sqrt((MAXW*MAXW-1.0)/(MAXW*MAXW*V2));
         //Reset velocity
         for(i=0; i<3; i++)
             v[i] = corr*v[i] - (1.0-corr)*b[i];
