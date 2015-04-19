@@ -84,7 +84,7 @@ def plot_equat_single(fig, ax, mesh, dat, gridscale="linear", gridbounds=None,
 
 def plot_roche(ax, mesh, gridbounds):
 
-    N = 128
+    N = 256
 
     global XROCHE
     global YROCHE
@@ -109,6 +109,7 @@ def plot_roche(ax, mesh, gridbounds):
 
     lvl = -4*M/BINSEP
     ax.contour(XROCHE, YROCHE, ZROCHE, levels=[lvl], colors='m')
+    #ax.contour(XROCHE, YROCHE, ZROCHE, levels=[1.4*lvl,1.35*lvl,1.3*lvl,1.25*lvl,1.2*lvl,1.15*lvl,1.1*lvl,1.05*lvl,lvl,0.95*lvl,0.9*lvl,0.85*lvl,0.8*lvl,0.75*lvl,0.7*lvl,0.65*lvl,0.6*lvl], colors='m')
     #ax.contour(XROCHE, YROCHE, ZROCHE)
 
 

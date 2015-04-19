@@ -172,6 +172,35 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
     for(i=0; i<4; i++)
         U[i] = metric_frame_U_u(g,i,theSim);
 
+    //Check if interpolated velocity is superluminal
+    if(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v) < 0)
+    {
+        printf("ERROR: Velocity too high in flux. r=%.12g, vr=%.12g, vp=%.12g, vz=%.12g\n", r, v[0], v[1], v[2]);
+
+        //If velocity is superluminal, reduce to Lorentz factor 5, keeping
+        //direction same in rest frame.
+        
+        double MAXW = 5;
+        double V[3], V2, corr;
+        //Calculate Eulerian velocity
+        for(i=0; i<3; i++)
+            V[i] = (v[i]+b[i])/a;
+        V2 = metric_square3_u(g, V);
+        //Correction factor.
+        corr = sqrt((MAXW*MAXW+1.0)/(MAXW*MAXW*V2));
+        //Reset velocity
+        for(i=0; i<3; i++)
+            v[i] = corr*v[i] - (1.0-corr)*b[i];
+
+        printf("   fix: badV2 = %.12g corr = %.12g, newV2 = %.12g\n", 
+                V2, corr, 1.0-1.0/(MAXW*MAXW));
+    }
+    //TODO: Remove this when the fix above is tested.
+    if(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v) < 0)
+    {
+        printf("AGAIN.  r = %.12g\n", r);
+    }
+
     //Calculate 4-velocity
     u0 = 1.0 / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
     u[0] = metric_g_dd(g,0,0) * u0 + u0*metric_dot3_u(g,b,v);
@@ -182,9 +211,6 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
             u[i] += metric_gamma_dd(g,i-1,j) * (v[j]+b[j]);
         u[i] *= u0;
     }
-    
-    if(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v) < 0)
-        printf("ERROR: Velocity too high in flux. r=%.12g, vr=%.12g, vp=%.12g, vz=%.12g\n", r, v[0], v[1], v[2]);
 
     //Calculate beta & v normal to face.
     vn = v[0]*theRiemann->n[0] + v[1]*theRiemann->n[1] + v[2]*theRiemann->n[2];
