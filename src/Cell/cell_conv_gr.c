@@ -190,15 +190,12 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
     c[4] = E*E-s2;
     if(c[4] <= 0)
     {
-        if(r >= metric_horizon(theSim) || PRINTTOOMUCH)
-        {
-            printf("ERROR: E2 <= s2!: e^2 = %lg, s^2 = %lg\n",E*E,s2);
-            printf("r = %lg, dV = %lg\n", r, dV);
-            printf("rho = %lg, P = %lg, vr = %lg, vp = %lg, vz = %lg\n",prim[RHO],prim[PPP],prim[URR],prim[UPP],prim[UZZ]);
-            printf("rhostar = %lg, tau = %lg, Sr = %lg, Sp = %lg, Sz = %lg\n",cons[DDD],cons[TAU],cons[SRR],cons[LLL],cons[SZZ]);
-        }
+        printf("ERROR: E2 <= s2!: e^2 = %lg, s^2 = %lg\n",E*E,s2);
+        printf("r = %lg, dV = %lg\n", r, dV);
+        printf("rho = %lg, P = %lg, vr = %lg, vp = %lg, vz = %lg\n",prim[RHO],prim[PPP],prim[URR],prim[UPP],prim[UZZ]);
+        printf("rhostar = %lg, tau = %lg, Sr = %lg, Sp = %lg, Sz = %lg\n",cons[DDD],cons[TAU],cons[SRR],cons[LLL],cons[SZZ]);
+
         err = 1;
-        //exit(0);
     }
 
     //Inital guess: previous value of prim
@@ -219,19 +216,15 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
     while(fabs(wmo-wmo1) > eps && i < 10000);
     if(i == 10000)
     {
-        if(r >= metric_horizon(theSim) || PRINTTOOMUCH)
-        {
-            printf("NR failed to converge: wmo0 = %lg, wmo = %lg, wmo1 = %lg\n", wmo0,wmo,wmo1);
-            printf("Poly coeffs: c[0]=%lg, c[1]=%lg, c[2]=%lg, c[3]=%lg, c[4]=%lg\n",c[0],c[1],c[2],c[3],c[4]);
-        }
+        printf("NR failed to converge: wmo0 = %lg, wmo = %lg, wmo1 = %lg\n", wmo0,wmo,wmo1);
+        printf("Poly coeffs: c[0]=%lg, c[1]=%lg, c[2]=%lg, c[3]=%lg, c[4]=%lg\n",c[0],c[1],c[2],c[3],c[4]);
         err = 1;
     }
     wmo = wmo1;
 
     if(wmo < 0.0)
     {
-        if(r >= metric_horizon(theSim) || PRINTTOOMUCH)
-            printf("ERROR: w-1 < 0 in cons2prim_gr. (r = %lg, wmo = %lg)\n", r, wmo);
+        printf("ERROR: w-1 < 0 in cons2prim_gr. (r = %lg, wmo = %lg)\n", r, wmo);
         wmo = 0.0;
         err = 1;
     }
@@ -242,17 +235,13 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
     hmo = w*(E-w)/(w*w-gam);
     if(hmo < -1.0)
     {
-        if(r >= metric_horizon(theSim) || PRINTTOOMUCH)
-            printf("ERROR: h < 0 in cons2prim_gr (r = %lg, h-1 = %lg)\n", r, hmo);
+        printf("ERROR: h < 0 in cons2prim_gr (r = %lg, h-1 = %lg)\n", r, hmo);
         err = 1;
     }
     else if(hmo < 0.0)
     {
-        if(r >= metric_horizon(theSim) || PRINTTOOMUCH)
-        {
-            printf("ERROR: h < 1 in cons2prim_gr (r = %.12g, h-1 = %.12g)\n", r, hmo);
-            printf("       e^2 = %.12g, s^2 = %.12g, w =%.12g\n", e*e, s2, w);
-        }
+        printf("ERROR: h < 1 in cons2prim_gr (r = %.12g, h-1 = %.12g)\n", r, hmo);
+        printf("       e^2 = %.12g, s^2 = %.12g, w =%.12g\n", e*e, s2, w);
         err = 1;
     }
 
@@ -264,23 +253,20 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
     if(rho < RHO_FLOOR)
     {
         rho = RHO_FLOOR;
-        if(r >= metric_horizon(theSim) || PRINTTOOMUCH)
-            printf("Whoa, not enough density pal! (r=%.12g)\n", r);
+        printf("Whoa, not enough density pal! (r=%.12g)\n", r);
         err = 1;
     }
     Pp = gam * rho * hmo;
     if(Pp < CS_FLOOR*CS_FLOOR*rho*(hmo+1)/GAMMALAW)
     {
         Pp = CS_FLOOR*CS_FLOOR*rho*(hmo+1)/GAMMALAW;
-        if(r >= metric_horizon(theSim) || PRINTTOOMUCH)
-            printf("Whoa, that's a pretty low pressure bub! (r=%.12g)\n", r);
+        printf("Whoa, that's a pretty low pressure bub! (r=%.12g)\n", r);
         err = 1;
     }
     if(Pp > CS_CAP*CS_CAP*rho*(hmo+1)/GAMMALAW)
     {
         Pp = CS_CAP*CS_CAP*rho*(hmo+1)/GAMMALAW;
-        if(r >= metric_horizon(theSim) || PRINTTOOMUCH)
-            printf("Whoa, that's a really high pressure chum! (r=%.12g)\n", r);
+        printf("Whoa, that's a really high pressure chum! (r=%.12g)\n", r);
         err = 1;
     }
 
