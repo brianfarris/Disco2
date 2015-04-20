@@ -235,7 +235,7 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
     hmo = w*(E-w)/(w*w-gam);
     if(hmo < -1.0)
     {
-        printf("ERROR: h < 0 in cons2prim_gr (r = %lg, h-1 = %lg)\n", r, hmo);
+        printf("ERROR: h < 0 in cons2prim_gr (r=%lg, h-1=%lg, w=%lg, E=%lg)\n", r, hmo, w, E);
         err = 1;
     }
     else if(hmo < 0.0)
