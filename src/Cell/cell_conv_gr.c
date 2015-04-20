@@ -113,7 +113,7 @@ static int cons2prim_prep(double *cons, double *prim, double *pos, double dV,
 
         S2 = metric_square3_d(g, S);
 
-        if(S2 >= tau*(tau+2*D))
+        if(S2 >= tau*(tau+2*D) || tau < 0)
         {
             if(pos[R_DIR] >= metric_horizon(theSim))
                 printf("2 fast 2 cold. r = %.12lg\n", pos[R_DIR]);
