@@ -216,8 +216,12 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
     while(fabs(wmo-wmo1) > eps && i < 10000);
     if(i == 10000)
     {
-        printf("NR failed to converge: wmo0 = %lg, wmo = %lg, wmo1 = %lg\n", wmo0,wmo,wmo1);
-        printf("Poly coeffs: c[0]=%lg, c[1]=%lg, c[2]=%lg, c[3]=%lg, c[4]=%lg\n",c[0],c[1],c[2],c[3],c[4]);
+        printf("ERROR: NR failed to converge: wmo0 = %lg, wmo = %lg, wmo1 = %lg\n", 
+                wmo0,wmo,wmo1);
+        printf("   Poly coeffs: c[0]=%lg, c[1]=%lg, c[2]=%lg, c[3]=%lg, c[4]=%lg\n",
+                c[0],c[1],c[2],c[3],c[4]);
+        printf("   r=%.12lg, D=%.12lg, tau/D=%.12lg, s2=%.12lg, Us=%.12lg\n", 
+                r, rhostar, e, s2, Us);
         err = 1;
     }
     wmo = wmo1;
