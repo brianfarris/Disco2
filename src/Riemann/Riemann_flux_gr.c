@@ -192,8 +192,11 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
         for(i=0; i<3; i++)
             v[i] = corr*v[i] - (1.0-corr)*b[i];
 
+        for(i=0; i<3; i++)
+            V[i] = (v[i]+b[i])/a;
+        double newV2 = metric_square3_u(g, V);
         printf("   fix: badV2 = %.12g corr = %.12g, newV2 = %.12g\n", 
-                V2, corr, 1.0-1.0/(MAXW*MAXW));
+                V2, corr, newV2);
     }
     //TODO: Remove this when the fix above is tested.
     if(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v) < 0)
@@ -228,7 +231,8 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
     F[SRR] = hn*sqrtg*a*(u0*rhoh * u[1]*vn + Pp*theRiemann->n[0]);
     F[LLL] = hn*sqrtg*a*(u0*rhoh * u[2]*vn + Pp*theRiemann->n[1]);
     F[SZZ] = hn*sqrtg*a*(u0*rhoh * u[3]*vn + Pp*theRiemann->n[2]);
-    F[TAU] = hn*sqrtg*a*(u0*(-rhoh*(U[0]*u[0]+U[1]*u[1]+U[2]*u[2]+U[3]*u[3]) - rho)*vn - Un*Pp);
+    F[TAU] = hn*sqrtg*a*(u0*(-rhoh*(U[0]*u[0]+U[1]*u[1]+U[2]*u[2]+U[3]*u[3])
+                            - rho)*vn - Un*Pp);
     //F[TAU] = hn*sqrtg*(a*u0*(a*u0*rhoh - rho)*vn + Pp*bn);
 
     //HLL Viscous Flux
