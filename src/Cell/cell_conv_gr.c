@@ -236,11 +236,12 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
     if(hmo < -1.0)
     {
         printf("ERROR: h < 0 in cons2prim_gr (r=%lg, h-1=%lg, w=%lg, E=%lg)\n", r, hmo, w, E);
+        printf("   D=%.12lg, tau/D=%.12lg, s2=%.12lg, Us=%.12lg\n", rhostar, e, s2, Us);
         err = 1;
     }
     else if(hmo < 0.0)
     {
-        printf("ERROR: h < 1 in cons2prim_gr (r = %.12g, h-1 = %.12g)\n", r, hmo);
+        printf("ERROR: h < 1 in cons2prim_gr (r=%lg, h-1=%lg, w=%lg, E=%lg)\n", r, hmo, w, E);
         printf("       e^2 = %.12g, s^2 = %.12g, w =%.12g\n", e*e, s2, w);
         err = 1;
     }
