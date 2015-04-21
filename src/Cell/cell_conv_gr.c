@@ -229,6 +229,7 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
     if(wmo < 0.0)
     {
         printf("ERROR: w-1 < 0 in cons2prim_gr. (r = %lg, wmo = %lg)\n", r, wmo);
+        printf("   D=%.12lg, tau/D=%.12lg, s2=%.12lg, Us=%.12lg\n", rhostar, e, s2, Us);
         wmo = 0.0;
         err = 1;
     }
