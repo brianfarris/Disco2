@@ -18,7 +18,6 @@ OPT      = -O3
 INCLUDES = -I$(H55)/include
 CFLAGS   = -c $(INCLUDES)
 LDFLAGS  = -lm -lz -L$(H55)/lib -lhdf5
-CC       = mpicc
 
 ifeq ($(strip $(USE_DEBUG)), 1)
 	CFLAGS += $(DEBUG)
@@ -26,6 +25,9 @@ endif
 ifeq ($(strip $(USE_OPT)), 1)
 	CFLAGS += $(OPT)
 endif
+
+CFLAGS += $(LOCAL_C_FLAGS)
+LDFLAGS += $(LOCAL_LD_FLAGS)
 
 
 .PHONY: all clean distclean
