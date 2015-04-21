@@ -123,7 +123,7 @@ static int cons2prim_prep(double *cons, double *prim, double *pos, double dV,
             //cons[SZZ] *= fac;
             err = 1;
             //cons[TAU] *= 1.01*(sqrt(D*D+S2)-D)/tau;
-            cons[TAU] = 1.001 * D * (sqrt(1.0+S2/(D*D))-1.0) * dV;
+            cons[TAU] = 1.01 * D * (sqrt(1.0+S2/(D*D))-1.0) * dV;
         }
     }
     else
@@ -211,6 +211,8 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
         wmo = wmo1;
         wmo1 = wmo - (c[0] + c[1]*wmo + c[2]*wmo*wmo + c[3]*wmo*wmo*wmo + c[4]*wmo*wmo*wmo*wmo)
                     / (c[1] + 2*c[2]*wmo + 3*c[3]*wmo*wmo + 4*c[4]*wmo*wmo*wmo);
+        if(wmo1 < 0.0)
+            wmo1 = 0.5*wmo;
         i++;
     }
     while(fabs(wmo-wmo1) > eps && i < 10000);
