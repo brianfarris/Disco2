@@ -203,16 +203,21 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
     v[1] = prim[UPP];
     v[2] = prim[UZZ];
     wmo0 = a / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v)) - 1.0;
+
+
     //Newton-Raphson to find w.
     wmo1 = wmo0;
     i = 0;
     do
     {
         wmo = wmo1;
-        wmo1 = wmo - (c[0] + c[1]*wmo + c[2]*wmo*wmo + c[3]*wmo*wmo*wmo + c[4]*wmo*wmo*wmo*wmo)
-                    / (c[1] + 2*c[2]*wmo + 3*c[3]*wmo*wmo + 4*c[4]*wmo*wmo*wmo);
-        if(wmo1 < 0.0)
-            wmo1 = 0.5*wmo;
+        double f = c[0]+c[1]*wmo+c[2]*wmo*wmo+c[3]*wmo*wmo*wmo+c[4]*wmo*wmo*wmo*wmo;
+        double df = c[1] + 2*c[2]*wmo + 3*c[3]*wmo*wmo + 4*c[4]*wmo*wmo*wmo;
+        wmo1 = wmo - f/df;
+
+        //if(df < 0)
+        //    wmo1 = wmo/2 //???? NOT GOOD!!!!
+
         i++;
     }
     while(fabs(wmo-wmo1) > eps && i < 10000);

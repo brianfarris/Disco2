@@ -198,11 +198,6 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
         printf("   fix: badV2 = %.12g corr = %.12g, newV2 = %.12g\n", 
                 V2, corr, newV2);
     }
-    //TODO: Remove this when the fix above is tested.
-    if(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v) < 0)
-    {
-        printf("AGAIN.  r = %.12g\n", r);
-    }
 
     //Calculate 4-velocity
     u0 = 1.0 / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));

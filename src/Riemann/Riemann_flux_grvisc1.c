@@ -32,6 +32,38 @@ void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
     v[1] = prim[UPP];
     v[2] = prim[UZZ];
 
+    a = metric_lapse(g);
+    for(i=0; i<3; i++)
+        b[i] = metric_shift_u(g, i);
+    sqrtg = metric_sqrtgamma(g)/r;
+
+    //Check if interpolated velocity is superluminal
+    if(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v) < 0)
+    {
+        printf("ERROR: Velocity too high in visc flux. r=%.12g, vr=%.12g, vp=%.12g, vz=%.12g\n", r, v[0], v[1], v[2]);
+
+        //If velocity is superluminal, reduce to Lorentz factor 5, keeping
+        //direction same in rest frame.
+        
+        double MAXW = 5;
+        double V[3], V2, corr;
+        //Calculate Eulerian velocity
+        for(i=0; i<3; i++)
+            V[i] = (v[i]+b[i])/a;
+        V2 = metric_square3_u(g, V);
+        //Correction factor.
+        corr = sqrt((MAXW*MAXW-1.0)/(MAXW*MAXW*V2));
+        //Reset velocity
+        for(i=0; i<3; i++)
+            v[i] = corr*v[i] - (1.0-corr)*b[i];
+
+        for(i=0; i<3; i++)
+            V[i] = (v[i]+b[i])/a;
+        double newV2 = metric_square3_u(g, V);
+        printf("   fix: badV2 = %.12g corr = %.12g, newV2 = %.12g\n", 
+                V2, corr, newV2);
+    }
+
     dir = -1;
     for(i=0; i<3; i++)
         if(theRiemann->n[i] == 1)
@@ -93,10 +125,6 @@ void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
         fclose(gradfile);
     }
     
-    a = metric_lapse(g);
-    for(i=0; i<3; i++)
-        b[i] = metric_shift_u(g, i);
-    sqrtg = metric_sqrtgamma(g)/r;
     u0 = 1.0/sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
     for(i=0; i<4; i++)
     {
@@ -180,6 +208,26 @@ void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
             printf("\n");
         }
 
+    }
+
+    //Add Diffusive flux within horizon
+    //
+    // This is the diffusive part of a local Lax-Friedrich's Flux,
+    // multiplied by a constant.
+    if(r < metric_horizon(theSim))
+    {
+        //Throw this magic number somewhere else.
+        double DIFF_CONST = 0.0;
+        double S = 0.0;
+        double Sl = fabs(theRiemann->Sl);
+        double Sr = fabs(theRiemann->Sr);
+        if(Sl > Sr)
+            S = Sl;
+        else
+            S = Sr;
+
+        for(i=0; i<sim_NUM_Q(theSim); i++)
+            F[i] += DIFF_CONST*S*(theRiemann->UL[i]-theRiemann->UL[i]);
     }
 
     theRiemann->F[SRR] += F[SRR];
