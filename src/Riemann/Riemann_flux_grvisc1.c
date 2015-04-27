@@ -228,7 +228,7 @@ void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
             S = Sr;
 
         for(i=0; i<sim_NUM_Q(theSim); i++)
-            F[i] += DIFF_CONST*S*(theRiemann->UL[i]-theRiemann->UL[i]);
+            F[i] += DIFF_CONST*S*(theRiemann->UL[i]-theRiemann->UR[i]);
     }
 
     theRiemann->F[SRR] += F[SRR];
