@@ -180,65 +180,80 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
         Us += (U[0]*b[i]+U[i+1])*S[i];
     Us /= rhostar;
     double E = (1.0 + e + Us) / (a*U[0]);
-
-    //Coefficients of polynomial to solve for w
-    //TODO: expand E and arrange to minimize truncation error.
-    c[0] = -s2*(gam-1)*(gam-1);
-    c[1] = 2*((E-gam)*(E-gam)+2*(gam-1)*s2);
-    c[2] = (5*E-gam)*(E-gam)-2*(3-gam)*s2;
-    c[3] = 4*(E*E-s2) - 2*gam*E;
-    c[4] = E*E-s2;
-    if(c[4] <= 0)
+    
+    if(E*E < s2)
     {
-        printf("ERROR: E2 <= s2!: e^2 = %lg, s^2 = %lg\n",E*E,s2);
+        printf("ERROR: E2 < s2!: e^2 = %lg, s^2 = %lg\n",E*E,s2);
         printf("r = %lg, dV = %lg\n", r, dV);
         printf("rho = %lg, P = %lg, vr = %lg, vp = %lg, vz = %lg\n",prim[RHO],prim[PPP],prim[URR],prim[UPP],prim[UZZ]);
         printf("rhostar = %lg, tau = %lg, Sr = %lg, Sp = %lg, Sz = %lg\n",cons[DDD],cons[TAU],cons[SRR],cons[LLL],cons[SZZ]);
 
         err = 1;
+        E = 1.001*sqrt(s2);
     }
 
-    //Inital guess: previous value of prim
-    v[0] = prim[URR];
-    v[1] = prim[UPP];
-    v[2] = prim[UZZ];
-    wmo0 = a / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v)) - 1.0;
-
-
-    //Newton-Raphson to find w.
-    wmo1 = wmo0;
-    i = 0;
-    do
-    {
-        wmo = wmo1;
-        double f = c[0]+c[1]*wmo+c[2]*wmo*wmo+c[3]*wmo*wmo*wmo+c[4]*wmo*wmo*wmo*wmo;
-        double df = c[1] + 2*c[2]*wmo + 3*c[3]*wmo*wmo + 4*c[4]*wmo*wmo*wmo;
-        wmo1 = wmo - f/df;
-
-        //if(df < 0)
-        //    wmo1 = wmo/2 //???? NOT GOOD!!!!
-
-        i++;
-    }
-    while(fabs(wmo-wmo1) > eps && i < 10000);
-    if(i == 10000)
-    {
-        printf("ERROR: NR failed to converge: wmo0 = %lg, wmo = %lg, wmo1 = %lg\n", 
-                wmo0,wmo,wmo1);
-        printf("   Poly coeffs: c[0]=%lg, c[1]=%lg, c[2]=%lg, c[3]=%lg, c[4]=%lg\n",
-                c[0],c[1],c[2],c[3],c[4]);
-        printf("   r=%.12lg, D=%.12lg, tau/D=%.12lg, s2=%.12lg, Us=%.12lg\n", 
-                r, rhostar, e, s2, Us);
-        err = 1;
-    }
-    wmo = wmo1;
-
-    if(wmo < 0.0)
-    {
-        printf("ERROR: w-1 < 0 in cons2prim_gr. (r = %lg, wmo = %lg)\n", r, wmo);
-        printf("   D=%.12lg, tau/D=%.12lg, s2=%.12lg, Us=%.12lg\n", rhostar, e, s2, Us);
+    if(s2 == 0.0)
         wmo = 0.0;
-        err = 1;
+    else
+    {
+        //Coefficients of polynomial to solve for w
+        //TODO: expand E and arrange to minimize truncation error.
+        c[0] = -s2*(gam-1)*(gam-1);
+        c[1] = 2*((E-gam)*(E-gam)+2*(gam-1)*s2);
+        c[2] = (5*E-gam)*(E-gam)-2*(3-gam)*s2;
+        c[3] = 4*(E*E-s2) - 2*gam*E;
+        c[4] = E*E-s2;
+
+        double wmomin = 0.0;
+        double wmomax = sqrt(1.0+s2)-1.0;
+
+        //Inital guess: previous value of prim
+        v[0] = prim[URR];
+        v[1] = prim[UPP];
+        v[2] = prim[UZZ];
+        wmo0 = a / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v)
+                - metric_square3_u(g,v)) - 1.0;
+
+        //Newton-Raphson to find w.
+        wmo1 = wmo0;
+        i = 0;
+        do
+        {
+            wmo = wmo1;
+            double f = c[0]+c[1]*wmo+c[2]*wmo*wmo+c[3]*wmo*wmo*wmo+c[4]*wmo*wmo*wmo*wmo;
+            double df = c[1] + 2*c[2]*wmo + 3*c[3]*wmo*wmo + 4*c[4]*wmo*wmo*wmo;
+            wmo1 = wmo - f/df;
+
+            if(f > 0.0 && wmo < wmomax)
+                wmomax = wmo;
+            else if(f < 0.0 && wmo > wmomin)
+                wmomin = wmo;
+
+            if(wmo1 < wmomin || wmo1 > wmomax)
+                wmo1 = 0.5*(wmomin + wmomax);
+
+            i++;
+        }
+        while(fabs(wmo-wmo1) > eps && i < 10000);
+        if(i == 10000)
+        {
+            printf("ERROR: NR failed to converge: wmo0 = %lg, wmo = %lg, wmo1 = %lg\n", 
+                    wmo0,wmo,wmo1);
+            printf("   Poly coeffs: c[0]=%lg, c[1]=%lg, c[2]=%lg, c[3]=%lg, c[4]=%lg\n",
+                    c[0],c[1],c[2],c[3],c[4]);
+            printf("   r=%.12lg, D=%.12lg, tau/D=%.12lg, s2=%.12lg, Us=%.12lg\n", 
+                    r, rhostar, e, s2, Us);
+            err = 1;
+        }
+        wmo = wmo1;
+
+        if(wmo < 0.0)
+        {
+            printf("ERROR: w-1 < 0 in cons2prim_gr. (r = %lg, wmo = %lg)\n", r, wmo);
+            printf("   D=%.12lg, tau/D=%.12lg, s2=%.12lg, Us=%.12lg\n", rhostar, e, s2, Us);
+            wmo = 0.0;
+            err = 1;
+        }
     }
     
     //Prim recovery

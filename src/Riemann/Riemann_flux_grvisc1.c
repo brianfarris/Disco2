@@ -214,6 +214,7 @@ void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
     //
     // This is the diffusive part of a local Lax-Friedrich's Flux,
     // multiplied by a constant.
+    //
     if(r < metric_horizon(theSim))
     {
         //Throw this magic number somewhere else.
