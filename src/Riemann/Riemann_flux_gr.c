@@ -247,6 +247,10 @@ void riemann_set_flux_gr(struct Riemann *theRiemann, struct Sim *theSim, double 
     for( q=sim_NUM_C(theSim) ; q<sim_NUM_Q(theSim) ; ++q )
         F[q] = prim[q]*F[DDD];
 
+    for(q=0; q<sim_NUM_Q(theSim); q++)
+        if(F[q] != F[q])
+            printf("ERROR: r=%.12g Flux[%d] is NaN.\n", r, q);
+
     metric_destroy(g);
 }
 

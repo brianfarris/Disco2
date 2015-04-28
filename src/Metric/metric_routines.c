@@ -359,3 +359,38 @@ double metric_frame_dU_du_acc(struct Metric *g, int mu, int nu, struct Sim *theS
 
     return 0.0;
 }
+
+int metric_fixV(struct Metric *g, double *v, double maxW)
+{
+    //If velocity is superluminal, reduce to Lorentz factor 5, keeping
+    //direction same in rest frame.
+
+    int i, err;
+    double a, b[3], V[3], V2, corr;
+
+    a = metric_lapse(g);
+    b[0] = metric_shift_u(g, 0);
+    b[1] = metric_shift_u(g, 1);
+    b[2] = metric_shift_u(g, 2);
+
+    //Calculate Eulerian velocity.
+    V[0] = (v[0]+b[0])/a;
+    V[1] = (v[1]+b[1])/a;
+    V[2] = (v[2]+b[2])/a;
+    V2 = metric_square3_u(g,V);
+
+    if(V2 < 1.0)
+        err = 0;
+    else
+    {
+        //Correction factor.
+        corr = sqrt((maxW*maxW-1.0)/(maxW*maxW*V2));
+        //Reset velocity
+        for(i=0; i<3; i++)
+            v[i] = corr*v[i] - (1.0-corr)*b[i];
+
+        err = 1;
+    }
+
+    return err;
+}

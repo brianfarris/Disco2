@@ -62,6 +62,7 @@ double metric_dot4_u(struct Metric *g, double *a, double *b);
 double metric_dot4_d(struct Metric *g, double *a, double *b);
 double metric_conn(struct Metric *g, int tau, int mu, int nu);
 void metric_shear_uu(struct Metric *g, double *v, double *dv, double *shear, struct Sim *theSim);
+int metric_fixV(struct Metric *g, double *v, double maxW);
 
 //Frames
 double (*metric_frame_U_u)(struct Metric *, int, struct Sim *);

@@ -6,6 +6,7 @@
 #include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
+#include "../Headers/Metric.h"
 #include "../Headers/MPIsetup.h"
 #include "../Headers/TimeStep.h"
 #include "../Headers/header.h"
@@ -473,15 +474,40 @@ void cell_boundary_linear_r_inner(struct Cell ***theCells,
                 cL->prim[q] += dA*qextrap;
             }
         }
+        double r = 0.5*(r0m+r0);
         for(k = 0; k < sim_N(theSim, Z_DIR); k++)
         {
-            double dz = sim_FacePos(theSim, k, Z_DIR)
-                        - sim_FacePos(theSim, k-1, Z_DIR);
+            double zp = sim_FacePos(theSim, k, Z_DIR);
+            double zm = sim_FacePos(theSim, k-1, Z_DIR);
+            double dz = zp-zm;
+            double z = 0.5*(zm+zp);
+
             for(j = 0; j < sim_N_p(theSim,0); j++)
             {
+                double phi = theCells[k][0][j].tiph
+                             - 0.5*theCells[k][0][j].dphi;
                 double dA = r0*theCells[k][0][j].dphi * dz;
                 for(q = 0; q < NUM_Q; q++)
                     theCells[k][0][j].prim[q] /= dA;
+
+                if(sim_Background(theSim) != NEWTON)
+                {
+                    double v[3];
+                    v[0] = theCells[k][0][j].prim[URR];
+                    v[1] = theCells[k][0][j].prim[UPP];
+                    v[2] = theCells[k][0][j].prim[UZZ];
+                    struct Metric *g = metric_create(time_global, r, phi, z,
+                                                        theSim);
+                    int err = metric_fixV(g, v, 5.0);
+                    if(err)
+                    {
+                        printf("Speed reset in LinearBC. r=%.12g phi=%.12g z=%.12g\n", r, phi, z);
+                        theCells[k][0][j].prim[URR] = v[0];
+                        theCells[k][0][j].prim[UPP] = v[1];
+                        theCells[k][0][j].prim[UZZ] = v[2];
+                    }
+                    metric_destroy(g);
+                }
             }
         }
     }

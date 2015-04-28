@@ -100,6 +100,8 @@ static int cons2prim_prep(double *cons, double *prim, double *pos, double dV,
                         struct Metric *g, struct Sim *theSim)
 {
     int err = 0;
+    int q;
+    int NUMQ = sim_NUM_Q(theSim);
 
     if(sim_Frame(theSim) == FR_EULER)
     {
@@ -131,6 +133,18 @@ static int cons2prim_prep(double *cons, double *prim, double *pos, double dV,
         //TODO: Figure out what to put here.
     }
 
+    int nan = 0;
+    for(q=0; q<NUMQ; q++)
+        if(cons[q] != cons[q])
+            nan = 1;
+    if(nan)
+    {
+        printf("ERROR: NaN in cons2prim. r=%.12g\n", pos[R_DIR]);
+        printf("   DDD=%.12g TAU=%.12g SRR=%.12g LLL=%.12g SZZ=%.12g\n",
+                 cons[DDD], cons[TAU], cons[SRR], cons[LLL], cons[SZZ]);
+        err = 1;
+    }
+    
     return err;
 }
 
@@ -315,6 +329,21 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
     
     for(i = sim_NUM_C(theSim); i < sim_NUM_Q(theSim); i++)
         prim[i] = cons[i]/cons[DDD];
+
+    if(prim[PPP] < 0.0)
+        printf("ERROR: P < 0.0 in cons2prim.  r=%.12lg P=%.12lg\n",
+                 r, prim[PPP]);
+
+    int nan = 0;
+    for(i=0; i<sim_NUM_Q(theSim); i++)
+        if(prim[i] != prim[i])
+            nan = 1;
+    if(nan)
+    {
+        printf("ERROR: NaN in cons2prim. r=%.12g\n", r);
+        printf("   rho=%.12g P=%.12g vr=%.12g vp=%.12g vz=%.12g\n",
+                 prim[RHO], prim[PPP], prim[URR], prim[UPP], prim[UZZ]);
+    }
 
     return err;
 }

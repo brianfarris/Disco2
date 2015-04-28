@@ -227,14 +227,16 @@ void riemann_visc_flux_gr(struct Riemann *theRiemann, struct Sim *theSim)
         else
             S = Sr;
 
-        for(i=0; i<sim_NUM_Q(theSim); i++)
+        for(i=0; i<NUMQ; i++)
             F[i] += DIFF_CONST*S*(theRiemann->UL[i]-theRiemann->UR[i]);
     }
-
-    theRiemann->F[SRR] += F[SRR];
-    theRiemann->F[LLL] += F[LLL];
-    theRiemann->F[SZZ] += F[SZZ];
-    theRiemann->F[TAU] += F[TAU];
+   
+    for(i=0; i<NUMQ; i++)
+    {
+        if(F[i] != F[i])
+            printf("ERROR: r=%.12g Flux[%d] is NaN.\n", r, i);
+        theRiemann->F[i] += F[i];
+    }
 
     free(prim);
     free(F);
