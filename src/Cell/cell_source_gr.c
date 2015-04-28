@@ -70,10 +70,12 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                 v[2] = c->prim[UZZ];
                 
                 // Check for superluminal velocity
+                /*
                 int err = metric_fixV(g, v, 5.0);
                 if(err)
                     printf("Speed reset in add_source_gr. r=%.12g phi=%.12g z=%.12g\n",
                             r, phi, z);
+                */
     
                 //Contravariant Four-Velocity u[i] = u^i
                 u[0] = 1.0 / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));

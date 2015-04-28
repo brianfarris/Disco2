@@ -99,7 +99,7 @@ void cell_boundary_outflow_r_outer( struct Cell *** theCells , struct Face * the
           theCells[k][sim_N(theSim,R_DIR)-1][j].prim[q] /= dA;
         }
         //theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] *= -1.;
-        if( theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] < 0.0 ) theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] = 0.0;
+        //if( theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] < 0.0 ) theCells[k][sim_N(theSim,R_DIR)-1][j].prim[URR] = 0.0;
         if (KEP_BNDRY==1){
           theCells[k][sim_N(theSim,R_DIR)-1][j].prim[UPP] = pow(r_cell,-1.5);
         }
