@@ -13,6 +13,9 @@
 void cell_src_boost(double t, double r, double phi, double z, double *cons, 
                     struct Metric *g, double rhoh, double *u, double *U, 
                     double dV, double dt, struct Sim *theSim);
+void cell_cool_integrateT(double *prim, double *dcons, double dt, 
+                            double u0, double GAM, double pos[], double M,
+                            struct Sim *theSim);
 
 void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses , double dt )
 {
@@ -21,6 +24,9 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
     FILE *sourcefile;
     if(PRINTTOOMUCH)
         sourcefile = fopen("source.out","w");
+
+    int NUMQ = sim_NUM_Q(theSim);
+    double *dcons_cool = (double *)malloc(NUMQ * sizeof(double));
   
     for( k=0 ; k<sim_N(theSim,Z_DIR) ; ++k )
     {
@@ -250,43 +256,30 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                 //Cooling should never (?) change the sign of the momenta,
                 //if it will, instead reduce the momenta by 0.9.  These lines
                 //should be irrelevant because of the luminosity-limited timestep.
-                
                 /*
-                if(fabs(c->cons[SRR]) < fabs(dt*dV*sqrtg*a* cool*u_d[1]))
-                {
-                    printf("That SRR is pretty cool! (r = %.12g, ur = %.12lg, SRR = %.12lg qR = %.12lg\n", r, u_d[1], c->cons[SRR], dt*dV*sqrtg*a* cool*u_d[1]);
-                    c->cons[SRR] /= 1.1;
-                }
-                else
-                */
-                    c->cons[SRR] -= dt*dV*sqrtg*a* cool*u_d[1];
-                /*
-                if(fabs(c->cons[LLL]) <  fabs(dt*dV*sqrtg*a* cool*u_d[2]))
-                {
-                    printf("That LLL is pretty cool! (r = %.12g, up = %.12lg, LLL = %.12lg qL = %.12lg\n", r, u_d[2], c->cons[LLL], dt*dV*sqrtg*a* cool*u_d[2]);
-                    c->cons[LLL] /= 1.1;
-                }
-                else
-                */
-                    c->cons[LLL] -= dt*dV*sqrtg*a* cool*u_d[2];
-                if( fabs(c->cons[SZZ]) < fabs(dt*dV*sqrtg*a* cool*u_d[3]))
-                    c->cons[SZZ] /= 1.1;
-                else
-                    c->cons[SZZ] -= dt*dV*sqrtg*a* cool*u_d[3];
-     //           if(fabs(c->cons[TAU]) < fabs(dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3])))
-     //           {
-     //               c->cons[TAU] /= 1.1;
-     //               printf("That TAU is pretty cool! (r = %.12g)\n", r);
-     //           }
-     //           else
-                    c->cons[TAU] += dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]); 
+                c->cons[SRR] -= dt*dV*sqrtg*a* cool*u_d[1];
+                c->cons[LLL] -= dt*dV*sqrtg*a* cool*u_d[2];
+                c->cons[SZZ] -= dt*dV*sqrtg*a* cool*u_d[3];
+                c->cons[TAU] += dt*dV*sqrtg*a* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]); 
                 if(PRINTTOOMUCH)
                 {
                     printf("SRR cooling: (%d,%d,%d): r=%.12g, dV=%.12g, q = %.12g, Q = %.12g\n",i,j,k,r,dV,-a*sqrtg* cool*u_d[1],-dt*dV*sqrtg*a *cool*u_d[1]);
                     printf("LLL cooling: (%d,%d,%d): r=%.12g, dV=%.12g, q = %.12g, Q = %.12g\n",i,j,k,r,dV,-a*sqrtg* cool*u_d[2],-dt*dV*sqrtg*a *cool*u_d[2]);
                     printf("TAU cooling: (%d,%d,%d): r=%.12g, dV=%.12g, q = %.12g, Q = %.12g\n",i,j,k,r,dV,a*sqrtg* cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]),dt*dV*sqrtg*a *cool * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]));
                 }
+                */
                
+
+                double pos[3];
+                pos[R_DIR] = r;
+                pos[P_DIR] = phi;
+                pos[Z_DIR] = z;
+                cell_cool_integrateT(c->prim, dcons_cool, dt, u[0], GAMMALAW, 
+                                        pos, M, theSim);
+                c->cons[SRR] += dcons_cool[SRR] * dV;
+                c->cons[LLL] += dcons_cool[LLL] * dV;
+                c->cons[SZZ] += dcons_cool[SZZ] * dV;
+                c->cons[TAU] += dcons_cool[TAU] * dV;
                 
                 if(sim_BoostType(theSim) == BOOST_BIN)
                         //&& r > metric_horizon(theSim))
@@ -302,6 +295,8 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
             }
         }
     }
+
+    free(dcons_cool);
 
     if(PRINTTOOMUCH)
         fclose(sourcefile);
@@ -331,4 +326,59 @@ void cell_src_boost(double t, double r, double phi, double z, double *cons,
     cons[SRR] += al*sqrtg*dV*dt * Fr;
     cons[LLL] += al*sqrtg*dV*dt * Fp;
     cons[TAU] += al*sqrtg*dV*dt * (-U[0]*Ft - U[1]*Fr - U[2]*Fp);
+}
+
+void cell_cool_integrateT(double *prim, double *dcons, double dt, 
+                            double u0, double GAM, double pos[], double M,
+                            struct Sim *theSim)
+
+{
+    int i;
+    int N = 10;
+
+    double c = (GAM-1.0)/(prim[RHO]*u0);
+    double r = pos[R_DIR];
+
+    double p[5];
+    p[RHO] = prim[RHO];
+    p[PPP] = prim[PPP];
+    p[URR] = prim[URR];
+    p[UPP] = prim[UPP];
+    p[UZZ] = prim[UZZ];
+    double logT = log(p[PPP]/p[RHO]);
+
+    double step = dt/N;
+
+    //Cool using N Forward Euler steps
+    //TODO: use ANY OTHER METHOD.
+    for(i=0; i<N; i++)
+    {
+        double T = exp(logT);
+        p[PPP] = p[RHO] * T;
+        double rhoh = p[RHO] + GAM/(GAM-1)*p[PPP];
+        double height = sqrt(p[PPP]*r*r*r/(rhoh*M))/u0;
+
+        double qdot = eos_cool(p, height, theSim);
+
+        logT += (-qdot * c / T) * step;
+    }
+
+    double T = exp(logT);
+    p[PPP] = p[RHO] * T;
+
+    int NUMQ = sim_NUM_Q(theSim);
+    double *cons0 = (double *)malloc(NUMQ * sizeof(double));
+    double *cons1 = (double *)malloc(NUMQ * sizeof(double));
+    cell_prim2cons(prim, cons0, pos, 1.0, theSim);
+    cell_prim2cons(p,    cons1, pos, 1.0, theSim);
+
+    dcons[RHO] = 0.0;
+    dcons[SRR] = cons1[SRR]-cons0[SRR];
+    dcons[LLL] = cons1[LLL]-cons0[LLL];
+    dcons[SZZ] = cons1[SZZ]-cons0[SZZ];
+    dcons[TAU] = cons1[TAU]-cons0[TAU];
+    for(i=5; i<NUMQ; i++)
+        dcons[i] = 0.0;
+    free(cons0);
+    free(cons1);
 }
