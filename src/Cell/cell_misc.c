@@ -162,3 +162,39 @@ void cell_print_all(struct Cell ***theCells, struct Sim *theSim)
                     c->cons[DDD],c->cons[SRR],c->cons[LLL],c->cons[SZZ],c->cons[TAU]);
             }
 }
+
+void cell_print_nan(struct Cell ***theCells, char label[], struct Sim *theSim)
+{
+    int i,j,k,q;
+    for(k=0; k<sim_N(theSim,Z_DIR); k++)
+        for(i=0; i<sim_N(theSim,R_DIR); i++)
+            for(j=0; j<sim_N_p(theSim,i); j++)
+            {
+                int nan = 0;
+                for(q=0; q<sim_NUM_Q(theSim); q++)
+                    if(theCells[k][i][j].prim[q] != theCells[k][i][j].prim[q])
+                        nan = 1;
+                for(q=0; q<sim_NUM_Q(theSim); q++)
+                    if(theCells[k][i][j].cons[q] != theCells[k][i][j].cons[q])
+                        nan = 1;
+                if(nan)
+                {
+                    struct Cell *c = &(theCells[k][i][j]);
+                    double rp = sim_FacePos(theSim,i,R_DIR);
+                    double rm = sim_FacePos(theSim,i-1,R_DIR);
+                    double r = 0.5*(rm+rp);
+                    double zp = sim_FacePos(theSim,k,Z_DIR);
+                    double zm = sim_FacePos(theSim,k-1,Z_DIR);
+                    double z = 0.5*(zm+zp);
+                    double phi = c->tiph - 0.5*c->dphi;
+                    printf("ERROR: nan @ %s - r=%.12g phi=%.12g z=%.12g\n",
+                            label,r,phi,z);
+                    printf("   rho=%.12g P=%.12g vr=%.12g vp=%.12g vz=%.12g\n",
+                            c->prim[RHO], c->prim[PPP], c->prim[URR],
+                            c->prim[UPP], c->prim[UZZ]);
+                    printf("   DDD=%.12g TAU=%.12g SRR=%.12g LLL=%.12g SZZ=%.12g\n",
+                            c->cons[RHO], c->cons[PPP], c->cons[URR],
+                            c->cons[UPP], c->cons[UZZ]);
+                }
+            }
+}

@@ -39,6 +39,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   {
     cell_print_all(theCells, theSim);
   }
+  cell_print_nan(theCells, "start", theSim);
   
   // this is part of the runge-kutta method
   cell_adjust_RK_cons( theCells, theSim, theTimeStep->RK);
@@ -154,6 +155,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   {
     cell_print_all(theCells, theSim);
   }
+
+  cell_print_nan(theCells, "after flux", theSim);
   
   //Source Terms
   cell_add_src( theCells ,theSim, theGravMasses , dt ); // add source terms
@@ -164,6 +167,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   {
     cell_print_all(theCells, theSim);
   }
+  cell_print_nan(theCells, "after src", theSim);
   
 
   //Bookkeeping
@@ -225,6 +229,8 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
       //do nothing, this is already handled by the syncing routine
     }
   }
+  
+  cell_print_nan(theCells, "after BC", theSim);
 
   // Add External Sources
   if(sim_BoundTypeSource(theSim) == BOUND_NOZZLE)
@@ -242,6 +248,7 @@ void timestep_substep(struct TimeStep * theTimeStep, struct Cell *** theCells,
   //re-calculate conserved quantities. 
   //things may have changed due to syncing and/or caps/floors applied in primitive solver.
   cell_calc_cons( theCells,theSim );
+  cell_print_nan(theCells, "after recal", theSim);
 }
 
 

@@ -45,6 +45,19 @@ void cell_prim2cons_gr( double * prim , double * cons , double *pos , double dV 
     for(i=0; i<4; i++)
         U[i] = metric_frame_U_u(g, i, theSim);
 
+    //Check if velocity superluminal.
+    double V[3];
+    for(i=0; i<3; i++)
+        V[i] = (v[i]+b[i])/a;
+    double V2 = metric_square3_u(g, V);
+    if(V2 >= 1.0)
+    {
+        printf("V2 really big! V2=%.12g r=%.12g phi=%.12g z=%.12g\n",
+                    V2, r, phi, z);
+        printf("    rho=%.12g Pp=%.12g vr=%.12g vp=%.12g vz=%.12g\n",
+                    rho, Pp, v[0], v[1], v[2]);
+    }   
+
     //Calculate 4-velocity, u0 = u^0, u[i] = u_i
     u0 = 1.0 / sqrt(-metric_g_dd(g,0,0) - 2*metric_dot3_u(g,b,v) - metric_square3_u(g,v));
     u[0] = metric_g_dd(g,0,0) * u0 + u0*metric_dot3_u(g,b,v);

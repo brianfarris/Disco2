@@ -146,5 +146,6 @@ void cell_set_prim(struct Cell ***,int,int,int,int,double);//this will morph int
 void cell_set_tiph(struct Cell ***,int,int,int,double);//this will morph into a checkpoint restart routine
 void cell_print(struct Cell *** ,int ,int ,int );
 void cell_print_all(struct Cell *** , struct Sim *);
+void cell_print_nan(struct Cell ***theCells, char label[], struct Sim *theSim);
 void cell_metric_horizon_jazz(struct Cell ***, struct Sim *);
 #endif
