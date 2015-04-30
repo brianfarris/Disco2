@@ -372,6 +372,9 @@ void cell_cool_integrateT(double *prim, double *dcons, double dt,
         t += step;
         i++;
     }
+    if(i>100)
+        printf("   Cell at (%.12lg, %.12lg, %.12lg) cooled in %d steps.\n",
+                pos[R_DIR], pos[P_DIR], pos[Z_DIR], i);
 
     double T = exp(logT);
     p[PPP] = p[RHO] * T;

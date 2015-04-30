@@ -260,7 +260,8 @@ double cell_mindt_gr(struct Cell ***theCells, struct Sim *theSim)
                     double maxdisp = 0.1; //Should be a fraction like 0.1
                     double dtl;
 
-                    if(sim_CoolingType(theSim) != COOL_NONE)
+                    //TODO: Decide whether this should be here at all.  If not, remove it.
+                    if(0 && sim_CoolingType(theSim) != COOL_NONE)
                     {
                         double dV = 0.5*(rp+rm)*dr*dphi*dz;
                         double U[4];
