@@ -398,14 +398,14 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+6] += (vp_minus_w/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+7] += (Cool/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+8] += (r * vr*rho/sim_N_p(theSim,i));//(Bz/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (E_hydro/sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9]  += (E_hydro/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (KE/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (rhoe/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (divB/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += 0.0;//(180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += (GradPsi_r/sim_N_p(theSim,i)*dz) ; 
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += 0.0;//(divB/sim_N_p(theSim,i)*dz) ;
+          //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] +=  //(180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
+          //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += r*fBin_phi*rho*dphi; //(GradPsi_r/sim_N_p(theSim,i)*dz) ; 
 	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+20] += (passive_scalar/sim_N_p(theSim,i)*dz) ;
 	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+21] += (passive_scalar2/sim_N_p(theSim,i)*dz) ;
 	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+22] += (passive_scalar3/sim_N_p(theSim,i)*dz) ;
@@ -413,9 +413,11 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 	  //
 	  // Don't count torques within a certain radius from secondary add r and 2pi for integration
 	  if ((i>=imin_noghost) && (i<imax_noghost) && (k>=kmin_noghost) && (k<kmax_noghost)){
-	    if (dist_bh1 > Rcut*Rhill){ //add 2pi to Trq to not azi average - see Scalar int below
+	    if (dist_bh1 > Rcut*Rhill && dist_bh0 >Rcut*Rhill){ //add 2pi to Trq to not azi average - see Scalar int below
 	      //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += (2.*M_PI*r*rho*dPhi_dphi/sim_N_p(theSim,i)*dz);
 	      //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] -= (r*2.*M_PI*rho*r*fBin_phi/sim_N_p(theSim,i));
+	      VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] -= Fr      *rho*  r*dphi;    //(180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
+	      VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] -= fBin_phi*rho*  r*dphi; //(GradPsi_r/sim_N_p(theSim,i)*dz) ;
 	      VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] -= (r*rho*fBin_phi * r*dphi);//((r_bh0*fp0+r_bh1*fp1)*rho *r*dphi);
 	      VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+19] -= (r_bh1*rho*fsec_phi * r*dphi);
 	      //positive gives torque ON binary                 
@@ -443,7 +445,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       for (j=0;j<sim_N_p(theSim,i);++j){
 	k = 0;
 	double rho = cell_prim(cell_single(theCells,i,j,k),RHO);
-	VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17]/(2*M_PI*rho)/sim_N_p(theSim,i);
+	VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17]/(2*M_PI*rho)/sim_N_p(theSim,i);
       }    
      }
 
@@ -453,7 +455,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       double rm = sim_FacePos(theSim,i-1,R_DIR);
       //TrScal_temp += TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]*(rp-rm);
       for (n=0;n<NUM_SCAL;++n){
-        if (n==16){ // the vol. el. 'r' already added so dr not dr^2 - does not need extra 1/2 in /(dz) below
+        if (n==16 || n==15 || n==14){ // the vol. el. 'r' already added so dr not dr^2 - does not need extra 1/2 in /(dz) below
 	  ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp-rm);
         }else{
           // mult by delta r^2 because we are doing an r integration r(rp-rm) = (rp+rm)/2*(rp-rm) = 1/2(rp^2-rm^2)
@@ -510,14 +512,19 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     double ZMAX = sim_MAX(theSim,Z_DIR);
 
 
+    double Fr_onBin = ScalarDiag_reduce[14];
+    double Fp_onBin = ScalarDiag_reduce[15];
+
+
     for (n=0;n<NUM_SCAL;++n){
-      if (n!=16 && n!=15){ //Don't Vol avg Torques - only Z avg                     
+      if (n!=16 && n!=15 && n!=14){ //Don't Vol avg Torques - only Z avg                     
         ScalarDiag_reduce[n] *= dtout/((ZMAX-ZMIN)*(RMAX*RMAX-RMIN*RMIN));
-	}else if(n==16 || n==15){
+	}else if(n==16 || n==15 || n==14){
            ScalarDiag_reduce[n] *= dtout; ///(ZMAX-ZMIN);
 	//TrScal_reduce        *= 1./(ZMAX-ZMIN);   don't volume average sigma = int{rho * dz}             
       }
     }
+    
 
     double r_bh1 = gravMass_r(theGravMasses,1);
     int req1_found = 0;
@@ -614,7 +621,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagBPFilename[256];
       sprintf(DiagBPFilename,"BinaryParams.dat");
       FILE * DiagBpFile = fopen(DiagBPFilename,"a");
-      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e  \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, Om, Om, Pow_reduce, gravMass_total_torque(theGravMasses,0), TrScal_reduce);
+      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, Om, Om, Pow_reduce, gravMass_total_torque(theGravMasses,0), TrScal_reduce, Fr_onBin, Fp_onBin);
       fclose(DiagBpFile);
     }
 
