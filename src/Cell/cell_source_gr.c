@@ -336,7 +336,7 @@ void cell_cool_integrateT(double *prim, double *dcons, double dt,
 
 {
     int i;
-    int N = 10;
+    double res = 0.1;
 
     double c = (GAM-1.0)/(prim[RHO]*u0);
     double r = pos[R_DIR];
@@ -349,11 +349,13 @@ void cell_cool_integrateT(double *prim, double *dcons, double dt,
     p[UZZ] = prim[UZZ];
     double logT = log(p[PPP]/p[RHO]);
 
-    double step = dt/N;
+    double t = 0;
 
     //Cool using N Forward Euler steps
     //TODO: use ANY OTHER METHOD.
-    for(i=0; i<N; i++)
+    //
+    i = 0;
+    while(t < dt)
     {
         double T = exp(logT);
         p[PPP] = p[RHO] * T;
@@ -361,8 +363,14 @@ void cell_cool_integrateT(double *prim, double *dcons, double dt,
         double height = sqrt(p[PPP]*r*r*r/(rhoh*M))/u0;
 
         double qdot = eos_cool(p, height, theSim);
+        double logTprime = qdot * c / T;
 
-        logT += (-qdot * c / T) * step;
+        double step = res / logTprime;
+        step = step < dt-t ? step : dt-t;
+
+        logT += -logTprime * step;
+        t += step;
+        i++;
     }
 
     double T = exp(logT);
