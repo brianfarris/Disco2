@@ -23,7 +23,7 @@ void get_rho_sink( struct GravMass * theGravMasses, struct Sim * theSim, int p, 
   double Mtotal = M0+M1;
   double alpha = sim_EXPLICIT_VISCOSITY(theSim);
   if (alpha <= 0.0){
-    alpha=0.0;
+    alpha=0.000025;
   }
 
   double one_o_nu0 = 1.0/(alpha*P/rho)*sqrt(pow(r0,-3)*M0/Mtotal);
