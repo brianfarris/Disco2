@@ -63,15 +63,31 @@ void cell_setT( struct Cell *** theCells ,struct Sim * theSim, struct GravMass *
 	double Omeff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
 	double Veff = sqrt(pow(dist_bh0*dist_bh0+eps*eps,-0.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-0.5)*M1); //Virial Thm 
 
-	double cs = Veff*HoR;
+	double cs = sqrt(Gam) * Veff*HoR;
 	//double cs = r*Omeff*HoR; //cst MAch
 	//double cs = HoR; //cst cs	
-	double PoRho = cs*cs/Gam;
 	
-	
-        double rho = c->prim[RHO]; //exponential atmosphere already in here
-	//
-        c->prim[PPP] = PoRho * rho;
+	double PoRho;
+	double rho;
+	//QUICK HACK
+	int ISO = 1;
+	int ADI = 0;
+	if (ISO==1){
+	  PoRho = cs*cs/Gam;
+	  rho = c->prim[RHO]; //exponential atmosphere already in here
+	  //
+	  c->prim[PPP] = PoRho * rho;
+	  //
+	}
+	else if (ADI==1){
+	  double rho0 = 1.0;
+	  double Kad = cs*cs/Gam/pow(rho0,(Gam-1)); // make cst in time not nec in space
+	  rho = c->prim[RHO]; //exponential atmosphere already in here
+	  c->prim[PPP] = Kad * pow(rho,Gam);
+	}
+	else{
+	  //Throw an error here
+	}
       }
     }
   }
