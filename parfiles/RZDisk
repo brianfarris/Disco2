@@ -1,0 +1,102 @@
+// parameter file for migrating planets April 2014
+
+//Disk and Binary ICs-------------------------------------------------------------------//
+InitialDataType         19              // 0 Flock, 1 Shear 7 MM08 10 SSmigration,  19- RZ andrea disk
+GravMassType            1               // 0 none, 1 single, 2 binary, 3 live binary
+MassRatio               1.0 
+sep0                    1.0 
+Restart                 0               //If this=1 restart using input.h5
+//--------------------------------------------------------------------------------------//
+
+//Computational Setup-------------------------------------------------------------------//
+NumR                    16 
+NumZ                    8                       //Vertical Zones
+ng                      2
+R_Min                   1.0   //was 0.05
+R_Max                   2.0
+Z_Min                   -1.0
+Z_Max                   1.0
+NP_CONST                1
+NPCAP                   1  //aspect 1 out to >~
+aspect                  0
+NUM_C                   5
+NUM_N                   0
+Time_Max                19.00 // >~1400 orb  //628318.5307
+Num_Checkpoints         1
+Num_Diag_Dump           6.0
+Num_Diag_Measure        100.0
+
+NoInnerBC               0               // 1 means do not apply an inner BC
+BoundTypeR              1               // 0 fixed, 1 outflow, 2 periodic
+BoundTypeZ              1               // 0 fixed, 1 outflow, 2 periodic
+ZeroPsiBndry            1
+
+Move_Cells              0           // move cells (but dont solve in cell frame) on top of w_det_a 0 FIXED, 3  Kepler, 5 MILOS
+RiemannSolver           0           // 0 hllc, 1 hll
+//--------------------------------------------------------------------------------------//
+
+//Viscosity-----------------------------------------------------------------------------//
+Explicit_Viscosity      -0.000025  // if nu cst in header.h then this should be alpha for IC 10
+ViscConst               1
+
+//Thermodynamics------------------------------------------------------------------------//
+Adiabatic_Index         1.0001
+Cooling                 0   //turn cooling on if 1 
+SET_T                   1   // keep isothermal if 1
+HoR                     0.05
+//--------------------------------------------------------------------------------------//
+
+RhoSinkOn		0      // 1 means sink
+Rsink0                  0.0
+Rsink1                  0.0
+
+
+//Arbitrary migrate rate
+vRate                   6.0   //in terms of viscous time (for nu=cst only right now)
+
+//Trq migrate params
+Rcut                    0.0   // Number of Hill spheres to remove around secondary in Trq calc
+Mdsk_o_Ms     		      1.0   //Fraction of secondary mass in disk r<a
+tmig_on                 0.0  // time when live binary turns on (in orbits)
+tramp                   0.0  // time period after tmigon over whicih disk density turns on
+tmaxOrb                 1200.00
+
+//GW decay params//
+OrbShrinkTscale         1000000000000000000000.0
+OrbShrinkT0			0.0
+
+
+DivB_Ch                 0.06            //Dedner divergence cleaning
+DivB_l                  0.1
+//Numerical Parameters
+CFL                     0.2
+PLM                     1.0
+
+POWELL                  1
+w_a_type                0    //move cells AND solve in cell frame 1st order 0 NONE, 1 KEPLER, 3 MILOS
+Grav_2D                 0
+G_EPS                   0.025
+
+PHI_ORDER               2
+
+//Atmosphere Parameters
+Rho_Floor               0.000001 //n5
+Cs_Floor                0.0001
+Cs_Cap                  1.0
+Vel_Cap                 10.0
+
+
+runtype                 0
+
+DAMP_TIME               -0.01       // Set negative to turn off
+RDAMP_INNER             0.0
+RDAMP_OUTER             2.0
+
+
+RLogScale               10000000.0  //13.14   // Large numbers gives uniform spacing
+ZLogScale               10000000.0
+HiResSigma              1.0    // SET IN sim_set.c
+HiResR0a                -10000000000000.0    //SET IN sim_set.c
+HiResR0b				     0.99
+HiResFac                1.0 //changes by factor of 1+HiResFac at r0.
+
