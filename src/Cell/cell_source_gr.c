@@ -351,7 +351,7 @@ void cell_cool_integrateT(double *prim, double *dcons, double dt,
 
     double t = 0;
 
-    //Cool using N Forward Euler steps
+    //Cool using adaptive Forward Euler.
     //TODO: use ANY OTHER METHOD.
     //
     i = 0;
@@ -367,8 +367,38 @@ void cell_cool_integrateT(double *prim, double *dcons, double dt,
 
         double step = res / logTprime;
         step = step < dt-t ? step : dt-t;
+        
+        //FE
+        //logT += -logTprime * step;
+        
+        //RK4
+        double logT1 = logT - 0.5*step*logTprime;
+        
+        T = exp(logT1);
+        p[PPP] = p[RHO] * T;
+        rhoh = p[RHO] + GAM/(GAM-1)*p[PPP];
+        height = sqrt(p[PPP]*r*r*r/(rhoh*M))/u0;
+        qdot = eos_cool(p, height, theSim);
+        double logTp2 = qdot * c / T;
+        double logT2 = logT - 0.5*step*logTp2;
 
-        logT += -logTprime * step;
+        T = exp(logT2);
+        p[PPP] = p[RHO] * T;
+        rhoh = p[RHO] + GAM/(GAM-1)*p[PPP];
+        height = sqrt(p[PPP]*r*r*r/(rhoh*M))/u0;
+        qdot = eos_cool(p, height, theSim);
+        double logTp3 = qdot * c / T;
+        double logT3 = logT - step*logTp3;
+        
+        T = exp(logT3);
+        p[PPP] = p[RHO] * T;
+        rhoh = p[RHO] + GAM/(GAM-1)*p[PPP];
+        height = sqrt(p[PPP]*r*r*r/(rhoh*M))/u0;
+        qdot = eos_cool(p, height, theSim);
+        double logTp4 = qdot * c / T;
+
+        logT += -step*(logTprime + 2*logTp2 + 2*logTp3 + logTp4)/6.0;
+
         t += step;
         i++;
     }
