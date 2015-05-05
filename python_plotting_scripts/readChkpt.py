@@ -12,6 +12,11 @@ def readChkpt(filename):
 
     #Standard way of removing duplicates (thnks to dfm and dh)
     Data = np.array(dict(izip(imap(hash, imap(tuple,Data[:,0:3])), Data)).values())
+    
+    #That step messed up the data, sort it by z, r, phi
+    sort_inds = np.lexsort((Data[:,0], Data[:,1], Data[:,2]))
+    Data = Data[sort_inds]
+
     #read in coords
     piph = np.array(Data[:,0])
     r = np.array(Data[:,1])

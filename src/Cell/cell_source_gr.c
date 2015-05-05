@@ -1,4 +1,5 @@
 #define CELL_PRIVATE_DEFS
+#define EOS_PRIVATE_DEFS
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -13,9 +14,12 @@
 void cell_src_boost(double t, double r, double phi, double z, double *cons, 
                     struct Metric *g, double rhoh, double *u, double *U, 
                     double dV, double dt, struct Sim *theSim);
-void cell_cool_integrateT(double *prim, double *dcons, double dt, 
-                            double u0, double GAM, double pos[], double M,
-                            struct Sim *theSim);
+void cell_cool_integrateT_num(double *prim, double *dcons, double dt, 
+                                double u0, double GAM, double pos[], double M,
+                                struct Sim *theSim);
+void cell_cool_integrateT_exact(double *prim, double *dcons, double dt, 
+                                double u0, double GAM, double pos[], double M,
+                                struct Sim *theSim);
 
 void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses , double dt )
 {
@@ -276,23 +280,21 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                 pos[R_DIR] = r;
                 pos[P_DIR] = phi;
                 pos[Z_DIR] = z;
-                cell_cool_integrateT(c->prim, dcons_cool, dt, u[0], GAMMALAW, 
-                                        pos, M, theSim);
+                //cell_cool_integrateT_num(c->prim, dcons_cool, dt, u[0], 
+                //                            GAMMALAW, pos, M, theSim);
+                cell_cool_integrateT_exact(c->prim, dcons_cool, dt, u[0], 
+                                            GAMMALAW, pos, M, theSim);
                 c->cons[SRR] += dcons_cool[SRR] * dV;
                 c->cons[LLL] += dcons_cool[LLL] * dV;
                 c->cons[SZZ] += dcons_cool[SZZ] * dV;
                 c->cons[TAU] += dcons_cool[TAU] * dV;
                 
                 if(sim_BoostType(theSim) == BOOST_BIN)
-                        //&& r > metric_horizon(theSim))
                 {
                     cell_src_boost(time_global, r, phi, z, c->cons, g, rhoh, 
                                     u, U, dV, dt, theSim);
                 }
                 
-                
-                
-
                 metric_destroy(g);
             }
         }
@@ -330,9 +332,9 @@ void cell_src_boost(double t, double r, double phi, double z, double *cons,
     cons[TAU] += al*sqrtg*dV*dt * (-U[0]*Ft - U[1]*Fr - U[2]*Fp);
 }
 
-void cell_cool_integrateT(double *prim, double *dcons, double dt, 
-                            double u0, double GAM, double pos[], double M,
-                            struct Sim *theSim)
+void cell_cool_integrateT_num(double *prim, double *dcons, double dt, 
+                                double u0, double GAM, double pos[], double M,
+                                struct Sim *theSim)
 
 {
     int i;
@@ -351,7 +353,7 @@ void cell_cool_integrateT(double *prim, double *dcons, double dt,
 
     double t = 0;
 
-    //Cool using adaptive Forward Euler.
+    //Cool using adaptive Forward Euler or RK4.
     //TODO: use ANY OTHER METHOD.
     //
     i = 0;
@@ -408,6 +410,43 @@ void cell_cool_integrateT(double *prim, double *dcons, double dt,
 
     double T = exp(logT);
     p[PPP] = p[RHO] * T;
+
+    int NUMQ = sim_NUM_Q(theSim);
+    double *cons0 = (double *)malloc(NUMQ * sizeof(double));
+    double *cons1 = (double *)malloc(NUMQ * sizeof(double));
+    cell_prim2cons(prim, cons0, pos, 1.0, theSim);
+    cell_prim2cons(p,    cons1, pos, 1.0, theSim);
+
+    dcons[RHO] = 0.0;
+    dcons[SRR] = cons1[SRR]-cons0[SRR];
+    dcons[LLL] = cons1[LLL]-cons0[LLL];
+    dcons[SZZ] = cons1[SZZ]-cons0[SZZ];
+    dcons[TAU] = cons1[TAU]-cons0[TAU];
+    for(i=5; i<NUMQ; i++)
+        dcons[i] = 0.0;
+    free(cons0);
+    free(cons1);
+}
+
+void cell_cool_integrateT_exact(double *prim, double *dcons, double dt, 
+                                double u0, double GAM, double pos[], double M,
+                                struct Sim *theSim)
+{
+    int i;
+
+    double sig0 = prim[RHO] * eos_rho_scale * eos_r_scale; // g/cm^2
+    double kappa = 0.2; // cm^2/g
+
+    double T0 = prim[PPP]/prim[RHO] * eos_mp*eos_c*eos_c; // erg
+    double T1 = pow(1.0 + 8.0*(GAM-1.0)*eos_sb/(kappa*sig0*sig0*u0) 
+                    * T0*T0*T0 * dt, -1.0/3.0) * T0 / (eos_mp*eos_c*eos_c);
+
+    double p[5];
+    p[RHO] = prim[RHO];
+    p[PPP] = prim[RHO] * T1;
+    p[URR] = prim[URR];
+    p[UPP] = prim[UPP];
+    p[UZZ] = prim[UZZ];
 
     int NUMQ = sim_NUM_Q(theSim);
     double *cons0 = (double *)malloc(NUMQ * sizeof(double));
