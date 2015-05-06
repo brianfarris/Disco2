@@ -29,7 +29,7 @@ aspect         1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                1.0e3
+Time_Max                0.001
 Num_Checkpoints	        1001
 Num_Diag_Dump           11
 Num_Diag_Measure        11

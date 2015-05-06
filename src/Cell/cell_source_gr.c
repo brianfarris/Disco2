@@ -338,7 +338,7 @@ void cell_cool_integrateT_num(double *prim, double *dcons, double dt,
 
 {
     int i;
-    double res = 0.1;
+    double res = 1.0e-8;
 
     double c = (GAM-1.0)/(prim[RHO]*u0);
     double r = pos[R_DIR];
@@ -411,6 +411,8 @@ void cell_cool_integrateT_num(double *prim, double *dcons, double dt,
     double T = exp(logT);
     p[PPP] = p[RHO] * T;
 
+    printf("%.12lg %.12lg\n", prim[PPP]/prim[RHO], T);
+
     int NUMQ = sim_NUM_Q(theSim);
     double *cons0 = (double *)malloc(NUMQ * sizeof(double));
     double *cons1 = (double *)malloc(NUMQ * sizeof(double));
@@ -437,9 +439,15 @@ void cell_cool_integrateT_exact(double *prim, double *dcons, double dt,
     double sig0 = prim[RHO] * eos_rho_scale * eos_r_scale; // g/cm^2
     double kappa = 0.2; // cm^2/g
 
-    double T0 = prim[PPP]/prim[RHO] * eos_mp*eos_c*eos_c; // erg
-    double T1 = pow(1.0 + 8.0*(GAM-1.0)*eos_sb/(kappa*sig0*sig0*u0) 
-                    * T0*T0*T0 * dt, -1.0/3.0) * T0 / (eos_mp*eos_c*eos_c);
+    double qdot = eos_cool(prim, 1.0, theSim);
+
+    //double T0 = prim[PPP]/prim[RHO] * eos_mp*eos_c*eos_c; // erg
+    //double T1 = pow(1.0 + 8.0*(GAM-1.0)*eos_sb/(kappa*sig0*sig0*u0) 
+    //                * T0*T0*T0 * dt * eos_r_scale/eos_c, -1.0/3.0) * T0 / (eos_mp*eos_c*eos_c);
+    //
+    double T0 = prim[PPP]/prim[RHO];
+    double T1 = pow(1.0 + 3*(GAM-1)*qdot/(prim[RHO]*u0*T0)*dt, -1.0/3.0) * T0;
+    printf("%.12lg %.12lg %.12lg\n", prim[PPP]/prim[RHO], T0, T1);
 
     double p[5];
     p[RHO] = prim[RHO];
