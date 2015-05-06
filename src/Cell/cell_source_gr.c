@@ -338,7 +338,7 @@ void cell_cool_integrateT_num(double *prim, double *dcons, double dt,
 
 {
     int i;
-    double res = 1.0e-8;
+    double res = 1.0e-1;
 
     double c = (GAM-1.0)/(prim[RHO]*u0);
     double r = pos[R_DIR];
@@ -411,7 +411,7 @@ void cell_cool_integrateT_num(double *prim, double *dcons, double dt,
     double T = exp(logT);
     p[PPP] = p[RHO] * T;
 
-    printf("%.12lg %.12lg\n", prim[PPP]/prim[RHO], T);
+    //printf("%.12lg %.12lg\n", prim[PPP]/prim[RHO], T);
 
     int NUMQ = sim_NUM_Q(theSim);
     double *cons0 = (double *)malloc(NUMQ * sizeof(double));
@@ -447,7 +447,7 @@ void cell_cool_integrateT_exact(double *prim, double *dcons, double dt,
     //
     double T0 = prim[PPP]/prim[RHO];
     double T1 = pow(1.0 + 3*(GAM-1)*qdot/(prim[RHO]*u0*T0)*dt, -1.0/3.0) * T0;
-    printf("%.12lg %.12lg %.12lg\n", prim[PPP]/prim[RHO], T0, T1);
+    //printf("%.12lg %.12lg %.12lg\n", prim[PPP]/prim[RHO], T0, T1);
 
     double p[5];
     p[RHO] = prim[RHO];
