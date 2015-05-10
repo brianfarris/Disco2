@@ -19,7 +19,6 @@ void cell_init_disctest_rigid(struct Cell *c, double r, double phi, double z, st
     double GAM = sim_GAMMALAW(theSim);
 
     double vp = up/sqrt(1.0+r*r*up*up);
-    double u0 = up/vp;
     double P = (P0+(GAM-1.0)/GAM*rho)*exp(0.5*GAM*r*r*up*up/(GAM-1.0)) - (GAM-1.0)/GAM*rho;
 
     if(sim_Background(theSim) == NEWTON)
@@ -37,7 +36,6 @@ void cell_init_disctest_rigid(struct Cell *c, double r, double phi, double z, st
     if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) 
     {
         int i;
-        double x;
         for(i=sim_NUM_C(theSim); i<sim_NUM_Q(theSim); i++)
         {
             if(r*cos(phi) < 0)
@@ -82,7 +80,6 @@ void cell_init_disctest_kepler(struct Cell *c, double r, double phi, double z, s
     if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) 
     {
         int i;
-        double x;
         for(i=sim_NUM_C(theSim); i<sim_NUM_Q(theSim); i++)
         {
             if(r*cos(phi) < 0)
@@ -122,7 +119,50 @@ void cell_init_disctest_alphakepler(struct Cell *c, double r, double phi, double
     if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) 
     {
         int i;
-        double x;
+        for(i=sim_NUM_C(theSim); i<sim_NUM_Q(theSim); i++)
+        {
+            if(r*cos(phi) < 0)
+                c->prim[i] = 0.0;
+            else
+                c->prim[i] = 1.0;
+        }
+    }
+}
+
+void cell_init_disctest_spread(struct Cell *c, double r, double phi, double z, struct Sim *theSim)
+{
+    double rho, vr, vp, P;
+    double rho0, P0, vrOut, vrIn, vpOut, vpIn, r0, dr;
+    double M  = sim_GravM(theSim);
+
+    rho0 = sim_InitPar1(theSim);
+    P0 = sim_InitPar2(theSim);
+    r0 = sim_InitPar3(theSim);
+    dr = sim_InitPar4(theSim);
+
+    vrOut = 0.0;
+    vrIn = -2*M/r / (1+2*M/r);
+    vpOut = sqrt(M/(r*r*r));
+    vpIn = 0.0;
+
+    //Sigmoid weighting.
+    double w = 1.0/(1.0+exp(-(r-r0)/dr));
+    
+    vr = (1-w)*vrIn + w*vrOut;
+    vp = (1-w)*vpIn + w*vpOut;
+
+    rho = rho0;
+    P = P0;
+
+    c->prim[RHO] = rho;
+    c->prim[PPP] = P;
+    c->prim[URR] = vr;
+    c->prim[UPP] = vp;
+    c->prim[UZZ] = 0.0;
+
+    if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) 
+    {
+        int i;
         for(i=sim_NUM_C(theSim); i<sim_NUM_Q(theSim); i++)
         {
             if(r*cos(phi) < 0)
@@ -143,6 +183,8 @@ void cell_init_disctest_calc(struct Cell *c, double r, double phi, double z, str
         cell_init_disctest_kepler(c, r, phi, z, theSim);
     else if(test_num == 2)
         cell_init_disctest_alphakepler(c, r, phi, z, theSim);
+    else if(test_num == 3)
+        cell_init_disctest_spread(c, r, phi, z, theSim);
     else
         printf("ERROR: cell_init_disctest given bad option.\n");
 }
@@ -162,8 +204,6 @@ void cell_single_init_disctest(struct Cell *theCell, struct Sim *theSim,int i,in
 
 void cell_init_disctest(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup)
 {
-    int test_num = sim_InitPar0(theSim);
-
     int i, j, k;
     for (k = 0; k < sim_N(theSim,Z_DIR); k++) 
     {

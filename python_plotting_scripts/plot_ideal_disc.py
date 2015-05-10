@@ -122,6 +122,8 @@ def plot_r_profile(filename, sca='linear'):
     plt.plot(r, V, 'b+')
     plot_r_profile_single(r, cs, "linear", r"$c_s$")
 
+    plt.suptitle(r"$T = {0:.3g}$".format(t))
+
     plt.tight_layout()
 
     outname = "plot_idisc_{0}.png".format("_".join( filename.split("/")[-1].split(".")[0].split("_")[1:] ))
