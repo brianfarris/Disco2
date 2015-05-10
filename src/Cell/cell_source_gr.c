@@ -436,8 +436,8 @@ void cell_cool_integrateT_exact(double *prim, double *dcons, double dt,
 {
     int i;
 
-    double sig0 = prim[RHO] * eos_rho_scale * eos_r_scale; // g/cm^2
-    double kappa = 0.2; // cm^2/g
+    //double sig0 = prim[RHO] * eos_rho_scale * eos_r_scale; // g/cm^2
+    //double kappa = 0.2; // cm^2/g
 
     double qdot = eos_cool(prim, 1.0, theSim);
 

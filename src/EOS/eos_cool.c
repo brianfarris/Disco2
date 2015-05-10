@@ -41,8 +41,12 @@ double eos_cool_bb_es(double *prim, double H, struct Sim *theSim)
     double kappa = 0.2;
     double h = H*eos_r_scale;
     double q0 = sim_CoolPar1(theSim);
-    double q = q0 * 8.0*eos_sb * T*T*T*T/(3.0*kappa*rho*h);
+    double tau = kappa*rho*h;
+    double q = q0 * 8.0*eos_sb * T*T*T*T/(3.0*tau);
     double Q = q / (eos_c*eos_c*eos_c * eos_rho_scale);
+
+    if(tau < 1.0)
+        printf("That's a pretty thin depth bro!\n");
 
     //if(sim_NUM_Q(theSim) > sim_NUM_C(theSim))
     //    Q *= prim[sim_NUM_C(theSim)];
