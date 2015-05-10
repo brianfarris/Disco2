@@ -449,14 +449,16 @@ void cell_cool_integrateT_exact(double *prim, double *dcons, double dt,
     double T1 = pow(1.0 + 3*(GAM-1)*qdot/(prim[RHO]*u0*T0)*dt, -1.0/3.0) * T0;
     //printf("%.12lg %.12lg %.12lg\n", prim[PPP]/prim[RHO], T0, T1);
 
-    double p[5];
+    int NUMQ = sim_NUM_Q(theSim);
+    double p[NUMQ];
     p[RHO] = prim[RHO];
     p[PPP] = prim[RHO] * T1;
     p[URR] = prim[URR];
     p[UPP] = prim[UPP];
     p[UZZ] = prim[UZZ];
+    for(i=5; i<NUMQ; i++)
+        p[i] = 0.0;
 
-    int NUMQ = sim_NUM_Q(theSim);
     double *cons0 = (double *)malloc(NUMQ * sizeof(double));
     double *cons1 = (double *)malloc(NUMQ * sizeof(double));
     cell_prim2cons(prim, cons0, pos, 1.0, theSim);
