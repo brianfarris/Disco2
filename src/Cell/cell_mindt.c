@@ -146,7 +146,7 @@ double cell_mindt( struct Cell *** theCells, struct Sim * theSim, struct GravMas
               double nu = alpha*Pp/rho/sqrt(pow(dist_bh0*dist_bh0+eps*eps,-1.5)*M0+pow(dist_bh1*dist_bh1+eps*eps,-1.5)*M1);
             }
           }
-          double dt_visc = .8*dx*dx/nu;  //Brian uses 0.25 for more stability - Paul used 0.8
+          double dt_visc = .25*dx*dx/nu;  //Brian uses 0.25 for more stability - Paul used 0.8
           dt = dt/( 1. + dt/dt_visc );
         }
         if( dt_m > dt ) {
