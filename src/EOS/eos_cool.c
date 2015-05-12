@@ -18,8 +18,13 @@ double eos_cool_isotherm(double *prim, double H, struct Sim *theSim)
 {
     double T0 = sim_CoolPar1(theSim);
     double tau = sim_CoolPar2(theSim);
+    double GAM = sim_GAMMALAW(theSim);
+    double rho = prim[RHO];
 
-    return (prim[PPP]/prim[RHO] - T0) / tau;
+    double qdot = rho * (prim[PPP]/prim[RHO] - T0) / ((GAM-1.0) * tau);
+    qdot = qdot>0 ? qdot : 0.0;
+
+    return qdot;
 }
 
 double eos_cool_bb_es(double *prim, double H, struct Sim *theSim)

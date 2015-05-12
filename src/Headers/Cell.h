@@ -77,6 +77,8 @@ void cell_init_orbit(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_orbit(struct Cell *, struct Sim *,int ,int ,int );
 void cell_init_minidisc(struct Cell ***,struct Sim *, struct MPIsetup *);
 void cell_single_init_minidisc(struct Cell *, struct Sim *,int ,int ,int );
+void cell_init_kick(struct Cell ***,struct Sim *, struct MPIsetup *);
+void cell_single_init_kick(struct Cell *, struct Sim *,int ,int ,int );
 void (*cell_init_ptr(struct Sim * ))(struct Cell *** , struct Sim * ,struct MPIsetup *);
 void (*cell_single_init_ptr(struct Sim * ))(struct Cell * , struct Sim *,int,int,int );
 ///retrieve data

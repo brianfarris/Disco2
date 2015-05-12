@@ -52,6 +52,8 @@ void (*cell_init_ptr(struct Sim * theSim))(struct Cell *** , struct Sim *,struct
     return(&cell_init_orbit);
   } else if (sim_InitialDataType(theSim)==MINIDISC){
     return(&cell_init_minidisc);
+  } else if (sim_InitialDataType(theSim)==KICK){
+    return(&cell_init_kick);
    } else{
     printf("ERROR: Do not recognize initial data selection.\n");
     exit(0);
@@ -107,6 +109,8 @@ void (*cell_single_init_ptr(struct Sim * theSim))(struct Cell * , struct Sim *,i
     return(&cell_single_init_orbit);
    } else if (sim_InitialDataType(theSim)==MINIDISC){
     return(&cell_single_init_minidisc);
+   } else if (sim_InitialDataType(theSim)==KICK){
+    return(&cell_single_init_kick);
   } else{
     printf("ERROR: Do not recognize initial data selection.\n");
     exit(0);
