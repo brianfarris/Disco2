@@ -6,6 +6,7 @@
 #include "../Headers/Sim.h"
 #include "../Headers/Face.h"
 #include "../Headers/GravMass.h"
+#include "../Headers/Metric.h"
 #include "../Headers/header.h"
 
 // Disc Tests
@@ -153,6 +154,32 @@ void cell_init_disctest_spread(struct Cell *c, double r, double phi, double z, s
 
     rho = rho0;
     P = P0;
+
+    //Cutoff at Vi = 0.5c
+    /*
+    vr = vrOut;
+    vp = vpOut;
+    struct Metric *g = metric_create(time_global, r, phi, z, theSim);
+    double a, br, bp, grr, gpp;
+    double VMAX = 0.5;
+    a = metric_lapse(g);
+    br = metric_shift_u(g,0);
+    bp = metric_shift_u(g,1);
+    grr = metric_gamma_dd(g,0,0);
+    gpp = metric_gamma_dd(g,1,1);
+    metric_destroy(g);
+    
+    double VR = sqrt(grr)*(vr+br)/a;
+    double VP = sqrt(gpp)*(vp+bp)/a;
+
+    VR = VR >  VMAX ?  VMAX : VR;
+    VR = VR < -VMAX ? -VMAX : VR;
+    VP = VP >  VMAX ?  VMAX : VP;
+    VP = VP < -VMAX ? -VMAX : VP;
+
+    vr = a*VR/sqrt(grr) - br;
+    vp = a*VP/sqrt(gpp) - bp;
+    */
 
     c->prim[RHO] = rho;
     c->prim[PPP] = P;

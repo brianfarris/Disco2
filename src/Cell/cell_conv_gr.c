@@ -116,34 +116,42 @@ static int cons2prim_prep(double *cons, double *prim, double *pos, double dV,
     int q;
     int NUMQ = sim_NUM_Q(theSim);
 
-    if(sim_Frame(theSim) == FR_EULER)
+    double D, tau, S[3], S2, SU, U[4], Ud[3], E, W;
+    int i,j;
+
+    D = cons[DDD]/dV;
+    tau = cons[TAU]/dV;
+    S[0] = cons[SRR]/dV;
+    S[1] = cons[LLL]/dV;
+    S[2] = cons[SZZ]/dV;
+
+    S2 = metric_square3_d(g, S);
+    for(i=0; i<4; i++)
+        U[i] = metric_frame_U_u(g, i, theSim);
+    for(i=0; i<3; i++)
     {
-        double D, tau, S[3], S2;
-
-        D = cons[DDD]/dV;
-        tau = cons[TAU]/dV;
-        S[0] = cons[SRR]/dV;
-        S[1] = cons[LLL]/dV;
-        S[2] = cons[SZZ]/dV;
-
-        S2 = metric_square3_d(g, S);
-
-        if(S2 >= tau*(tau+2*D) || tau < 0)
-        {
-            if(pos[R_DIR] >= metric_horizon(theSim))
-                printf("2 fast 2 cold. r = %.12lg\n", pos[R_DIR]);
-            //double fac = sqrt(0.98*tau*(tau+2*D)/S2);
-            //cons[SRR] *= fac;
-            //cons[LLL] *= fac;
-            //cons[SZZ] *= fac;
-            err = 1;
-            //cons[TAU] *= 1.01*(sqrt(D*D+S2)-D)/tau;
-            cons[TAU] = 1.01 * D * (sqrt(1.0+S2/(D*D))-1.0) * dV;
-        }
+        Ud[i] = 0;
+        for(j=0; j<4; j++)
+            Ud[i] += metric_g_dd(g,i+1,j)*U[j];
     }
-    else
+
+    SU = metric_dot3_d(g, S, Ud);
+    W = metric_lapse(g) * U[0];
+
+    E = (tau + SU + D)/W;
+
+    if(S2 + D*D >= E*E || E < D)
     {
-        //TODO: Figure out what to put here.
+    //    if(pos[R_DIR] >= metric_horizon(theSim))
+            printf("2 fast 2 cold. r = %.12lg\n", pos[R_DIR]);
+        //double fac = sqrt(0.98*tau*(tau+2*D)/S2);
+        //cons[SRR] *= fac;
+        //cons[LLL] *= fac;
+        //cons[SZZ] *= fac;
+        err = 1;
+        //cons[TAU] *= 1.01*(sqrt(D*D+S2)-D)/tau;
+        E = 1.01 * D * (sqrt(1.0+S2/(D*D)));
+        cons[TAU] = (W*E - SU - D) * dV;
     }
 
     int nan = 0;

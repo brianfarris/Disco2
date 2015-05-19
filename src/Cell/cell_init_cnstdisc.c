@@ -42,10 +42,6 @@ void cell_single_init_cnstdisc(struct Cell *theCell, struct Sim *theSim,int i,in
     theCell->prim[URR] = vr;
     theCell->prim[UPP] = vp;
     theCell->prim[UZZ] = 0.0;
-    theCell->divB = 0.0;
-    theCell->GradPsi[0] = 0.0;
-    theCell->GradPsi[1] = 0.0;
-
 }
 
 void cell_init_cnstdisc(struct Cell ***theCells,struct Sim *theSim,struct MPIsetup * theMPIsetup)
