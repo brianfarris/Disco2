@@ -232,12 +232,20 @@ double metric_frame_U_u_acc(struct Metric *g, int mu, struct Sim *theSim)
 
     if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
+        /*
         if(mu == 1)
             return -2*M/sqrt((r+2*M)*(r-M));
         else if(mu == 2)
             return sqrt(M/(r*r*(r-M)));
         else if (mu == 0)
             return sqrt((r+2*M)/(r-M));
+        */
+        if(mu == 1)
+            return -2*M/r * sqrt((r+M)/(r+2*M));
+        else if(mu == 2)
+            return sqrt(M/(r*r*r));
+        else if (mu == 0)
+            return sqrt((1+2*M/r)*(1+M/r));
     }
     else if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
     {
@@ -283,19 +291,24 @@ double metric_frame_dU_du_acc(struct Metric *g, int mu, int nu, struct Sim *theS
     
     if(sim_Metric(theSim) == SCHWARZSCHILD_KS)
     {
+        
+        // ur = -2*M/r * sqrt((r+M)/(r+2*M));
+        // up = sqrt(M/(r*r*r))
+        // u0 = sqrt((1+2*M/r)*(1+M/r))
+
         if(nu == 1)
         {
-            double ur = -2*M/sqrt((r+2*M)*(r-M));
-            return ur*ur*ur/(-8*M*M) * (2*r+M);
+            double ur = -2*M/r * sqrt((r+M)/(r+2*M));
+            return ur * ( -1.0/r + 0.5/(r+M) - 0.5/(r+2*M));
         }
         else if(nu == 2)
         {
-            double up = sqrt(M/(r*r*(r-M)));
-            return -0.5*up*up*up/M * (3*r*r-2*M*r);
+            return -1.5 * sqrt(M/(r*r*r*r*r));
         }
         else if(nu == 0)
         {
-            return -1.5*M*sqrt((r-M)/(r+2*M)) / ((r-M)*(r-M));
+            double  u0 = sqrt((1+2*M/r)*(1+M/r));
+            return 0.5/u0 * (-3*M/(r*r) - 4*M*M/(r*r*r));
         }
     }
     else if(sim_Metric(theSim) == SCHWARZSCHILD_SC)
