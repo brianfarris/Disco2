@@ -81,10 +81,10 @@ def plot_r_profile(filename, sca='linear'):
 
     plt.subplot(331)
     plot_r_profile_single(r, rho, sca, r"$\Sigma$")
-    ax1 = plt.gca()
-    ax2 = ax1.twinx()
-    ax2.set_ylabel(r"$q$")
-    ax2.plot(r, q, 'r+')
+    #ax1 = plt.gca()
+    #ax2 = ax1.twinx()
+    #ax2.set_ylabel(r"$q$")
+    #ax2.plot(r, q, 'r+')
 
     plt.subplot(332)
     plot_r_profile_single(r, p, sca, r"$\Pi$")
@@ -102,9 +102,9 @@ def plot_r_profile(filename, sca='linear'):
     plt.gca().set_xscale(sca)
     
     plt.subplot(335)
-    plot_r_profile_single(r, vp, "linear", r"$v^\phi$")
-    plt.plot(R, 1.0/(R*(1+2*M/R)), 'r--')
-    plt.plot(R, 0.5/(R*(1+2*M/R)), 'b--')
+    plot_r_profile_single(r, vp, sca, r"$v^\phi$")
+    plt.plot(R, 1.0/(R*np.sqrt(1+2*M/R)), 'r--')
+    plt.plot(R, 0.5/(R*np.sqrt(1+2*M/R)), 'b--')
 
     plt.subplot(336)
     plot_r_profile_single(r, mach, "log", r"$\mathcal{M}$")
