@@ -14,10 +14,10 @@
 void cell_src_boost(double t, double r, double phi, double z, double *cons, 
                     struct Metric *g, double rhoh, double *u, double *U, 
                     double dV, double dt, struct Sim *theSim);
-void cell_cool_integrateT_num(double *prim, double *dcons, double dt, 
+void cell_cool_integrateT_gr_num(double *prim, double *dcons, double dt, 
                                 double u0, double GAM, double pos[], double M,
                                 struct Sim *theSim);
-void cell_cool_integrateT_exact(double *prim, double *dcons, double dt, 
+void cell_cool_integrateT_gr_exact(double *prim, double *dcons, double dt, 
                                 double u0, double GAM, double pos[], double M,
                                 struct Sim *theSim);
 
@@ -280,10 +280,15 @@ void cell_add_src_gr( struct Cell *** theCells ,struct Sim * theSim, struct Grav
                 pos[R_DIR] = r;
                 pos[P_DIR] = phi;
                 pos[Z_DIR] = z;
-                //cell_cool_integrateT_num(c->prim, dcons_cool, dt, u[0], 
-                //                            GAMMALAW, pos, M, theSim);
-                cell_cool_integrateT_exact(c->prim, dcons_cool, dt, u[0], 
-                                            GAMMALAW, pos, M, theSim);
+                int coolType = sim_CoolingType(theSim);
+
+                if(coolType == COOL_ISOTHERM || coolType == COOL_BB_ES)
+                    cell_cool_integrateT_gr_exact(c->prim, dcons_cool, dt, 
+                                            u[0], GAMMALAW, pos, M, theSim);
+                else
+                    cell_cool_integrateT_gr_num(c->prim, dcons_cool, dt, u[0], 
+                                                GAMMALAW, pos, M, theSim);
+
                 c->cons[SRR] += dcons_cool[SRR] * dV;
                 c->cons[LLL] += dcons_cool[LLL] * dV;
                 c->cons[SZZ] += dcons_cool[SZZ] * dV;
@@ -332,29 +337,33 @@ void cell_src_boost(double t, double r, double phi, double z, double *cons,
     cons[TAU] += al*sqrtg*dV*dt * (-U[0]*Ft - U[1]*Fr - U[2]*Fp);
 }
 
-void cell_cool_integrateT_num(double *prim, double *dcons, double dt, 
+void cell_cool_integrateT_gr_num(double *prim, double *dcons, double dt, 
                                 double u0, double GAM, double pos[], double M,
                                 struct Sim *theSim)
 
 {
     int i;
     double res = 1.0e-1;
+    int NUMQ = sim_NUM_Q(theSim);
 
     double c = (GAM-1.0)/(prim[RHO]*u0);
     double r = pos[R_DIR];
 
-    double p[5];
+    double p[NUMQ];
     p[RHO] = prim[RHO];
     p[PPP] = prim[PPP];
     p[URR] = prim[URR];
     p[UPP] = prim[UPP];
     p[UZZ] = prim[UZZ];
+    for(i=5; i<NUMQ; i++)
+        p[i] = 0.0;
+
     double logT = log(p[PPP]/p[RHO]);
 
     double t = 0;
 
-    //Cool using adaptive Forward Euler or RK4.
-    //TODO: use ANY OTHER METHOD.
+    // Cool using adaptive Forward Euler or RK4.
+    // TODO: Verify convergence, etc.
     //
     i = 0;
     while(t < dt)
@@ -413,7 +422,6 @@ void cell_cool_integrateT_num(double *prim, double *dcons, double dt,
 
     //printf("%.12lg %.12lg\n", prim[PPP]/prim[RHO], T);
 
-    int NUMQ = sim_NUM_Q(theSim);
     double *cons0 = (double *)malloc(NUMQ * sizeof(double));
     double *cons1 = (double *)malloc(NUMQ * sizeof(double));
     cell_prim2cons(prim, cons0, pos, 1.0, theSim);
@@ -430,24 +438,22 @@ void cell_cool_integrateT_num(double *prim, double *dcons, double dt,
     free(cons1);
 }
 
-void cell_cool_integrateT_exact(double *prim, double *dcons, double dt, 
+void cell_cool_integrateT_gr_exact(double *prim, double *dcons, double dt, 
                                 double u0, double GAM, double pos[], double M,
                                 struct Sim *theSim)
 {
     int i;
 
-    //double sig0 = prim[RHO] * eos_rho_scale * eos_r_scale; // g/cm^2
-    //double kappa = 0.2; // cm^2/g
-
     double qdot = eos_cool(prim, 1.0, theSim);
 
-    //double T0 = prim[PPP]/prim[RHO] * eos_mp*eos_c*eos_c; // erg
-    //double T1 = pow(1.0 + 8.0*(GAM-1.0)*eos_sb/(kappa*sig0*sig0*u0) 
-    //                * T0*T0*T0 * dt * eos_r_scale/eos_c, -1.0/3.0) * T0 / (eos_mp*eos_c*eos_c);
-    //
     double T0 = prim[PPP]/prim[RHO];
-    double T1 = pow(1.0 + 3*(GAM-1)*qdot/(prim[RHO]*u0*T0)*dt, -1.0/3.0) * T0;
-    //printf("%.12lg %.12lg %.12lg\n", prim[PPP]/prim[RHO], T0, T1);
+    double T1;
+    if (sim_CoolingType(theSim) == COOL_BB_ES)
+        T1 = pow(1.0 + 3*(GAM-1)*qdot/(prim[RHO]*u0*T0)*dt, -1.0/3.0) * T0;
+    else if (sim_CoolingType(theSim) == COOL_ISOTHERM)
+        T1 = sim_CoolPar1(theSim);
+    else
+        T1 = 0.0;
 
     int NUMQ = sim_NUM_Q(theSim);
     double p[NUMQ];

@@ -10,6 +10,13 @@
 #include "../Headers/Metric.h"
 #include "../Headers/header.h"
 
+// Local Functions
+void cell_cool_integrateT_grdisc_num(double *prim, double *dcons, double dt, 
+                                double u0, double pos[], double M,
+                                struct Sim *theSim);
+double logT_prime(double logT, double p[], double r, double M, double u0,
+                    struct Sim *theSim);
+
 //Add source terms to theCells.
 void cell_add_src_grdisc( struct Cell ***theCells, struct Sim *theSim, 
                         struct GravMass *theGravMasses, double dt)
@@ -218,6 +225,22 @@ void cell_add_src_grdisc( struct Cell ***theCells, struct Sim *theSim,
                 //cooling rate, hence these don't include explicit factors
                 //of H.
                 
+                double pos[3];
+                pos[R_DIR] = r;
+                pos[P_DIR] = phi;
+                pos[Z_DIR] = z;
+                int NUMQ = sim_NUM_Q(theSim);
+                double dcons_cool[NUMQ];
+
+                cell_cool_integrateT_grdisc_num(c->prim, dcons_cool, dt, u[0], 
+                                                pos, M, theSim);
+
+                c->cons[SRR] += dcons_cool[SRR] * dV;
+                c->cons[LLL] += dcons_cool[LLL] * dV;
+                c->cons[SZZ] += dcons_cool[SZZ] * dV;
+                c->cons[TAU] += dcons_cool[TAU] * dV;
+
+                /*
                 qdot = eos_cool(c->prim, H, theSim);
 
                 if(fabs(c->cons[SRR]) < fabs(dt*dV*sqrtg*a* qdot*u_d[1]))
@@ -240,6 +263,7 @@ void cell_add_src_grdisc( struct Cell ***theCells, struct Sim *theSim,
                 }
                 else
                     c->cons[TAU] += dt*dV*sqrtg*a* qdot * (u_d[0]*U[0]+u_d[1]*U[1]+u_d[2]*U[2]+u_d[3]*U[3]); 
+                */
                 if(PRINTTOOMUCH)
                 {
                     printf("SRR cooling: (%d,%d,%d): r=%.12g, dV=%.12g, q = %.12g, Q = %.12g\n",i,j,k,r,dV,-a*sqrtg* qdot*u_d[1],-dt*dV*sqrtg*a *qdot*u_d[1]);
@@ -254,5 +278,106 @@ void cell_add_src_grdisc( struct Cell ***theCells, struct Sim *theSim,
 
     if(PRINTTOOMUCH)
         fclose(sourcefile);
+}
+
+void cell_cool_integrateT_grdisc_num(double *prim, double *dcons, double dt, 
+                                double u0, double pos[], double M, 
+                                struct Sim *theSim)
+{
+    // Add source terms by integrating temperature over timestep subject only
+    // to cooling.  Assume velocities and surface density are constant.
+
+    int i;
+    int NUMQ = sim_NUM_Q(theSim);
+    double res = 1.0e-1;
+
+    double r = pos[R_DIR];
+
+    double p[NUMQ];
+    p[RHO] = prim[RHO];
+    p[TTT] = prim[TTT];
+    p[URR] = prim[URR];
+    p[UPP] = prim[UPP];
+    p[UZZ] = prim[UZZ];
+    double logT = log(p[TTT]);
+
+    double t = 0;
+
+    // Cool using adaptive Forward Euler or RK4.
+    // TODO: Verify convergence, etc.
+    //
+    i = 0;
+    while(t < dt)
+    {
+        double logTprime = logT_prime(logT, p, r, M, u0, theSim);
+
+        double step = res / logTprime;
+        step = step < dt-t ? step : dt-t;
+        
+        //FE
+        //logT += -logTprime * step;
+        
+        //RK4
+        double logT1 = logT - 0.5*step*logTprime;
+        double logTp2 = logT_prime(logT1, p, r, M, u0, theSim);
+        double logT2 = logT - 0.5*step*logTp2;
+        double logTp3 = logT_prime(logT2, p, r, M, u0, theSim);
+        double logT3 = logT - step*logTp3;
+        double logTp4 = logT_prime(logT3, p, r, M, u0, theSim);
+
+        logT += -step*(logTprime + 2*logTp2 + 2*logTp3 + logTp4)/6.0;
+
+        t += step;
+        i++;
+    }
+    if(i>100)
+        printf("   Cell at (%.12lg, %.12lg, %.12lg) cooled in %d steps.\n",
+                pos[R_DIR], pos[P_DIR], pos[Z_DIR], i);
+
+    double T = exp(logT);
+    p[TTT] = T;
+
+    //printf("%.12lg %.12lg\n", prim[PPP]/prim[RHO], T);
+
+    double *cons0 = (double *)malloc(NUMQ * sizeof(double));
+    double *cons1 = (double *)malloc(NUMQ * sizeof(double));
+    cell_prim2cons(prim, cons0, pos, 1.0, theSim);
+    cell_prim2cons(p,    cons1, pos, 1.0, theSim);
+
+    dcons[RHO] = 0.0;
+    dcons[SRR] = cons1[SRR]-cons0[SRR];
+    dcons[LLL] = cons1[LLL]-cons0[LLL];
+    dcons[SZZ] = cons1[SZZ]-cons0[SZZ];
+    dcons[TAU] = cons1[TAU]-cons0[TAU];
+    for(i=5; i<NUMQ; i++)
+        dcons[i] = 0.0;
+    free(cons0);
+    free(cons1);
+}
+
+double logT_prime(double logT, double p[], double r, double M, double u0,
+                    struct Sim *theSim)
+{
+        double T = exp(logT);
+        p[TTT] = T;
+        double rho, P, eps, dPdp, dPdT, dedp, dedT, dedT_sig;
+        rho = p[RHO];
+        P = eos_ppp(p, theSim);
+        eps = eos_eps(p, theSim);
+        dPdp = eos_dpppdrho(p, theSim);
+        dPdT = eos_dpppdttt(p, theSim);
+        dedp = eos_depsdrho(p, theSim);
+        dedT = eos_depsdttt(p, theSim);
+        double rhoh = rho*(1+eps) + P;
+        double h = rhoh / rho;
+        double height = sqrt(P*r*r*r/(rhoh*M))/u0;
+
+        dedT_sig = dedT - 0.5*dedp*(dPdT-(rho*dedT+dPdT)/h)
+                         / (1 + 0.5*(dPdp-(1+eps+rho*dedp+dPdp)/h));
+
+        double qdot = eos_cool(p, height, theSim);
+        double logTprime = qdot / (rho * height * u0 * dedT_sig * T);
+
+        return logTprime;
 }
 

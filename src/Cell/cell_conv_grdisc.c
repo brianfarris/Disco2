@@ -123,35 +123,60 @@ void cell_cons2prim_grdisc(double *cons, double *prim, double *pos, double dV,
 static int cons2prim_prep(double *cons, double *prim, double *pos, double dV, 
                         struct Metric *g, struct Sim *theSim)
 {
+    // Enforces the inequalities E^2 > rho^2 + S^2 and E > rho. This *should*
+    // guarantee a successful prim recovery in cons2prim_solve.  This 
+    // inequality is not always true, depends on the EoS.
+    // TODO: Check inequality w/ Gas,Rad,Deg EoSes.
+
     int err = 0;
+    int q;
+    int NUMQ = sim_NUM_Q(theSim);
 
-    if(sim_Frame(theSim) == FR_EULER)
+    double D, tau, S[3], S2, SU, U[4], Ud[3], E, W;
+    int i,j;
+
+    D = cons[DDD]/dV;
+    tau = cons[TAU]/dV;
+    S[0] = cons[SRR]/dV;
+    S[1] = cons[LLL]/dV;
+    S[2] = cons[SZZ]/dV;
+
+    S2 = metric_square3_d(g, S);
+    for(i=0; i<4; i++)
+        U[i] = metric_frame_U_u(g, i, theSim);
+    for(i=0; i<3; i++)
     {
-        double D, tau, S[3], S2;
+        Ud[i] = 0;
+        for(j=0; j<4; j++)
+            Ud[i] += metric_g_dd(g,i+1,j)*U[j];
+    }
 
-        D = cons[DDD]/dV;
-        tau = cons[TAU]/dV;
-        S[0] = cons[SRR]/dV;
-        S[1] = cons[LLL]/dV;
-        S[2] = cons[SZZ]/dV;
+    SU = metric_dot3_d(g, S, Ud);
+    W = metric_lapse(g) * U[0];
 
-        S2 = metric_square3_d(g, S);
+    E = (tau + SU + D)/W;
 
-        if(S2 >= tau*(tau+2*D))
-        {
+    if(S2 + D*D >= E*E || E < D)
+    {
+    //    if(pos[R_DIR] >= metric_horizon(theSim))
             printf("2 fast 2 cold. r = %.12lg\n", pos[R_DIR]);
-            double fac = sqrt(0.98*tau*(tau+2*D)/S2);
-            cons[SRR] *= fac;
-            cons[LLL] *= fac;
-            cons[SZZ] *= fac;
-            err = 1;
-        }
-    }
-    else
-    {
-        //TODO: Figure out what to put here.
+        err = 1;
+        E = 1.01 * D * (sqrt(1.0+S2/(D*D)));
+        cons[TAU] = (W*E - SU - D) * dV;
     }
 
+    int nan = 0;
+    for(q=0; q<NUMQ; q++)
+        if(cons[q] != cons[q])
+            nan = 1;
+    if(nan)
+    {
+        printf("ERROR: NaN in cons2prim. r=%.12g\n", pos[R_DIR]);
+        printf("   DDD=%.12g TAU=%.12g SRR=%.12g LLL=%.12g SZZ=%.12g\n",
+                 cons[DDD], cons[TAU], cons[SRR], cons[LLL], cons[SZZ]);
+        err = 1;
+    }
+    
     return err;
 }
 
