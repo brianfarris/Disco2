@@ -133,11 +133,11 @@ void cell_init_disctest_alphakepler(struct Cell *c, double r, double phi, double
 void cell_init_disctest_spread(struct Cell *c, double r, double phi, double z, struct Sim *theSim)
 {
     double rho, vr, vp, P;
-    double rho0, P0, vrOut, vrIn, vpOut, vpIn, r0, dr;
+    double rho0, T0, vrOut, vrIn, vpOut, vpIn, r0, dr;
     double M  = sim_GravM(theSim);
 
     rho0 = sim_InitPar1(theSim);
-    P0 = sim_InitPar2(theSim);
+    T0 = sim_InitPar2(theSim);
     r0 = sim_InitPar3(theSim);
     dr = sim_InitPar4(theSim);
 
@@ -153,10 +153,15 @@ void cell_init_disctest_spread(struct Cell *c, double r, double phi, double z, s
     vp = (1-w)*vpIn + w*vpOut;
 
     rho = rho0;
-    P = P0;
+    P = rho*T0;
+
+    if(sim_Background(theSim) == GRDISC)
+    {
+        rho = rho0 / sqrt(r*r*r*T0/M);
+    }
 
     //Cutoff at Vi = 0.5c
-    /*
+    
     vr = vrOut;
     vp = vpOut;
     struct Metric *g = metric_create(time_global, r, phi, z, theSim);
@@ -179,13 +184,16 @@ void cell_init_disctest_spread(struct Cell *c, double r, double phi, double z, s
 
     vr = a*VR/sqrt(grr) - br;
     vp = a*VP/sqrt(gpp) - bp;
-    */
+    
 
     c->prim[RHO] = rho;
-    c->prim[PPP] = P;
     c->prim[URR] = vr;
     c->prim[UPP] = vp;
     c->prim[UZZ] = 0.0;
+    if(sim_Background(theSim) == GRDISC)
+        c->prim[TTT] = T0;
+    else
+        c->prim[PPP] = P;
 
     if(sim_NUM_C(theSim)<sim_NUM_Q(theSim)) 
     {

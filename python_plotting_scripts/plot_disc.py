@@ -121,12 +121,7 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
     vr = vr[inds]
     vp = vp[inds]
 
-    i = r.argmax()
     R = np.logspace(np.log10(r.min()), np.log10(r.max()), 100)
-    RHO = rho[i] * np.power(R/r[i], -1.5)
-    TTT = T[i] * np.power(R/r[i], -1.0)
-    URR = vr[i] * np.power(R/r[i], -0.5)
-    UPP = vp[i] * np.power(R/r[i], -1.5)
 
     #u0 = 1.0/np.sqrt(1.0-2*M/r-vr*vr/(1-2*M/r)-r*r*vp*vp)
     u0 = 1.0/np.sqrt(1.0-2*M/r - 4*M/r*vr + 4*M*A/r*vp - (1+2*M/r)*vr*vr
@@ -173,22 +168,18 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         fig = plt.figure(figsize=(12,9))
 
         plt.subplot(331)
-        #plot_r_profile_single(r, rho, sca, r"$\rho_0$", R, RHO)
         plot_r_profile_single(r, rho, sca, r"$\rho_0$ ($g/cm^3$)", bounds[0])
 
         plt.subplot(332)
-        #plot_r_profile_single(r, T, sca, r"$T$", R, TTT)
         plot_r_profile_single(r, T, sca, r"$T$ ($m_p c^2$)", bounds[1])
 
         plt.subplot(333)
         plt.plot(r, Pg, 'g+')
         plt.plot(r, Pr, 'b+')
         plt.plot(r, Pd, 'r+')
-        #plot_r_profile_single(r, Ptot, sca, r"$P$", R, PPP)
         plot_r_profile_single(r, Ptot, sca, r"$P$ ($g\ c^2/cm^3$)", bounds[2])
 
         plt.subplot(334)
-        #plot_r_profile_single(r, vr, "linear", r"$v^r$", R, URR)
         plt.plot(r, -((1-2*M/r)/(1+2*M/r) + A*vp), 'r--')
         plt.plot(r, -(-1*np.ones(r.shape) + A*vp), 'r--')
         plt.plot(r, -((0.5-2*M/r)/(1+2*M/r) + A*vp), 'b--')
@@ -198,7 +189,6 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         #plt.gca().set_xscale(sca)
 
         plt.subplot(335)
-        #plot_r_profile_single(r, vp, sca, r"$v^\phi$", R, UPP)
         plt.plot(R, 1.0/(np.sqrt(1+2.0*M/R)*R), 'r--')
         plt.plot(R, 0.5/(np.sqrt(1+2.0*M/R)*R), 'b--')
         plot_r_profile_single(r, vp, sca, r"$v^\phi$", bounds[4])
@@ -213,7 +203,6 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         plt.gca().set_yscale('linear')
 
         plt.subplot(337)
-        #plot_r_profile_single(r, H, sca, r"$\mathcal{H}$", R, HHH)
         plot_r_profile_single(r, H, sca, r"$H$", bounds[6])
 
         plt.subplot(338)
