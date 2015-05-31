@@ -289,7 +289,7 @@ void cell_cool_integrateT_grdisc_num(double *prim, double *dcons, double dt,
 
     int i;
     int NUMQ = sim_NUM_Q(theSim);
-    double res = 1.0e-1;
+    double res = 1.0e-6;
 
     double r = pos[R_DIR];
 
@@ -331,12 +331,17 @@ void cell_cool_integrateT_grdisc_num(double *prim, double *dcons, double dt,
         t += step;
         i++;
     }
+    /*
     if(i>100)
         printf("   Cell at (%.12lg, %.12lg, %.12lg) cooled in %d steps.\n",
                 pos[R_DIR], pos[P_DIR], pos[Z_DIR], i);
+    */
 
     double T = exp(logT);
     p[TTT] = T;
+
+    if(T > prim[TTT])
+        printf("WAT\n");
 
     //printf("%.12lg %.12lg\n", prim[PPP]/prim[RHO], T);
 
@@ -352,6 +357,10 @@ void cell_cool_integrateT_grdisc_num(double *prim, double *dcons, double dt,
     dcons[TAU] = cons1[TAU]-cons0[TAU];
     for(i=5; i<NUMQ; i++)
         dcons[i] = 0.0;
+
+    if(dcons[TAU] > 0.0)
+        printf("WAT WAT\n");
+
     free(cons0);
     free(cons1);
 }

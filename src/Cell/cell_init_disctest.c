@@ -133,10 +133,10 @@ void cell_init_disctest_alphakepler(struct Cell *c, double r, double phi, double
 void cell_init_disctest_spread(struct Cell *c, double r, double phi, double z, struct Sim *theSim)
 {
     double rho, vr, vp, P;
-    double rho0, T0, vrOut, vrIn, vpOut, vpIn, r0, dr;
+    double sig0, T0, vrOut, vrIn, vpOut, vpIn, r0, dr;
     double M  = sim_GravM(theSim);
 
-    rho0 = sim_InitPar1(theSim);
+    sig0 = sim_InitPar1(theSim);
     T0 = sim_InitPar2(theSim);
     r0 = sim_InitPar3(theSim);
     dr = sim_InitPar4(theSim);
@@ -152,12 +152,12 @@ void cell_init_disctest_spread(struct Cell *c, double r, double phi, double z, s
     vr = (1-w)*vrIn + w*vrOut;
     vp = (1-w)*vpIn + w*vpOut;
 
-    rho = rho0;
+    rho = sig0;
     P = rho*T0;
 
     if(sim_Background(theSim) == GRDISC)
     {
-        rho = rho0 / sqrt(r*r*r*T0/M);
+        rho = sig0 / sqrt(r*r*r*T0/M);
     }
 
     //Cutoff at Vi = 0.5c

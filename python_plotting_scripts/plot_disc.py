@@ -169,6 +169,11 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
 
         plt.subplot(331)
         plot_r_profile_single(r, rho, sca, r"$\rho_0$ ($g/cm^3$)", bounds[0])
+        ax1 = plt.gca()
+        ax2 = ax1.twinx()
+        ax2.set_ylabel(r"$\Sigma_0$ ($g/cm^2$)")
+        ax2.set_yscale(sca)
+        ax2.plot(r, rho*H * rg_solar, 'r+')
 
         plt.subplot(332)
         plot_r_profile_single(r, T, sca, r"$T$ ($m_p c^2$)", bounds[1])
@@ -176,8 +181,13 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         plt.subplot(333)
         plt.plot(r, Pg, 'g+')
         plt.plot(r, Pr, 'b+')
-        plt.plot(r, Pd, 'r+')
+        #plt.plot(r, Pd, 'r+')
         plot_r_profile_single(r, Ptot, sca, r"$P$ ($g\ c^2/cm^3$)", bounds[2])
+        ax1 = plt.gca()
+        ax2 = ax1.twinx()
+        ax2.set_ylabel(r"$\Pi$ ($g c^2/cm^2$)")
+        ax2.set_yscale(sca)
+        ax2.plot(r, Ptot*H * rg_solar, 'r+')
 
         plt.subplot(334)
         plt.plot(r, -((1-2*M/r)/(1+2*M/r) + A*vp), 'r--')

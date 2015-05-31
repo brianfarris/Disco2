@@ -486,8 +486,9 @@ double cell_mindt_grdisc(struct Cell ***theCells, struct Sim *theSim)
                 //Luminosity Time
                 double maxdisp = 0.1; //Should be a fraction like 0.1
                 double dtl;
-
-                if(sim_CoolingType(theSim) != COOL_NONE)
+                
+                //TODO: Remove?
+                if(0 && (sim_CoolingType(theSim) != COOL_NONE))
                 {
                     qdot = eos_cool(theCells[k][i][j].prim, H, theSim);
                     
