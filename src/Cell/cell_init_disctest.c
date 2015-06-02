@@ -155,11 +155,6 @@ void cell_init_disctest_spread(struct Cell *c, double r, double phi, double z, s
     rho = sig0;
     P = rho*T0;
 
-    if(sim_Background(theSim) == GRDISC)
-    {
-        rho = sig0 / sqrt(r*r*r*T0/M);
-    }
-
     //Cutoff at Vi = 0.5c
     
     vr = vrOut;
@@ -185,6 +180,13 @@ void cell_init_disctest_spread(struct Cell *c, double r, double phi, double z, s
     vr = a*VR/sqrt(grr) - br;
     vp = a*VP/sqrt(gpp) - bp;
     
+    if(sim_Background(theSim) == GRDISC)
+    {
+        double W = 1.0/sqrt(1.0-VR*VR-VP*VP);
+        double u0 = sqrt(1+2*M/r) * W;
+        rho = sig0 / (sqrt(r*r*r*T0/M)/u0);
+    }
+
 
     c->prim[RHO] = rho;
     c->prim[URR] = vr;

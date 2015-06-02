@@ -145,6 +145,7 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
     VR = np.abs((1.0 + 2.0*M/r)*vr + 2.0*M/r)
     VP = np.sqrt(1.0+2.0*M/r)*r*vp
     V = np.sqrt(VR*VR+VP*VP)
+    mach = V/cs
 
     if bounds is None:
         bounds = []
@@ -195,8 +196,8 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         plt.plot(r, -((0.5-2*M/r)/(1+2*M/r) + A*vp), 'b--')
         plt.plot(r, -((-0.5-2*M/r)/(1+2*M/r) + A*vp), 'b--')
         plt.plot(r, -((0.0-2*M/r)/(1+2*M/r) + A*vp), ls='--', color='grey')
-        plot_r_profile_single(r, -vr, sca, r"$v^r$", bounds[3])
-        #plt.gca().set_xscale(sca)
+        plot_r_profile_single(r, -vr, "linear", r"$v^r$", bounds[3])
+        plt.gca().set_xscale(sca)
 
         plt.subplot(335)
         plt.plot(R, 1.0/(np.sqrt(1+2.0*M/R)*R), 'r--')
@@ -210,7 +211,12 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
         plt.subplot(336)
         #plot_r_profile_single(r, mach, sca, r"$\mathcal{M}$", R, MACH)
         plot_r_profile_single(r, W, sca, r"$W$", bounds[5])
-        plt.gca().set_yscale('linear')
+        ax1 = plt.gca()
+        ax1.set_yscale('linear')
+        ax2 = ax1.twinx()
+        ax2.set_ylabel(r"\mathcal{M}")
+        ax2.set_yscale(sca)
+        ax2.plot(r, mach, 'r+')
 
         plt.subplot(337)
         plot_r_profile_single(r, H, sca, r"$H$", bounds[6])
