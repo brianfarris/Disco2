@@ -10,7 +10,7 @@ InitialDataType        17       // 0 Torus, 1 Bondi, 2 Vortex, 3 Uniform,
                                 // 21 Atmosphere, 22 Orbit, 23 Minidisc,
                                 // 24 Kick
 GravMassType            0       // 0 none, 1 single, 2 binary
-Background              3       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
+Background              2       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
 Metric                  2       // 0 Flat, 1 Schwarzschild-SC,
                                 // 2 Schwarzschild-KS, 4 Kerr-KS, 5 FlatADM,
                                 // 6 Schwarzschild-KS-ADM, 
@@ -18,11 +18,11 @@ Frame                   2       // 0 Euler, 1 Keplerian, 2 Accreting
 Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR			256			//Radial Zones
+NumR			512			//Radial Zones
 NumZ			1       //Vertical Zones
 ng              2
 R_Min		    1.5e0
-R_Max			1.0e2
+R_Max			1.0e3
 Z_Min			-1.0e4
 Z_Max			1.0e4
 NP_CONST       2
@@ -30,7 +30,7 @@ aspect         1.0
 
 NUM_C                   5
 NUM_N                   1
-Time_Max                6.0e2
+Time_Max                6.0e3
 Num_Checkpoints	        6001
 Num_Diag_Dump           61
 Num_Diag_Measure        61
