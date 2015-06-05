@@ -77,8 +77,8 @@ void io_hdf5_out(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeS
   // Then we save the info of the GravMasses
   // *****************************************
 
-  dimsf2[0] = 2;
-  dimsf2[1] = 9; //DD!!!  4;  
+  dimsf2[0] = 2;  // number of masses
+  dimsf2[1] = 10; //number of quantities per mass DD!!!  4;  
   // Create the dataspace for the dataset.
   filespace = H5Screate_simple(2, dimsf2, NULL); 
   memspace  = H5Screate_simple(2, dimsf2, NULL); 

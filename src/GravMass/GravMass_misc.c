@@ -35,12 +35,19 @@ void gravMass_copy(struct GravMass * theGravMasses,struct Sim * theSim){
 
 // Analytic uodate via Keplers Laws - now jsut e=0 circular orbits
 void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt ){
+  // Should be given the updated M, Mp, l, E
     double Ms = thisGravMass->M; 
     double Ltot = thisGravMass->Ltot;
-    double a = Ltot*Ltot/(Ms*Ms*Mp*Mp)*(Ms+Mp);
+    double asmaj = Ltot*Ltot/(Ms*Ms*Mp*Mp)*(Ms+Mp);
+    /// Dan June 5
+    double ecc = sqrt( 1.+2.*E*Ltot*Ltot/pow(Ms*Mp,3)*(Ms+Mp)  ); //E<0
+    double rsep = asmaj*(1.-ecc*ecc)/(1. + ecc*cos(theGravMasses[p].phi)) // is this the correct angle at teh correct timestpe? 
+    
 
-    thisGravMass->r = a/(1.+Ms/Mp);
-    thisGravMass->omega = pow(a,(-3./2.));           //Is this a bad idea?
+    thisGravMass->r = rsep/(1.+Ms/Mp);
+    //thisGravMass->omega = pow(a,(-3./2.));           //Is this a bad idea?
+    thisGravMass->omega = sqrt((Ms+Mp)/(asmaj*asmaj*asmaj));
+
 }
 
 // Forced uodate
@@ -79,16 +86,17 @@ void gravMass_adv_arb( struct Sim * theSim, struct GravMass * thisGravMass , dou
 void gravMass_move( struct Sim * theSim, struct GravMass * theGravMasses, double t, double dt ){
   if (sim_GravMassType(theSim)==LIVEBINARY){
     //printf("LIVEBINARY");
+    // Should be accretion updated
     double Mp = theGravMasses[0].M; //primary
     double Ms = theGravMasses[1].M; //secondary
 
     //Here we need to analytically update a, phi, vr from Kepler's equations 
-    //gravMass_adv_anly(&(theGravMasses[1]), Mp, dt);
+    gravMass_adv_anly(&(theGravMasses[1]), Mp, dt);
     // Or just push the binary together arbitrarily for testing
-    gravMass_adv_arb(theSim, &(theGravMasses[1]), Mp, t, dt); //TESTING 
+    //gravMass_adv_arb(theSim, &(theGravMasses[1]), Mp, t, dt); //TESTING 
                                                                        
     theGravMasses[0].r   = theGravMasses[1].r*Ms/Mp;
-    theGravMasses[0].omega  = theGravMasses[1].omega;
+    theGravMasses[0].omega  = theGravMasses[1].omega; // True for eccentric binary?
 
     theGravMasses[1].phi += theGravMasses[1].omega*dt; //Instead of updating in adv_anly ONLY GOOD FOR CIRC?
     theGravMasses[0].phi = theGravMasses[1].phi + M_PI;
@@ -121,11 +129,24 @@ void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, do
 
     //toal torque gives the torque on the binary due to the gas wrt to r=0 
     double Tot_Trq =  gravMass_total_torque(theGravMasses,0);
+    double Tot_Pow =  gravMass_total_power(theGravMasses,0);
+    double M0 =  gravMass_Macc(theGravMasses,0);
+    double M1 =  gravMass_Macc(theGravMasses,1);
+    double Ebin    =  gravMass_Etot(theGravMasses,1);
     double Lbin    =  gravMass_Ltot(theGravMasses,1); //theGravMasses[1].Ltot;
     //IMPORTANT 0 and 1 Ltot are the same but use 1 only! see adv_anyl() above    
 
-    Lbin  += Tot_Trq*dt;      
+    Lbin  += Tot_Trq*dt;
+    Ebin  += Tot_Pow*dt;
+
+      
     GravMass_set_Ltot(theGravMasses, 1, Lbin);
+    GravMass_set_M(theGravMasses, 0, M0);
+    GravMass_set_M(theGravMasses, 0, M1);
+    GravMass_set_Etot(theGravMasses, Ebin);
+   // also update the binary mass and ENergy here
+
+
   }
 }
 

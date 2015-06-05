@@ -152,17 +152,27 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
   int kmax_noghost = sim_N(theSim,Z_DIR) - sim_Nghost_max(theSim,Z_DIR);
 
   double ttorque_temp = 0.0;
+  double Pow_temp = 0.0;
   //  double total_Fr_temp = 0.0;
 
 
-  double Mtotal = 1.0;
+  //double Mtotal = 1.0;
   //double sep = 1.0;
   double M0 = gravMass_M(theGravMasses,0);
   double M1 = gravMass_M(theGravMasses,1);
 
+  double Mtotal = M0 + M1; //DD June 2015 here and below update vr and total mass and sep
+
   double rbh0 = gravMass_r(theGravMasses,0);
   double rbh1 = gravMass_r(theGravMasses,1);
-  
+
+  double vr_bh0 = gravMass_vr(theGravMasses,0);
+  double vr_bh1 = gravMass_vr(theGravMasses,1);  
+
+  double vp_bh0 = rbh0 * gravMass_om(theGravMasses,0)
+  double vp_bh1 = rbh1 * gravMass_om(theGravMasses,1)
+
+
   double a = rbh0+rbh1;
 
   double phi_bh0 = gravMass_phi(theGravMasses,0);
@@ -245,6 +255,10 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double fr,fp;
         double Fr = 0.0;
         double Fp = 0.0;
+	double Fr0 = 0.0;
+        double Fp0 = 0.0;
+        double Fr1 = 0.0;
+        double Fp1 = 0.0;
 	//double Fmr =0.0; // for torques
 	//double Fmp = 0.0;
 
@@ -255,6 +269,14 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
           gravMassForce( theGravMasses , theSim , p , gravdist , phi , &fr , &fp );
           Fr += fr;
           Fp += fp;
+	  if (p==0){
+	    Fr0 += fr;
+	    Fp0 += fp;
+	  }
+          if (p==1){
+            Fr1 += fr;
+            Fp1 += fp;
+          }
 	  //Fmr -= fr*dm;
 	  //Fmp = -fp*dm;
         }
@@ -285,6 +307,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 	    //gravMassForce( theGravMasses , theSim , 0 , gravdist , phi , &fr0 , &fp0 );
 	    //gravMassForce( theGravMasses , theSim , 1 , gravdist , phi , &fr1 , &fp1 );
 	    ttorque_temp -= r*Fp*dm;
+	    Pow_temp     += Fr0*vr_bh0 + Fr1*vr_bh1 + Fp0*vp_bh0 + Fp1*vp_bh1;
 	    //ttorque_temp -= rbh0*fp0*dm;
 	    //ttorque_temp -= rbh1*fp1*dm;
 	  }

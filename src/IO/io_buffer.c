@@ -48,10 +48,11 @@ void io_setbuf(struct IO *theIO,struct Cell ***theCells,struct Sim *theSim,struc
   theIO->GravMassBuffer[0][3] = gravMass_omega(theGravMasses,0);
   theIO->GravMassBuffer[0][4] = gravMass_E(theGravMasses,0);
   theIO->GravMassBuffer[0][5] = gravMass_L(theGravMasses,0);
-  theIO->GravMassBuffer[0][6] = gravMass_Ltot(theGravMasses,0);
-  theIO->GravMassBuffer[0][7] = gravMass_Mdot(theGravMasses,0);
-  theIO->GravMassBuffer[0][8] = gravMass_Macc(theGravMasses,0);
-  theIO->GravMassBuffer[0][9] = gravMass_total_torque(theGravMasses,0);
+  theIO->GravMassBuffer[0][6] = gravMass_vr(theGravMasses,0);
+  theIO->GravMassBuffer[0][7] = gravMass_Ltot(theGravMasses,0);
+  theIO->GravMassBuffer[0][8] = gravMass_Mdot(theGravMasses,0);
+  theIO->GravMassBuffer[0][9] = gravMass_Macc(theGravMasses,0);
+  theIO->GravMassBuffer[0][10] = gravMass_total_torque(theGravMasses,0);
   //second GravMass
   theIO->GravMassBuffer[1][0] = gravMass_r(theGravMasses,1);
   theIO->GravMassBuffer[1][1] = gravMass_phi(theGravMasses,1);
@@ -59,10 +60,11 @@ void io_setbuf(struct IO *theIO,struct Cell ***theCells,struct Sim *theSim,struc
   theIO->GravMassBuffer[1][3] = gravMass_omega(theGravMasses,1);
   theIO->GravMassBuffer[1][4] = gravMass_E(theGravMasses,1);
   theIO->GravMassBuffer[1][5] = gravMass_L(theGravMasses,1);
-  theIO->GravMassBuffer[1][6] = gravMass_Ltot(theGravMasses,1);
-  theIO->GravMassBuffer[1][7] = gravMass_Mdot(theGravMasses,1);
-  theIO->GravMassBuffer[1][8] = gravMass_Macc(theGravMasses,1);
-  theIO->GravMassBuffer[1][9] = gravMass_total_torque(theGravMasses,1);
+  theIO->GravMassBuffer[1][6] = gravMass_vr(theGravMasses,1);
+  theIO->GravMassBuffer[1][7] = gravMass_Ltot(theGravMasses,1);
+  theIO->GravMassBuffer[1][8] = gravMass_Mdot(theGravMasses,1);
+  theIO->GravMassBuffer[1][9] = gravMass_Macc(theGravMasses,1);
+  theIO->GravMassBuffer[1][10] = gravMass_total_torque(theGravMasses,1);
 }
 
 void io_readbuf(struct IO *theIO,struct Cell ***theCells,struct Sim *theSim,struct GravMass * theGravMasses){
@@ -85,11 +87,11 @@ void io_readbuf(struct IO *theIO,struct Cell ***theCells,struct Sim *theSim,stru
   }
   //first GravMass
   int p = 0;
-  gravMass_set_chkpt(theGravMasses,p,theIO->GravMassBuffer[p][0],theIO->GravMassBuffer[p][1],theIO->GravMassBuffer[p][2],theIO->GravMassBuffer[p][3], theIO->GravMassBuffer[p][4],theIO->GravMassBuffer[p][5],theIO->GravMassBuffer[p][6],theIO->GravMassBuffer[p][7],theIO->GravMassBuffer[p][8],theIO->GravMassBuffer[p][9]);
+  gravMass_set_chkpt(theGravMasses,p,theIO->GravMassBuffer[p][0],theIO->GravMassBuffer[p][1],theIO->GravMassBuffer[p][2],theIO->GravMassBuffer[p][3], theIO->GravMassBuffer[p][4],theIO->GravMassBuffer[p][5],theIO->GravMassBuffer[p][6],theIO->GravMassBuffer[p][7],theIO->GravMassBuffer[p][8],theIO->GravMassBuffer[p][9],theIO->GravMassBuffer[p][10]);
   //gravMass_set_chkpt(theGravMasses,p,theIO->GravMassBuffer[p][0],theIO->GravMassBuffer[p][1],theIO->GravMassBuffer[p][2],theIO->GravMassBuffer[p][3]);
   //second GravMass
   p=1;
-  gravMass_set_chkpt(theGravMasses,p,theIO->GravMassBuffer[p][0],theIO->GravMassBuffer[p][1],theIO->GravMassBuffer[p][2],theIO->GravMassBuffer[p][3], theIO->GravMassBuffer[p][4],theIO->GravMassBuffer[p][5],theIO->GravMassBuffer[p][6],theIO->GravMassBuffer[p][7],theIO->GravMassBuffer[p][8],theIO->GravMassBuffer[p][9]);
+  gravMass_set_chkpt(theGravMasses,p,theIO->GravMassBuffer[p][0],theIO->GravMassBuffer[p][1],theIO->GravMassBuffer[p][2],theIO->GravMassBuffer[p][3], theIO->GravMassBuffer[p][4],theIO->GravMassBuffer[p][5],theIO->GravMassBuffer[p][6],theIO->GravMassBuffer[p][7],theIO->GravMassBuffer[p][8],theIO->GravMassBuffer[p][9],theIO->GravMassBuffer[p][10]);
  //gravMass_set_chkpt(theGravMasses,p,theIO->GravMassBuffer[p][0],theIO->GravMassBuffer[p][1],theIO->GravMassBuffer[p][2],theIO->GravMassBuffer[p][3]);
 
 }

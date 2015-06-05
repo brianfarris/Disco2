@@ -18,3 +18,10 @@ void GravMass_set_omega( struct GravMass * theGravMasses, int p, double Om){
 void GravMass_set_Ltot( struct GravMass * theGravMasses, int p, double Ltot){
   theGravMasses[p].Ltot = Ltot;
 }
+void GravMass_set_M( struct GravMass * theGravMasses, int p, double M){
+  theGravMasses[p].M = M;
+}
+void GravMass_set_Etot( struct GravMass * theGravMasses, double Etot){
+  theGravMasses[0].E = Etot;
+  theGravMasses[1].E = Etot;  // not ideal
+}

@@ -121,7 +121,7 @@ void gravMass_init_livebinary(struct GravMass * theGravMasses,struct Sim * theSi
   theGravMasses[0].omega = om;
   theGravMasses[0].E = E;
   theGravMasses[0].L = L0;
-  //theGravMasses[0].vr = rate0*M1/M0;
+  theGravMasses[0].vr = rate0*M1/M0;
   //theGravMasses[0].Fr = 0.0;
   //theGravMasses[0].Fp = 0.0;
   theGravMasses[0].Ltot = Ltot;
@@ -138,7 +138,7 @@ void gravMass_init_livebinary(struct GravMass * theGravMasses,struct Sim * theSi
   theGravMasses[1].omega = om;
   theGravMasses[1].E = E;
   theGravMasses[1].L = L1;
-  //theGravMasses[1].vr = rate0;
+  theGravMasses[1].vr = rate0;
   //theGravMasses[1].Fr = 0.0;
   //theGravMasses[1].Fp = 0.0;
   theGravMasses[1].Ltot = Ltot;
@@ -159,12 +159,12 @@ void gravMass_set_chkpt(struct GravMass * theGravMasses,int p,double r,double ph
     theGravMasses[p].E = E;
     theGravMasses[p].L = L;
     theGravMasses[p].Ltot = Ltot;
-    //    theGravMasses[p].vr = vr;
+    theGravMasses[p].vr = vr;
     //    theGravMasses[p].Fr = Fr;
     //    theGravMasses[p].Fp = Fp;
     theGravMasses[p].Mdot = Mdot;
     theGravMasses[p].Macc = Macc;
-    theGravMasses[0].total_torque = total_torque;
+    theGravMasses[0].total_torque = total_torque; // total binary ang mom so set p=0
 }
   //void gravMass_set_chkpt(struct GravMass * theGravMasses,int p,double r,double phi,double M, double omega){
   // theGravMasses[p].r = r; 
