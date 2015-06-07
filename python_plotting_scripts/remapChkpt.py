@@ -330,6 +330,141 @@ class Grid:
         print("Not Same!")
         return
 
+    def _calcGrad(self):
+        
+        # Initialize grad array to zero.  
+        grad = []
+        for k in xrange(self.nz_tot):
+            slice = []
+            for i in xrange(self.nr_tot):
+                np = self.np[k,i]
+                slice.append(np.zeros((np,self.nq,3), dtype=np.float64))
+            grad.append(slice)
+
+        # Phi-direction
+        for k in xrange(self.nz_tot):
+            for i in xrange(self.nr_tot):
+                np = self.np[k,i]
+                right = np.arange(np) + 1
+                right[np-1] = 0
+                left = np.arange(np) - 1
+                left[0] = np
+
+                dphi = self.pFaces - self.pFaces[left]
+                dphi[dphi>2*np.pi] -= 2*np.pi
+                dphi[dphi<0] += 2*np.pi
+
+                dR = 0.5*(dphi + dphi[right])
+                dL = 0.5*(dphi + dphi[left])
+
+                fR = self.prim[k][i][right,:]
+                fC = self.prim[k][i][:,:]
+                fL = self.prim[k][i][left,:]
+
+                grad[k][i][:,:,1] = (dL*(fR-fC)/dR + dR*(fC-fL)/dL) / (dL+dR)
+
+                for j in xrange(self.np[k,i]):
+
+        # R-direction
+        for k in xrange(self.nz_tot):
+            dz = self.zFaces[k+1] - self.zFaces[k]
+            for i,r in enumerate(self.rFaces)
+                if i == 0 or i == self.nr_tot:
+                    continue
+
+                dr = 0.5 * (self.rFaces[i+1] - self.rFaces[i-1])
+                r = self.rFaces[i]
+
+                npL = self.np[k][i-1]
+                npR = self.np[k][i]
+                pFacesL = self.pFaces[k][i-1]
+                pFacesR = self.pFaces[k][i-1]
+                jL0 = np.argmin(pFacesL)
+                jR0 = np.argmin(pFacesR)
+
+                primL = self.prim[k][i-1]
+                primR = self.prim[k][i]
+
+                jL = jL0
+                jR = jR0
+
+                done = False
+
+                while not done:
+
+                    phiL1, phiL2, phiR1, phiR2 = fixPhi(pFacesL[jL-1], 
+                                                        pFacesL[jL],
+                                                        pFacesR[jR-1],
+                                                        pFacesR[jR])
+                    phiL = 0.5 * (phiL1 + phiL2)
+                    phiR = 0.5 * (phiR1 + phiR2)
+
+                    phi1 = max(phiL1, phiR1)
+                    phi2 = min(phiL2, phiR2)
+                    
+                    phi = 0.5 * (phi1+phi2)
+                    dphi = phi2-phi1
+
+                    fL = primL[jL] + (phi-phiL) * grad[k][i-1][jL,:,1]
+                    fR = primR[jR] + (phi-phiR) * grad[k][i  ][jR,:,1]
+
+                    df = (fR - fL) / dr
+                    dA = r * dphi * dz
+
+                    grad[k][i-1][jL,:,0] += df*dA
+                    grad[k][i  ][jR,:,0] += df*dA
+
+                    if phiL2 < phiR2:
+                        jL += 1
+                        if jL == npL:
+                            jL = 0
+                    else
+                        jR += 1
+                        if jR == npR:
+                            jR = 0
+
+                    if jL == jL0 and jR == jR0:
+                        done = True
+
+        for k in xrange(self.nz_tot):
+            dz = self.zFaces[k+1] - self.zFaces[k]
+            for i in xrange(self.nr_tot):
+                r1 = self.rFaces[i]
+                r2 = self.rFaces[i+1]
+                for j in xrange(self.np[k,i]):
+                    dphi = self.pFaces[k][i][j] - self.pFaces[k][i][j-1]
+                    if dphi < 0:
+                        dphi += 2*np.pi
+                    dA = (r1+r2)*dphi*dz
+                    grad[k][i][j,:,0] /= dA
+
+        # Z - Direction
+
+
+def _fixPhi(phiL1, phiL2, phiR1, phiR2):
+
+    phiL = 0.5 * (phiL1 + phiL2)
+    phiR = 0.5 * (phiR1 + phiR2)
+
+    if phiL1 > phiL2 and phiR1 > phiR2:
+        phiL1 -= 2*np.pi
+        phiR1 -= 2*np.pi
+    elif phiL1 > phiL2:
+        if phiR < np.pi:
+            phiL1 -= 2*np.pi
+        else:
+            phiL2 += 2*np.pi
+    elif phiR1 > phiR2:
+        if phiL < np.pi:
+            phiR1 -= 2*np.pi
+        else:
+            phiR2 += 2*np.pi
+
+    return phiL1, phiL2, phiR1, phiR2
+
+
+
+
 def _r_func(r, r2, fac, sigma, r0):
     #print r, r2, fac, sigma, r0
     f = r - r2 + fac*sigma*math.sqrt(0.25*math.pi)*(math.erf((r-r0)/sigma)+1.0)
