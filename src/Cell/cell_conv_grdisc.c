@@ -302,16 +302,21 @@ static int cons2prim_solve(double *cons, double *prim, double *pos, double dV,
         }
         
         //f-values
-        f1 = (h*w*w - P/rho) / w - A;
+        //f1 = (h*w*w - P/rho) / w - A;
+        f1 = (1.0+eps)*w + P*C/(h*h*rho*w) - A;
         f2 = w*rho*H - B;
         if(PRINTTOOMUCH)
             printf("    %.12lg (%.12lg %.12lg %.12lg) %.12lg (%.12lg %.12lg)\n", 
                 f1, h*w,-P/(rho*w),-A,f2,w*rho*H,-B);
 
         //jacobian
-        df1dr = ((dhdr*w*w+2*h*w*dwdr-(dpdr*rho-P)/(rho*rho))*w
-                    - (h*w*w-P/rho)*dwdr) / (w*w);
-        df1dt = ((dhdt*w*w+2*h*w*dwdt-dpdt/rho)*w-(h*w*w-P/rho)*dwdt) / (w*w);
+        //df1dr = ((dhdr*w*w+2*h*w*dwdr-(dpdr*rho-P)/(rho*rho))*w
+        //            - (h*w*w-P/rho)*dwdr) / (w*w);
+        //df1dt = ((dhdt*w*w+2*h*w*dwdt-dpdt/rho)*w-(h*w*w-P/rho)*dwdt) / (w*w);
+        df1dr = dedr*w + (1+eps)*dwdr + C * (dpdr*h*rho*w - P*(2*dhdr*rho*w
+                    + h*w + h*rho*dwdr)) / (h*h*h*rho*rho*w*w);
+        df1dt = dedt*w + (1+eps)*dwdt + C * (dpdt*h*w - P*(2*dhdt*w + h*dwdt))
+                                            / (h*h*h*rho*w*w);
         df2dr = dwdr*rho*H + w*H + w*rho*dHdr;
         df2dt = dwdt*rho*H + w*rho*dHdt;
         detj = df1dr*df2dt - df1dt*df2dr;

@@ -68,5 +68,5 @@ def readChkpt(filename):
         phi[inds] = piph[inds] - 0.5*dp
         dV[inds] *= r[inds] * dphi[inds]
 
-    return t, r, phi, z, rho, P, vr, vp, vz, dV, q
+    return t, r, phi, z, rho, P, vr, vp, vz, dV, q, piph
 

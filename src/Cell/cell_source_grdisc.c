@@ -315,10 +315,10 @@ void cell_cool_integrateT_grdisc_num(double *prim, double *dcons, double dt,
         step = step < dt-t ? step : dt-t;
         
         //FE
-        logT += -logTprime * step;
+        //logT += -logTprime * step;
         
         //RK4
-        /*
+        
         double logT1 = logT - 0.5*step*logTprime;
         double logTp2 = logT_prime(logT1, p, r, M, u0, theSim);
         double logT2 = logT - 0.5*step*logTp2;
@@ -326,7 +326,7 @@ void cell_cool_integrateT_grdisc_num(double *prim, double *dcons, double dt,
         double logT3 = logT - step*logTp3;
         double logTp4 = logT_prime(logT3, p, r, M, u0, theSim);
         logT += -step*(logTprime + 2*logTp2 + 2*logTp3 + logTp4)/6.0;
-        */
+        
 
         t += step;
         i++;
