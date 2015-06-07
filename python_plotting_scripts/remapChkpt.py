@@ -25,12 +25,27 @@ class Grid:
 
     prim = None
     grad = None
+    nq = 0
 
-    def __init__(self, pars):
-        self._setNRZ(pars)
-        self._setFacePosRZ(pars)
-        self._setNP(pars)
-        self._setFacePosP(pars)
+    _pars = None
+
+    def __init__(self, pars=None, chkpt=None, archive=None):
+
+        if archive is not None:
+            self.loadArchive(archive)
+        
+        elif pars is not None:
+            self.loadPars(pars)
+
+            if chkpt is not None:
+                self.loadChkpt(chkpt)
+
+    def loadPars(self, pars):
+        self._pars = pars
+        self._setNRZ()
+        self._setFacePosRZ()
+        self._setNP()
+        self._setFacePosP()
 
     def loadChkpt(self, filename):
         dat = rc.readChkpt(filename)
@@ -45,18 +60,115 @@ class Grid:
             print("Looks like different grids! Remapping...")
             self._loadChkptRemap(dat)
 
-    def _setNRZ(self, pars):
+    def loadArchive(self, filename):
+        f = h5.File(filename, "r")
+
+        parGroup = f["parameters"]
+        gridGroup = f["grid"]
+        dataGroup = f["data"]
+
+        self._pars = dict()
+        for key in parGroup.attrs:
+            self._pars[key] = parGroup.attrs[key]
+
+        self.rFaces = gridGroup['r_faces'][...]
+        self.zFaces = gridGroup['z_faces'][...]
+        self.np = gridGroup['np'][...]
+        piph_arr = gridGroup['p_faces'][...][2,:]
+
+        self.nr_tot = gridGroup.attrs['nr_tot']
+        self.nz_tot = gridGroup.attrs['nz_tot']
+        self.ng_rmin = gridGroup.attrs['ng_rmin']
+        self.ng_rmax = gridGroup.attrs['ng_rmax']
+        self.ng_zmin = gridGroup.attrs['ng_zmin']
+        self.ng_zmax = gridGroup.attrs['ng_zmax']
+        self.nq = dataGroup.attrs['nq']
+
+        j = 0
+        self.pFaces = []
+        for k in xrange(self.nz_tot):
+            slice = []
+            for i in xrange(self.nr_tot):
+                np = self.np[k,i]
+                slice.append(piph_arr[j:j+np])
+                j += np
+            self.pFaces.append(slice)
+
+        if self.nq > 0:
+            j = 0
+            self.prim = []
+            prim = dataGroup["prim"][...][2:,:].T
+            for k in xrange(self.nz_tot):
+                slice = []
+                for i in xrange(self.nr_tot):
+                    np = self.np[k,i]
+                    slice.append(prim[j:j+np,:])
+                    j += self.np[k,i]
+                self.prim.append(slice)
+
+        f.close()
+
+    def saveArchive(self, filename):
+        f = h5.File(filename, "w")
+
+        parGroup = f.create_group("parameters")
+        gridGroup = f.create_group("grid")
+        dataGroup = f.create_group("data")
+
+        for key in self._pars:
+            parGroup.attrs[key] = self._pars[key]
+
+        gridGroup.create_dataset("r_faces", data=self.rFaces)
+        gridGroup.create_dataset("z_faces", data=self.zFaces)
+        gridGroup.create_dataset("np", data=self.np)
+        piphDSet = gridGroup.create_dataset("p_faces", (3, self.np.sum()))
+
+        gridGroup.attrs["ng_rmin"] = self.ng_rmin
+        gridGroup.attrs["ng_rmax"] = self.ng_rmax
+        gridGroup.attrs["ng_zmin"] = self.ng_zmin
+        gridGroup.attrs["ng_zmax"] = self.ng_zmax
+        gridGroup.attrs["nr_tot"] = self.nr_tot
+        gridGroup.attrs["nz_tot"] = self.nz_tot
+
+        dataGroup.attrs['nq'] = self.nq
+
+        j = 0
+        for k in xrange(self.nz_tot):
+            for i in xrange(self.nr_tot):
+                np = self.np[k,i]
+                piphDSet[0,j:j+np] = k
+                piphDSet[1,j:j+np] = i
+                piphDSet[2,j:j+np] = self.pFaces[k][i]
+
+                j += self.np[k,i]
+
+        if self.nq > 0:
+            j = 0
+            primDSet = dataGroup.create_dataset("prim", (2+self.nq, self.np.sum()))
+            for k in xrange(self.nz_tot):
+                for i in xrange(self.nr_tot):
+                    np = self.np[k,i]
+                    primDSet[0,j:j+np] = k
+                    primDSet[1,j:j+np] = i
+                    for q in xrange(self.nq):
+                        primDSet[2+q, j:j+np] = self.prim[k][i][:,q]
+
+                    j += self.np[k,i]
+
+        f.close()
+
+    def _setNRZ(self):
         # Same logic as in sim_alloc_arr() in sim_alloc_arr.c
 
-        nr = pars["NumR"]
-        nz = pars["NumZ"]
-        ng = pars["ng"]
+        nr = self._pars["NumR"]
+        nz = self._pars["NumZ"]
+        ng = self._pars["ng"]
 
         self.nr_noghost = nr
         self.nz_noghost = nz
         self.ng = ng
 
-        if pars["NoInnerBC"] == 0:
+        if self._pars["NoInnerBC"] == 0:
             self.nr_tot = 2*ng + nr
             self.ng_rmin = ng
             self.ng_rmax = ng
@@ -74,20 +186,20 @@ class Grid:
             self.ng_zmin = ng
             self.ng_zmax = ng
 
-    def _setFacePosRZ(self, pars):
+    def _setFacePosRZ(self):
         # This is meant to be an exact copy of the set_rz() and set_N_p() 
         # functions in sim_set.c
 
-        Rmin = pars["R_Min"]
-        Rmax = pars["R_Max"]
-        Zmin = pars["Z_Min"]
-        Zmax = pars["Z_Max"]
+        Rmin = self._pars["R_Min"]
+        Rmax = self._pars["R_Max"]
+        Zmin = self._pars["Z_Min"]
+        Zmax = self._pars["Z_Max"]
 
-        Rscale = pars["RLogScale"]
-        Zscale = pars["ZLogScale"]
-        sigma = pars["HiResSigma"]
-        R0 = pars["HiResR0"]
-        fac = pars["HiResFac"]
+        Rscale = self._pars["RLogScale"]
+        Zscale = self._pars["ZLogScale"]
+        sigma = self._pars["HiResSigma"]
+        R0 = self._pars["HiResR0"]
+        fac = self._pars["HiResFac"]
 
         r2_max = Rmax + fac*sigma*math.sqrt(math.pi/4.0) \
                             * (math.erf((Rmax-R0)/sigma) + 1.0)
@@ -116,15 +228,15 @@ class Grid:
             self.rFaces[i] = opt.brentq(_r_func, 0.0, 2*Rmax, maxiter=1000,
                                             args=(r2val,fac,sigma,R0))
 
-        if pars["NoInnerBC"] != 0:
+        if self._pars["NoInnerBC"] != 0:
             self.rFaces[0] = 0.0
 
         self.zFaces = np.sign(z1) * Zscale * (np.exp(np.fabs(z1)/Zscale)-1.0)
 
-    def _setNP(self, pars):
+    def _setNP(self):
         self.np = np.zeros((self.nz_tot,self.nr_tot), dtype=np.int64)
-        NP = pars["NP_CONST"]
-        aspect = pars["aspect"]
+        NP = self._pars["NP_CONST"]
+        aspect = self._pars["aspect"]
 
         if NP > 0:
             self.np[:,:] = NP
@@ -133,7 +245,7 @@ class Grid:
             dr = self.rFaces[1:]-self.rFaces[:-1]
             self.np[:,:] = [int(x) for x in 2*math.pi*(1.0 + (r/dr-1.0)/aspect)]
 
-    def _setFacePosP(self, pars):
+    def _setFacePosP(self):
 
         phi0 = np.random.rand(self.nz_tot,self.nr_tot)
 
@@ -188,6 +300,8 @@ class Grid:
         if self.prim is None:
             self.prim = []
 
+        self.nq = 6
+
         R = dat[1]
         Z = dat[3]
         Piph = dat[11]
@@ -226,22 +340,33 @@ def _r_func(r, r2, fac, sigma, r0):
 if __name__ == "__main__":
 
     if len(sys.argv) < 2:
-        print("I need a parfile to nom.")
+        print("Gimme some files.")
         sys.exit()
 
-    elif len(sys.argv) == 2:
-        pars = rp.readParfile(sys.argv[1])
-        g = Grid(pars)
+    if "archive" in sys.argv[1]:
+        g = Grid(archive=sys.argv[1])
 
         print g.rFaces
         print g.zFaces
         print g.pFaces
+        print g.prim
 
-    elif len(sys.argv) > 2:
-        
-        pars = rp.readParfile(sys.argv[1])
-        g = Grid(pars)
-        g.loadChkpt(sys.argv[2])
+    else:
+        if len(sys.argv) == 2:
+            pars = rp.readParfile(sys.argv[1])
+            g = Grid(pars)
+
+            print g.rFaces
+            print g.zFaces
+            print g.pFaces
+
+        elif len(sys.argv) > 2:
+            
+            pars = rp.readParfile(sys.argv[1])
+            g = Grid(pars)
+            g.loadChkpt(sys.argv[2])
+
+    g.saveArchive("archive.h5")
 
 
 

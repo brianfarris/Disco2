@@ -66,27 +66,35 @@ if __name__ == "__main__":
         print("Need a parfile")
         sys.exit()
 
-    pars = rp.readParfile(sys.argv[1])
-    print("Making grid...")
-    g = rc.Grid(pars)
+    if "archive" in sys.argv[1]:
+        g = rc.Grid(archive=sys.argv[1])
+        
+        fig = plt.figure()
+        ax = fig.add_subplot(1,1,1)
 
-
-    fig = plt.figure()
-    ax = fig.add_subplot(1,1,1)
-
-    if len(sys.argv) == 2:
-        print("Plotting grid...")
         plotGrid(g, ax)
+        plotGridData(g, ax)
         sizePlot(g, ax)
 
-    elif len(sys.argv) > 2:
-        print("Loading Checkpoint...")
-        g.loadChkpt(sys.argv[2])
-        print("Plotting grid...")
-        #plotGrid(g, ax)
-        print("Plotting data...")
-        plotGridData(g, ax, q=0)
-        sizePlot(g, ax)
+    else:
+        pars = rp.readParfile(sys.argv[1])
+        print("Making grid...")
+        g = rc.Grid(pars)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(1,1,1)
+
+        if len(sys.argv) == 2:
+            print("Plotting grid...")
+            plotGrid(g, ax)
+            sizePlot(g, ax)
+
+        elif len(sys.argv) > 2:
+            print("Loading Checkpoint...")
+            g.loadChkpt(sys.argv[2])
+            print("Plotting data...")
+            plotGridData(g, ax, q=0)
+            sizePlot(g, ax)
 
     plt.show()
 
