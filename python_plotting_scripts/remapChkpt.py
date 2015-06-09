@@ -363,12 +363,10 @@ class Grid:
 
                 grad[k][i][:,:,1] = (dL*(fR-fC)/dR + dR*(fC-fL)/dL) / (dL+dR)
 
-                for j in xrange(self.np[k,i]):
-
         # R-direction
         for k in xrange(self.nz_tot):
             dz = self.zFaces[k+1] - self.zFaces[k]
-            for i,r in enumerate(self.rFaces)
+            for i,r in enumerate(self.rFaces):
                 if i == 0 or i == self.nr_tot:
                     continue
 
@@ -418,7 +416,7 @@ class Grid:
                         jL += 1
                         if jL == npL:
                             jL = 0
-                    else
+                    else:
                         jR += 1
                         if jR == npR:
                             jR = 0
