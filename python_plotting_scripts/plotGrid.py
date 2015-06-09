@@ -87,15 +87,17 @@ if __name__ == "__main__":
     if "archive" in sys.argv[1]:
         g = dg.Grid(archive=sys.argv[1])
         
-        fig = plt.figure()
-        ax = fig.add_subplot(1,1,1)
 
 #        plotGrid(g, ax)
-        plotGridData(g, ax)
-        sizePlot(g, ax)
 
-#        fig.savefig("test.png")
-#        fig.savefig("test.pdf")
+        for q in xrange(g.nq):
+            fig = plt.figure()
+            ax = fig.add_subplot(1,1,1)
+            plotGridData(g, ax, q=q, cmap=cm.afmhot)
+            sizePlot(g, ax)
+            fig.savefig("grid_{0:d}.png".format(q))
+            fig.savefig("grid_{0:d}.pdf".format(q))
+            plt.close()
 
     else:
         pars = rp.readParfile(sys.argv[1])

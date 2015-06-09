@@ -59,6 +59,12 @@ class Grid:
         else:
             print("Given checkpoint has different grid structure, can not load.")
 
+    def saveChkpt(self, filename, numProc=1):
+        return
+
+    def saveChkpt(self, filename, numProc=1):
+        return
+
     def loadArchive(self, filename):
         f = h5.File(filename, "r")
 
@@ -164,7 +170,7 @@ class Grid:
 
         f.close()
 
-    def interpolate(self):
+    def plm(self):
         self._calcGrad()
 
     def _setNRZ(self):
@@ -347,6 +353,7 @@ class Grid:
             grad.append(slice)
 
         # Phi-direction
+        print("Calculating phi derivatives...")
         for k in xrange(self.nz_tot):
             for i in xrange(self.nr_tot):
                 nphi = self.np[k,i]
@@ -371,12 +378,13 @@ class Grid:
                                     / (dL[:,None]+dR[:,None])
 
         # R-direction
+        print("Calculating r derivatives...")
         for k in xrange(self.nz_tot):
             dz = self.zFaces[k+1] - self.zFaces[k]
             for i,r in enumerate(self.rFaces):
                 if i == 0 or i == self.nr_tot:
                     continue
-
+                print("   interface {0:d}".format(i))
                 dr = 0.5 * (self.rFaces[i+1] - self.rFaces[i-1])
                 r = self.rFaces[i]
 
