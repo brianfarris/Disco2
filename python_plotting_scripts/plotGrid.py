@@ -5,21 +5,39 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as pat
 import matplotlib.collections as coll
 import matplotlib.cm as cm
-import remapChkpt as rc
+import discoGrid as dg
 import readParfile as rp
 
-def plotGrid(g, ax, k=0):
+def plotGrid(g, ax, k=0, N=1000):
 
-    PHI = np.linspace(0, 2*math.pi, 1000)
+    PHI = np.linspace(0, 2*math.pi, N)
 
+    lines = []
+    
+    phiLines = np.zeros((g.nr_tot+1, N, 2))
+    phiLines[:,:,0] = g.rFaces[:,None] * np.cos(PHI)[None,:]
+    phiLines[:,:,1] = g.rFaces[:,None] * np.sin(PHI)[None,:]
+
+    rLines = np.zeros((g.np[k,:].sum(),2,2))
+
+    j = 0
     for i in xrange(g.nr_tot):
         r1 = g.rFaces[i]
         r2 = g.rFaces[i+1]
-        ax.plot(r1*np.cos(PHI), r1*np.sin(PHI), 'k')
-        r = np.linspace(r1, r2, 2)
+
         for phi in g.pFaces[k][i]:
-            ax.plot(r*math.cos(phi), r*math.sin(phi), 'k')
-    ax.plot(g.rFaces[-1]*np.cos(PHI), g.rFaces[-1]*np.sin(PHI), 'k')
+            cp = math.cos(phi)
+            sp = math.sin(phi)
+            rLines[j,0,0] = r1*cp
+            rLines[j,0,1] = r1*sp
+            rLines[j,1,0] = r2*cp
+            rLines[j,1,1] = r2*sp
+            j += 1
+
+    rColl = coll.LineCollection(rLines, colors=[(0,0,0,1)], linewidths=0.5)
+    phiColl = coll.LineCollection(phiLines, colors=[(0,0,0,1)], linewidths=0.5)
+    ax.add_collection(rColl)
+    ax.add_collection(phiColl)
 
 
 def plotGridData(g, ax, k=0, q=0, cmap=cm.spring):
@@ -67,19 +85,22 @@ if __name__ == "__main__":
         sys.exit()
 
     if "archive" in sys.argv[1]:
-        g = rc.Grid(archive=sys.argv[1])
+        g = dg.Grid(archive=sys.argv[1])
         
         fig = plt.figure()
         ax = fig.add_subplot(1,1,1)
 
-        plotGrid(g, ax)
+#        plotGrid(g, ax)
         plotGridData(g, ax)
         sizePlot(g, ax)
+
+#        fig.savefig("test.png")
+#        fig.savefig("test.pdf")
 
     else:
         pars = rp.readParfile(sys.argv[1])
         print("Making grid...")
-        g = rc.Grid(pars)
+        g = dg.Grid(pars)
 
         fig = plt.figure()
         ax = fig.add_subplot(1,1,1)

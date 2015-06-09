@@ -57,8 +57,7 @@ class Grid:
             print("Looks like the same grid! Copying...")
             self._loadChkptIdentical(dat)
         else:
-            print("Looks like different grids! Remapping...")
-            self._loadChkptRemap(dat)
+            print("Given checkpoint has different grid structure, can not load.")
 
     def loadArchive(self, filename):
         f = h5.File(filename, "r")
@@ -76,6 +75,13 @@ class Grid:
         self.np = gridGroup['np'][...]
         piph_arr = gridGroup['p_faces'][...][2,:]
 
+
+        #print "Loading archive..."
+        #print self.rFaces.dtype, gridGroup['r_faces'].dtype
+        #print self.zFaces.dtype, gridGroup['z_faces'].dtype
+        #print self.np.dtype, gridGroup['np'].dtype
+        #print piph_arr.dtype, gridGroup['p_faces'].dtype
+
         self.nr_tot = gridGroup.attrs['nr_tot']
         self.nz_tot = gridGroup.attrs['nz_tot']
         self.ng_rmin = gridGroup.attrs['ng_rmin']
@@ -89,9 +95,9 @@ class Grid:
         for k in xrange(self.nz_tot):
             slice = []
             for i in xrange(self.nr_tot):
-                np = self.np[k,i]
-                slice.append(piph_arr[j:j+np])
-                j += np
+                nphi = self.np[k,i]
+                slice.append(piph_arr[j:j+nphi])
+                j += nphi
             self.pFaces.append(slice)
 
         if self.nq > 0:
@@ -101,8 +107,8 @@ class Grid:
             for k in xrange(self.nz_tot):
                 slice = []
                 for i in xrange(self.nr_tot):
-                    np = self.np[k,i]
-                    slice.append(prim[j:j+np,:])
+                    nphi = self.np[k,i]
+                    slice.append(prim[j:j+nphi,:])
                     j += self.np[k,i]
                 self.prim.append(slice)
 
@@ -135,27 +141,31 @@ class Grid:
         j = 0
         for k in xrange(self.nz_tot):
             for i in xrange(self.nr_tot):
-                np = self.np[k,i]
-                piphDSet[0,j:j+np] = k
-                piphDSet[1,j:j+np] = i
-                piphDSet[2,j:j+np] = self.pFaces[k][i]
+                nphi = self.np[k,i]
+                piphDSet[0,j:j+nphi] = k
+                piphDSet[1,j:j+nphi] = i
+                piphDSet[2,j:j+nphi] = self.pFaces[k][i]
 
                 j += self.np[k,i]
 
         if self.nq > 0:
             j = 0
-            primDSet = dataGroup.create_dataset("prim", (2+self.nq, self.np.sum()))
+            primDSet = dataGroup.create_dataset("prim", 
+                                    (2+self.nq, self.np.sum()), dtype=np.float64)
             for k in xrange(self.nz_tot):
                 for i in xrange(self.nr_tot):
-                    np = self.np[k,i]
-                    primDSet[0,j:j+np] = k
-                    primDSet[1,j:j+np] = i
+                    nphi = self.np[k,i]
+                    primDSet[0,j:j+nphi] = k
+                    primDSet[1,j:j+nphi] = i
                     for q in xrange(self.nq):
-                        primDSet[2+q, j:j+np] = self.prim[k][i][:,q]
+                        primDSet[2+q, j:j+nphi] = self.prim[k][i][:,q]
 
                     j += self.np[k,i]
 
         f.close()
+
+    def interpolate(self):
+        self._calcGrad()
 
     def _setNRZ(self):
         # Same logic as in sim_alloc_arr() in sim_alloc_arr.c
@@ -320,15 +330,10 @@ class Grid:
                 rind = r==R
                 self.pFaces[k][i] = Piph[zind][rind]
 
-                #annulus = np.zeros((self.np[k][i], prim.shape[0]))
                 annulus = prim[zind][rind]
                 slice.append(annulus)
             
             self.prim.append(slice)
-
-    def _loadChkptRemap(self, dat):
-        print("Not Same!")
-        return
 
     def _calcGrad(self):
         
@@ -337,20 +342,20 @@ class Grid:
         for k in xrange(self.nz_tot):
             slice = []
             for i in xrange(self.nr_tot):
-                np = self.np[k,i]
-                slice.append(np.zeros((np,self.nq,3), dtype=np.float64))
+                nphi = self.np[k,i]
+                slice.append(np.zeros((nphi,self.nq,3), dtype=np.float64))
             grad.append(slice)
 
         # Phi-direction
         for k in xrange(self.nz_tot):
             for i in xrange(self.nr_tot):
-                np = self.np[k,i]
-                right = np.arange(np) + 1
-                right[np-1] = 0
-                left = np.arange(np) - 1
-                left[0] = np
+                nphi = self.np[k,i]
+                right = np.arange(nphi) + 1
+                right[nphi-1] = 0
+                left = np.arange(nphi) - 1
+                left[0] = nphi-1
 
-                dphi = self.pFaces - self.pFaces[left]
+                dphi = self.pFaces[k][i][:] - self.pFaces[k][i][left]
                 dphi[dphi>2*np.pi] -= 2*np.pi
                 dphi[dphi<0] += 2*np.pi
 
@@ -361,14 +366,14 @@ class Grid:
                 fC = self.prim[k][i][:,:]
                 fL = self.prim[k][i][left,:]
 
-                grad[k][i][:,:,1] = (dL*(fR-fC)/dR + dR*(fC-fL)/dL) / (dL+dR)
-
-                for j in xrange(self.np[k,i]):
+                grad[k][i][:,:,1] = (dL[:,None]*(fR-fC)/dR[:,None]
+                                     + dR[:,None]*(fC-fL)/dL[:,None]) \
+                                    / (dL[:,None]+dR[:,None])
 
         # R-direction
         for k in xrange(self.nz_tot):
             dz = self.zFaces[k+1] - self.zFaces[k]
-            for i,r in enumerate(self.rFaces)
+            for i,r in enumerate(self.rFaces):
                 if i == 0 or i == self.nr_tot:
                     continue
 
@@ -378,7 +383,7 @@ class Grid:
                 npL = self.np[k][i-1]
                 npR = self.np[k][i]
                 pFacesL = self.pFaces[k][i-1]
-                pFacesR = self.pFaces[k][i-1]
+                pFacesR = self.pFaces[k][i]
                 jL0 = np.argmin(pFacesL)
                 jR0 = np.argmin(pFacesR)
 
@@ -418,7 +423,7 @@ class Grid:
                         jL += 1
                         if jL == npL:
                             jL = 0
-                    else
+                    else:
                         jR += 1
                         if jR == npR:
                             jR = 0
@@ -439,9 +444,83 @@ class Grid:
                     grad[k][i][j,:,0] /= dA
 
         # Z - Direction
+        for i in xrange(self.nr_tot):
+
+            dr = self.rFaces[i+1] - self.rFaces[i]
+            r = 0.5*(self.rFaces[i+1] + self.rFaces[i])
+
+            for k, z in enumerate(self.zFaces):
+                if k == 0 or k == self.nz_tot:
+                    continue
+                dz = self.zFaces[k+1] - self.zFaces[k-1]
+
+                npL = self.np[k-1][i]
+                npR = self.np[k][i]
+                pFacesL = self.pFaces[k-1][i]
+                pFacesR = self.pFaces[k][i]
+                jL0 = np.argmin(pFacesL)
+                jR0 = np.argmin(pFacesR)
+
+                primL = self.prim[k-1][i]
+                primR = self.prim[k][i]
+
+                jL = jL0
+                jR = jR0
+
+                done = False
+
+                while not done:
+
+                    phiL1, phiL2, phiR1, phiR2 = fixPhi(pFacesL[jL-1], 
+                                                        pFacesL[jL],
+                                                        pFacesR[jR-1],
+                                                        pFacesR[jR])
+                    phiL = 0.5 * (phiL1 + phiL2)
+                    phiR = 0.5 * (phiR1 + phiR2)
+
+                    phi1 = max(phiL1, phiR1)
+                    phi2 = min(phiL2, phiR2)
+                    
+                    phi = 0.5 * (phi1+phi2)
+                    dphi = phi2-phi1
+
+                    fL = primL[jL] + (phi-phiL) * grad[k-1][i][jL,:,1]
+                    fR = primR[jR] + (phi-phiR) * grad[k  ][i][jR,:,1]
+
+                    df = (fR - fL) / dz
+                    dA = r * dr * dphi
+
+                    grad[k-1][i][jL,:,2] += df*dA
+                    grad[k  ][i][jR,:,2] += df*dA
+
+                    if phiL2 < phiR2:
+                        jL += 1
+                        if jL == npL:
+                            jL = 0
+                    else:
+                        jR += 1
+                        if jR == npR:
+                            jR = 0
+
+                    if jL == jL0 and jR == jR0:
+                        done = True
+
+        for k in xrange(self.nz_tot):
+            dz = self.zFaces[k+1] - self.zFaces[k]
+            for i in xrange(self.nr_tot):
+                r1 = self.rFaces[i]
+                r2 = self.rFaces[i+1]
+                for j in xrange(self.np[k,i]):
+                    dphi = self.pFaces[k][i][j] - self.pFaces[k][i][j-1]
+                    if dphi < 0:
+                        dphi += 2*np.pi
+                    dA = (r1+r2)*(r2-r1)*dphi
+                    grad[k][i][j,:,2] /= dA
+
+        self.grad = grad
 
 
-def _fixPhi(phiL1, phiL2, phiR1, phiR2):
+def fixPhi(phiL1, phiL2, phiR1, phiR2):
 
     phiL = 0.5 * (phiL1 + phiL2)
     phiR = 0.5 * (phiR1 + phiR2)
@@ -466,9 +545,7 @@ def _fixPhi(phiL1, phiL2, phiR1, phiR2):
 
 
 def _r_func(r, r2, fac, sigma, r0):
-    #print r, r2, fac, sigma, r0
     f = r - r2 + fac*sigma*math.sqrt(0.25*math.pi)*(math.erf((r-r0)/sigma)+1.0)
-    #print f
     return f
 
 
@@ -481,19 +558,13 @@ if __name__ == "__main__":
     if "archive" in sys.argv[1]:
         g = Grid(archive=sys.argv[1])
 
-        print g.rFaces
-        print g.zFaces
-        print g.pFaces
-        print g.prim
+        g.interpolate()
+
 
     else:
         if len(sys.argv) == 2:
             pars = rp.readParfile(sys.argv[1])
             g = Grid(pars)
-
-            print g.rFaces
-            print g.zFaces
-            print g.pFaces
 
         elif len(sys.argv) > 2:
             
