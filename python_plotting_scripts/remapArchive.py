@@ -56,7 +56,6 @@ def remapGrid2D(g0, g1):
             donePhi = False
 
             while not donePhi:
-                print("   {0:d} {1:d} ({2:d} {3:d})".format(j0,j1,np0,np1))
 
                 phi0L, phi0R, phi1L, phi1R = dg.fixPhi(pFaces0[j0-1],
                                                         pFaces0[j0],
@@ -68,8 +67,6 @@ def remapGrid2D(g0, g1):
                 phi0 = 0.5*(phi0L + phi0R)
                 phi = 0.5*(phiL + phiR)
                 dphi = phiR-phiL
-
-                print phi0L, phi0R, phi1L, phi1R
 
                 if dphi < 0:
                     print("AAAAAAHHHHHHH!")
@@ -118,6 +115,7 @@ def remapGrid2D(g0, g1):
     # Done!
     g1.prim = [prim]
     g1.nq = nq
+    g1.T = g0.T
 
 
 if __name__ == "__main__":

@@ -13,6 +13,7 @@ class Grid:
     nz_noghost = 0
     nr_tot = 0
     nz_tot = 0
+    ng = 0
     ng_rmin = 0
     ng_rmax = 0
     ng_zmin = 0
@@ -23,6 +24,7 @@ class Grid:
     zFaces = None
     pFaces = None
 
+    T = 0
     prim = None
     grad = None
     nq = 0
@@ -60,10 +62,74 @@ class Grid:
             print("Given checkpoint has different grid structure, can not load.")
 
     def saveChkpt(self, filename, numProc=1):
-        return
+        # Saves grid to checkpoint file, ASSUMES 2D
+        # TODO: 3D
 
-    def saveChkpt(self, filename, numProc=1):
-        return
+        N = 0
+        nr = self.nr_tot - self.ng_rmin - self.ng_rmax
+        nr_loc = nr / numProc
+
+        for rank in xrange(numProc):
+
+            ng1 = self.ng
+            ng2 = self.ng
+            if rank == 0:
+                ng1 = self.ng_rmin
+            if rank == numProc-1:
+                ng2 = self.ng_rmax
+            
+            i1 = self.ng_rmin + (rank  )*nr_loc - ng1
+            i2 = self.ng_rmin + (rank+1)*nr_loc + ng2
+
+            N += self.np[:,i1:i2].sum()
+
+        f = h5.File(filename, "w")
+        dat = f.create_dataset('Data', (N,3+self.nq), dtype=np.float64)
+        f.create_dataset('T', (1,), dtype=np.float64)
+        f.create_dataset('GravMass', (2,4), dtype=np.float64)
+
+        f['T'][0] = self.T
+        f['GravMass'][:,:] = np.zeros((2,4))
+
+        ind = 0
+        for rank in xrange(numProc):
+            ng1 = self.ng
+            ng2 = self.ng
+            if rank == 0:
+                ng1 = self.ng_rmin
+            if rank == numProc-1:
+                ng2 = self.ng_rmax
+            
+            i1 = self.ng_rmin + (rank  )*nr_loc - ng1
+            i2 = self.ng_rmin + (rank+1)*nr_loc + ng2
+            
+            dN = self.np[:,i1:i2].sum()
+
+            piph = np.zeros(dN)
+            r = np.zeros(dN)
+            z = np.zeros(dN)
+            prim = np.zeros((dN,self.nq))
+
+            ind1 = 0
+            for k in xrange(self.nz_tot):
+                z0 = 0.5 * (self.zFaces[k+1] + self.zFaces[k])
+                for i in xrange(i1,i2):
+                    nphi = self.np[k,i]
+                    r0 = 0.5 * (self.rFaces[i+1] + self.rFaces[i])
+
+                    piph[ind1:ind1+nphi] = self.pFaces[k][i]
+                    r[ind1:ind1+nphi] = r0
+                    z[ind1:ind1+nphi] = z0
+                    prim[ind1:ind1+nphi] = self.prim[k][i]
+
+                    ind1 += nphi
+
+            dat[ind:ind+dN, 0] = piph
+            dat[ind:ind+dN, 1] = r
+            dat[ind:ind+dN, 2] = z
+            dat[ind:ind+dN, 3:] = prim
+
+        f.close()
 
     def loadArchive(self, filename):
         f = h5.File(filename, "r")
@@ -94,7 +160,9 @@ class Grid:
         self.ng_rmax = gridGroup.attrs['ng_rmax']
         self.ng_zmin = gridGroup.attrs['ng_zmin']
         self.ng_zmax = gridGroup.attrs['ng_zmax']
+        self.ng = gridGroup.attrs['ng']
         self.nq = dataGroup.attrs['nq']
+        self.T = dataGroup.attrs['T']
 
         j = 0
         self.pFaces = []
@@ -141,8 +209,10 @@ class Grid:
         gridGroup.attrs["ng_zmax"] = self.ng_zmax
         gridGroup.attrs["nr_tot"] = self.nr_tot
         gridGroup.attrs["nz_tot"] = self.nz_tot
+        gridGroup.attrs["ng"] = self.ng
 
         dataGroup.attrs['nq'] = self.nq
+        dataGroup.attrs['T'] = self.T
 
         j = 0
         for k in xrange(self.nz_tot):
@@ -318,6 +388,7 @@ class Grid:
 
         self.nq = 6
 
+        T = dat[0]
         R = dat[1]
         Z = dat[3]
         Piph = dat[11]
@@ -326,6 +397,8 @@ class Grid:
 
         Rvals = np.unique(R)
         Zvals = np.unique(Z)
+
+        self.T = T
 
         for k, z in enumerate(Zvals):
             
@@ -581,6 +654,7 @@ if __name__ == "__main__":
             g.loadChkpt(sys.argv[2])
 
     g.saveArchive("archive.h5")
+    g.saveChkpt("checkpoint_test.h5")
 
 
 
