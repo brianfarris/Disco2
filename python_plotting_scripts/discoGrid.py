@@ -129,6 +129,8 @@ class Grid:
             dat[ind:ind+dN, 2] = z
             dat[ind:ind+dN, 3:] = prim
 
+            ind += dN
+
         f.close()
 
     def loadArchive(self, filename):
