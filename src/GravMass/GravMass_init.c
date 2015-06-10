@@ -121,15 +121,16 @@ void gravMass_init_livebinary(struct GravMass * theGravMasses,struct Sim * theSi
   theGravMasses[0].omega = om;
   theGravMasses[0].E = E;
   theGravMasses[0].L = L0;
-  theGravMasses[0].vr = rate0*M1/M0;
+  theGravMasses[0].vr = v0;//rate0*M1/M0;
   //theGravMasses[0].Fr = 0.0;
   //theGravMasses[0].Fp = 0.0;
   theGravMasses[0].Ltot = Ltot;
   //theGravMasses[0].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
   //theGravMasses[0].OrbShrinkT0 = sim_OrbShrinkT0(theSim);
   theGravMasses[0].Mdot = 0.0;
-  theGravMasses[0].Macc = 0.0;
+  theGravMasses[0].Macc = M0;
   theGravMasses[0].total_torque = 0.0;
+  theGravMasses[0].total_power = 0.0;
 
 
   theGravMasses[1].M   = M1;
@@ -138,20 +139,21 @@ void gravMass_init_livebinary(struct GravMass * theGravMasses,struct Sim * theSi
   theGravMasses[1].omega = om;
   theGravMasses[1].E = E;
   theGravMasses[1].L = L1;
-  theGravMasses[1].vr = rate0;
+  theGravMasses[1].vr = v1; //rate0;
   //theGravMasses[1].Fr = 0.0;
   //theGravMasses[1].Fp = 0.0;
   theGravMasses[1].Ltot = Ltot;
   //theGravMasses[1].OrbShrinkTscale = sim_OrbShrinkTscale(theSim);
   //theGravMasses[1].OrbShrinkT0 = sim_OrbShrinkT0(theSim);
   theGravMasses[1].Mdot = 0.0;
-  theGravMasses[1].Macc = 0.0;
+  theGravMasses[1].Macc = M1;
   theGravMasses[1].total_torque = 0.0;
+  theGravMasses[1].total_power = 0.0;
 }
 
 // If you change the number of things to chpnt about the GravMasses then you need to normal Header changes as well as update io_buffer and 
 // also update fdims[2] twice! in io_hdf5
-void gravMass_set_chkpt(struct GravMass * theGravMasses,int p,double r,double phi, double M, double omega, double E, double L, double Ltot, double Mdot, double Macc, double total_torque){
+void gravMass_set_chkpt(struct GravMass * theGravMasses,int p,double r,double phi, double M, double omega, double E, double L, double vr, double Ltot, double Mdot, double Macc, double total_torque, double total_power){
     theGravMasses[p].r = r;
     theGravMasses[p].phi = phi;
     theGravMasses[p].M = M;
@@ -165,6 +167,7 @@ void gravMass_set_chkpt(struct GravMass * theGravMasses,int p,double r,double ph
     theGravMasses[p].Mdot = Mdot;
     theGravMasses[p].Macc = Macc;
     theGravMasses[0].total_torque = total_torque; // total binary ang mom so set p=0
+    theGravMasses[0].total_power = total_power;
 }
   //void gravMass_set_chkpt(struct GravMass * theGravMasses,int p,double r,double phi,double M, double omega){
   // theGravMasses[p].r = r; 

@@ -120,9 +120,19 @@ void gravMassForce( struct GravMass * theGravMasses ,struct Sim * theSim, int p 
 }
 
 void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses , double dt ){
-  ///Set a density scale for feedback to holes                                                                                                
+  ///Set a density scale for feedback to holes
+
+  double M0 = gravMass_M(theGravMasses,0);
+  double M1 = gravMass_M(theGravMasses,1);                  
+  double rbh0 = gravMass_r(theGravMasses,0);
+  double rbh1 = gravMass_r(theGravMasses,1);
+  double asep = rbh0 + rbh1;
+  double a    = sim_sep0(theSim); //Cst sep for rotation cells and frame etc
+  double massRatio = M1/M0;
+
   double Rcut = sim_Rcut(theSim);
-  double dens_scale = ( sim_Mdsk_o_Ms(theSim)/( 1.+1./sim_MassRatio(theSim) ) )/( M_PI*sim_sep0(theSim)*sim_sep0(theSim) );
+  //set density using initial separation and mass ratio - why is this being computed each step??
+  double dens_scale = ( sim_Mdsk_o_Ms(theSim)/( 1.+1./sim_MassRatio(theSim) ) )/( M_PI*a*a );
   if (   time_global <=    2.*M_PI*(sim_tmig_on(theSim) + sim_tramp(theSim))   ){
     dens_scale *= (time_global - 2*M_PI*sim_tmig_on(theSim))/( sim_tramp(theSim)*2*M_PI );
     // ABOVE^ Allow migration to turn on slowly                                                                                               
@@ -158,22 +168,24 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 
   //double Mtotal = 1.0;
   //double sep = 1.0;
-  double M0 = gravMass_M(theGravMasses,0);
-  double M1 = gravMass_M(theGravMasses,1);
+  //SET ABOVE
+  //double M0 = gravMass_M(theGravMasses,0);
+  // double M1 = gravMass_M(theGravMasses,1);
 
   double Mtotal = M0 + M1; //DD June 2015 here and below update vr and total mass and sep
 
-  double rbh0 = gravMass_r(theGravMasses,0);
-  double rbh1 = gravMass_r(theGravMasses,1);
+  //SET ABOVE
+  //double rbh0 = gravMass_r(theGravMasses,0);
+  // double rbh1 = gravMass_r(theGravMasses,1);
 
   double vr_bh0 = gravMass_vr(theGravMasses,0);
   double vr_bh1 = gravMass_vr(theGravMasses,1);  
 
-  double vp_bh0 = rbh0 * gravMass_om(theGravMasses,0)
-  double vp_bh1 = rbh1 * gravMass_om(theGravMasses,1)
+  double vp_bh0 = rbh0 * gravMass_omega(theGravMasses,0);
+  double vp_bh1 = rbh1 * gravMass_omega(theGravMasses,1);
 
-
-  double a = rbh0+rbh1;
+  //SET AS asep ABOVE
+  //double a = rbh0+rbh1;
 
   double phi_bh0 = gravMass_phi(theGravMasses,0);
   double phi_bh1 = gravMass_phi(theGravMasses,1);
@@ -235,7 +247,8 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
         double r0 = sqrt((xpos-xbh0)*(xpos-xbh0)+(ypos-ybh0)*(ypos-ybh0));
         double r1 = sqrt((xpos-xbh1)*(xpos-xbh1)+(ypos-ybh1)*(ypos-ybh1));
 
-
+	//massRatio/asep is the time dependent mass-ratio/separation
+	//sim_MassRatio(theSim) and a are the initial values
 	double Rhill = a * pow(sim_MassRatio(theSim)/3., (1./3.));
 
         double z  = .5*(zp+zm);
@@ -280,6 +293,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 	  //Fmr -= fr*dm;
 	  //Fmp = -fp*dm;
         }
+	// a is the cst a=1 
         double w_a = sim_rOm_a(theSim,r,a);
         double rdrOm_a = sim_rdrOm_a(theSim,r,a);
         double F_centrifugal_r = w_a*w_a/r;
@@ -307,7 +321,7 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
 	    //gravMassForce( theGravMasses , theSim , 0 , gravdist , phi , &fr0 , &fp0 );
 	    //gravMassForce( theGravMasses , theSim , 1 , gravdist , phi , &fr1 , &fp1 );
 	    ttorque_temp -= r*Fp*dm;
-	    Pow_temp     += Fr0*vr_bh0 + Fr1*vr_bh1 + Fp0*vp_bh0 + Fp1*vp_bh1;
+	    Pow_temp     -= (Fr0*vr_bh0 + Fr1*vr_bh1 + Fp0*vp_bh0 + Fp1*vp_bh1)*dm;
 	    //ttorque_temp -= rbh0*fp0*dm;
 	    //ttorque_temp -= rbh1*fp1*dm;
 	  }
@@ -385,25 +399,31 @@ void cell_add_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMas
   MPI_Allreduce( Mdot_temp, Mdot_reduce , 2, MPI_DOUBLE, MPI_SUM, sim_comm);
   double ttorque_reduce;
   MPI_Allreduce(&ttorque_temp, &ttorque_reduce, 1, MPI_DOUBLE, MPI_SUM, sim_comm);
+  double Pow_reduce;
+  MPI_Allreduce(&Pow_temp, &Pow_reduce, 1, MPI_DOUBLE, MPI_SUM, sim_comm);
   int p;
   for( p=0 ; p<sim_NumGravMass(theSim); ++p ){
     gravMass_set_Mdot(theGravMasses,Mdot_reduce[p],p);  //dont set for now DD
-    double Macc_prev = gravMass_Macc(theGravMasses,p);
-    gravMass_set_Macc(theGravMasses,Macc_prev+Mdot_reduce[p]*dt,p);
+    double Macc_prev = gravMass_Macc(theGravMasses,p); //starts as M0 or M1
+    gravMass_set_Macc(theGravMasses,  Macc_prev + dens_scale*(Mdot_reduce[p]*dt),p); //mult by dens scale for updating BH masses
     gravMass_set_total_torque(theGravMasses,ttorque_reduce,p);
+    gravMass_set_total_power(theGravMasses,Pow_reduce,p);
   }
 }
 
 void cell_add_visc_src( struct Cell *** theCells ,struct Sim * theSim, struct GravMass * theGravMasses, double dt ){
-  double Mtotal = 1.0;
-  //double sep = 1.0;
   double M0 = gravMass_M(theGravMasses,0);
   double M1 = gravMass_M(theGravMasses,1);
+  double Mtotal = M0 + M1;
+
+  //double Mtotal = 1.0;
+  //double sep = 1.0;
 
   double r0 = gravMass_r(theGravMasses,0);
   double r1 = gravMass_r(theGravMasses,1);
+  double asep = r0 + r1;
 
-  double a = r0 + r1;
+  double a = sim_sep0(theSim);
 
   double phi_bh0 = gravMass_phi(theGravMasses,0);
   double phi_bh1 = gravMass_phi(theGravMasses,1);

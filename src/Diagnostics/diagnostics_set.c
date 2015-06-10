@@ -615,13 +615,15 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     //double a_bin = sqrt(r_bh0*r_bh0 + r_bh1*r_bh1 - 2.*r_bh0*r_bh1*cos(phi_bh1-phi_bh0));
     double a_bin = r_bh0+r_bh1;
     double mu = M0*M1/(M0+M1);
-    double l2 = mu*mu*pow(a_bin,4)*Om*Om;
-    double ecc = sqrt( 1. + 2.*l2*E/(mu*(M0*M1)*(M0*M1)) );
+    double lbtot = (M0*r_bh0*r_bh0 + M1*r_bh1*r_bh1)*Om;//mu*mu*pow(a_bin,4)*Om*Om;
+    double l2 = lbtot*lbtot; 
+    double ecc = sqrt( fabs(1. - 2.*l2*fabs(E)/pow(M0*M1, 3)*(M0+M1) ) );//
+      //double ecc = sqrt( 1. + 2.*l2*E/(mu*(M0*M1)*(M0*M1)) );
     if(mpisetup_MyProc(theMPIsetup)==0){
       char DiagBPFilename[256];
       sprintf(DiagBPFilename,"BinaryParams.dat");
       FILE * DiagBpFile = fopen(DiagBPFilename,"a");
-      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, Om, Om, Pow_reduce, gravMass_total_torque(theGravMasses,0), TrScal_reduce, Fr_onBin, Fp_onBin);
+      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, M0, M1, Pow_reduce, gravMass_total_torque(theGravMasses,0), TrScal_reduce, Fr_onBin, Fp_onBin);
       fclose(DiagBpFile);
     }
 

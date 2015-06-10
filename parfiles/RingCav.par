@@ -2,15 +2,15 @@
 
 //Disk and Binary ICs-------------------------------------------------------------------//
 InitialDataType         15              // 0 Flock, 1 Shear 7 MM08 10 SSmigration
-GravMassType            2               // 0 none, 1 single, 2 binary, 3 live binary
-MassRatio               0.05            //0.00000261 =  0.0209M_{Th} for Mach=20
+GravMassType            3               // 0 none, 1 single, 2 binary, 3 live binary
+MassRatio               1.0            //0.00000261 =  0.0209M_{Th} for Mach=20
 sep0                    1.0               // starting binary separation
                                         //(or permanent separations if GravMassType is not 3)
 Restart                 0               //If this=1 restart using input.h5
 //--------------------------------------------------------------------------------------//
 
 //Computational Setup-------------------------------------------------------------------//
-NumR                    384 //128                     //Radial Zones
+NumR                    128                     //Radial Zones
 NumZ                    1                       //Vertical Zones
 ng                      2
 R_Min                   0.05   //was 0.05
@@ -18,16 +18,16 @@ R_Max                   8.0
 Z_Min                   -1.0
 Z_Max                   1.0
 NP_CONST                -256
-NPCAP                   384  //aspect 1 out to >~
+NPCAP                   128  //aspect 1 out to >~
 aspect                  1
 Lim_InZone              -4
 
 NUM_C                   5
 NUM_N                   3
-Time_Max                6283.185 //1884.95559 //628.31853  // >~1400 orb  //628318.5307
-Num_Checkpoints         50
-Num_Diag_Dump           50
-Num_Diag_Measure        10000
+Time_Max                628.3185 //1884.95559 //628.31853  // >~1400 orb  //628318.5307
+Num_Checkpoints         0
+Num_Diag_Dump           100
+Num_Diag_Measure        1000
 
 NoInnerBC               1               // 1 means do not apply an inner BC
 BoundTypeR              1               // 0 fixed, 1 outflow, 2 periodic
@@ -39,8 +39,8 @@ RiemannSolver           0           // 0 hllc, 1 hll
 //--------------------------------------------------------------------------------------//
 
 //Viscosity-----------------------------------------------------------------------------//
-Explicit_Viscosity      0.000025  // if nu cst in header.h then this should be alpha for IC 10
-ViscConst               1
+Explicit_Viscosity      0.1  // if nu cst in header.h then this should be alpha for IC 10
+ViscConst               0
 
 //Thermodynamics------------------------------------------------------------------------//
 Adiabatic_Index         1.0001

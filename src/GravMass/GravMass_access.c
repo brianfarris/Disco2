@@ -25,6 +25,9 @@ double gravMass_Macc(struct GravMass * theGravMasses,int p){
 double gravMass_total_torque(struct GravMass * theGravMasses,int p){
   return(theGravMasses[p].total_torque);
 }
+double gravMass_total_power(struct GravMass * theGravMasses,int p){
+  return(theGravMasses[p].total_power);
+}
 double gravMass_E(struct GravMass * theGravMasses,int p){
   return(theGravMasses[p].E);
 }

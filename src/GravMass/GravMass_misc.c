@@ -35,19 +35,88 @@ void gravMass_copy(struct GravMass * theGravMasses,struct Sim * theSim){
 
 // Analytic uodate via Keplers Laws - now jsut e=0 circular orbits
 void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt ){
-  // Should be given the updated M, Mp, l, E
+  // Should be given the updated M, Mp, l, E. G=1
     double Ms = thisGravMass->M; 
     double Ltot = thisGravMass->Ltot;
-    double asmaj = Ltot*Ltot/(Ms*Ms*Mp*Mp)*(Ms+Mp);
+    double Etot = thisGravMass->E;
+    double asmaj = 0.5*Ms*Mp/fabs(Etot);
+    //double asmaj = Ltot*Ltot/(Ms*Ms*Mp*Mp)*(Ms+Mp);
     /// Dan June 5
-    double ecc = sqrt( 1.+2.*E*Ltot*Ltot/pow(Ms*Mp,3)*(Ms+Mp)  ); //E<0
-    double rsep = asmaj*(1.-ecc*ecc)/(1. + ecc*cos(theGravMasses[p].phi)) // is this the correct angle at teh correct timestpe? 
-    
+    double ecc = sqrt( fabs(1.- 2.*fabs(Etot)*Ltot*Ltot/pow(Ms*Mp,3)*(Ms+Mp) )  ); //E<0
+    double r1 = thisGravMass->r;
+    double phi = thisGravMass->phi;
+    double vr1 = thisGravMass->vr;
+
+    double rsep = r1 + r1*Ms/Mp;
+
+    //Get inital eccentric anamoly 
+    double cosE0 = (1.-rsep/asmaj)/ecc;    // from r=a(1-ecos(E))
+    if( ecc <= 0.0 ) cosE0 = 0.0;   // circular orbit or imaginary e -> something weird?
+
+    double sinE0 = sqrt(fabs(1.-cosE0*cosE0));
+    if( vr1 < 0.0 ) sinE0 = -sinE0; //???                                                                               
+
+    double E0 = atan2( sinE0 , cosE0 );
+    if( Etot>0.0 ) E0 = log( sinE0 + cosE0 );
+
+
+    //From ecc and eccentric anamoly get true anamoly
+    double phi0 = 2.*atan2( sqrt(1.+ecc)*sin(E0/2.) , sqrt(1.-ecc)*cos(E0/2.) );   //standard Newtonian formulae for phi
+    //if( E>0.0 ) phi0 = 2.*atan2( sqrt(1.+e)*sinh(E0/2.) , sqrt(fabs(1.-e))*cosh(E0/2.) ); //Paul
+    if( Etot>0.0 ) phi0 = 2.*atan2( sqrt(ecc+1.)*sinh(E0/2.) , sqrt(ecc-1.)*cosh(E0/2.) );//above unbound; why use fabs? - if unbound then e>=1 -Dan        
+
+    // Mean anamoly
+    double M0a = E0 - ecc*sin(E0);  
+    if( Etot>0.0 ) M0a = E0 - ecc*sinh(E0); // above unbound
+
+    double Ma = M0a + dt*pow((Ms+Mp)/asmaj, 1.5);//dt*sqrt(mt)/pow(a,1.5);  // advance to new mean anamoly
+    if( Etot>0.0 ) Ma = M0a - dt*pow((Ms+Mp)/asmaj, 1.5); //- dt*sqrt(mt)/pow(-a,1.5);
+
+    double E1 = Ma;
+    double dfnc = Ma-E1+ecc*sin(E1); //should equal zero M=E-esinE
+    // solve for E1 eccentric anamoly
+    if( Etot>0.0 ) dfnc = Ma-E1+ecc*sinh(E1);
+    while( fabs(dfnc) > 1e-12 ){
+      double dfdE = -1.+ecc*cos(E1);
+      if( Etot>0.0 ) dfdE = -1.+ecc*cosh(E1);
+      double dE = -dfnc/dfdE;
+      E1 += dE;
+      dfnc = Ma-E1+ecc*sin(E1);
+      if( Etot>0.0 ) dfnc = Ma-E1+ecc*sinh(E1);
+    }
+
+    rsep = asmaj*(1.-ecc*cos(E1));
+    if( Etot>0.0 ) rsep = asmaj*(1.-ecc*cosh(E1));
+    double phi1 = 2.*atan2( sqrt(1.+ecc)*sin(E1/2.) , sqrt(1.-ecc)*cos(E1/2.) );
+    if( Etot>0.0 )  phi1 = 2.*atan2( sqrt(1.+ecc)*sinh(E1/2.) , sqrt(fabs(1.-ecc))*cosh(E1/2.) );
+
 
     thisGravMass->r = rsep/(1.+Ms/Mp);
-    //thisGravMass->omega = pow(a,(-3./2.));           //Is this a bad idea?
-    thisGravMass->omega = sqrt((Ms+Mp)/(asmaj*asmaj*asmaj));
+    //thisGravMass->phi = phi1; // set in move
+    double vr = sqrt((Ms+Mp)*(2./rsep - 1./asmaj) - (Ms+Mp)/asmaj/asmaj/asmaj * rsep*rsep); //0 for circ orbit                                                             
 
+    if((Ms+Mp)*(2./rsep - 1./asmaj) - (Ms+Mp)/asmaj/asmaj/asmaj * rsep*rsep < 0.0 ) vr = 0.0;
+    if( sin(E1) < 0.0 ) vr = -vr; //???               
+
+
+
+
+
+  
+    //  double rsep = asmaj*(1.- ecc*ecc)/(1. + ecc*cos( thisGravMass->phi  )); // is this the correct angle at the correct timestpe?
+    ////double Nom = sqrt((Ms+Mp)/(asmaj*asmaj*asmaj));
+    double hh = Ltot*(Ms+Mp)/(Ms*Mp);
+    ////double vp0 = hh/(1.+Mp/Ms)/rsep;
+    double vp1 = hh/(1.+Ms/Mp)/rsep;
+    //double vr = sqrt( -2*Etot/rsep/rsep * ( 0.5*Ltot*Ltot/Etot - 0.5*(Ms+Mp)/Etot * rsep - rsep*rsep  ) );    
+
+
+
+    //thisGravMass->r = rsep/(1.+Ms/Mp);
+    ////thisGravMass->omega = pow(rsep,(-3./2.)); 
+    //thisGravMass->omega = vp1/rsep/(1.+Ms/Mp);     // vphi/r 
+    thisGravMass->vr = vr/(1.+Ms/Mp);
+    thisGravMass->omega = fabs(phi0 - phi1)/dt;           //Circ case - Is this a bad idea?
 }
 
 // Forced uodate
@@ -86,7 +155,6 @@ void gravMass_adv_arb( struct Sim * theSim, struct GravMass * thisGravMass , dou
 void gravMass_move( struct Sim * theSim, struct GravMass * theGravMasses, double t, double dt ){
   if (sim_GravMassType(theSim)==LIVEBINARY){
     //printf("LIVEBINARY");
-    // Should be accretion updated
     double Mp = theGravMasses[0].M; //primary
     double Ms = theGravMasses[1].M; //secondary
 
@@ -97,6 +165,8 @@ void gravMass_move( struct Sim * theSim, struct GravMass * theGravMasses, double
                                                                        
     theGravMasses[0].r   = theGravMasses[1].r*Ms/Mp;
     theGravMasses[0].omega  = theGravMasses[1].omega; // True for eccentric binary?
+    theGravMasses[0].vr  = theGravMasses[1].vr * Ms/Mp;
+
 
     theGravMasses[1].phi += theGravMasses[1].omega*dt; //Instead of updating in adv_anly ONLY GOOD FOR CIRC?
     theGravMasses[0].phi = theGravMasses[1].phi + M_PI;
@@ -125,31 +195,59 @@ void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, do
     theGravMasses[i].vr    = (1.0-RK)*theGravMasses[i].vr     + RK*theGravMasses[i].RK_vr;
     theGravMasses[i].omega = (1.0-RK)*theGravMasses[i].omega  + RK*theGravMasses[i].RK_omega;
   }
+  // IF LIVE BINARY UPDATE MASSES ENERY, ANG MOMENTUM (IS THIS THE BEST PLACE TO DO THIS)?
   if ( (sim_GravMassType(theSim)==LIVEBINARY)  && (time_global > 2.*M_PI*sim_tmig_on(theSim)) ){
 
     //toal torque gives the torque on the binary due to the gas wrt to r=0 
     double Tot_Trq =  gravMass_total_torque(theGravMasses,0);
     double Tot_Pow =  gravMass_total_power(theGravMasses,0);
-    double M0 =  gravMass_Macc(theGravMasses,0);
-    double M1 =  gravMass_Macc(theGravMasses,1);
-    double Ebin    =  gravMass_Etot(theGravMasses,1);
+    double Macc0   =  gravMass_Macc(theGravMasses,0);
+    double Macc1   =  gravMass_Macc(theGravMasses,1);
+    double M0   =  gravMass_M(theGravMasses,0);
+    double M1   =  gravMass_M(theGravMasses,1);
+    double rbh0   =  gravMass_r(theGravMasses,0);
+    double rbh1   =  gravMass_r(theGravMasses,1);
+    double om     =  gravMass_omega(theGravMasses,1);
+    double Mdot0   =  gravMass_Mdot(theGravMasses,0);
+    double Mdot1   =  gravMass_Mdot(theGravMasses,1);
+
+    double Ebin    =  gravMass_E(theGravMasses,1);
     double Lbin    =  gravMass_Ltot(theGravMasses,1); //theGravMasses[1].Ltot;
     //IMPORTANT 0 and 1 Ltot are the same but use 1 only! see adv_anyl() above    
 
+    double dens_scale = ( sim_Mdsk_o_Ms(theSim)/( 1.+1./sim_MassRatio(theSim) ) )/( M_PI*sim_sep0(theSim)*sim_sep0(theSim) );
+    if (   time_global <=    2.*M_PI*(sim_tmig_on(theSim) + sim_tramp(theSim))   ){
+      dens_scale *= (time_global - 2*M_PI*sim_tmig_on(theSim))/( sim_tramp(theSim)*2*M_PI );
+    }      //^REDUNDANT WITH celll-source
+
+    //SCALE accretion in terms of disk density
+    double DS_Mdot0 = dens_scale*Mdot0;
+    double DS_Mdot1 = dens_scale*Mdot1;
+    
+    //UPDATE E and L
+    //ORDER MATTERS FOR UPDATE BELOW - is it correct?
+    //due to accretion
+    Lbin  += (DS_Mdot0*rbh0*rbh0* + DS_Mdot1*rbh1*rbh1)*om; 
+    Ebin  += Ebin*(DS_Mdot0/M0 + DS_Mdot1/M1); 
+    //due to forces from gas
     Lbin  += Tot_Trq*dt;
     Ebin  += Tot_Pow*dt;
+    //UPDATE MASSES
+    M0 += DS_Mdot0*dt;
+    M1 += DS_Mdot1*dt;
 
       
     GravMass_set_Ltot(theGravMasses, 1, Lbin);
     GravMass_set_M(theGravMasses, 0, M0);
-    GravMass_set_M(theGravMasses, 0, M1);
-    GravMass_set_Etot(theGravMasses, Ebin);
-   // also update the binary mass and ENergy here
+    GravMass_set_M(theGravMasses, 1, M1);   
+    GravMass_set_Etot(theGravMasses, 1, Ebin);
+   // also update the binary mass and Energy here
 
 
   }
 }
 
+//PUT THESE IN _set no?
 void gravMass_set_Mdot( struct GravMass * theGravMasses, double Mdot, int p){
   theGravMasses[p].Mdot = Mdot;
 }
@@ -160,4 +258,8 @@ void gravMass_set_Macc( struct GravMass * theGravMasses, double Macc, int p){
 
 void gravMass_set_total_torque( struct GravMass * theGravMasses, double total_torque, int p){
   theGravMasses[p].total_torque = total_torque;
+}
+
+void gravMass_set_total_power( struct GravMass * theGravMasses, double total_power, int p){
+  theGravMasses[p].total_power = total_power;
 }

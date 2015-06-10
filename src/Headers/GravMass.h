@@ -29,6 +29,7 @@ struct GravMass{
   double Mdot;
   double Macc;
   double total_torque;
+  double total_power;
 };
 #endif
 
@@ -42,7 +43,7 @@ void gravMass_init_binary(struct GravMass *,struct Sim *);
 void gravMass_init_livebinary(struct GravMass *,struct Sim *);
 void (*gravMass_init_ptr(struct Sim * ))(struct GravMass *,struct Sim *);
 //void gravMass_set_chkpt(struct GravMass * ,int ,double ,double ,double, double );
-void gravMass_set_chkpt(struct GravMass * ,int ,double ,double ,double, double, double, double, double, double, double, double ); //DD
+void gravMass_set_chkpt(struct GravMass * ,int ,double ,double ,double, double, double, double, double, double, double, double, double, double ); //DD
 //access data
 double gravMass_r(struct GravMass * ,int);
 double gravMass_phi(struct GravMass * ,int);
@@ -51,6 +52,7 @@ double gravMass_omega(struct GravMass * ,int );
 double gravMass_Mdot(struct GravMass *,int);
 double gravMass_Macc(struct GravMass *,int); 
 double gravMass_total_torque(struct GravMass *,int);
+double gravMass_total_power(struct GravMass *,int);
 //For live binary -DD
 double gravMass_L(struct GravMass * ,int);
 double gravMass_Ltot(struct GravMass * ,int);
@@ -64,7 +66,7 @@ double gravMass_Fp(struct GravMass * ,int );
 void GravMass_set_omega( struct GravMass *, int, double);
 void GravMass_set_Ltot( struct GravMass *, int, double);
 void GravMass_set_M( struct GravMass *, int, double);
-void GravMass_set_Etot( struct GravMass *, double);
+void GravMass_set_Etot( struct GravMass *, int, double);
 //void GravMass_set_L( struct GravMass *, int, double);
 //miscellaneous
 void gravMass_clean_pi(struct GravMass *,struct Sim *);
@@ -74,6 +76,7 @@ void gravMass_update_RK( struct GravMass * ,struct Sim * , double, double ); //D
 void gravMass_set_Mdot( struct GravMass * , double, int );
 void gravMass_set_Macc( struct GravMass * , double, int );
 void gravMass_set_total_torque( struct GravMass * , double , int );
+void gravMass_set_total_power( struct GravMass * , double , int );
 //For moving Bin
 void gravMass_adv_anly(struct GravMass * , double, double ); 
 void gravMass_adv_arb( struct Sim *, struct GravMass * , double, double, double );
