@@ -1,11 +1,11 @@
-* discopy *
+# discopy 
 
 This is a python module for the analysis, transformation, and plotting of Disco
 data.  It contains standalone functions for reading checkpoint files and
 parfiles for basic data analysis.  More advanced features use the `Grid` object
 to transform data between grids, make grid-accurate plots, and save archives.
 
-Basic Use:
+## Basic Use
 
 First import the package.
 ```python
@@ -39,7 +39,7 @@ pars = dg.readParfile("vortex.par")
 pars['NumR']   #Number of radial non-ghost zones.
 ```
 
-Advanced Use:
+## Advanced Use
 
 'Grid' objects contain all the necessary grid data: face locations, numbers of
 zones and ghost zones in each dimension, and primitive values for each cell.
