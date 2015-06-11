@@ -1,19 +1,19 @@
-# discopy 
+## discopy 
 
 This is a python module for the analysis, transformation, and plotting of Disco
 data.  It contains standalone functions for reading checkpoint files and
 parfiles for basic data analysis.  More advanced features use the `Grid` object
 to transform data between grids, make grid-accurate plots, and save archives.
 
-## Basic Use
+### Basic Use
 
 First import the package.
 ```python
 import discopy as dp
 ```
 
-Read in checkpoint files with 'readCheckpoint()'.  It returns a tuple of 1D 
-'numpy' arrays containing the checkpoint data.  Duplicate rows (e.g. output from a parallel run) are removed.  Given positions are cell-centered values.
+Read in checkpoint files with `readCheckpoint()`.  It returns a tuple of 1D 
+`numpy` arrays containing the checkpoint data.  Duplicate rows (e.g. output from a parallel run) are removed.  Given positions are cell-centered values.
 ```python
 dat = dg.readCheckpoint("checkpoint_0100.h5")
 t = dat[0]      # Time
@@ -30,8 +30,8 @@ q = dat[10]     # First passive scalar if present, np.zeros(r.shape) otherwise.
 piph = dat[11]  # phi value for face in positive phi direction of each cell.
 ```
 
-Read in parameter files with 'readParfile()'.  It returns a dictionary
-containing all parameters.  Keys are defined in 'dp.parnames', using the 
+Read in parameter files with `readParfile()`.  It returns a dictionary
+containing all parameters.  Keys are defined in `dp.parnames`, using the 
 same strings the parfile uses.
 
 ```python
@@ -39,9 +39,9 @@ pars = dg.readParfile("vortex.par")
 pars['NumR']   #Number of radial non-ghost zones.
 ```
 
-## Advanced Use
+### Advanced Use
 
-'Grid' objects contain all the necessary grid data: face locations, numbers of
+`Grid` objects contain all the necessary grid data: face locations, numbers of
 zones and ghost zones in each dimension, and primitive values for each cell.
 
 Make a grid, from a parfile, or a parfile and checkpoint:
@@ -58,7 +58,7 @@ g2 = dg.Grid(pars, checkpointName)
 Grid objects can be saved as "archives".  These files are similar to, but they 
 contain all the information needed to construct the grid, as well as a copy
 of the parameter file.  That is, a single archive file contains all the
-information necessary to start a 'disco' run.
+information necessary to start a `disco` run.
 
 Grids can also output checkpoint files, with boundary zones properly copied
 to enable running on a parallel machine.
