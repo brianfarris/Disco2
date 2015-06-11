@@ -147,5 +147,5 @@ if __name__ == "__main__":
 
     print("Saving new grid...")
     g1.saveArchive(root + "_archive" + ".h5")
-    g1.saveChkpt(root + "_checkpoint" + ".h5", numProc)
+    g1.saveCheckpoint(root + "_checkpoint" + ".h5", numProc)
 

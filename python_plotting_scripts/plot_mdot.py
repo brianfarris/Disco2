@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 import sys
 import numpy as np
-import readChkpt as rc
+import discopy as dp
 
 M = 1.0
 a = 0.0
@@ -63,7 +63,7 @@ def get_mdot(filename):
 
     print("Reading {0:s}".format(filename))
 
-    dat = rc.readChkpt(filename)
+    dat = dp.readCheckpoint(filename)
     t = dat[0]
     r = dat[1]
     phi = dat[2]

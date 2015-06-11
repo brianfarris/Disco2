@@ -3,7 +3,7 @@ import math
 import numpy as np
 import scipy.optimize as opt
 import h5py as h5
-import readChkpt as rc
+import readCheckpoint as rc
 import readParfile as rp
 
 class Grid:
@@ -40,7 +40,7 @@ class Grid:
             self.loadPars(pars)
 
             if chkpt is not None:
-                self.loadChkpt(chkpt)
+                self.loadCheckpoint(chkpt)
 
     def loadPars(self, pars):
         self._pars = pars
@@ -49,19 +49,19 @@ class Grid:
         self._setNP()
         self._setFacePosP()
 
-    def loadChkpt(self, filename):
-        dat = rc.readChkpt(filename)
+    def loadCheckpoint(self, filename):
+        dat = rc.readCheckpoint(filename)
         r = dat[1]
         z = dat[3]
         piph = dat[11]
 
         if self._checkSame(r, z, piph):
             print("Looks like the same grid! Copying...")
-            self._loadChkptIdentical(dat)
+            self._loadCheckpointIdentical(dat)
         else:
             print("Given checkpoint has different grid structure, can not load.")
 
-    def saveChkpt(self, filename, numProc=1):
+    def saveCheckpoint(self, filename, numProc=1):
         # Saves grid to checkpoint file, ASSUMES 2D
         # TODO: 3D
 
@@ -383,7 +383,7 @@ class Grid:
 
         return True
 
-    def _loadChkptIdentical(self, dat):
+    def _loadCheckpointIdentical(self, dat):
 
         if self.prim is None:
             self.prim = []
@@ -653,10 +653,10 @@ if __name__ == "__main__":
             
             pars = rp.readParfile(sys.argv[1])
             g = Grid(pars)
-            g.loadChkpt(sys.argv[2])
+            g.loadCheckpoint(sys.argv[2])
 
     g.saveArchive("archive.h5")
-    g.saveChkpt("checkpoint_test.h5")
+    g.saveCheckpoint("checkpoint_test.h5")
 
 
 

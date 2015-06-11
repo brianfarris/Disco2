@@ -8,7 +8,7 @@ import matplotlib.patches as pat
 import matplotlib.ticker as tkr
 import sys
 import numpy as np
-import readChkpt as rc
+import discopy as dp
 
 M = 1.0
 a = 0.0
@@ -132,7 +132,7 @@ def plot_all(filename, gridscale='linear', plot=True, bounds=None):
 
     print("Reading {0:s}".format(filename))
 
-    dat = rc.readChkpt(filename)
+    dat = dp.readCheckpoint(filename)
     t = dat[0]
     r = dat[1]
     phi = dat[2]

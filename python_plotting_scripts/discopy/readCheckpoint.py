@@ -3,7 +3,7 @@ from itertools import imap, izip
 import h5py as h5
 import numpy as np
 
-def readChkpt(filename):
+def readCheckpoint(filename):
 
     f = h5.File(filename, "r")
     Data = f['Data'][...]

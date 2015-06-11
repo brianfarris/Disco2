@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 import sys
 import numpy as np
-import readChkpt as rc
+import discopy as dp
 
 GAM = 5.0/3.0
 M = 1.0
@@ -98,7 +98,7 @@ def plot_r_profile(filename, sca='linear', plot=True, bounds=None):
 
     print("Reading {0:s}".format(filename))
 
-    dat = rc.readChkpt(filename)
+    dat = dp.readCheckpoint(filename)
     t = dat[0]
     r = dat[1]
     rho = dat[4]

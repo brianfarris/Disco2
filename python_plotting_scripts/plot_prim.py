@@ -4,7 +4,7 @@ import matplotlib.tri as tri
 import sys
 import h5py
 import numpy as np
-import readChkpt as rc
+import discopy as dp
 
 equat = False
 if(len(sys.argv) < 3):
@@ -18,7 +18,7 @@ if(len(sys.argv) > 3):
     if(sys.argv[3] == 'e'):
         equat = True
 
-dat = rc.readChkpt(filename)
+dp = rc.readCheckpoint(filename)
 t = dat[0]
 r = dat[1]
 phi = dat[2]
