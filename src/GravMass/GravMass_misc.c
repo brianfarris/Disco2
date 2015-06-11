@@ -54,14 +54,13 @@ void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt )
     if( ecc <= 0.0 ) cosE0 = 0.0;   // circular orbit or imaginary e -> something weird?
 
     double sinE0 = sqrt(fabs(1.-cosE0*cosE0));
-    if( vr1 < 0.0 ) sinE0 = -sinE0; //???                                                                               
-
+    if( vr1 < 0.0 ) sinE0 = -sinE0; 
     double E0 = atan2( sinE0 , cosE0 );
     if( Etot>0.0 ) E0 = log( sinE0 + cosE0 );
 
 
     //From ecc and eccentric anamoly get true anamoly
-    double phi0 = 2.*atan2( sqrt(1.+ecc)*sin(E0/2.) , sqrt(1.-ecc)*cos(E0/2.) );   //standard Newtonian formulae for phi
+    double phi0 = 2.*atan2( sqrt(1.+ecc)*sin(E0/2.) , sqrt(1.-ecc)*cos(E0/2.) );
     //if( E>0.0 ) phi0 = 2.*atan2( sqrt(1.+e)*sinh(E0/2.) , sqrt(fabs(1.-e))*cosh(E0/2.) ); //Paul
     if( Etot>0.0 ) phi0 = 2.*atan2( sqrt(ecc+1.)*sinh(E0/2.) , sqrt(ecc-1.)*cosh(E0/2.) );//above unbound; why use fabs? - if unbound then e>=1 -Dan        
 
@@ -76,7 +75,7 @@ void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt )
     double dfnc = Ma-E1+ecc*sin(E1); //should equal zero M=E-esinE
     // solve for E1 eccentric anamoly
     if( Etot>0.0 ) dfnc = Ma-E1+ecc*sinh(E1);
-    while( fabs(dfnc) > 1e-12 ){
+    while( fabs(dfnc) > 1e-10 ){
       double dfdE = -1.+ecc*cos(E1);
       if( Etot>0.0 ) dfdE = -1.+ecc*cosh(E1);
       double dE = -dfnc/dfdE;
@@ -91,28 +90,19 @@ void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt )
     if( Etot>0.0 )  phi1 = 2.*atan2( sqrt(1.+ecc)*sinh(E1/2.) , sqrt(fabs(1.-ecc))*cosh(E1/2.) );
 
 
-    thisGravMass->r = rsep/(1.+Ms/Mp);
-    //thisGravMass->phi = phi1; // set in move
-    double vr = sqrt((Ms+Mp)*(2./rsep - 1./asmaj) - (Ms+Mp)/asmaj/asmaj/asmaj * rsep*rsep); //0 for circ orbit                                                             
-
-    if((Ms+Mp)*(2./rsep - 1./asmaj) - (Ms+Mp)/asmaj/asmaj/asmaj * rsep*rsep < 0.0 ) vr = 0.0;
-    if( sin(E1) < 0.0 ) vr = -vr; //???               
-
-
-
-
-
+        
   
-    //  double rsep = asmaj*(1.- ecc*ecc)/(1. + ecc*cos( thisGravMass->phi  )); // is this the correct angle at the correct timestpe?
-    ////double Nom = sqrt((Ms+Mp)/(asmaj*asmaj*asmaj));
     double hh = Ltot*(Ms+Mp)/(Ms*Mp);
     ////double vp0 = hh/(1.+Mp/Ms)/rsep;
     double vp1 = hh/(1.+Ms/Mp)/rsep;
-    //double vr = sqrt( -2*Etot/rsep/rsep * ( 0.5*Ltot*Ltot/Etot - 0.5*(Ms+Mp)/Etot * rsep - rsep*rsep  ) );    
+    //double vr = sqrt( -2*Etot/rsep/rsep * ( 0.5*Ltot*Ltot/Etot - 0.5*(Ms+Mp)/Etot * rsep - rsep*rsep  ) );
+    double vr = sqrt( fabs( (Ms+Mp)*(2./rsep - 1./asmaj) -hh*hh/rsep/rsep )  ); //- (Ms+Mp)/asmaj/asmaj/asmaj * rsep*rsep); //0 for circ orbit
 
 
+    //if((Ms+Mp)*(2./rsep - 1./asmaj) - (Ms+Mp)/asmaj/asmaj/asmaj * rsep*rsep < 0.0 ) vr = 0.0;
+    if( sin(E1) < 0.0 ) vr = -vr; //???
 
-    //thisGravMass->r = rsep/(1.+Ms/Mp);
+    thisGravMass->r = rsep/(1.+Ms/Mp);
     ////thisGravMass->omega = pow(rsep,(-3./2.)); 
     //thisGravMass->omega = vp1/rsep/(1.+Ms/Mp);     // vphi/r 
     thisGravMass->vr = vr/(1.+Ms/Mp);
@@ -152,7 +142,7 @@ void gravMass_adv_arb( struct Sim * theSim, struct GravMass * thisGravMass , dou
 
 //Analytic Kepler    
 void gravMass_move( struct Sim * theSim, struct GravMass * theGravMasses, double t, double dt ){
-  if (sim_GravMassType(theSim)==LIVEBINARY){
+  if (sim_GravMassType(theSim)==LIVEBINARY || BINARY){
     //printf("LIVEBINARY");
     double Mp = theGravMasses[0].M; //primary
     double Ms = theGravMasses[1].M; //secondary
@@ -233,6 +223,15 @@ void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, do
       GravMass_set_M(theGravMasses, 0, M0);
       GravMass_set_M(theGravMasses, 1, M1);
     }
+    //else{
+    //  // keep track of bin radial velocity for keplerian ecc orbit
+    //  double Ebin    =  gravMass_E(theGravMasses,1);
+    //  double semaj = 0.5*Ms*Mp/fabs(Ebin);;
+    //  double ecc = sim_ecc0(theSim);
+    //  double vr = semaj * sqrt(Mtotal/semaj/semaj/semaj) * ecc/sqrt(1.-ecc*ecc) * sin(theGravMasses[1].phi);
+    //  theGravMasses[0].vr    = vr/(1.+M0/M1);
+    //  theGravMasses[1].vr    = vr/(1.+M1/M0);
+    //}
 
 
     //due to forces from gas

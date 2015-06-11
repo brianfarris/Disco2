@@ -191,6 +191,9 @@ double sim_RDAMP_OUTER(struct Sim * theSim){
 double sim_sep0(struct Sim * theSim){
   return(theSim->sep0);
 }
+double sim_ecc0(struct Sim * theSim){
+  return(theSim->ecc0);
+}
 double sim_Rcut(struct Sim * theSim){
   return(theSim->Rcut);
 }

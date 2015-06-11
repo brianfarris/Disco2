@@ -75,6 +75,7 @@ struct Sim {
   double HiResFac;
   int W_A_TYPE;
   double sep0;
+  double ecc0;
   double Rcut;
   double Mdsk_o_Ms;
   double tmig_on;
@@ -149,6 +150,7 @@ double sim_DAMP_TIME(struct Sim *);
 double sim_RDAMP_INNER(struct Sim *);
 double sim_RDAMP_OUTER(struct Sim *);
 double sim_sep0(struct Sim *);
+double sim_ecc0(struct Sim *);
 double sim_Rcut(struct Sim *);
 double sim_Mdsk_o_Ms(struct Sim *);
 double sim_tmig_on(struct Sim *);

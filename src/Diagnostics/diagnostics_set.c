@@ -602,8 +602,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
     double E  = gravMass_E(theGravMasses,1);
     double Om = gravMass_omega(theGravMasses,1);
 
-    //double vr0 = gravMass_vr(theGravMasses,0);
-    //double vr1 = gravMass_vr(theGravMasses,1);
+    double vr0 = gravMass_vr(theGravMasses,0);
+    double vr1 = gravMass_vr(theGravMasses,1);
 
     //double Mdotp = gravMass_Mdot(theGravMasses,0);
     //double Maccp = gravMass_Macc(theGravMasses,0);
@@ -623,7 +623,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagBPFilename[256];
       sprintf(DiagBPFilename,"BinaryParams.dat");
       FILE * DiagBpFile = fopen(DiagBPFilename,"a");
-      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, M0, M1, Pow_reduce, gravMass_total_torque(theGravMasses,0), TrScal_reduce, Fr_onBin, Fp_onBin);
+      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, vr0, vr1, M0, M1, Pow_reduce, gravMass_total_torque(theGravMasses,0), TrScal_reduce, Fr_onBin, Fp_onBin);
       fclose(DiagBpFile);
     }
 
