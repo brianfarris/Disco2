@@ -218,4 +218,6 @@ double sim_tmaxOrb(struct Sim * theSim){
 int sim_Lim_InZone(struct Sim * theSim){
   return(theSim->Lim_InZone);
 }
-
+int sim_LiveAcc(struct Sim * theSim){
+  return(theSim->LiveAcc);
+}

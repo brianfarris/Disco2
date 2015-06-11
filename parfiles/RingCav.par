@@ -3,6 +3,7 @@
 //Disk and Binary ICs-------------------------------------------------------------------//
 InitialDataType         15              // 0 Flock, 1 Shear 7 MM08 10 SSmigration
 GravMassType            3               // 0 none, 1 single, 2 binary, 3 live binary
+LiveAcc                 0              // 0 doesnt not add accreted mass to binary
 MassRatio               1.0            //0.00000261 =  0.0209M_{Th} for Mach=20
 sep0                    1.0               // starting binary separation
                                         //(or permanent separations if GravMassType is not 3)

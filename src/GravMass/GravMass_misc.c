@@ -116,7 +116,7 @@ void gravMass_adv_anly( struct GravMass * thisGravMass , double Mp , double dt )
     ////thisGravMass->omega = pow(rsep,(-3./2.)); 
     //thisGravMass->omega = vp1/rsep/(1.+Ms/Mp);     // vphi/r 
     thisGravMass->vr = vr/(1.+Ms/Mp);
-    thisGravMass->omega = fabs(phi0 - phi1)/dt;           //Circ case - Is this a bad idea?
+    thisGravMass->omega = hh/rsep/rsep; //fabs(phi0 - phi1)/dt;           //Circ case - Is this a bad idea?
 }
 
 // Forced uodate
@@ -146,7 +146,6 @@ void gravMass_adv_arb( struct Sim * theSim, struct GravMass * thisGravMass , dou
     thisGravMass->r = anew/(1.+Ms/Mp);
     thisGravMass->omega = pow(anew,-1.5);
 }
-
 
 
 
@@ -201,16 +200,8 @@ void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, do
     //toal torque gives the torque on the binary due to the gas wrt to r=0 
     double Tot_Trq =  gravMass_total_torque(theGravMasses,0);
     double Tot_Pow =  gravMass_total_power(theGravMasses,0);
-    double Macc0   =  gravMass_Macc(theGravMasses,0);
-    double Macc1   =  gravMass_Macc(theGravMasses,1);
-    double M0   =  gravMass_M(theGravMasses,0);
-    double M1   =  gravMass_M(theGravMasses,1);
-    double rbh0   =  gravMass_r(theGravMasses,0);
-    double rbh1   =  gravMass_r(theGravMasses,1);
-    double om     =  gravMass_omega(theGravMasses,1);
-    double Mdot0   =  gravMass_Mdot(theGravMasses,0);
-    double Mdot1   =  gravMass_Mdot(theGravMasses,1);
-
+    //double Macc0   =  gravMass_Macc(theGravMasses,0);
+    //double Macc1   =  gravMass_Macc(theGravMasses,1);
     double Ebin    =  gravMass_E(theGravMasses,1);
     double Lbin    =  gravMass_Ltot(theGravMasses,1); //theGravMasses[1].Ltot;
     //IMPORTANT 0 and 1 Ltot are the same but use 1 only! see adv_anyl() above    
@@ -220,26 +211,36 @@ void gravMass_update_RK( struct GravMass * theGravMasses,struct Sim * theSim, do
       dens_scale *= (time_global - 2*M_PI*sim_tmig_on(theSim))/( sim_tramp(theSim)*2*M_PI );
     }      //^REDUNDANT WITH celll-source
 
-    //SCALE accretion in terms of disk density
-    double DS_Mdot0 = dens_scale*Mdot0;
-    double DS_Mdot1 = dens_scale*Mdot1;
-    
+       
     //UPDATE E and L
     //ORDER MATTERS FOR UPDATE BELOW - is it correct?
-    //due to accretion
-    Lbin  += (DS_Mdot0*rbh0*rbh0* + DS_Mdot1*rbh1*rbh1)*om; 
-    Ebin  += Ebin*(DS_Mdot0/M0 + DS_Mdot1/M1); 
+    if (sim_LiveAcc(theSim) == 1){
+      double M0   =  gravMass_M(theGravMasses,0);
+      double M1   =  gravMass_M(theGravMasses,1);
+      double rbh0   =  gravMass_r(theGravMasses,0);
+      double rbh1   =  gravMass_r(theGravMasses,1);
+      double om     =  gravMass_omega(theGravMasses,1);
+      double Mdot0   =  gravMass_Mdot(theGravMasses,0);
+      double Mdot1   =  gravMass_Mdot(theGravMasses,1);
+      //SCALE accretion in terms of disk density
+      double DS_Mdot0 = dens_scale*Mdot0;
+      double DS_Mdot1 = dens_scale*Mdot1;
+      Lbin  += (DS_Mdot0*rbh0*rbh0* + DS_Mdot1*rbh1*rbh1)*om;
+      Ebin  += Ebin*(DS_Mdot0/M0 + DS_Mdot1/M1);
+      //UPDATE MASSES
+      M0 += DS_Mdot0*dt;
+      M1 += DS_Mdot1*dt;
+      GravMass_set_M(theGravMasses, 0, M0);
+      GravMass_set_M(theGravMasses, 1, M1);
+    }
+
+
     //due to forces from gas
     Lbin  += Tot_Trq*dt;
     Ebin  += Tot_Pow*dt;
-    //UPDATE MASSES
-    M0 += DS_Mdot0*dt;
-    M1 += DS_Mdot1*dt;
 
       
     GravMass_set_Ltot(theGravMasses, 1, Lbin);
-    GravMass_set_M(theGravMasses, 0, M0);
-    GravMass_set_M(theGravMasses, 1, M1);   
     GravMass_set_Etot(theGravMasses, 1, Ebin);
    // also update the binary mass and Energy here
 
