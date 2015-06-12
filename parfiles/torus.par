@@ -1,20 +1,33 @@
 
 //Disco Parameter File//
 
-InitialDataType         1
-GravMassType            1               // 0 none, 1 single, 2 binary
-Restart			0		//If this=1 restart using input.h5
+InitialDataType         1       // 0 Vortex, 1 Torus, 2 Bondi, 3 Uniform,
+                                // 4 Shock1, 5 Shock2, 6 Shock3, 7 Shock4,
+                                // 8 Isentrope, 9 GR-Bondi, 10 GR-Bondi2,
+                                // 11 Equilibrium1, 12 Equilibrium2, 13 SSDisc
+                                // 14 NTDisc, 15 ConstantDisc,
+                                // 16 Cartesian-Shear, 17 Disc Tests,
+                                // 18 Accreting Disc, 19 ADAF, 20 ADAF2, 
+                                // 21 Atmosphere, 22 Orbit, 23 Minidisc,
+                                // 24 Kick
+GravMassType            1       // 0 none, 1 single, 2 binary
+Background              0       // 0 Newtonian, 1 GR, 2 GRvisc, 3 GRDisc
+Metric                  0       // 0 Flat, 1 Schwarzschild-SC,
+                                // 2 Schwarzschild-KS, 4 Kerr-KS, 5 FlatADM,
+                                // 6 Schwarzschild-KS-ADM, 
+Frame                   0       // 0 Euler, 1 Keplerian, 2 Accreting
+Restart                 0       // If this=1 restart using input.h5
 
 //Computational Grid
-NumR			128			//Radial Zones
+NumR			32			//Radial Zones
 NumZ			32			//Vertical Zones
 ng                      2
 R_Min			0.2
 R_Max			2.0
 Z_Min			-1.0
 Z_Max			1.0
-NP_CONST                3
-aspect                  1.0
+NP_CONST            -1
+aspect              1.0
 
 
 NUM_C                   5
@@ -29,6 +42,12 @@ BoundTypeRIn            1               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeROut           1               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZBot           2               // 0 fixed, 1 outflow, 2 periodic
 BoundTypeZTop           2               // 0 fixed, 1 outflow, 2 periodic
+ZeroPsiBndry            1
+BoundTypeSource         0       // 0 None, 5 Nozzle
+BoundPar1               0.0
+BoundPar2               0.0
+BoundPar3               0.0
+BoundPar4               0.0
 
 Move_Cells              3
 RiemannSolver           0           // 0 hllc, 1 hll
@@ -41,9 +60,29 @@ PLM			1.0
 Grav_2D			0
 G_EPS			0.0
 GravM          1.0
+GravA          0.0
 AlphaVisc       0.0
-CoolFac         0.0
 
+BoostType   0       // 0 None, 1 Rigid, 2 Binary
+BinA        100.0
+BinW        5e-4
+BinM        1.0
+
+//EoS
+EOSType            0       //0 Gammalaw, 1 Gas+Rad, 2 Gas+Rad+Deg, 3 PWF
+EOSPar1            0.0      // Gas
+EOSPar2            0.0      // Radiation
+EOSPar3            0.0      // Degeneracy
+EOSPar4            0.0      // Burning
+
+//Cooling
+CoolingType         0       //0 None, 1 Isothermal, 2 Blackbody-Thompson,
+                            //3 Blackbody-freefree, 4 Neutrino-Approx,
+                            //5 Neutrino-Itoh
+CoolPar1            0.0     // Coefficient
+CoolPar2            0.0     //
+CoolPar3            0.0
+CoolPar4            0.0
 //Initial Condition Parameters
 InitPar0        0
 InitPar1        0

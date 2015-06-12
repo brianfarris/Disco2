@@ -229,7 +229,8 @@ class Grid:
         if self.nq > 0:
             j = 0
             primDSet = dataGroup.create_dataset("prim", 
-                                    (2+self.nq, self.np.sum()), dtype=np.float64)
+                                    (2+self.nq, self.np.sum()), 
+                                    dtype=np.float64)
             for k in xrange(self.nz_tot):
                 for i in xrange(self.nr_tot):
                     nphi = self.np[k,i]
@@ -377,7 +378,7 @@ class Grid:
                 if r < self.rFaces[i] or r > self.rFaces[i+1]:
                     return False
 
-                rind = (R==r)
+                rind = (Rz==r)
                 if len(Piphz[rind]) != self.np[k][i]:
                     return False
 
@@ -409,9 +410,9 @@ class Grid:
             
             for i, r in enumerate(Rvals):
                 rind = r==R
-                self.pFaces[k][i] = Piph[zind][rind]
+                self.pFaces[k][i] = Piph[zind*rind]
 
-                annulus = prim[zind][rind]
+                annulus = prim[zind*rind]
                 slice.append(annulus)
             
             self.prim.append(slice)
@@ -459,7 +460,7 @@ class Grid:
             for i,r in enumerate(self.rFaces):
                 if i == 0 or i == self.nr_tot:
                     continue
-                print("   interface {0:d}".format(i))
+                #print("   interface {0:d}".format(i))
                 dr = 0.5 * (self.rFaces[i+1] - self.rFaces[i-1])
                 r = self.rFaces[i]
 
@@ -527,6 +528,7 @@ class Grid:
                     grad[k][i][j,:,0] /= dA
 
         # Z - Direction
+        print("Calculating z derivatives...")
         for i in xrange(self.nr_tot):
 
             dr = self.rFaces[i+1] - self.rFaces[i]

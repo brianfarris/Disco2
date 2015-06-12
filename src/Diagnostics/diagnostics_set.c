@@ -99,13 +99,6 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
             ++position;
           }
           // divide by number of phi cells to get phi average, mult by dz because we are doing a z integration;
-          double tmp_prim[5];
-          struct Metric *g = metric_create(time_global, r, phi, z, theSim);
-          tmp_prim[RHO] = rho;
-          tmp_prim[PPP] = press;
-          tmp_prim[URR] = vr;
-          tmp_prim[UPP] = vp/r;
-          tmp_prim[UZZ] = vz;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+0] += (r/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+1] += (rho/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+2] += (vr/sim_N_p(theSim,i)*dz) ;
@@ -118,23 +111,34 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9] += (rho*vr*sin(phi)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (rho*vr*cos(2.*phi)/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (rho*vr*sin(2.*phi)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (eos_cs2(tmp_prim,theSim)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (eos_eps(tmp_prim,theSim)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (eos_ppp(tmp_prim,theSim)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += 
-              (metric_frame_U_u(g,0,theSim)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += 
-              (metric_frame_U_u(g,1,theSim)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += 
-              (metric_frame_U_u(g,2,theSim)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+18] += 
-              (metric_frame_dU_du(g,1,0,theSim)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+19] += 
-              (metric_frame_dU_du(g,1,1,theSim)/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+20] += 
-              (metric_frame_dU_du(g,1,2,theSim)/sim_N_p(theSim,i)*dz) ;
 
-          metric_destroy(g);
+          if(sim_Background(theSim) != NEWTON)
+          {
+              struct Metric *g = metric_create(time_global, r, phi, z, theSim);
+              double tmp_prim[5];
+              tmp_prim[RHO] = rho;
+              tmp_prim[PPP] = press;
+              tmp_prim[URR] = vr;
+              tmp_prim[UPP] = vp/r;
+              tmp_prim[UZZ] = vz;
+              VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (eos_cs2(tmp_prim,theSim)/sim_N_p(theSim,i)*dz) ;
+              VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (eos_eps(tmp_prim,theSim)/sim_N_p(theSim,i)*dz) ;
+              VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += (eos_ppp(tmp_prim,theSim)/sim_N_p(theSim,i)*dz) ;
+              VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] += 
+                  (metric_frame_U_u(g,0,theSim)/sim_N_p(theSim,i)*dz) ;
+              VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += 
+                  (metric_frame_U_u(g,1,theSim)/sim_N_p(theSim,i)*dz) ;
+              VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+17] += 
+                  (metric_frame_U_u(g,2,theSim)/sim_N_p(theSim,i)*dz) ;
+              VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+18] += 
+                  (metric_frame_dU_du(g,1,0,theSim)/sim_N_p(theSim,i)*dz) ;
+              VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+19] += 
+                  (metric_frame_dU_du(g,1,1,theSim)/sim_N_p(theSim,i)*dz) ;
+              VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+20] += 
+                  (metric_frame_dU_du(g,1,2,theSim)/sim_N_p(theSim,i)*dz) ;
+
+              metric_destroy(g);
+          }
           // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }

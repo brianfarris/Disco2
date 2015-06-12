@@ -137,15 +137,18 @@ int main(int argc, char **argv) {
   // set conserved quantities
   cell_calc_cons(theCells,theSim);
   
-  printf("Setting up diagnostics.\n");
+  printf("Creating diagnostics.\n");
   // set up diagnostics struct
   struct Diagnostics * theDiagnostics = diagnostics_create(theSim,theTimeStep,theMPIsetup);
  
+  printf("Setting up diagnostics.\n");
   // Initial Diagnostic dump
   diagnostics_set(theDiagnostics,theCells,theSim,theTimeStep,theMPIsetup,theGravMasses);
   MPI_Barrier(sim_comm);    
+  printf("Initial diagnostic dump.\n");
   diagnostics_print(theDiagnostics,theTimeStep,theSim,theMPIsetup);
 
+  printf("Printing initial checkpoint.\n");
   // Initial Checkpoint
   if( timestep_get_t(theTimeStep)>=io_tcheck(theIO))
   {

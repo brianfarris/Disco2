@@ -7,9 +7,9 @@ def remapGrid(g0, g1):
     # Maps g0's data onto g1, taking into account differing grid structures.
 
     if g0.nz_tot != 1 or g1.nz_tot != 1:
-        _remapGrid2D(g0, g1)
-    else:
         _remapGrid3D(g0, g1)
+    else:
+        _remapGrid2D(g0, g1)
 
 def _remapGrid2D(g0, g1):
     # Instantiate g1's prim with values linearly interpolated from g0, assuming
@@ -103,7 +103,7 @@ def _remapGrid2D(g0, g1):
         else:
             i1 += 1
 
-        if i1 == g1.nr_tot:
+        if i0 == g0.nr_tot or i1 == g1.nr_tot:
             done = True
 
     # Calculate densities
@@ -151,6 +151,7 @@ def _remapGrid3D(g0, g1):
     k1 = 0
 
     while not doneZ:
+        print("Interpolating {0:d} and {1:d}".format(k0, k1))
         z0L = g0.zFaces[k0]
         z0R = g0.zFaces[k0+1]
         z1L = g1.zFaces[k1]
@@ -170,7 +171,6 @@ def _remapGrid3D(g0, g1):
             i1 = 0
 
             while not doneR:
-                print("Interpolating {0:d} and {1:d}".format(i0, i1))
                 r0L = g0.rFaces[i0]
                 r0R = g0.rFaces[i0+1]
                 r1L = g1.rFaces[i1]
@@ -191,7 +191,7 @@ def _remapGrid3D(g0, g1):
                     pFaces1 = g1.pFaces[k1][i1]
 
                     prim0 = g0.prim[k0][i0]
-                    grad0 = g0.grad[k1][i0]
+                    grad0 = g0.grad[k0][i0]
 
                     j0_0 = np.argmin(pFaces0)
                     j1_0 = np.argmin(pFaces1)
@@ -241,7 +241,7 @@ def _remapGrid3D(g0, g1):
                 else:
                     i1 += 1
 
-                if i1 == g1.nr_tot:
+                if i0 == g0.nr_tot or i1 == g1.nr_tot:
                     doneR = True
 
         if z0R < z1R:
@@ -249,13 +249,13 @@ def _remapGrid3D(g0, g1):
         else:
             k1 += 1
 
-        if k1 == g1.nz_tot:
+        if k0 == g0.nz_tot or k1 == g1.nz_tot:
             doneZ = True
 
     # Calculate densities
     for k in xrange(g1.nz_tot):
-        z1 = g1.rFaces[k]
-        z2 = g1.rFaces[k+1]
+        z1 = g1.zFaces[k]
+        z2 = g1.zFaces[k+1]
         z = 0.5*(z1+z2)
         dz = z2-z1
         for i in xrange(g1.nr_tot):
