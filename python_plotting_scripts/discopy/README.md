@@ -68,6 +68,42 @@ g2.saveArchive("archive.h5")
 g2.saveCheckpoint("input.h5", numProc=64)
 ```
 
+#### Remapping Checkpoints
 
+The main reason `discopy` exists is to map `disco` output onto different grids 
+suitable for restarting a calculation.  This could be used, for instance, to 
+bootstrap convergence at high resolution.  Data from a run that has already
+converged to a quasi steady steady state can be remapped to a higher
+resolution so the initial transients do not have to be recalculated.
+
+To remap a checkpoint into `disco` input you need a checkpoint file (that you
+wish to remap), the parfile used to create that checkpoint, and the parfile
+for the new run.
+
+```python
+import discopy as dp
+
+#Load the relevant parfiles.
+par1 = dp.readParfile("lores.par")
+par2 = dp.readParfile("hires.par")
+
+# Make Grid objects for each.
+g1 = dp.Grid(par1, "checkpoint_0100.h5")
+g2 = dp.Grid(par2)
+
+# Do the remap
+dp.remapGrid(g1, g2)
+
+# Save the new grid, and archives for good measure
+g1.saveArchive("archive_lores.h5")
+g2.saveArchive("archive_hires.h5")
+g2.saveCheckpoint("input.h5", numProc=64)
+```
+
+Saving the archive files is useful, I highly recommend it.  Since they contain 
+a copy of the parfile, they can be used to completely restart a run if you
+lose the other checkpoint data.  You can also load the archive in `discopy` 
+and immediately save a checkpoint for an arbitrary number of processes.  This
+is very useful if you want to run on a different number of cores!
 
 
