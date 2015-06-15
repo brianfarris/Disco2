@@ -32,7 +32,7 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim, struct G
   }
   double maxv = sqrt(cf2) + sqrt( vr*vr + vp*vp + vz*vz );
 
-  /*  
+    
   // BH's moving on Grid                              
   //FOR CIRC ORBIT case vr is 0 but really is moving in r - put vr ~ dL/dt/(M r Omega) = Fp/(M Omega) here?
   if (sim_GravMassType(theSim)==LIVEBINARY && time_global > 2.*M_PI*sim_tmig_on(theSim)){
@@ -40,24 +40,33 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim, struct G
     double rBH0  = gravMass_r(theGravMasses,0);
     double rBH1  = gravMass_r(theGravMasses,1);
 
-    //double vrBH1;
-    double nu = sim_EXPLICIT_VISCOSITY(theSim);
-    //  if ( time_global > 2.*M_PI*sim_tmig_on(theSim) ){
-    double vrBH1 = -sim_vRate(theSim)*1.5 * nu/rBH1;
-      //}else{
-      // vrBH1 = 0.0;
-      // }
+
+
+    // Forces
     //double vrBH1 = 2.*gravMass_total_torque(theGravMasses,0)/( gravMass_M(theGravMasses,1) * Om * rBH1); //approx for small mass ratio
     //double vrBH0   = 0.0;//gravMass_Fp(theGravMasses,1)/( gravMass_M(theGravMasses,1) * Om );
-    //double vrBH0 = gravMass_vr(theGravMasses,0);
-    //double vrBH1 = gravMass_vr(theGravMasses,1);
-    double vpBH0;
+
+    double vrBH1 = 0.0;
+    if (LIVEBINARY || BINARY){ // time_global > 2.*M_PI*sim_tmig_on(theSim) ){ 
+      double nu = sim_EXPLICIT_VISCOSITY(theSim);
+      //double vrBH0 = gravMass_vr(theGravMasses,0);
+      vrBH1 = gravMass_vr(theGravMasses,1);
+      //}else{      
+      //double vrBH1 = 0.0;
+      //vrBH0 = 0.0;
+    } 
+    //elif (DRIFT){
+      //double vrBH1 = -sim_vRate(theSim)*1.5 * nu/rBH1;
+      //double vrBH0 = -sim_vRate(theSim)*1.5 * nu/rBH1 * gravMass_M(theGravMasses,1)/gravMass_M(theGravMasses,0);
+    //}  
+
+    //double vpBH0;
     double vpBH1;
     if (NO_W_IN_CFL==1){
-      vpBH0  = Om*rBH0;
+      //vpBH0  = Om*rBH0;
       vpBH1  = Om*rBH1;
     } else{
-      vpBH0  = Om*rBH0-w;
+      //vpBH0  = Om*rBH0-w;
       vpBH1  = Om*rBH1-w;
     }
 
@@ -67,7 +76,7 @@ double maxvel(double * prim , double w , double r ,struct Sim * theSim, struct G
       maxv = maxvBH;
     }
   } 
-  */
+  
 
   if (sim_runtype(theSim)==MHD){
     double ch = sim_DIVB_CH(theSim); 
