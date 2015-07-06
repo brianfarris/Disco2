@@ -12,7 +12,7 @@ struct IO{
   double dtcheck;
   int nfile;
   char filename[256];
-  double GravMassBuffer[2][10];
+  double GravMassBuffer[2][12];
 };
 #endif
 //create and destroy

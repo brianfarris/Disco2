@@ -78,7 +78,7 @@ void io_hdf5_out(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeS
   // *****************************************
 
   dimsf2[0] = 2;  // number of masses
-  dimsf2[1] = 11; //number of quantities per mass DD!!!  4;  
+  dimsf2[1] = 12; //number of quantities per mass DD!!!  4;  
   // Create the dataspace for the dataset.
   filespace = H5Screate_simple(2, dimsf2, NULL); 
   memspace  = H5Screate_simple(2, dimsf2, NULL); 
@@ -208,7 +208,7 @@ void io_hdf5_in(struct IO *theIO,struct Sim * theSim,struct TimeStep * theTimeSt
 
   dataset = H5Dopen1(file,"GravMass");
   dims2[0] = 2;
-  dims2[1] = 9; //DD!!!  4;
+  dims2[1] = 12; //DD!!!  4;
 
   // Get dataset rank and dimension.
   filespace = H5Dget_space(dataset);    /* Get filespace handle first. */
