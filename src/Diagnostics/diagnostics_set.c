@@ -159,6 +159,13 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 
     double Rcut = sim_Rcut(theSim); //DD - for cutting out unresolved trq close to binary components
     double mass_inside_1_temp=0.0;
+
+    double e1a;
+    double e1b;
+    double e2a;
+    double e2b;
+    double edn;
+
     position=0;
     for (k=kmin;k<kmax;++k){
       double zp = sim_FacePos(theSim,k,Z_DIR);
@@ -401,8 +408,13 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+9]  += (E_hydro/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (KE/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (rhoe/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (rho * vr * cos(1.*phi) *  sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (rho * vr * sin(1.*phi) *  sim_N_p(theSim,i)*dz) ;
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+23] += (rho * vr * cos(2.*phi) *  sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+24] += (rho * vr * sin(2.*phi) *  sim_N_p(theSim,i)*dz) ;
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+25] += (rho * vp *  sim_N_p(theSim,i)*dz) ;
+          //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
+          //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (Br*Bp/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+14] += 0.0;//(divB/sim_N_p(theSim,i)*dz) ;
           //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+15] +=  //(180./M_PI*0.5*asin(-Br*Bp/(0.5*B2))/sim_N_p(theSim,i)*dz) ;
           //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+16] += r*fBin_phi*rho*dphi; //(GradPsi_r/sim_N_p(theSim,i)*dz) ; 
@@ -435,10 +447,22 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 	  if (r<r_bh1){ ///Mass encolsed by binary               
             VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+18] += ( 2*M_PI*rho/sim_N_p(theSim,i) );
           }
+
+	  //Define eccentricity and ellipticity measuremnets via MM08                                                                                                       
+	  e1a = VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12];
+	  e1b = VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13];
+	  e2a = VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+23];
+	  e2b = VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+24];
+	  edn = VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+25];
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+26] = sqrt(e1a*e1a + e1b*e1b)/edn;
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+27] = sqrt(e2a*e2a + e2b*e2b)/edn;
+
           // the above are just placeholders. Put the real diagnostics you want here, then adjust NUM_DIAG accordingly.
         }
       }
     }
+
+
 
     
      for (i=imin;i<imax;++i){
@@ -514,7 +538,8 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
 
     double Fr_onBin = ScalarDiag_reduce[14];
     double Fp_onBin = ScalarDiag_reduce[15];
-
+    double e_1 = ScalarDiag_reduce[25];
+    double e_2 = ScalarDiag_reduce[26];
 
     for (n=0;n<NUM_SCAL;++n){
       if (n!=16 && n!=15 && n!=14){ //Don't Vol avg Torques - only Z avg                     
@@ -621,7 +646,7 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
       char DiagBPFilename[256];
       sprintf(DiagBPFilename,"BinaryParams.dat");
       FILE * DiagBpFile = fopen(DiagBPFilename,"a");
-      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, Om, Om, Pow_reduce, gravMass_total_torque(theGravMasses,0), TrScal_reduce, Fr_onBin, Fp_onBin);
+      fprintf(DiagBpFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e \n",t, r_bh0, r_bh1, a_bin, phi_bh0, phi_bh1, ecc, E, Ltot, Om, Om, Om, Pow_reduce, gravMass_total_torque(theGravMasses,0), TrScal_reduce, Fr_onBin, Fp_onBin, e_1, e_2);
       fclose(DiagBpFile);
     }
 
