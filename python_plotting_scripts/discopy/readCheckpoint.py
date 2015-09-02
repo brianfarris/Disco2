@@ -63,7 +63,7 @@ def readCheckpoint(filename):
     for i in range(len(r_vals)):
         inds = (r==r_vals[i])
         my_phi = piph[inds]
-        dp = 2*math.pi/len(my_phi)
+        dp = 2*math.pi/(len(my_phi)/len(z_vals))
         dphi[inds] = dp
         phi[inds] = piph[inds] - 0.5*dp
         dV[inds] *= r[inds] * dphi[inds]
