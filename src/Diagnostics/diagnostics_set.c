@@ -474,20 +474,30 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
      }
 
 
-    for (i=imin;i<imax;++i){
-      double rp = sim_FacePos(theSim,i,R_DIR);
-      double rm = sim_FacePos(theSim,i-1,R_DIR);
-      //TrScal_temp += TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]*(rp-rm);
-      for (n=0;n<NUM_SCAL;++n){
-        if (n==16 || n==15 || n==14){ // the vol. el. 'r' already added so dr not dr^2 - does not need extra 1/2 in /(dz) below
-	  ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp-rm);
-        }else{
-          // mult by delta r^2 because we are doing an r integration r(rp-rm) = (rp+rm)/2*(rp-rm) = 1/2(rp^2-rm^2)
-	  ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp*rp-rm*rm);
-        }
 
-      }
-    }
+
+
+     for (i=imin;i<imax;++i){
+       double rp = sim_FacePos(theSim,i,R_DIR);
+       double rm = sim_FacePos(theSim,i-1,R_DIR);
+       //TrScal_temp += TrVec_temp[(sim_N0(theSim,R_DIR)+i-imin)]*(rp-rm);
+       for (n=0;n<NUM_SCAL;++n){
+	 if (n==16 || n==15 || n==14){ // the vol. el. 'r' already added so dr not dr^2 - does not need extra 1/2 in /(dz) below
+	   ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp-rm);
+	 }else{
+	   if ( n==25 || n==26 ){
+	     if (rp>1.0){
+	       ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp*rp-rm*rm);
+	     }
+	   }else{
+	     // mult by delta r^2 because we are doing an r integration r(rp-rm) = (rp+rm)/2*(rp-rm) = 1/2(rp^2-rm^2)
+	     ScalarDiag_temp[n] += VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+n+1]*(rp*rp-rm*rm);
+	   }
+	 }
+
+       }
+     }
+
 
     // zero out vector array used to sum total Trq each timestep
     //for (i=imin;i<imax;++i){
