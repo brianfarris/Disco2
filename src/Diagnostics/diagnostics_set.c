@@ -409,11 +409,11 @@ void diagnostics_set(struct Diagnostics * theDiagnostics,struct Cell *** theCell
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+10] += (KE/sim_N_p(theSim,i)*dz) ;
           VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+11] += (rhoe/sim_N_p(theSim,i)*dz) ;
 	  //
-	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += 1.;//(rho * vr * cos(1.*phi) *  sim_N_p(theSim,i)*dz) ;
-	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += 1.;//(rho * vr * sin(1.*phi) *  sim_N_p(theSim,i)*dz) ;
-	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+23] += 1.;//(rho * vr * cos(2.*phi) *  sim_N_p(theSim,i)*dz) ;
-	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+24] += 1.;//(rho * vr * sin(2.*phi) *  sim_N_p(theSim,i)*dz) ;
-          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+25] += 1.;//(rho * vp               *  sim_N_p(theSim,i)*dz) ;
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (rho * vr * cos(1.*phi) *  sim_N_p(theSim,i)*dz) ;
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+13] += (rho * vr * sin(1.*phi) *  sim_N_p(theSim,i)*dz) ;
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+23] += (rho * vr * cos(2.*phi) *  sim_N_p(theSim,i)*dz) ;
+	  VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+24] += (rho * vr * sin(2.*phi) *  sim_N_p(theSim,i)*dz) ;
+          VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+25] += (rho * vp               *  sim_N_p(theSim,i)*dz) ;
 	  //
 
           //VectorDiag_temp[(sim_N0(theSim,R_DIR)+i-imin)*NUM_VEC+12] += (0.5*B2/sim_N_p(theSim,i)*dz) ;
