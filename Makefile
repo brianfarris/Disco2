@@ -1,41 +1,51 @@
+#TODO: Check if Makefile.in exists
+MAKEFILE_IN = $(PWD)/Makefile.in
+include $(MAKEFILE_IN)
+
 APP      = disco
 
 SRCEXT   = c
 SRCDIR   = src
 OBJDIR   = obj
 BINDIR   = bin
-
-UNAME = $(shell uname)
-ifeq ($(UNAME),Linux)
-H55 = /home/install/app/hdf5-1.6_intel_mpi
-#H55 = /share/apps/hdf5/1.8.2/openmpi/intel
-#GSL = /home/install/app/gsl_gcc_mpi
-#H55 = /share/apps/hdf5/1.8.2/openmpi/intel
-endif
-ifeq ($(UNAME),Darwin)
-H55 = /usr/local/
-#H55 = /opt/local/
-#GSL = /opt/local
-endif
+VISDIR   = python_plotting_scripts
+PARDIR   = parfiles
 
 SRCS    := $(shell find $(SRCDIR) -name '*.$(SRCEXT)')
 SRCDIRS := $(shell find . -name '*.$(SRCEXT)' -exec dirname {} \; | uniq)
 OBJS    := $(patsubst %.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
 
-DEBUG    = -g
-#INCLUDES = -I$(H55)/include -I$(GSL)/include
+DEBUG    = -g -Wall
+OPT      = -O3
 INCLUDES = -I$(H55)/include
-CFLAGS   = -O3 -c $(DEBUG) $(INCLUDES)
-#CFLAGS   = -c $(DEBUG) $(INCLUDES)
-#LDFLAGS  = -lm -lz -L$(H55)/lib -L$(GSL)/lib -lhdf5 -lgsl -lgslcblas
+CFLAGS   = -c $(INCLUDES)
 LDFLAGS  = -lm -lz -L$(H55)/lib -lhdf5
 
-CC       = mpicc
+ifeq ($(strip $(USE_DEBUG)), 1)
+	CFLAGS += $(DEBUG)
+endif
+ifeq ($(strip $(USE_OPT)), 1)
+	CFLAGS += $(OPT)
+endif
 
-.PHONY: all clean distclean
+CFLAGS += $(LOCAL_C_FLAGS)
+LDFLAGS += $(LOCAL_LD_FLAGS)
 
+.PHONY: all clean distclean install
 
 all: $(BINDIR)/$(APP)
+
+install: $(BINDIR)/$(APP)
+ifndef INSTALL_DIR
+	$(error INSTALL_DIR has not been set in Makefile.in $(INSTALL_DIR))
+endif
+	@echo "Installing into $(INSTALL_DIR)..."
+	@mkdir -p $(INSTALL_DIR)/$(BINDIR)
+	@mkdir -p $(INSTALL_DIR)/$(VISDIR)
+	@mkdir -p $(INSTALL_DIR)/$(PARDIR)
+	@cp $(BINDIR)/$(APP) $(INSTALL_DIR)/$(BINDIR)/$(APP)
+	@cp -r $(VISDIR)/* $(INSTALL_DIR)/$(VISDIR)/
+	@cp -r $(PARDIR)/* $(INSTALL_DIR)/$(PARDIR)/
 
 $(BINDIR)/$(APP): buildrepo $(OBJS)
 	@mkdir -p `dirname $@`
